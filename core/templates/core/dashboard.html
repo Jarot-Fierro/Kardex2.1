@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard | Kardex{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card card-primary card-outline">
+                <div class="card-body">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between">
+                        <div>
+                            <h5 class="mb-1">Bienvenido,
+                                {% if not request.user.first_name and not request.user.last_name %}
+                                    {{ request.user.username }}
+                                {% else %}
+                                    {{ request.user.first_name }} {{ request.user.last_name }}
+                                {% endif %}
+                            </h5>
+                            <p class="mb-0 text-muted">
+                                Establecimiento:
+                                {% if request.user.establecimiento %}
+                                    <strong>{{ request.user.establecimiento.nombre }}</strong>
+                                {% else %}
+                                    <span class="badge badge-warning">Sin establecimiento</span>
+                                {% endif %}
+                                {% if rol %}&nbsp;|&nbsp; Rol: <strong>{{ rol }}</strong>{% endif %}
+                            </p>
+                        </div>
+                        <form class="form-inline mt-2 mt-md-0" method="get">
+                            <div class="input-group"></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary cards -->
+    <div class="row">
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="small-box bg-info">
+                <div class="inner">
+                    <h3>{{ total_pacientes|default:"0" }}</h3>
+                    <p>Total de Pacientes</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-users"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="small-box bg-success">
+                <div class="inner">
+                    <h3>{{ total_ingresos_est|default:"0" }}</h3>
+                    <p>Ingresos en este establecimiento</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-hospital-user"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="small-box bg-warning">
+                <div class="inner">
+                    <h3>{{ total_fichas_est|default:"0" }}</h3>
+                    <p>Fichas en este establecimiento</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-folder"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="small-box bg-danger">
+                <div class="inner">
+                    <h3>{{ cambios_recientes_count|default:"0" }}</h3>
+                    <p>Cambios recientes de pacientes (7 días)</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-history"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header border-0 d-flex align-items-center">
+                    <h3 class="card-title mb-0">Pacientes recientes con ingreso en este establecimiento</h3>
+                    <a href="" class="btn btn-warning btn-sm ml-auto">
+                        Ver todos los cambios
+                    </a>
+                </div>
+
+
+                <div class="card-body table-responsive p-0" style="max-height: 480px;">
+                    <table class="table table-striped table-hover table-sm">
+                        <thead class="thead-light">
+                        <tr>
+                            <th>Nombre completo</th>
+                            <th>RUT</th>
+                            <th>Fecha ingreso</th>
+                            <th>N° Ficha</th>
+                            <th>Acciones</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% if pacientes_recientes %}
+                            {% for item in pacientes_recientes %}
+                                {% with p=item.paciente i=item.ingreso f=item.ficha %}
+                                    <tr>
+                                        <td>{{ p.nombre }} {{ p.apellido_paterno }} {{ p.apellido_materno }}</td>
+                                        <td>{{ p.rut|default:'-' }}</td>
+                                        <td>{{ i.created_at|date:'d-m-Y H:i' }}</td>
+                                        <td>
+                                            {% if item.numero_ficha %}
+                                                <span class="badge badge-primary">{{ item.numero_ficha }}</span>
+                                            {% else %}
+                                                <span class="badge badge-secondary">Sin ficha</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if p %}
+                                                {% if p.rut %}
+                                                    <a href="?rut={{ p.rut|urlencode }}"
+                                                       class="btn btn-sm btn-outline-primary">
+                                                        Ver ficha
+                                                    </a>
+                                                {% elif item.numero_ficha %}
+                                                    <a href="?ficha={{ item.numero_ficha }}"
+                                                       class="btn btn-sm btn-outline-primary">
+                                                        Ver ficha
+                                                    </a>
+                                                {% else %}
+                                                    <button class="btn btn-sm btn-outline-secondary" disabled>Ver
+                                                        ficha
+                                                    </button>
+                                                {% endif %}
+                                            {% else %}
+                                                <button class="btn btn-sm btn-outline-secondary" disabled>Ver ficha
+                                                </button>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endwith %}
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">No hay ingresos recientes para este
+                                    establecimiento.
+                                </td>
+                            </tr>
+                        {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header border-0">
+                    <h3 class="card-title">Últimos cambios (Pacientes)</h3>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">
+                        {% for c in cambios %}
+                            <li class="list-group-item">
+                                <div class="small text-muted">{{ c.fecha|date:'d-m-Y H:i' }}
+                                    · {{ c.usuario|default:'—' }}</div>
+                                <div><strong>{{ c.paciente_str|default:"-" }}</strong></div>
+                                {% if c.campo %}
+                                    <div class="text-truncate" title="{{ c.antes }} → {{ c.despues }}">
+                                        <span class="badge badge-light">{{ c.campo|default:"-" }}</span>:
+                                        {{ c.antes|default:"-" }}
+                                        → <strong>
+                                        {{ c.despues }}</strong>
+                                    </div>
+                                {% else %}
+                                    <div class="text-muted">Actualización registrada</div>
+                                {% endif %}
+                            </li>
+                        {% empty %}
+                            <li class="list-group-item text-muted">Sin cambios recientes.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% for permission in permissions %}
+        {% if permission > 1 %}
+            <div>{{ permission }}</div>
+        {% endif %}
+    {% endfor %}
+{% endblock %}

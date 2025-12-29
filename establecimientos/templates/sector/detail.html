@@ -1,0 +1,24 @@
+{% load static %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h5 class="mb-3">Detalle de Comuna</h5>
+            <dl class="row mb-0">
+                <dt class="col-sm-4">ID</dt>
+                <dd class="col-sm-8">{{ object.id|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Código</dt>
+                <dd class="col-sm-8">{{ object.codigo|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Color</dt>
+                <dd class="col-sm-8">{{ object.color|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Observaciones</dt>
+                <dd class="col-sm-8">{{ object.observacion|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Comuna</dt>
+                <dd class="col-sm-8">{{ object.comuna|default:"-" }}</dd>
+            </dl>
+        </div>
+    </div>
+</div>

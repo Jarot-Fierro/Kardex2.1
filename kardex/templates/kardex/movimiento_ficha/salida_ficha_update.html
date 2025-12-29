@@ -1,0 +1,811 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{#{% block extra_css %}#}
+{#    <style>#}
+{#        .card {#}
+{#            margin-bottom: 20px;#}
+{#            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);#}
+{#        }#}
+{##}
+{#        .config-section {#}
+{#            background-color: #f8f9fa;#}
+{#            padding: 15px;#}
+{#            border-radius: 5px;#}
+{#            margin-bottom: 20px;#}
+{#            border-left: 4px solid #007bff;#}
+{#        }#}
+{##}
+{#        .escaneo-section {#}
+{#            background-color: #fff;#}
+{#            padding: 20px;#}
+{#            border-radius: 5px;#}
+{#            border: 2px dashed #28a745;#}
+{#        }#}
+{##}
+{#        #id_busqueda {#}
+{#            font-size: 1.2rem;#}
+{#            height: 50px;#}
+{#            text-align: center;#}
+{#            letter-spacing: 1px;#}
+{#        }#}
+{##}
+{#        .paciente-info {#}
+{#            background-color: #e8f4fd;#}
+{#            padding: 15px;#}
+{#            border-radius: 5px;#}
+{#            margin-top: 15px;#}
+{#            display: none;#}
+{#        }#}
+{##}
+{#        .loading-spinner {#}
+{#            display: none;#}
+{#            width: 20px;#}
+{#            height: 20px;#}
+{#            border: 3px solid #f3f3f3;#}
+{#            border-top: 3px solid #3498db;#}
+{#            border-radius: 50%;#}
+{#            animation: spin 1s linear infinite;#}
+{#            margin-left: 10px;#}
+{#        }#}
+{##}
+{#        @keyframes spin {#}
+{#            0% {#}
+{#                transform: rotate(0deg);#}
+{#            }#}
+{#            100% {#}
+{#                transform: rotate(360deg);#}
+{#            }#}
+{#        }#}
+{##}
+{#        .search-container {#}
+{#            position: relative;#}
+{#        }#}
+{##}
+{#        .search-loading {#}
+{#            position: absolute;#}
+{#            right: 10px;#}
+{#            top: 50%;#}
+{#            transform: translateY(-50%);#}
+{#        }#}
+{##}
+{#        .registro-item {#}
+{#            padding: 8px 12px;#}
+{#            border-bottom: 1px solid #dee2e6;#}
+{#            font-size: 0.9rem;#}
+{#        }#}
+{##}
+{#        .counter-badge {#}
+{#            font-size: 0.8rem;#}
+{#            padding: 3px 8px;#}
+{#            margin-left: 10px;#}
+{#        }#}
+{##}
+{#        .auto-send-badge {#}
+{#            background-color: #28a745;#}
+{#            color: white;#}
+{#            padding: 2px 8px;#}
+{#            border-radius: 10px;#}
+{#            font-size: 0.75rem;#}
+{#            margin-left: 10px;#}
+{#        }#}
+{#    </style>#}
+{#{% endblock %}#}
+
+{% block content %}
+    <div class="container-fluid">
+
+        <div class="row">
+            <!-- Configuración fija -->
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Configuración del Movimiento</h5>
+                    </div>
+                    <div class="card-body config-section">
+                        <form id="config-form">
+                            {% csrf_token %}
+
+                            <div class="form-group">
+                                <label for="id_servicio_clinico_envio">{{ form.servicio_clinico_envio.label }}</label>
+                                {{ form.servicio_clinico_envio }}
+                            </div>
+
+                            <div class="form-group">
+                                <label for="id_servicio_clinico_recepcion">{{ form.servicio_clinico_recepcion.label }}</label>
+                                {{ form.servicio_clinico_recepcion }}
+                            </div>
+
+                            <div class="form-group">
+                                <label for="id_profesional_envio">{{ form.profesional_envio.label }}</label>
+                                {{ form.profesional_envio }}
+                            </div>
+
+                            <div class="form-group">
+                                <label for="id_observacion_envio">{{ form.observacion_envio.label }}</label>
+                                {{ form.observacion_envio }}
+                            </div>
+
+                            <button type="button" id="btn-guardar-config" class="btn btn-primary btn-block">
+                                <i class="fas fa-save"></i> Guardar Configuración
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Registros recientes -->
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-history"></i> Registros Ahora
+                            <span id="contador-registros" class="badge badge-light counter-badge">0</span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="registros-recientes">
+                            <p class="text-muted text-center py-3">No hay registros aún</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Área de escaneo -->
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-barcode"></i> Área de Escaneo
+                            <span class="auto-send-badge">ENVÍO AUTOMÁTICO</span>
+                        </h5>
+                    </div>
+                    <div class="card-body escaneo-section">
+                        <!-- Input principal de búsqueda -->
+                        <div class="form-group">
+                            <label for="id_busqueda" class="font-weight-bold">
+                                {{ form.busqueda.label }}
+                                <small class="text-muted">(Escanea el RUT o Número de Ficha)</small>
+                            </label>
+                            <div class="search-container">
+                                {{ form.busqueda }}
+                                <div id="search-spinner" class="loading-spinner search-loading"></div>
+                            </div>
+                            <small class="form-text text-muted">
+                                Escanee y espere - El sistema buscará automáticamente y enviará cuando encuentre al
+                                paciente.
+                            </small>
+                        </div>
+
+                        <!-- Hidden fields del formulario -->
+                        {{ form.paciente_id }}
+                        {{ form.rut }}
+                        {{ form.ficha_id }}
+                        {{ form.numero_ficha }}
+                        {{ form.nombre_completo }}
+
+                        <!-- Información del paciente encontrado -->
+                        <div id="paciente-info" class="paciente-info">
+                            <h6 class="font-weight-bold mb-3">
+                                <i class="fas fa-user-check text-success"></i> Paciente Encontrado
+                                <span id="auto-send-status"
+                                      class="badge badge-success ml-2">Enviando automáticamente...</span>
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="font-weight-bold">Nombre Completo</label>
+                                        <div id="display-nombre" class="form-control-plaintext font-weight-bold"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="font-weight-bold">RUT</label>
+                                        <div id="display-rut" class="form-control-plaintext"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="font-weight-bold">N° Ficha</label>
+                                        <div id="display-ficha" class="form-control-plaintext"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-right mt-3">
+                                <a class="btn btn-warning" href="{% url 'kardex:salida_tabla_ficha' %}">Lista de
+                                    Salidas</a>
+                                <button id="btn-registrar-salida" class="btn btn-success">
+                                    <i class="fas fa-paper-plane"></i> Enviar Manualmente
+                                </button>
+                                <button id="btn-limpiar" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Mensajes de estado -->
+                        <div id="mensajes" class="mt-3"></div>
+
+                        <!-- Información de configuración actual -->
+                        <div id="config-actual" class="alert alert-info mt-4" style="display: none;">
+                            <h6 class="alert-heading">
+                                <i class="fas fa-cog"></i> Configuración Actual
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <small class="text-muted">Servicio Envío:</small>
+                                    <div id="config-servicio-envio" class="font-weight-bold"></div>
+                                </div>
+                                <div class="col-md-4">
+                                    <small class="text-muted">Servicio Recepción:</small>
+                                    <div id="config-servicio-recepcion" class="font-weight-bold"></div>
+                                </div>
+                                <div class="col-md-4">
+                                    <small class="text-muted">Profesional:</small>
+                                    <div id="config-profesional" class="font-weight-bold"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de error -->
+    <div class="modal fade" id="errorModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-exclamation-triangle"></i> Error
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span class="text-white">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="errorModalMessage" class="text-danger"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        $(document).ready(function () {
+            console.log('[Sistema] Iniciando módulo de salida masiva de fichas');
+
+            // Inicializar Select2
+            $('.select2').select2({
+                theme: 'bootstrap4',
+                width: '100%'
+            });
+
+            // Variables globales
+            let configuracion = {
+                servicio_envio_id: null,
+                servicio_recepcion_id: null,
+                profesional_id: null,
+                observacion: ''
+            };
+
+            let pacienteActual = {
+                id: null,
+                rut: null,
+                ficha_id: null,
+                numero_ficha: null,
+                nombre: null
+            };
+
+            let registros = [];
+            let autoSendTimeout = null;
+            let isAutoSending = false;
+
+            // Cargar configuración guardada
+            cargarConfiguracion();
+            cargarRegistrosRecientes();
+
+            // Guardar configuración
+            $('#btn-guardar-config').click(function () {
+                console.log('[Configuración] Guardando configuración');
+                guardarConfiguracion();
+            });
+
+            // Evento en input de búsqueda (sin focus automático)
+            $('#id_busqueda').on('keypress', function (e) {
+                if (e.which === 13) { // Enter
+                    e.preventDefault();
+                    const valor = $(this).val().trim();
+                    console.log('[Escaneo] Enter presionado, valor:', valor);
+
+                    if (valor) {
+                        buscarPaciente(valor);
+                    } else {
+                        mostrarMensaje('Ingrese un RUT o número de ficha.', 'warning');
+                    }
+                }
+            });
+
+            // Botón registrar salida MANUAL (backup)
+            $('#btn-registrar-salida').click(function () {
+                console.log('[Manual] Envío manual solicitado');
+                if (pacienteActual.id) {
+                    registrarSalida();
+                } else {
+                    mostrarMensaje('Primero busque un paciente.', 'warning');
+                }
+            });
+
+            // Botón limpiar/cancelar
+            $('#btn-limpiar').click(function () {
+                console.log('[Sistema] Limpiando búsqueda actual');
+                cancelarAutoSend();
+                limpiarBusqueda();
+            });
+
+            // ========== FUNCIONES PRINCIPALES ==========
+
+            // Función para guardar configuración
+            function guardarConfiguracion() {
+                configuracion = {
+                    servicio_envio_id: $('#id_servicio_clinico_envio').val(),
+                    servicio_recepcion_id: $('#id_servicio_clinico_recepcion').val(),
+                    profesional_id: $('#id_profesional_envio').val(),
+                    observacion: $('#id_observacion_envio').val()
+                };
+
+                console.log('[Configuración] Datos a guardar:', configuracion);
+
+                // Validar configuración
+                if (!configuracion.servicio_envio_id || !configuracion.servicio_recepcion_id || !configuracion.profesional_id) {
+                    mostrarMensaje('Por favor, complete todos los campos de configuración.', 'warning');
+                    return;
+                }
+
+                if (configuracion.servicio_envio_id === configuracion.servicio_recepcion_id) {
+                    mostrarMensaje('El servicio de recepción no puede ser igual al de envío.', 'warning');
+                    return;
+                }
+
+                // Guardar en localStorage
+                localStorage.setItem('salida_ficha_config', JSON.stringify(configuracion));
+
+                // Actualizar visualización
+                actualizarConfigVisual();
+
+                mostrarMensaje('Configuración guardada correctamente. Ya puede comenzar a escanear.', 'success');
+            }
+
+            // Función para cargar configuración desde localStorage
+            function cargarConfiguracion() {
+                const saved = localStorage.getItem('salida_ficha_config');
+                if (saved) {
+                    try {
+                        configuracion = JSON.parse(saved);
+                        console.log('[Configuración] Cargada desde localStorage:', configuracion);
+
+                        // Actualizar campos del formulario
+                        $('#id_servicio_clinico_envio').val(configuracion.servicio_envio_id).trigger('change');
+                        $('#id_servicio_clinico_recepcion').val(configuracion.servicio_recepcion_id).trigger('change');
+                        $('#id_profesional_envio').val(configuracion.profesional_id).trigger('change');
+                        $('#id_observacion_envio').val(configuracion.observacion);
+
+                        actualizarConfigVisual();
+                    } catch (e) {
+                        console.error('[Configuración] Error al cargar configuración:', e);
+                        localStorage.removeItem('salida_ficha_config');
+                    }
+                } else {
+                    console.log('[Configuración] No hay configuración guardada');
+                    mostrarMensaje('Configure los servicios y profesional antes de escanear.', 'info');
+                }
+            }
+
+            // Actualizar visualización de configuración
+            function actualizarConfigVisual() {
+                const servicioEnvio = $('#id_servicio_clinico_envio option:selected').text();
+                const servicioRecepcion = $('#id_servicio_clinico_recepcion option:selected').text();
+                const profesional = $('#id_profesional_envio option:selected').text();
+
+                $('#config-servicio-envio').text(servicioEnvio);
+                $('#config-servicio-recepcion').text(servicioRecepcion);
+                $('#config-profesional').text(profesional);
+                $('#config-actual').show();
+            }
+
+            // Buscar paciente por API
+            function buscarPaciente(valor) {
+                console.log('[Búsqueda] Iniciando búsqueda para:', valor);
+
+                // Verificar configuración
+                if (!configuracion.servicio_envio_id || !configuracion.servicio_recepcion_id || !configuracion.profesional_id) {
+                    mostrarMensaje('Debe configurar servicios y profesional antes de escanear.', 'warning');
+                    console.warn('[Búsqueda] Configuración incompleta:', configuracion);
+                    return;
+                }
+
+                // Limpiar búsqueda anterior
+                cancelarAutoSend();
+                limpiarBusqueda();
+
+                // Mostrar loading
+                mostrarLoading(true);
+                mostrarMensaje('Buscando paciente en el sistema...', 'info');
+
+                // Llamar a la API
+                $.ajax({
+                    url: '{% url "ficha-paciente-buscar" %}',  // Asegúrate que esta URL exista
+                    method: 'GET',
+                    data: {q: valor},
+                    timeout: 10000,  // 10 segundos timeout
+                    success: function (response) {
+                        console.log('[Búsqueda] Respuesta API:', response);
+
+                        // Manejar paginación si existe
+                        const resultados = response && response.results ? response.results : response;
+
+                        if (Array.isArray(resultados) && resultados.length > 0) {
+                            const paciente = resultados[0];  // Tomar el primer resultado
+                            console.log('[Búsqueda] Paciente encontrado:', paciente);
+
+                            procesarPacienteEncontrado(paciente);
+                        } else {
+                            console.warn('[Búsqueda] No se encontraron resultados');
+                            mostrarMensaje('No se encontró paciente con los datos ingresados.', 'warning');
+                            mostrarErrorModal('No se encontró ningún paciente con el RUT o número de ficha: ' + valor);
+                        }
+                    },
+                    error: function (xhr, status, err) {
+                        console.error('[Búsqueda] Error en API:', status, err, xhr);
+                        mostrarMensaje('Error al buscar paciente. Intente nuevamente.', 'danger');
+                        mostrarErrorModal('Error de conexión con el servidor. Verifique su conexión a internet.');
+                    },
+                    complete: function () {
+                        mostrarLoading(false);
+                    }
+                });
+            }
+
+            // Procesar paciente encontrado y enviar automáticamente
+            function procesarPacienteEncontrado(paciente) {
+                console.log('[Procesamiento] Procesando paciente:', paciente);
+
+                // Validar datos esenciales
+                if (!paciente.paciente_id || !paciente.ficha_id || !paciente.rut || !paciente.numero_ficha_sistema || !paciente.nombre_completo) {
+                    console.error('[Procesamiento] Datos incompletos del paciente:', paciente);
+                    mostrarMensaje('Datos incompletos del paciente. Intente nuevamente.', 'warning');
+                    return;
+                }
+
+                // Almacenar datos del paciente
+                pacienteActual = {
+                    id: paciente.paciente_id,
+                    rut: paciente.rut,
+                    ficha_id: paciente.ficha_id,
+                    numero_ficha: paciente.numero_ficha_sistema,
+                    nombre: paciente.nombre_completo
+                };
+
+                console.log('[Procesamiento] Paciente almacenado:', pacienteActual);
+
+                // Llenar campos hidden del formulario
+                $('#id_paciente_id').val(pacienteActual.id);
+                $('#id_rut').val(pacienteActual.rut);
+                $('#id_ficha_id').val(pacienteActual.ficha_id);
+                $('#id_numero_ficha').val(pacienteActual.numero_ficha);
+                $('#id_nombre_completo').val(pacienteActual.nombre);
+
+                // Mostrar información del paciente
+                mostrarPaciente(paciente);
+
+                // Iniciar envío automático después de 1 segundo (para que el usuario vea los datos)
+                console.log('[AutoSend] Programando envío automático en 1 segundo...');
+                isAutoSending = true;
+
+                autoSendTimeout = setTimeout(function () {
+                    console.log('[AutoSend] Ejecutando envío automático');
+                    registrarSalida();
+                }, 1000);
+            }
+
+            // Mostrar información del paciente
+            function mostrarPaciente(paciente) {
+                $('#display-nombre').text(paciente.nombre_completo || '');
+                $('#display-rut').text(paciente.rut || '');
+                $('#display-ficha').text(paciente.numero_ficha_sistema || '');
+                $('#paciente-info').show();
+
+                // Actualizar estado del envío automático
+                $('#auto-send-status').text('Enviando automáticamente...');
+
+                mostrarMensaje('Paciente encontrado. Enviando automáticamente en 1 segundo...', 'success');
+            }
+
+            // Registrar salida vía AJAX (automático o manual)
+            function registrarSalida() {
+                // Cancelar timeout si aún no se ejecutó
+                cancelarAutoSend();
+
+                // Verificar datos mínimos
+                if (!pacienteActual.ficha_id) {
+                    console.error('[Envío] Ficha ID no disponible');
+                    mostrarMensaje('Error: Ficha no encontrada.', 'danger');
+                    return;
+                }
+
+                if (!configuracion.servicio_envio_id || !configuracion.servicio_recepcion_id || !configuracion.profesional_id) {
+                    console.error('[Envío] Configuración incompleta');
+                    mostrarMensaje('Error: Configuración incompleta.', 'danger');
+                    return;
+                }
+
+                console.log('[Envío] Enviando movimiento:', {
+                    ficha_id: pacienteActual.ficha_id,
+                    paciente: pacienteActual.nombre
+                });
+
+                const datos = {
+                    ficha_id: pacienteActual.ficha_id,
+                    servicio_envio_id: configuracion.servicio_envio_id,
+                    servicio_recepcion_id: configuracion.servicio_recepcion_id,
+                    profesional_id: configuracion.profesional_id,
+                    observacion: configuracion.observacion
+                };
+
+                // Actualizar estado
+                $('#auto-send-status').text('Enviando...').removeClass('badge-success').addClass('badge-warning');
+                mostrarMensaje('Registrando salida de la ficha...', 'info');
+
+                $.ajax({
+                    url: window.location.href,  // Misma URL de la vista
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    contentType: 'application/json',
+                    data: JSON.stringify(datos),
+                    timeout: 15000,  // 15 segundos timeout
+                    success: function (response) {
+                        console.log('[Envío] Respuesta del servidor:', response);
+
+                        if (response.success) {
+                            // Éxito: actualizar registros
+                            procesarEnvioExitoso(response);
+                        } else {
+                            // Error del servidor
+                            procesarErrorEnvio(response.error || 'Error desconocido del servidor');
+                        }
+                    },
+                    error: function (xhr, status, err) {
+                        console.error('[Envío] Error en AJAX:', status, err, xhr);
+
+                        let errorMsg = 'Error de conexión al registrar salida.';
+                        try {
+                            const response = JSON.parse(xhr.responseText);
+                            errorMsg = response.error || response.detail || errorMsg;
+                        } catch (e) {
+                            if (xhr.status === 0) {
+                                errorMsg = 'Error de conexión. Verifique su internet.';
+                            } else if (xhr.status === 403) {
+                                errorMsg = 'No tiene permisos para realizar esta acción.';
+                            } else if (xhr.status === 404) {
+                                errorMsg = 'Recurso no encontrado.';
+                            } else if (xhr.status >= 500) {
+                                errorMsg = 'Error interno del servidor. Contacte al administrador.';
+                            }
+                        }
+
+                        procesarErrorEnvio(errorMsg);
+                    }
+                });
+            }
+
+            // Procesar envío exitoso
+            function procesarEnvioExitoso(response) {
+                console.log('[Éxito] Movimiento registrado:', response);
+
+                // Agregar a registros locales
+                const ahora = new Date();
+                const hora = ahora.getHours().toString().padStart(2, '0') + ':' +
+                    ahora.getMinutes().toString().padStart(2, '0') + ':' +
+                    ahora.getSeconds().toString().padStart(2, '0');
+
+                registros.unshift({
+                    id: response.movimiento_id,
+                    ficha: pacienteActual.numero_ficha,
+                    paciente: pacienteActual.nombre,
+                    hora: hora
+                });
+
+                // Actualizar contador
+                $('#contador-registros').text(registros.length);
+
+                // Actualizar lista de registros
+                actualizarListaRegistros();
+
+                // Mostrar mensaje de éxito
+                mostrarMensaje(
+                    `✓ Salida registrada exitosamente: Ficha #${pacienteActual.numero_ficha} - ${hora}`,
+                    'success'
+                );
+
+                // Limpiar para siguiente escaneo (después de 1 segundo para que se vea el mensaje)
+                setTimeout(function () {
+                    limpiarBusqueda();
+                    mostrarMensaje('Listo para siguiente escaneo. Escanee otra ficha...', 'info');
+                }, 1000);
+            }
+
+            // Procesar error en envío
+            function procesarErrorEnvio(errorMsg) {
+                console.error('[Error] Envío fallido:', errorMsg);
+
+                // Mostrar error en la interfaz
+                $('#auto-send-status').text('Error').removeClass('badge-warning').addClass('badge-danger');
+                mostrarMensaje('Error al registrar salida: ' + errorMsg, 'danger');
+
+                // Mostrar modal de error con detalles
+                mostrarErrorModal('No se pudo registrar el movimiento: ' + errorMsg);
+
+                // Cambiar texto del botón manual para indicar que puede intentar manualmente
+                $('#btn-registrar-salida').html('<i class="fas fa-redo"></i> Reintentar Envío');
+            }
+
+            // Limpiar búsqueda actual
+            function limpiarBusqueda() {
+                console.log('[Limpieza] Limpiando búsqueda actual');
+
+                // Cancelar cualquier envío pendiente
+                cancelarAutoSend();
+
+                // Limpiar campos
+                $('#id_busqueda').val('');
+                $('#paciente-info').hide();
+
+                // Limpiar campos hidden
+                $('#id_paciente_id').val('');
+                $('#id_rut').val('');
+                $('#id_ficha_id').val('');
+                $('#id_numero_ficha').val('');
+                $('#id_nombre_completo').val('');
+
+                // Resetear objeto paciente
+                pacienteActual = {
+                    id: null,
+                    rut: null,
+                    ficha_id: null,
+                    numero_ficha: null,
+                    nombre: null
+                };
+
+                // Restaurar texto del botón manual
+                $('#btn-registrar-salida').html('<i class="fas fa-paper-plane"></i> Enviar Manualmente');
+            }
+
+            // Cancelar envío automático pendiente
+            function cancelarAutoSend() {
+                if (autoSendTimeout) {
+                    console.log('[AutoSend] Cancelando envío automático pendiente');
+                    clearTimeout(autoSendTimeout);
+                    autoSendTimeout = null;
+                }
+                isAutoSending = false;
+            }
+
+            // Mostrar/ocultar loading spinner
+            function mostrarLoading(mostrar) {
+                if (mostrar) {
+                    $('#search-spinner').show();
+                } else {
+                    $('#search-spinner').hide();
+                }
+            }
+
+            // Mostrar modal de error
+            function mostrarErrorModal(message) {
+                $('#errorModalMessage').text(message || 'Ocurrió un error inesperado.');
+                $('#errorModal').modal('show');
+            }
+
+            // Mostrar mensajes en la interfaz
+            function mostrarMensaje(texto, tipo) {
+                const iconos = {
+                    'success': 'check-circle',
+                    'warning': 'exclamation-triangle',
+                    'danger': 'times-circle',
+                    'info': 'info-circle'
+                };
+
+                const html = `
+                    <div class="alert alert-${tipo} alert-dismissible fade show">
+                        <i class="fas fa-${iconos[tipo]}"></i> ${texto}
+                        <button type="button" class="close" data-dismiss="alert">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                `;
+
+                $('#mensajes').html(html);
+
+                // Auto-ocultar después de 5 segundos (excepto errores)
+                if (tipo !== 'danger') {
+                    setTimeout(() => {
+                        $('#mensajes .alert').alert('close');
+                    }, 5000);
+                }
+            }
+
+            // Cargar registros recientes (podrías implementar carga desde API si quieres)
+            function cargarRegistrosRecientes() {
+                // Por ahora solo mostramos los registrados en esta sesión
+                actualizarListaRegistros();
+            }
+
+            // Actualizar lista de registros en el panel lateral
+            function actualizarListaRegistros() {
+                const container = $('#registros-recientes');
+
+                if (registros.length === 0) {
+                    container.html('<p class="text-muted text-center py-3">No hay registros aún</p>');
+                    return;
+                }
+
+                let html = '';
+                const maxRegistros = 10;
+                const registrosMostrar = registros.slice(0, maxRegistros);
+
+                registrosMostrar.forEach(registro => {
+                    html += `
+                        <div class="registro-item">
+                            <div class="d-flex justify-content-between">
+                                <span class="font-weight-bold">Ficha #${registro.ficha}</span>
+                                <span class="text-muted">${registro.hora}</span>
+                            </div>
+                            <small class="text-muted">${registro.paciente}</small>
+                        </div>
+                    `;
+                });
+
+                // Si hay más registros de los que mostramos, agregar indicador
+                if (registros.length > maxRegistros) {
+                    html += `<div class="text-center mt-2">
+                                <small class="text-muted">+${registros.length - maxRegistros} más</small>
+                            </div>`;
+                }
+
+                container.html(html);
+            }
+
+            // Función para obtener cookie CSRF
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+
+            // ========== INICIALIZACIÓN ==========
+            console.log('[Sistema] Módulo de salida masiva listo');
+
+            // Verificar configuración inicial
+            if (!configuracion.servicio_envio_id) {
+                mostrarMensaje('Configure los servicios y profesional para comenzar a escanear.', 'info');
+            } else {
+                mostrarMensaje('Configuración cargada. Puede comenzar a escanear fichas.', 'success');
+            }
+        });
+    </script>
+{% endblock %}

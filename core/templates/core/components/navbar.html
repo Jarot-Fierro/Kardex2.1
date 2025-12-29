@@ -1,0 +1,225 @@
+{% load static %}
+
+<!-- Navbar -->
+<nav class="main-header navbar navbar-expand-md navbar-light navbar-white py-3">
+    <div class="container">
+        <a href="" class="navbar-brand">
+            <img src="{% static 'adminlte3/img/AdminLTELogo.png' %}" alt="AdminLTE Logo"
+                 class="brand-image img-circle elevation-3" style="opacity: .8">
+            <span class="brand-text font-weight-light">Kardex</span>
+        </a>
+
+        <button class="navbar-toggler order-1" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+                aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse order-3" id="navbarCollapse">
+            <!-- Left navbar links -->
+            <ul class="navbar-nav">
+                <li class="nav-item dropdown">
+                    <a id="dropdownSubMenu1" href="#" data-toggle="dropdown" aria-haspopup="true"
+                       aria-expanded="false" class="nav-link dropdown-toggle">Mantenedores</a>
+                    <ul aria-labelledby="dropdownSubMenu1" class="dropdown-menu border-0 shadow">
+                        {% if user_permissions.comunas > 0 %}
+                            <li><a href="{% url 'list_comunas' %}" class="dropdown-item">Comunas</a></li>
+                            <li class="dropdown-divider"></li>
+                        {% endif %}
+
+                        {% if user_permissions.establecimientos > 0 %}
+                            <li><a href="{% url 'establecimiento_list' %}" class="dropdown-item">Establecimientos</a>
+                            </li>
+                            <li class="dropdown-divider"></li>
+                        {% endif %}
+
+                        {% if user_permissions.servicios_clinicos > 0 %}
+                            <li><a href="" class="dropdown-item">Servicios Clínicos</a>
+                            </li>
+                            <li class="dropdown-divider"></li>
+                        {% endif %}
+
+                        {% if user_permissions.profesiones > 0 %}
+                            <li><a href="" class="dropdown-item">Profesiones</a></li>
+                            <li class="dropdown-divider"></li>
+                        {% endif %}
+
+                        {% if user_permissions.profesionales > 0 %}
+                            <li><a href="" class="dropdown-item">Profesionales</a></li>
+                            <li class="dropdown-divider"></li>
+                        {% endif %}
+
+
+                        {% if user_permissions.paciente > 0 %}
+                            <li><a href="" class="dropdown-item">Pacientes</a></li>
+                            <li class="dropdown-divider"></li>
+                        {% endif %}
+
+                        {% if user_permissions.prevision > 0 %}
+                            <li><a href="" class="dropdown-item">Previsión</a></li>
+                            <li class="dropdown-divider"></li>
+                        {% endif %}
+
+                        {% if user_permissions.fichas > 0 %}
+                            <li><a href="" class="dropdown-item">Fichas</a></li>
+                            <li class="dropdown-divider"></li>
+                        {% endif %}
+
+                        {% if user_permissions.sectores > 0 %}
+                            <li><a href="{% url 'sector_list' %}" class="dropdown-item">Sectores</a></li>
+                            <li class="dropdown-divider"></li>
+                        {% endif %}
+                    </ul>
+                </li>
+                {% if user_permissions.paciente > 0 and user_permissions.fichas > 0 %}
+                    <li class="nav-item">
+                        <a href="" class="nav-link">Consulta Pacientes</a>
+                    </li>
+                {% endif %}
+                {% if user_permissions.reportes > 0 %}
+                    <li class="nav-item dropdown">
+                        <a id="dropdownSubMenu2" href="#" data-toggle="dropdown" aria-haspopup="true"
+                           aria-expanded="false" class="nav-link dropdown-toggle">Reportes</a>
+                        <ul aria-labelledby="dropdownSubMenu2" class="dropdown-menu border-0 shadow">
+                            <li>
+                                <a href="" class="dropdown-item">Ingresos por rango de
+                                    fechas
+                                </a>
+                            </li>
+                            <li class="dropdown-divider"></li>
+                            <li>
+                                <a href="" class="dropdown-item">Reporte
+                                    recien nacidos
+                                </a>
+                            </li>
+                            <li>
+                                <a href="" class="dropdown-item">Reporte
+                                    extranjeros
+                                </a>
+                            </li>
+                            <li>
+                                <a href="" class="dropdown-item">Reporte
+                                    fallecidos
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="" class="dropdown-item">Reporte
+                                    Rut Madre Paciente
+                                </a>
+                            </li>
+                            <li>
+                                <a href="" class="dropdown-item">Reporte
+                                    Pueblo Indigena
+                                </a>
+                            </li>
+                            <li class="dropdown-divider"></li>
+                            <li>
+                                <a href="" class="dropdown-item">Reporte
+                                    Fichas Pasivadas
+                                </a>
+                            </li>
+                            <li class="dropdown-divider"></li>
+                            <li>
+                                <a href="" class="dropdown-item">Reporte
+                                    Movimientos Clínicos
+                                </a>
+                            </li>
+
+                        </ul>
+                    </li>
+                {% endif %}
+
+                {% if user_permissions.movimiento_ficha > 0 %}
+                    <li class="nav-item dropdown">
+                        <a id="dropdownSubMenu3" href="#" data-toggle="dropdown" aria-haspopup="true"
+                           aria-expanded="false" class="nav-link dropdown-toggle">Movimiento Ficha</a>
+                        <ul aria-labelledby="dropdownSubMenu3" class="dropdown-menu border-0 shadow">
+                            <li>
+                                <a href="" class="dropdown-item">Recepción fichas</a>
+                            </li>
+                            <li>
+                                <a href="" class="dropdown-item">Envío fichas
+                                </a>
+                            </li>
+                            <li class="dropdown-divider"></li>
+                            <li>
+                                <a href="" class="dropdown-item">Ficha en transito</a>
+                            </li>
+                            <li class="dropdown-divider"></li>
+                            <li>
+                                <a href="" class="dropdown-item">Traspaso de Fichas</a>
+                            </li>
+                        </ul>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+
+        <ul class="order-1 order-md-3 navbar-nav navbar-no-expand ml-auto">
+            <li class="nav-item dropdown">
+                <a id="dropdownUserMenu" href="#" data-toggle="dropdown" aria-haspopup="true"
+                   aria-expanded="false" class="nav-link dropdown-toggle">
+                    {% if request.user.is_superuser %}
+                        <span class="badge badge-danger">Administrador</span>
+                    {% else %}
+                        <span class="badge badge-success">{{ request.user.first_name|default:request.user.username }}</span>
+                    {% endif %}
+
+                    <i class="fas fa-user ml-1"></i>
+                </a>
+                <ul aria-labelledby="dropdownUserMenu" class="dropdown-menu dropdown-menu-right border-0 shadow">
+                    {% if request.user.is_superuser %}
+                        <li>
+                            <a href="" class="dropdown-item">
+                                <i class="fas fa-cog"></i>
+                                Panel de Administrador
+                            </a>
+                        </li>
+                        <li>
+                            <a href="" class="dropdown-item">
+                                <i class="fas fa-plus"></i>
+                                Crear Usuario
+                            </a>
+                        </li>
+                    {% endif %}
+                    <li><a href="" class="dropdown-item"><i class="fas fa-id-badge mr-2"></i>
+                        Perfil</a></li>
+                    <li>
+                        <a href="" class="dropdown-item">
+                            <i class="fas fa-key mr-2"></i>Cambiar contraseña</a>
+                    </li>
+                    <li>
+                        <a href="" class="dropdown-item">
+                            <i class="fas fa-phone-alt"></i>
+                            Contacto</a>
+                    </li>
+                    <li>
+                        <a href="" class="dropdown-item">
+                            <i class="fas fa-headset"></i>
+                            Soporte</a>
+                    </li>
+                    <li>
+                        <a href="" class="dropdown-item">
+                            <i class="fas fa-video"></i>
+                            Tutoriales</a>
+                    </li>
+
+
+                    <li class="dropdown-divider"></li>
+                    <li>
+                        <!-- language: html -->
+                        <form id="logout-form" action="" method="post"
+                              style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="dropdown-item text-danger">
+                                <i class="fas fa-sign-out-alt mr-2"></i>
+                                Cerrar sesión
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</nav>
+<!-- /.navbar -->

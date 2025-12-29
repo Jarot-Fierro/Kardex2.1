@@ -1,0 +1,10 @@
+python manage.py importar_comunas C:\Users\Informatica\Desktop\some2025\db_some\db_some_excel_maestra.xlsx
+
+
+SQLITE
+DELETE FROM nombre_de_tabla;
+DELETE FROM sqlite_sequence WHERE name='nombre_de_tabla';
+
+MYSQL
+DELETE FROM kardex_servicioclinico;
+ALTER TABLE kardex_servicioclinico AUTO_INCREMENT = 1;

@@ -1,0 +1,78 @@
+{% load static %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h5 class="mb-3">Detalle de Paciente</h5>
+            <dl class="row mb-0">
+                <dt class="col-sm-4">ID</dt>
+                <dd class="col-sm-8">{{ object.id|default:"-" }}</dd>
+
+                <dt class="col-sm-4">RUT</dt>
+                <dd class="col-sm-8">{{ object.rut|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Nombre</dt>
+                <dd class="col-sm-8">{{ object.nombre|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Apellido Paterno</dt>
+                <dd class="col-sm-8">{{ object.apellido_paterno|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Apellido Materno</dt>
+                <dd class="col-sm-8">{{ object.apellido_materno|default:"-" }}</dd>
+
+                <dt class="col-sm-4">RUT Madre</dt>
+                <dd class="col-sm-8">{{ object.rut_madre|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Fecha de Nacimiento</dt>
+                <dd class="col-sm-8">{{ object.fecha_nacimiento|date:'Y-m-d'|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Sexo</dt>
+                <dd class="col-sm-8">{{ object.sexo|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Estado Civil</dt>
+                <dd class="col-sm-8">{{ object.estado_civil|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Comuna</dt>
+                <dd class="col-sm-8">{{ object.comuna.nombre|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Previsión</dt>
+                <dd class="col-sm-8">{{ object.prevision.nombre|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Dirección</dt>
+                <dd class="col-sm-8">{{ object.direccion|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Teléfono 1</dt>
+                <dd class="col-sm-8">{{ object.numero_telefono1|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Teléfono 2</dt>
+                <dd class="col-sm-8">{{ object.numero_telefono2|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Pasaporte</dt>
+                <dd class="col-sm-8">{{ object.pasaporte|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Recién Nacido</dt>
+                <dd class="col-sm-8">{{ object.recien_nacido|yesno:"Sí,No" }}</dd>
+
+                <dt class="col-sm-4">Extranjero</dt>
+                <dd class="col-sm-8">{{ object.extranjero|yesno:"Sí,No" }}</dd>
+
+                <dt class="col-sm-4">Fallecido</dt>
+                <dd class="col-sm-8">{{ object.fallecido|yesno:"Sí,No" }}</dd>
+
+                <dt class="col-sm-4">Fecha de Fallecimiento</dt>
+                <dd class="col-sm-8">{{ object.fecha_fallecimiento|date:'Y-m-d'|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Ocupación</dt>
+                <dd class="col-sm-8">{{ object.ocupacion|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Representante Legal</dt>
+                <dd class="col-sm-8">{{ object.representante_legal|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Nombre Social</dt>
+                <dd class="col-sm-8">{{ object.nombre_social|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Usuario</dt>
+                <dd class="col-sm-8">{{ object.usuario.username|default:"-" }}</dd>
+            </dl>
+        </div>
+    </div>
+</div>

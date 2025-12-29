@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container card shadow-sm card-primary card-outline mb-4 mt-3">
+
+    <div class="card-header">
+        <div class="row align-items-center w-100">
+            <div class="col">
+                <h5 class="mb-0">Consulta de Pacientes por Rango de Fechas</h5>
+            </div>
+        </div>
+    </div>
+
+    <form method="post" class="row g-3 m-4">
+        {% csrf_token %}
+        <div class="col-md-4">
+            {{ form.fecha_inicio.label_tag }} {{ form.fecha_inicio }}
+        </div>
+        <div class="col-md-4">
+            {{ form.fecha_fin.label_tag }} {{ form.fecha_fin }}
+        </div>
+        <div class="col-md-4 d-flex flex-column justify-content-end">
+            <button class="btn btn-primary mt-auto" type="submit">Buscar</button>
+        </div>
+    </form>
+
+
+    {% if pacientes %}
+    <div class="card-body">
+        <table id="Table" class="table table-bordered table-striped table-sm">
+            <thead>
+            <tr>
+                <th>RUT</th>
+                <th>Nombre</th>
+                <th>Fecha Nacimiento</th>
+                <th>Sexo</th>
+                <th>Estado Civil</th>
+                <th>Previsión</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for p in pacientes %}
+            <tr>
+                <td>{{ p.rut }}</td>
+                <td>{{ p.nombre }} {{ p.apellido_paterno }} {{ p.apellido_materno }}</td>
+                <td>{{ p.fecha_nacimiento }}</td>
+                <td>{{ p.get_sexo_display }}</td>
+                <td>{{ p.get_estado_civil_display }}</td>
+                <td>{{ p.prevision }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% endif %}
+</div>
+{% endblock %}

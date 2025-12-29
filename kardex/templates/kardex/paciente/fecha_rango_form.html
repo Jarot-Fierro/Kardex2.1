@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Pacientes - Rango de fechas{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h5 class="mb-0">Consultar pacientes por rango de fechas</h5>
+  </div>
+  <div class="card-body">
+    <form method="get" action="{% url 'kardex:paciente_por_fecha_list' %}" class="row g-3">
+      <div class="col-md-4">
+        <label for="id_fecha_inicio" class="form-label">Fecha inicio</label>
+        {{ form.fecha_inicio }}
+      </div>
+      <div class="col-md-4">
+        <label for="id_fecha_fin" class="form-label">Fecha fin</label>
+        {{ form.fecha_fin }}
+      </div>
+      <div class="col-md-4 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary me-2"><i class="fas fa-search"></i> Buscar</button>
+        <a href="{% url 'kardex:paciente_fecha_form' %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Limpiar</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

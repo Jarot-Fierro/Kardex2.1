@@ -1,0 +1,257 @@
+21/10/2025
+PROFESIONALES
+⚠️ Fila 72 sin rut, nombre o correo. Se omite.
+
+
+SERVICIOS CLINICOS
+⚠️ Fila 99 sin nombre, tiempo_horas o correo_jefe. Se omite.
+⚠️ Fila 143 sin nombre, tiempo_horas o correo_jefe. Se omite.
+⚠️ Fila 172 sin nombre, tiempo_horas o correo_jefe. Se omite.
+
+PACIENTE
+(.venv) PS C:\Users\Informatica\PycharmProjects\Kardex\kardex> python manage.py importar_pacientes C:\Users\Informatica\Desktop\some2025\db_some\db_some_excel_maestra.xlsx
+⚠️ Fila 1455: Faltan datos obligatorios. Se omite.
+❌ Error en fila 10804: cannot convert float NaN to integer
+❌ Error en fila 11035: cannot convert float NaN to integer
+❌ Error en fila 12325: cannot convert float NaN to integer
+⚠️ Fila 14344: Faltan datos obligatorios. Se omite.
+❌ Error en fila 22225: cannot convert float NaN to integer
+❌ Error en fila 22423: cannot convert float NaN to integer
+⚠️ Fila 39771: Faltan datos obligatorios. Se omite.
+❌ Error en fila 69886: cannot convert float NaN to integer
+❌ Error en fila 71261: cannot convert float NaN to integer
+⚠️ Fila 74347: Faltan datos obligatorios. Se omite.
+❌ Error en fila 75232: cannot convert float NaN to integer
+❌ Error en fila 81855: cannot convert float NaN to integer
+❌ Error en fila 102036: cannot convert float NaN to integer
+⚠️ Fila 118483: Faltan datos obligatorios. Se omite.
+⚠️ Fila 118626: Faltan datos obligatorios. Se omite.
+⚠️ Fila 138254: Faltan datos obligatorios. Se omite.
+❌ Error en fila 147136: cannot convert float NaN to integer
+❌ Error en fila 147906: cannot convert float NaN to integer
+❌ Error en fila 190684: cannot convert float NaN to integer
+⚠️ Fila 190907: Faltan datos obligatorios. Se omite.
+⚠️ Fila 206178: Faltan datos obligatorios. Se omite.
+❌ Error en fila 207644: cannot convert float NaN to integer
+❌ Error en fila 217067: cannot convert float NaN to integer
+❌ Error en fila 234743: cannot convert float NaN to integer
+❌ Error en fila 239801: cannot convert float NaN to integer
+⚠️ Fila 246314: Faltan datos obligatorios. Se omite.
+✅ Pacientes procesados: 247072 nuevos, 2 actualizados.
+
+
+
+22/10/2025
+
+PACIENTES
+
+(.venv) PS C:\Users\Informatica\PycharmProjects\Kardex\kardex> python manage.py importar_pacientes C:\Users\Informatica\Desktop\some2025\db_some\db_some_excel_maestra.xlsx
+⚠️ UsuarioAnterior con RUT '15.854.155-6' no encontrado (Fila 64324)
+⚠️ UsuarioAnterior con RUT '15.173.534-7' no encontrado (Fila 107530)
+⚠️ UsuarioAnterior con RUT '15.173.534-7' no encontrado (Fila 149954)
+⚠️ UsuarioAnterior con RUT '15.173.534-7' no encontrado (Fila 177722)
+⚠️ UsuarioAnterior con RUT '15.854.155-6' no encontrado (Fila 245849)
+✅ Pacientes procesados: 247099 nuevos, 2 actualizados.
+
+
+
+
+FICHAS
+
+(.venv) PS C:\Users\Informatica\PycharmProjects\Kardex\kardex> python manage.py importar_fichas C:\Users\Informatica\Desktop\some2025\db_some\db_some_excel_maestra.xlsx
+⚠️ Fila 7191: Ficha #35214 ya existe para el establecimiento HOSPITAL DE ARAUCO. Se omite.
+⚠️ Fila 14556: Ficha #66122 ya existe para el establecimiento HOSPITAL DE ARAUCO. Se omite.
+⚠️ Fila 19964: Ficha #60098 ya existe para el establecimiento HOSPITAL DE ARAUCO. Se omite.
+⚠️ Fila 22594: Ficha #35534 ya existe para el establecimiento HOSPITAL DE ARAUCO. Se omite.
+⚠️ Fila 23483: Ficha #60194 ya existe para el establecimiento HOSPITAL DE ARAUCO. Se omite.
+⚠️ Fila 23810: Ficha #58223 ya existe para el establecimiento HOSPITAL DE ARAUCO. Se omite.
+⚠️ Fila 25851: Ficha #85795 ya existe para el establecimiento HOSPITAL DE ARAUCO. Se omite.
+⚠️ Fila 30491: Ficha #60289 ya existe para el establecimiento HOSPITAL DE ARAUCO. Se omite.
+⚠️ Fila 32404: Ficha #39521 ya existe para el establecimiento HOSPITAL DE ARAUCO. Se omite.
+⚠️ Fila 39959: Ficha #77012 ya existe para el establecimiento HOSPITAL DE ARAUCO. Se omite.
+⚠️ Fila 40565: Ficha #58658 ya existe para el establecimiento HOSPITAL DE ARAUCO. Se omite.
+⚠️ Fila 40677: Ficha #87532 ya existe para el establecimiento HOSPITAL DE ARAUCO. Se omite.
+⚠️ Fila 44080: Ficha #58855 ya existe para el establecimiento HOSPITAL DE ARAUCO. Se omite.
+⚠️ Fila 45237: Ficha #66373 ya existe para el establecimiento HOSPITAL DE ARAUCO. Se omite.
+⚠️ Fila 46510: Ficha #93679 ya existe para el establecimiento HOSPITAL DE ARAUCO. Se omite.
+⚠️ Fila 47017: Ficha #92889 ya existe para el establecimiento HOSPITAL DE ARAUCO. Se omite.
+⚠️ Fila 47350: Ficha #95376 ya existe para el establecimiento HOSPITAL DE ARAUCO. Se omite.
+⚠️ Fila 48249: Ficha #66112 ya existe para el establecimiento HOSPITAL DE ARAUCO. Se omite.
+⚠️ Fila 48510: Ficha #94784 ya existe para el establecimiento HOSPITAL DE ARAUCO. Se omite.
+⚠️ Fila 49861: Ficha #30296 ya existe para el establecimiento HOSPITAL DE ARAUCO. Se omite.
+⚠️ Fila 50802: Ficha #74299 ya existe para el establecimiento HOSPITAL DE ARAUCO. Se omite.
+⚠️ Fila 66910: Ficha #59534 ya existe para el establecimiento HOSPITAL DE ARAUCO. Se omite.
+⚠️ Fila 67727: Ficha #59989 ya existe para el establecimiento HOSPITAL DE ARAUCO. Se omite.
+⚠️ Fila 67768: Ficha #29269 ya existe para el establecimiento HOSPITAL DE ARAUCO. Se omite.
+⚠️ Fila 67780: Ficha #85034 ya existe para el establecimiento HOSPITAL DE ARAUCO. Se omite.
+⚠️ Fila 68122: Ficha #94200 ya existe para el establecimiento HOSPITAL DE ARAUCO. Se omite.
+⚠️ Fila 74000: Ficha #77396 ya existe para el establecimiento HOSPITAL DE ARAUCO. Se omite.
+⚠️ Fila 74104: Ficha #92819 ya existe para el establecimiento HOSPITAL DE ARAUCO. Se omite.
+⚠️ Fila 76418: Ficha #92935 ya existe para el establecimiento HOSPITAL DE ARAUCO. Se omite.
+⚠️ Fila 76542: Ficha #94653 ya existe para el establecimiento HOSPITAL DE ARAUCO. Se omite.
+⚠️ Fila 81272: Ficha #60252 ya existe para el establecimiento HOSPITAL DE ARAUCO. Se omite.
+⚠️ Fila 81817: Ficha #66099 ya existe para el establecimiento HOSPITAL DE ARAUCO. Se omite.
+⚠️ Fila 81959: Ficha #60257 ya existe para el establecimiento HOSPITAL DE ARAUCO. Se omite.
+⚠️ Fila 86174: Ficha #87332 ya existe para el establecimiento HOSPITAL DE ARAUCO. Se omite.
+⚠️ Fila 86422: Ficha #59658 ya existe para el establecimiento HOSPITAL DE ARAUCO. Se omite.
+⚠️ Fila 89103: Ficha #64581 ya existe para el establecimiento HOSPITAL DE ARAUCO. Se omite.
+⚠️ Fila 94251: Ficha #25671 ya existe para el establecimiento HOSPITAL DE ARAUCO. Se omite.
+⚠️ Fila 96330: Paciente con RUT 92.100.613-6 no encontrado.
+⚠️ Fila 96331: Paciente con RUT 92.100.614-4 no encontrado.
+⚠️ Fila 96348: Paciente con RUT 92.100.897-K no encontrado.
+⚠️ Fila 96369: Paciente con RUT 92.101.485-6 no encontrado.
+⚠️ Fila 96385: Paciente con RUT 92.102.036-8 no encontrado.
+⚠️ Fila 96408: Paciente con RUT 92.102.694-3 no encontrado.
+⚠️ Fila 96410: Paciente con RUT 92.102.797-4 no encontrado.
+⚠️ Fila 96417: Paciente con RUT 92.102.981-0 no encontrado.
+⚠️ Fila 96422: Paciente con RUT 92.103.066-5 no encontrado.
+⚠️ Fila 96465: Paciente con RUT 92.104.144-6 no encontrado.
+⚠️ Fila 96471: Paciente con RUT 92.104.259-0 no encontrado.
+⚠️ Fila 96497: Paciente con RUT 96.393.612-5 no encontrado.
+⚠️ Fila 96501: Paciente con RUT 96.393.745-8 no encontrado.
+⚠️ Fila 96572: Paciente con RUT 96.395.430-1 no encontrado.
+⚠️ Fila 96580: Paciente con RUT 96.395.677-0 no encontrado.
+⚠️ Fila 96588: Paciente con RUT 96.395.910-9 no encontrado.
+⚠️ Fila 96599: Paciente con RUT 96.396.345-9 no encontrado.
+⚠️ Fila 96619: Paciente con RUT 96.397.057-9 no encontrado.
+⚠️ Fila 96620: Paciente con RUT 96.397.066-8 no encontrado.
+⚠️ Fila 96632: Paciente con RUT 96.397.544-9 no encontrado.
+⚠️ Fila 96634: Paciente con RUT 96.397.648-8 no encontrado.
+⚠️ Fila 96636: Paciente con RUT 96.397.714-K no encontrado.
+⚠️ Fila 96637: Paciente con RUT 96.397.719-0 no encontrado.
+⚠️ Fila 96643: Paciente con RUT 96.397.903-7 no encontrado.
+⚠️ Fila 96648: Paciente con RUT 96.398.088-4 no encontrado.
+⚠️ Fila 96651: Paciente con RUT 96.398.163-5 no encontrado.
+⚠️ Fila 96699: Paciente con RUT 96.400.589-3 no encontrado.
+⚠️ Fila 122421: Fecha inválida: 9981-06-22 00:00:00.000. Se omite.
+⚠️ Fila 126938: Fecha inválida: 2982-01-04 00:00:00.000. Se omite.
+⚠️ Fila 157661: Fecha inválida: 2997-05-10 00:00:00.000. Se omite.
+⚠️ Fila 215132: Fecha inválida: 9999-11-29 00:00:00.000. Se omite.
+⚠️ Fila 215954: Fecha inválida: 5006-05-25 00:00:00.000. Se omite.
+⚠️ Fila 231015: Fecha inválida: 9690-08-17 10:22:00.000. Se omite.
+⚠️ Fila 236646: Fecha inválida: 9830-08-16 00:00:00.000. Se omite.
+⚠️ Fila 241750: Paciente con RUT 92.101.342-6 no encontrado.
+⚠️ Fila 241752: Paciente con RUT 92.102.407-K no encontrado.
+⚠️ Fila 241753: Paciente con RUT 92.102.437-1 no encontrado.
+⚠️ Fila 241754: Paciente con RUT 92.102.684-6 no encontrado.
+⚠️ Fila 241756: Paciente con RUT 92.103.435-0 no encontrado.
+⚠️ Fila 241760: Paciente con RUT 92.103.537-3 no encontrado.
+⚠️ Fila 241774: Paciente con RUT 96.393.316-9 no encontrado.
+⚠️ Fila 241776: Paciente con RUT 96.393.339-8 no encontrado.
+⚠️ Fila 241780: Paciente con RUT 96.393.402-5 no encontrado.
+⚠️ Fila 241782: Paciente con RUT 96.393.548-K no encontrado.
+⚠️ Fila 241784: Paciente con RUT 96.393.575-7 no encontrado.
+⚠️ Fila 241786: Paciente con RUT 96.393.627-3 no encontrado.
+⚠️ Fila 241791: Paciente con RUT 96.394.087-4 no encontrado.
+⚠️ Fila 241793: Paciente con RUT 96.394.141-2 no encontrado.
+⚠️ Fila 241795: Paciente con RUT 96.394.215-K no encontrado.
+⚠️ Fila 241797: Paciente con RUT 96.394.257-5 no encontrado.
+⚠️ Fila 241805: Paciente con RUT 96.394.546-9 no encontrado.
+⚠️ Fila 241806: Paciente con RUT 96.394.549-3 no encontrado.
+⚠️ Fila 241811: Paciente con RUT 96.394.760-7 no encontrado.
+⚠️ Fila 241812: Paciente con RUT 96.394.870-0 no encontrado.
+⚠️ Fila 241813: Paciente con RUT 96.394.896-4 no encontrado.
+⚠️ Fila 241820: Paciente con RUT 96.395.011-K no encontrado.
+⚠️ Fila 241826: Paciente con RUT 96.395.128-0 no encontrado.
+⚠️ Fila 241830: Paciente con RUT 96.395.262-7 no encontrado.
+⚠️ Fila 241831: Paciente con RUT 96.395.297-K no encontrado.
+⚠️ Fila 241832: Paciente con RUT 96.395.316-K no encontrado.
+⚠️ Fila 241833: Paciente con RUT 96.395.361-5 no encontrado.
+⚠️ Fila 241845: Ficha #205878 ya existe para el establecimiento HOSPITAL DE CURANILAHUE. Se omite.
+⚠️ Fila 241846: Paciente con RUT 96.395.602-9 no encontrado.
+⚠️ Fila 241847: Paciente con RUT 96.395.616-9 no encontrado.
+⚠️ Fila 241850: Paciente con RUT 96.395.683-5 no encontrado.
+⚠️ Fila 241853: Paciente con RUT 96.395.777-7 no encontrado.
+⚠️ Fila 241856: Paciente con RUT 96.395.929-K no encontrado.
+⚠️ Fila 241859: Paciente con RUT 96.396.215-0 no encontrado.
+⚠️ Fila 241863: Paciente con RUT 96.396.521-4 no encontrado.
+⚠️ Fila 241873: Paciente con RUT 96.396.814-0 no encontrado.
+⚠️ Fila 241880: Paciente con RUT 96.396.951-1 no encontrado.
+⚠️ Fila 241881: Paciente con RUT 96.396.954-6 no encontrado.
+⚠️ Fila 241882: Paciente con RUT 96.396.969-4 no encontrado.
+⚠️ Fila 241883: Paciente con RUT 96.396.970-8 no encontrado.
+⚠️ Fila 241884: Paciente con RUT 96.397.029-3 no encontrado.
+⚠️ Fila 241897: Paciente con RUT 96.397.527-9 no encontrado.
+⚠️ Fila 241900: Paciente con RUT 96.397.614-3 no encontrado.
+⚠️ Fila 241901: Paciente con RUT 96.397.634-8 no encontrado.
+⚠️ Fila 241913: Paciente con RUT 96.397.955-K no encontrado.
+⚠️ Fila 241918: Paciente con RUT 96.398.059-0 no encontrado.
+⚠️ Fila 241928: Paciente con RUT 96.398.368-9 no encontrado.
+⚠️ Fila 241931: Paciente con RUT 96.398.402-2 no encontrado.
+⚠️ Fila 241932: Paciente con RUT 96.398.411-1 no encontrado.
+⚠️ Fila 241951: Paciente con RUT 96.398.965-2 no encontrado.
+⚠️ Fila 241957: Paciente con RUT 96.399.074-K no encontrado.
+⚠️ Fila 241969: Paciente con RUT 96.399.305-6 no encontrado.
+⚠️ Fila 241984: Paciente con RUT 96.399.805-8 no encontrado.
+⚠️ Fila 241985: Paciente con RUT 96.400.084-0 no encontrado.
+⚠️ Fila 241991: Paciente con RUT 96.400.301-7 no encontrado.
+⚠️ Fila 241992: Paciente con RUT 96.400.302-5 no encontrado.
+⚠️ Fila 241995: Ficha #220705 ya existe para el establecimiento HOSPITAL DE CURANILAHUE. Se omite.
+⚠️ Fila 241997: Paciente con RUT 96.400.742-K no encontrado.
+⚠️ Fila 242001: Paciente con RUT 96.400.850-7 no encontrado.
+⚠️ Fila 242005: Paciente con RUT 96.400.981-3 no encontrado.
+⚠️ Fila 242009: Paciente con RUT 96.401.160-5 no encontrado.
+⚠️ Fila 242011: Paciente con RUT 96.401.225-3 no encontrado.
+⚠️ Fila 242013: Paciente con RUT 96.401.297-0 no encontrado.
+⚠️ Fila 242019: Paciente con RUT 96.401.476-0 no encontrado.
+⚠️ Fila 242195: Fecha inválida: 8280-12-31 00:00:00.000. Se omite.
+⚠️ Fila 249296: Fecha inválida: 2989-12-28 00:00:00.000. Se omite.
+⚠️ Fila 250240: Fecha inválida: 9993-11-17 00:00:00.000. Se omite.
+⚠️ Fila 252714: Fecha inválida: 5015-01-08 12:16:00.000. Se omite.
+⚠️ Fila 253776: Fecha inválida: 9180-10-15 00:00:00.000. Se omite.
+⚠️ Fila 255653: Fecha inválida: 9754-10-10 00:00:00.000. Se omite.
+⚠️ Fila 256460: Fecha inválida: 7976-07-09 09:26:00.000. Se omite.
+⚠️ Fila 263017: Fecha inválida: 9889-06-28 12:15:00.000. Se omite.
+⚠️ Fila 264847: Fecha inválida: 9023-10-01 00:00:00.000. Se omite.
+⚠️ Fila 268410: Fecha inválida: 9595-01-24 09:22:00.000. Se omite.
+⚠️ Fila 270629: Fecha inválida: 9978-08-08 00:00:00.000. Se omite.
+⚠️ Fila 272167: Fecha inválida: 3013-12-18 00:00:00.000. Se omite.
+⚠️ Fila 272565: Fecha inválida: 9999-04-20 12:13:00.000. Se omite.
+⚠️ Fila 277838: Fecha inválida: 5005-02-10 00:00:00.000. Se omite.
+⚠️ Fila 293874: Fecha inválida: 2987-10-29 00:00:00.000. Se omite.
+⚠️ Fila 298105: Fecha inválida: 9941-03-07 12:09:00.000. Se omite.
+⚠️ Fila 300558: Fecha inválida: 9569-02-08 12:09:00.000. Se omite.
+⚠️ Fila 310823: Ficha #143395 ya existe para el establecimiento HOSPITAL  INTERCULTURAL KALLVU LLANKA - CAÑETE. Se omite.
+⚠️ Fila 314310: Paciente con RUT 92.101.388-4 no encontrado.
+⚠️ Fila 314312: Paciente con RUT 92.101.711-1 no encontrado.
+⚠️ Fila 314313: Paciente con RUT 92.101.922-K no encontrado.
+⚠️ Fila 314315: Paciente con RUT 92.102.061-9 no encontrado.
+⚠️ Fila 314316: Paciente con RUT 92.102.062-7 no encontrado.
+⚠️ Fila 314318: Paciente con RUT 92.102.431-2 no encontrado.
+⚠️ Fila 314319: Paciente con RUT 92.102.491-6 no encontrado.
+⚠️ Fila 314325: Paciente con RUT 92.103.107-6 no encontrado.
+⚠️ Fila 314327: Paciente con RUT 92.103.168-8 no encontrado.
+⚠️ Fila 314334: Paciente con RUT 92.103.964-6 no encontrado.
+⚠️ Fila 314362: Paciente con RUT 96.395.538-3 no encontrado.
+⚠️ Fila 314382: Paciente con RUT 96.398.649-1 no encontrado.
+⚠️ Fila 314383: Paciente con RUT 96.398.732-3 no encontrado.
+⚠️ Fila 314384: Paciente con RUT 96.398.849-4 no encontrado.
+⚠️ Fila 314428: Paciente con RUT 96.401.055-2 no encontrado.
+⚠️ Fila 314433: Paciente con RUT 96.401.583-6 no encontrado.
+⚠️ Fila 324132: Ficha #96141 ya existe para el establecimiento HOSPITAL DE LEBU. Se omite.
+⚠️ Fila 334352: Paciente con RUT 92.104.110-1 no encontrado.
+⚠️ Fila 334368: Paciente con RUT 96.393.307-K no encontrado.
+⚠️ Fila 334382: Paciente con RUT 96.393.533-1 no encontrado.
+⚠️ Fila 334396: Paciente con RUT 96.394.001-7 no encontrado.
+⚠️ Fila 334409: Paciente con RUT 96.394.373-3 no encontrado.
+⚠️ Fila 334416: Paciente con RUT 96.394.682-1 no encontrado.
+⚠️ Fila 334424: Paciente con RUT 96.394.822-0 no encontrado.
+⚠️ Fila 334445: Paciente con RUT 96.395.432-8 no encontrado.
+⚠️ Fila 334455: Paciente con RUT 96.395.634-7 no encontrado.
+⚠️ Fila 334458: Paciente con RUT 96.395.691-6 no encontrado.
+⚠️ Fila 334463: Paciente con RUT 96.395.960-5 no encontrado.
+⚠️ Fila 334476: Paciente con RUT 96.396.283-5 no encontrado.
+⚠️ Fila 334498: Paciente con RUT 96.397.184-2 no encontrado.
+⚠️ Fila 334559: Paciente con RUT 96.399.244-0 no encontrado.
+⚠️ Fila 334562: Paciente con RUT 96.399.344-7 no encontrado.
+⚠️ Fila 334567: Paciente con RUT 96.399.447-8 no encontrado.
+⚠️ Fila 334585: Paciente con RUT 96.400.139-1 no encontrado.
+⚠️ Fila 334586: Paciente con RUT 96.400.158-8 no encontrado.
+⚠️ Fila 334591: Paciente con RUT 96.400.581-8 no encontrado.
+⚠️ Fila 334592: Paciente con RUT 96.400.628-8 no encontrado.
+⚠️ Fila 334612: Paciente con RUT 96.401.395-0 no encontrado.
+⚠️ Fila 334615: Paciente con RUT 96.401.511-2 no encontrado.
+⚠️ Fila 334626: Paciente con RUT 96.402.210-0 no encontrado.
+⚠️ Fila 340248: Fecha inválida: 9802-05-25 00:00:00.000. Se omite.
+✅ Fichas procesadas: 341155 importadas, 194 omitidas.
+(.venv) PS C:\Users\Informatica\PycharmProjects\Kardex\kardex>

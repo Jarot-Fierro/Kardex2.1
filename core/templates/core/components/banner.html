@@ -1,0 +1,26 @@
+{% load static %}
+<section class="container-fluid bg-light" style="border-bottom: 1px solid #dee2e6;">
+    <div class="container py-2">
+        <div class="d-flex justify-content-between align-items-center">
+            <!-- Logo izquierda -->
+            <div class="logo-left">
+                <img src="{% static 'media/ministerio_logo.png' %}"
+                     alt="Ministerio de Salud" class="img-fluid" style="max-height: 100px;">
+            </div>
+
+            <!-- Texto central/derecha -->
+            <div class="text-center">
+                <h2 class="mb-0" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+                    <span class="text-danger font-weight-bold">SOME</span>
+                    <span class="text-dark">Fichas Clínicas</span>
+                </h2>
+            </div>
+
+            <!-- Logo derecha -->
+            <div class="logo-right">
+                <img src="{% static 'media/ssa_logo.webp' %}"
+                     alt="Logo secundario" class="img-fluid" style="max-height: 100px;">
+            </div>
+        </div>
+    </div>
+</section>

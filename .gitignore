@@ -1,0 +1,68 @@
+# ==========================
+# 🔥 Django / Python
+# ==========================
+
+# Entorno virtual
+.venv/
+env/
+venv/
+
+# Base de datos (no subir)
+db.sqlite3
+
+# Archivos de configuración sensibles
+*.env
+*.env.*
+!.env.example   # puedes crear uno de ejemplo si quieres
+
+# Archivos compilados Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+*.egg-info/
+*.egg
+dist/
+build/
+
+# Media / archivos subidos
+media/
+uploads/
+
+# Staticfiles colectivos (se generan)
+staticfiles/
+static/
+
+# Migraciones (si no quieres subirlas)
+# ⚠ OJO: si se trata de un equipo real, SÍ se deben versionar
+**/migrations/*
+!**/migrations/__init__.py   # mantener solo __init__.py
+
+# ==========================
+# 🛠 IDE y editores
+# ==========================
+
+# PyCharm / JetBrains
+.idea/
+
+# VSCode
+.vscode/
+
+# Archivos temporales
+*.log
+*.pot
+*.po~
+*.mo
+*.tmp
+*.swp
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# ==========================
+# Docker (si usas)
+# ==========================
+docker-compose.override.yml
+*.pid

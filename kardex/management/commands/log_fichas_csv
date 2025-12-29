@@ -1,0 +1,1449 @@
+(.venv) PS C:\Users\Informatica\PycharmProjects\Kardex\kardex> python manage.py importar_fichas C:\Users\Informatica\Desktop\fichas_csv.csv --batch-size 2000
+📖 Leyendo archivo CSV: C:\Users\Informatica\Desktop\fichas_csv.csv
+📊 Total de registros encontrados: 341,349
+🔄 Pre-procesando datos...
+🗃️ Cargando datos en memoria...
+🔍 Verificando fichas existentes...
+🚀 Procesando fichas...
+📋 Procesando fichas:   1%|▌                                                                                              | 1999/341349 [00:00<01:34, 3578.15registro/s, Importadas=1999, Omitidas=0, Duplicadas=0, Pacientes NF=0]✅ Lote creado: 2000 fichas (total: 2000)
+📋 Procesando fichas:   1%|█                                                                                              | 3999/341349 [00:01<01:47, 3130.37registro/s, Importadas=3999, Omitidas=0, Duplicadas=0, Pacientes NF=0]✅ Lote creado: 2000 fichas (total: 4000)
+📋 Procesando fichas:   2%|█▋                                                                                             | 5999/341349 [00:02<01:38, 3400.96registro/s, Importadas=5999, Omitidas=0, Duplicadas=0, Pacientes NF=0]✅ Lote creado: 2000 fichas (total: 6000)
+📋 Procesando fichas:   2%|██▏                                                                                            | 7999/341349 [00:02<01:36, 3469.04registro/s, Importadas=7999, Omitidas=0, Duplicadas=0, Pacientes NF=0]❌ Error en bulk_create: (1062, "Duplicate entry '35214-1' for key 'unique_ficha_por_establecimiento'")
+🔍 Intentando crear una por una para identificar el problema...
+❌ Error en fila 7191: Ficha #35214 - Establecimiento 1 - Paciente 116774909 - Error: (1062, "Duplicate entry '35214-1' for key 'unique_ficha_por_establecimiento'")
+📋 Procesando fichas:   3%|██▊                                                                                            | 9998/341349 [00:06<03:55, 1408.18registro/s, Importadas=9998, Omitidas=1, Duplicadas=0, Pacientes NF=0]✅ Lote creado: 2000 fichas (total: 9999)
+📋 Procesando fichas:   3%|██▊                                                                                            | 9999/341349 [00:07<03:55, 1408.18registro/s, Importadas=9999, Omitidas=1, Duplicadas=0, Pacientes NF=0]🔍 Procesando fila 10002: 84849-1
+📋 Procesando fichas:   4%|███▎                                                                                         | 11998/341349 [00:07<02:09, 2546.17registro/s, Importadas=11998, Omitidas=1, Duplicadas=0, Pacientes NF=0]✅ Lote creado: 2000 fichas (total: 11999)
+📋 Procesando fichas:   4%|███▋                                                                                         | 13715/341349 [00:08<01:46, 3085.59registro/s, Importadas=13715, Omitidas=1, Duplicadas=0, Pacientes NF=0]⚠️ Fila 13718: Paciente con RUT "123855531" no encontrado en BD.
+📋 Procesando fichas:   4%|███▊                                                                                         | 13999/341349 [00:08<01:39, 3301.89registro/s, Importadas=13998, Omitidas=2, Duplicadas=0, Pacientes NF=1]✅ Lote creado: 2000 fichas (total: 13999)
+📋 Procesando fichas:   5%|████▎                                                                                        | 15999/341349 [00:08<01:34, 3460.93registro/s, Importadas=15998, Omitidas=2, Duplicadas=0, Pacientes NF=1]❌ Error en bulk_create: (1062, "Duplicate entry '66122-1' for key 'unique_ficha_por_establecimiento'")
+🔍 Intentando crear una por una para identificar el problema...
+❌ Error en fila 14556: Ficha #66122 - Establecimiento 1 - Paciente 136066242 - Error: (1062, "Duplicate entry '66122-1' for key 'unique_ficha_por_establecimiento'")
+📋 Procesando fichas:   5%|████▌                                                                                         | 16512/341349 [00:12<11:38, 465.18registro/s, Importadas=16511, Omitidas=3, Duplicadas=0, Pacientes NF=1]⚠️ Fila 16516: Paciente con RUT "138011194" no encontrado en BD.
+📋 Procesando fichas:   5%|████▉                                                                                        | 17999/341349 [00:12<04:50, 1113.98registro/s, Importadas=17997, Omitidas=4, Duplicadas=0, Pacientes NF=2]✅ Lote creado: 2000 fichas (total: 17998)
+📋 Procesando fichas:   6%|█████▌                                                                                        | 19998/341349 [00:13<02:00, 2664.57registro/s, Importadas=2e+4, Omitidas=4, Duplicadas=0, Pacientes NF=2]🔍 Procesando fila 20002: 104129-1
+📋 Procesando fichas:   6%|█████▌                                                                                        | 19999/341349 [00:13<02:00, 2664.57registro/s, Importadas=2e+4, Omitidas=4, Duplicadas=0, Pacientes NF=2]❌ Error en bulk_create: (1062, "Duplicate entry '60098-1' for key 'unique_ficha_por_establecimiento'")
+🔍 Intentando crear una por una para identificar el problema...
+❌ Error en fila 19964: Ficha #60098 - Establecimiento 1 - Paciente 151925642 - Error: (1062, "Duplicate entry '60098-1' for key 'unique_ficha_por_establecimiento'")
+📋 Procesando fichas:   6%|█████▉                                                                                        | 21505/341349 [00:17<06:29, 822.09registro/s, Importadas=21503, Omitidas=5, Duplicadas=0, Pacientes NF=2]⚠️ Fila 21510: Paciente con RUT "152035861" no encontrado en BD.
+📋 Procesando fichas:   6%|█████▉                                                                                       | 21999/341349 [00:17<04:56, 1078.75registro/s, Importadas=21996, Omitidas=6, Duplicadas=0, Pacientes NF=3]✅ Lote creado: 2000 fichas (total: 21997)
+📋 Procesando fichas:   7%|██████▎                                                                                      | 23321/341349 [00:18<02:51, 1853.38registro/s, Importadas=23318, Omitidas=6, Duplicadas=0, Pacientes NF=3]⚠️ Fila 23326: Paciente con RUT "152003234" no encontrado en BD.
+📋 Procesando fichas:   7%|██████▌                                                                                      | 24000/341349 [00:18<02:05, 2531.77registro/s, Importadas=23996, Omitidas=7, Duplicadas=0, Pacientes NF=4]❌ Error en bulk_create: (1062, "Duplicate entry '35534-1' for key 'unique_ficha_por_establecimiento'")
+🔍 Intentando crear una por una para identificar el problema...
+❌ Error en fila 22595: Ficha #35534 - Establecimiento 1 - Paciente 161640581 - Error: (1062, "Duplicate entry '35534-1' for key 'unique_ficha_por_establecimiento'")
+❌ Error en fila 23483: Ficha #60194 - Establecimiento 1 - Paciente 161640581 - Error: (1062, "Duplicate entry '60194-1' for key 'unique_ficha_por_establecimiento'")
+❌ Error en fila 23810: Ficha #58223 - Establecimiento 1 - Paciente 161640581 - Error: (1062, "Duplicate entry '58223-1' for key 'unique_ficha_por_establecimiento'")
+📋 Procesando fichas:   8%|███████                                                                                     | 25999/341349 [00:22<04:55, 1067.35registro/s, Importadas=25993, Omitidas=10, Duplicadas=0, Pacientes NF=4]❌ Error en bulk_create: (1062, "Duplicate entry '85795-1' for key 'unique_ficha_por_establecimiento'")
+🔍 Intentando crear una por una para identificar el problema...
+❌ Error en fila 25851: Ficha #85795 - Establecimiento 1 - Paciente 16757775K - Error: (1062, "Duplicate entry '85795-1' for key 'unique_ficha_por_establecimiento'")
+📋 Procesando fichas:   8%|███████▎                                                                                     | 26622/341349 [00:25<13:51, 378.37registro/s, Importadas=26616, Omitidas=11, Duplicadas=0, Pacientes NF=4]⚠️ Fila 26629: Paciente con RUT "169312931" no encontrado en BD.
+📋 Procesando fichas:   8%|███████▌                                                                                    | 27999/341349 [00:26<04:17, 1216.91registro/s, Importadas=27992, Omitidas=12, Duplicadas=0, Pacientes NF=5]✅ Lote creado: 2000 fichas (total: 27993)
+📋 Procesando fichas:   9%|████████▏                                                                                    | 29995/341349 [00:26<01:57, 2641.93registro/s, Importadas=3e+4, Omitidas=12, Duplicadas=0, Pacientes NF=5]🔍 Procesando fila 30002: 109506-1
+📋 Procesando fichas:   9%|████████▏                                                                                    | 29999/341349 [00:26<01:57, 2641.93registro/s, Importadas=3e+4, Omitidas=12, Duplicadas=0, Pacientes NF=5]✅ Lote creado: 2000 fichas (total: 29993)
+📋 Procesando fichas:   9%|████████▌                                                                                   | 31999/341349 [00:27<01:32, 3330.59registro/s, Importadas=31992, Omitidas=12, Duplicadas=0, Pacientes NF=5]❌ Error en bulk_create: (1062, "Duplicate entry '60289-1' for key 'unique_ficha_por_establecimiento'")
+🔍 Intentando crear una por una para identificar el problema...
+❌ Error en fila 30491: Ficha #60289 - Establecimiento 1 - Paciente 184150204 - Error: (1062, "Duplicate entry '60289-1' for key 'unique_ficha_por_establecimiento'")
+📋 Procesando fichas:  10%|█████████▏                                                                                  | 33998/341349 [00:31<04:40, 1096.56registro/s, Importadas=33991, Omitidas=13, Duplicadas=0, Pacientes NF=5]❌ Error en bulk_create: (1062, "Duplicate entry '39521-1' for key 'unique_ficha_por_establecimiento'")
+🔍 Intentando crear una por una para identificar el problema...
+❌ Error en fila 32404: Ficha #39521 - Establecimiento 1 - Paciente 189439628 - Error: (1062, "Duplicate entry '39521-1' for key 'unique_ficha_por_establecimiento'")
+📋 Procesando fichas:  10%|█████████▍                                                                                   | 34738/341349 [00:35<13:15, 385.45registro/s, Importadas=34731, Omitidas=14, Duplicadas=0, Pacientes NF=5]⚠️ Fila 34747: Paciente con RUT "190327175" no encontrado en BD.
+📋 Procesando fichas:  11%|█████████▋                                                                                  | 35998/341349 [00:35<04:08, 1227.97registro/s, Importadas=35990, Omitidas=15, Duplicadas=0, Pacientes NF=6]✅ Lote creado: 2000 fichas (total: 35991)
+📋 Procesando fichas:  11%|██████████▏                                                                                 | 37998/341349 [00:36<01:53, 2677.33registro/s, Importadas=37990, Omitidas=15, Duplicadas=0, Pacientes NF=6]✅ Lote creado: 2000 fichas (total: 37991)
+📋 Procesando fichas:  12%|██████████▌                                                                                 | 39330/341349 [00:36<01:43, 2911.48registro/s, Importadas=39322, Omitidas=15, Duplicadas=0, Pacientes NF=6]⚠️ Fila 39339: Paciente con RUT "22604465" no encontrado en BD.
+📋 Procesando fichas:  12%|██████████▉                                                                                  | 39993/341349 [00:37<01:29, 3375.39registro/s, Importadas=4e+4, Omitidas=16, Duplicadas=0, Pacientes NF=7]🔍 Procesando fila 40002: 81641-1
+📋 Procesando fichas:  12%|██████████▉                                                                                  | 39999/341349 [00:37<01:29, 3375.39registro/s, Importadas=4e+4, Omitidas=16, Duplicadas=0, Pacientes NF=7]❌ Error en bulk_create: (1062, "Duplicate entry '77012-1' for key 'unique_ficha_por_establecimiento'")
+🔍 Intentando crear una por una para identificar el problema...
+❌ Error en fila 39959: Ficha #77012 - Establecimiento 1 - Paciente 27330924 - Error: (1062, "Duplicate entry '77012-1' for key 'unique_ficha_por_establecimiento'")
+📋 Procesando fichas:  12%|███████████▎                                                                                | 41998/341349 [00:40<04:30, 1107.37registro/s, Importadas=41989, Omitidas=17, Duplicadas=0, Pacientes NF=7]❌ Error en bulk_create: (1062, "Duplicate entry '58658-1' for key 'unique_ficha_por_establecimiento'")
+🔍 Intentando crear una por una para identificar el problema...
+❌ Error en fila 40565: Ficha #58658 - Establecimiento 1 - Paciente 202760236 - Error: (1062, "Duplicate entry '58658-1' for key 'unique_ficha_por_establecimiento'")
+❌ Error en fila 40677: Ficha #87532 - Establecimiento 1 - Paciente 202760236 - Error: (1062, "Duplicate entry '87532-1' for key 'unique_ficha_por_establecimiento'")
+📋 Procesando fichas:  13%|███████████▉                                                                                 | 43997/341349 [00:45<05:07, 966.52registro/s, Importadas=43987, Omitidas=19, Duplicadas=0, Pacientes NF=7]✅ Lote creado: 2000 fichas (total: 43988)
+📋 Procesando fichas:  13%|████████████▍                                                                               | 45997/341349 [00:45<01:47, 2745.15registro/s, Importadas=45987, Omitidas=19, Duplicadas=0, Pacientes NF=7]❌ Error en bulk_create: (1062, "Duplicate entry '58855-1' for key 'unique_ficha_por_establecimiento'")
+🔍 Intentando crear una por una para identificar el problema...
+❌ Error en fila 44080: Ficha #58855 - Establecimiento 1 - Paciente 211181699 - Error: (1062, "Duplicate entry '58855-1' for key 'unique_ficha_por_establecimiento'")
+❌ Error en fila 45237: Ficha #66373 - Establecimiento 1 - Paciente 211181699 - Error: (1062, "Duplicate entry '66373-1' for key 'unique_ficha_por_establecimiento'")
+📋 Procesando fichas:  14%|████████████▉                                                                               | 47996/341349 [00:49<04:29, 1090.12registro/s, Importadas=47985, Omitidas=21, Duplicadas=0, Pacientes NF=7]❌ Error en bulk_create: (1062, "Duplicate entry '93679-1' for key 'unique_ficha_por_establecimiento'")
+🔍 Intentando crear una por una para identificar el problema...
+❌ Error en fila 46510: Ficha #93679 - Establecimiento 1 - Paciente 216092910 - Error: (1062, "Duplicate entry '93679-1' for key 'unique_ficha_por_establecimiento'")
+❌ Error en fila 47017: Ficha #92889 - Establecimiento 1 - Paciente 216092910 - Error: (1062, "Duplicate entry '92889-1' for key 'unique_ficha_por_establecimiento'")
+❌ Error en fila 47350: Ficha #95376 - Establecimiento 1 - Paciente 216092910 - Error: (1062, "Duplicate entry '95376-1' for key 'unique_ficha_por_establecimiento'")
+📋 Procesando fichas:  15%|█████████████▊                                                                                | 49989/341349 [00:53<04:54, 988.84registro/s, Importadas=5e+4, Omitidas=24, Duplicadas=0, Pacientes NF=7]🔍 Procesando fila 50002: 118763-1
+📋 Procesando fichas:  15%|█████████████▊                                                                                | 49995/341349 [00:53<04:54, 988.84registro/s, Importadas=5e+4, Omitidas=24, Duplicadas=0, Pacientes NF=7]❌ Error en bulk_create: (1062, "Duplicate entry '66112-1' for key 'unique_ficha_por_establecimiento'")
+🔍 Intentando crear una por una para identificar el problema...
+❌ Error en fila 48249: Ficha #66112 - Establecimiento 1 - Paciente 220047288 - Error: (1062, "Duplicate entry '66112-1' for key 'unique_ficha_por_establecimiento'")
+❌ Error en fila 48510: Ficha #94784 - Establecimiento 1 - Paciente 220047288 - Error: (1062, "Duplicate entry '94784-1' for key 'unique_ficha_por_establecimiento'")
+❌ Error en fila 49861: Ficha #30296 - Establecimiento 1 - Paciente 220047288 - Error: (1062, "Duplicate entry '30296-1' for key 'unique_ficha_por_establecimiento'")
+📋 Procesando fichas:  15%|██████████████▏                                                                              | 51994/341349 [00:57<05:09, 934.20registro/s, Importadas=51979, Omitidas=27, Duplicadas=0, Pacientes NF=7]❌ Error en bulk_create: (1062, "Duplicate entry '74299-1' for key 'unique_ficha_por_establecimiento'")
+🔍 Intentando crear una por una para identificar el problema...
+❌ Error en fila 50802: Ficha #74299 - Establecimiento 1 - Paciente 22470030K - Error: (1062, "Duplicate entry '74299-1' for key 'unique_ficha_por_establecimiento'")
+📋 Procesando fichas:  16%|██████████████▌                                                                             | 53993/341349 [01:01<03:51, 1239.81registro/s, Importadas=53978, Omitidas=28, Duplicadas=0, Pacientes NF=7]✅ Lote creado: 2000 fichas (total: 53979)
+📋 Procesando fichas:  16%|███████████████                                                                             | 55993/341349 [01:02<01:49, 2617.68registro/s, Importadas=55978, Omitidas=28, Duplicadas=0, Pacientes NF=7]✅ Lote creado: 2000 fichas (total: 55979)
+📋 Procesando fichas:  17%|███████████████▋                                                                            | 57993/341349 [01:03<01:38, 2864.62registro/s, Importadas=57978, Omitidas=28, Duplicadas=0, Pacientes NF=7]✅ Lote creado: 2000 fichas (total: 57979)
+📋 Procesando fichas:  18%|████████████████▎                                                                            | 59987/341349 [01:03<01:24, 3345.36registro/s, Importadas=6e+4, Omitidas=28, Duplicadas=0, Pacientes NF=7]🔍 Procesando fila 60002: 113842-1
+📋 Procesando fichas:  18%|████████████████▎                                                                            | 59993/341349 [01:03<01:24, 3345.36registro/s, Importadas=6e+4, Omitidas=28, Duplicadas=0, Pacientes NF=7]✅ Lote creado: 2000 fichas (total: 59979)
+📋 Procesando fichas:  18%|████████████████▋                                                                           | 61993/341349 [01:04<01:25, 3253.83registro/s, Importadas=61978, Omitidas=28, Duplicadas=0, Pacientes NF=7]✅ Lote creado: 2000 fichas (total: 61979)
+📋 Procesando fichas:  19%|█████████████████▏                                                                          | 63993/341349 [01:05<01:23, 3302.12registro/s, Importadas=63978, Omitidas=28, Duplicadas=0, Pacientes NF=7]✅ Lote creado: 2000 fichas (total: 63979)
+📋 Procesando fichas:  19%|█████████████████▊                                                                          | 65993/341349 [01:06<01:31, 3021.56registro/s, Importadas=65978, Omitidas=28, Duplicadas=0, Pacientes NF=7]✅ Lote creado: 2000 fichas (total: 65979)
+📋 Procesando fichas:  20%|██████████████████▎                                                                         | 67993/341349 [01:06<01:21, 3348.32registro/s, Importadas=67978, Omitidas=28, Duplicadas=0, Pacientes NF=7]❌ Error en bulk_create: (1062, "Duplicate entry '59534-1' for key 'unique_ficha_por_establecimiento'")
+🔍 Intentando crear una por una para identificar el problema...
+❌ Error en fila 66910: Ficha #59534 - Establecimiento 1 - Paciente 36158107 - Error: (1062, "Duplicate entry '59534-1' for key 'unique_ficha_por_establecimiento'")
+❌ Error en fila 67727: Ficha #59989 - Establecimiento 1 - Paciente 36158107 - Error: (1062, "Duplicate entry '59989-1' for key 'unique_ficha_por_establecimiento'")
+❌ Error en fila 67768: Ficha #29269 - Establecimiento 1 - Paciente 36158107 - Error: (1062, "Duplicate entry '29269-1' for key 'unique_ficha_por_establecimiento'")
+❌ Error en fila 67780: Ficha #85034 - Establecimiento 1 - Paciente 36158107 - Error: (1062, "Duplicate entry '85034-1' for key 'unique_ficha_por_establecimiento'")
+📋 Procesando fichas:  21%|███████████████████                                                                          | 69986/341349 [01:10<04:07, 1095.58registro/s, Importadas=7e+4, Omitidas=32, Duplicadas=0, Pacientes NF=7]🔍 Procesando fila 70002: 74519-1
+📋 Procesando fichas:  21%|███████████████████                                                                          | 69992/341349 [01:10<04:07, 1095.58registro/s, Importadas=7e+4, Omitidas=32, Duplicadas=0, Pacientes NF=7]❌ Error en bulk_create: (1062, "Duplicate entry '94200-1' for key 'unique_ficha_por_establecimiento'")
+🔍 Intentando crear una por una para identificar el problema...
+❌ Error en fila 68122: Ficha #94200 - Establecimiento 1 - Paciente 42484709 - Error: (1062, "Duplicate entry '94200-1' for key 'unique_ficha_por_establecimiento'")
+📋 Procesando fichas:  21%|███████████████████▌                                                                         | 71991/341349 [01:14<04:33, 983.74registro/s, Importadas=71973, Omitidas=33, Duplicadas=0, Pacientes NF=7]✅ Lote creado: 2000 fichas (total: 71974)
+📋 Procesando fichas:  22%|███████████████████▉                                                                        | 73991/341349 [01:15<01:45, 2531.56registro/s, Importadas=73973, Omitidas=33, Duplicadas=0, Pacientes NF=7]❌ Error en bulk_create: (1062, "Duplicate entry '77396-1' for key 'unique_ficha_por_establecimiento'")
+🔍 Intentando crear una por una para identificar el problema...
+❌ Error en fila 74000: Ficha #77396 - Establecimiento 1 - Paciente 52522404 - Error: (1062, "Duplicate entry '77396-1' for key 'unique_ficha_por_establecimiento'")
+📋 Procesando fichas:  22%|████████████████████▍                                                                       | 75990/341349 [01:19<04:09, 1062.87registro/s, Importadas=75972, Omitidas=34, Duplicadas=0, Pacientes NF=7]❌ Error en bulk_create: (1062, "Duplicate entry '92819-1' for key 'unique_ficha_por_establecimiento'")
+🔍 Intentando crear una por una para identificar el problema...
+❌ Error en fila 74104: Ficha #92819 - Establecimiento 1 - Paciente 56700218 - Error: (1062, "Duplicate entry '92819-1' for key 'unique_ficha_por_establecimiento'")
+📋 Procesando fichas:  23%|█████████████████████▏                                                                       | 77989/341349 [01:23<04:31, 971.57registro/s, Importadas=77971, Omitidas=35, Duplicadas=0, Pacientes NF=7]❌ Error en bulk_create: (1062, "Duplicate entry '92935-1' for key 'unique_ficha_por_establecimiento'")
+🔍 Intentando crear una por una para identificar el problema...
+❌ Error en fila 76418: Ficha #92935 - Establecimiento 1 - Paciente 61079971 - Error: (1062, "Duplicate entry '92935-1' for key 'unique_ficha_por_establecimiento'")
+❌ Error en fila 76542: Ficha #94653 - Establecimiento 1 - Paciente 61079971 - Error: (1062, "Duplicate entry '94653-1' for key 'unique_ficha_por_establecimiento'")
+📋 Procesando fichas:  23%|█████████████████████▎                                                                       | 78401/341349 [01:27<11:22, 385.53registro/s, Importadas=78382, Omitidas=37, Duplicadas=0, Pacientes NF=7]⚠️ Fila 78421: Paciente con RUT "61675779" no encontrado en BD.
+📋 Procesando fichas:  23%|█████████████████████▊                                                                       | 79982/341349 [01:27<03:32, 1229.48registro/s, Importadas=8e+4, Omitidas=38, Duplicadas=0, Pacientes NF=8]🔍 Procesando fila 80002: 29783-1
+📋 Procesando fichas:  23%|█████████████████████▊                                                                       | 79989/341349 [01:27<03:32, 1229.48registro/s, Importadas=8e+4, Omitidas=38, Duplicadas=0, Pacientes NF=8]✅ Lote creado: 2000 fichas (total: 79970)
+📋 Procesando fichas:  24%|██████████████████████                                                                      | 81989/341349 [01:28<01:48, 2393.07registro/s, Importadas=81969, Omitidas=38, Duplicadas=0, Pacientes NF=8]❌ Error en bulk_create: (1062, "Duplicate entry '60252-1' for key 'unique_ficha_por_establecimiento'")
+🔍 Intentando crear una por una para identificar el problema...
+❌ Error en fila 81272: Ficha #60252 - Establecimiento 1 - Paciente 69438709 - Error: (1062, "Duplicate entry '60252-1' for key 'unique_ficha_por_establecimiento'")
+❌ Error en fila 81817: Ficha #66099 - Establecimiento 1 - Paciente 69438709 - Error: (1062, "Duplicate entry '66099-1' for key 'unique_ficha_por_establecimiento'")
+❌ Error en fila 81959: Ficha #60257 - Establecimiento 1 - Paciente 69438709 - Error: (1062, "Duplicate entry '60257-1' for key 'unique_ficha_por_establecimiento'")
+📋 Procesando fichas:  25%|██████████████████████▋                                                                     | 83988/341349 [01:32<04:12, 1018.88registro/s, Importadas=83966, Omitidas=41, Duplicadas=0, Pacientes NF=8]✅ Lote creado: 2000 fichas (total: 83967)
+📋 Procesando fichas:  25%|███████████████████████▏                                                                    | 85988/341349 [01:33<01:32, 2764.09registro/s, Importadas=85966, Omitidas=41, Duplicadas=0, Pacientes NF=8]✅ Lote creado: 2000 fichas (total: 85967)
+📋 Procesando fichas:  26%|███████████████████████▋                                                                    | 87988/341349 [01:33<01:16, 3297.56registro/s, Importadas=87966, Omitidas=41, Duplicadas=0, Pacientes NF=8]❌ Error en bulk_create: (1062, "Duplicate entry '87332-1' for key 'unique_ficha_por_establecimiento'")
+🔍 Intentando crear una por una para identificar el problema...
+❌ Error en fila 86174: Ficha #87332 - Establecimiento 1 - Paciente 82023410 - Error: (1062, "Duplicate entry '87332-1' for key 'unique_ficha_por_establecimiento'")
+❌ Error en fila 86422: Ficha #59658 - Establecimiento 1 - Paciente 82023410 - Error: (1062, "Duplicate entry '59658-1' for key 'unique_ficha_por_establecimiento'")
+📋 Procesando fichas:  26%|████████████████████████▌                                                                    | 89980/341349 [01:37<04:01, 1042.34registro/s, Importadas=9e+4, Omitidas=43, Duplicadas=0, Pacientes NF=8]🔍 Procesando fila 90002: 28551-1
+📋 Procesando fichas:  26%|████████████████████████▌                                                                    | 89987/341349 [01:37<04:01, 1042.34registro/s, Importadas=9e+4, Omitidas=43, Duplicadas=0, Pacientes NF=8]❌ Error en bulk_create: (1062, "Duplicate entry '64581-1' for key 'unique_ficha_por_establecimiento'")
+🔍 Intentando crear una por una para identificar el problema...
+❌ Error en fila 89103: Ficha #64581 - Establecimiento 1 - Paciente 86181258 - Error: (1062, "Duplicate entry '64581-1' for key 'unique_ficha_por_establecimiento'")
+📋 Procesando fichas:  27%|████████████████████████▉                                                                    | 91603/341349 [01:41<04:18, 964.47registro/s, Importadas=91580, Omitidas=44, Duplicadas=0, Pacientes NF=8]⚠️ Fila 91626: Paciente con RUT "89837790" no encontrado en BD.
+📋 Procesando fichas:  27%|████████████████████████▉                                                                    | 91743/341349 [01:41<04:18, 964.47registro/s, Importadas=91719, Omitidas=45, Duplicadas=0, Pacientes NF=9]⚠️ Fila 91766: Paciente con RUT "870778740" no encontrado en BD.
+⚠️ Fila 91767: Paciente con RUT "892205248" no encontrado en BD.
+📋 Procesando fichas:  27%|████████████████████████▌                                                                  | 91989/341349 [01:41<03:21, 1238.98registro/s, Importadas=91963, Omitidas=47, Duplicadas=0, Pacientes NF=11]✅ Lote creado: 2000 fichas (total: 91964)
+📋 Procesando fichas:  27%|████████████████████████▊                                                                  | 92909/341349 [01:42<02:29, 1656.92registro/s, Importadas=92883, Omitidas=47, Duplicadas=0, Pacientes NF=11]⚠️ Fila 92932: Paciente con RUT "92603733" no encontrado en BD.
+📋 Procesando fichas:  28%|█████████████████████████                                                                  | 93990/341349 [01:42<01:33, 2638.34registro/s, Importadas=93963, Omitidas=48, Duplicadas=0, Pacientes NF=12]✅ Lote creado: 2000 fichas (total: 93964)
+📋 Procesando fichas:  28%|█████████████████████████▌                                                                 | 95990/341349 [01:43<01:15, 3261.12registro/s, Importadas=95963, Omitidas=48, Duplicadas=0, Pacientes NF=12]❌ Error en bulk_create: (1062, "Duplicate entry '25671-1' for key 'unique_ficha_por_establecimiento'")
+🔍 Intentando crear una por una para identificar el problema...
+❌ Error en fila 94251: Ficha #25671 - Establecimiento 1 - Paciente 99378255 - Error: (1062, "Duplicate entry '25671-1' for key 'unique_ficha_por_establecimiento'")
+📋 Procesando fichas:  28%|█████████████████████████▉                                                                  | 96290/341349 [01:46<13:04, 312.52registro/s, Importadas=96263, Omitidas=49, Duplicadas=0, Pacientes NF=12]⚠️ Fila 96314: Paciente con RUT "918157506" no encontrado en BD.
+📋 Procesando fichas:  28%|█████████████████████████▉                                                                  | 96292/341349 [01:46<13:04, 312.52registro/s, Importadas=96264, Omitidas=50, Duplicadas=0, Pacientes NF=13]⚠️ Fila 96316: Paciente con RUT "920006493" no encontrado en BD.
+⚠️ Fila 96317: Paciente con RUT "920218628" no encontrado en BD.
+⚠️ Fila 96318: Paciente con RUT "921002963" no encontrado en BD.
+⚠️ Fila 96319: Paciente con RUT "921003099" no encontrado en BD.
+⚠️ Fila 96320: Paciente con RUT "921003250" no encontrado en BD.
+⚠️ Fila 96321: Paciente con RUT "921003404" no encontrado en BD.
+⚠️ Fila 96322: Paciente con RUT "921003579" no encontrado en BD.
+⚠️ Fila 96323: Paciente con RUT "921004451" no encontrado en BD.
+⚠️ Fila 96324: Paciente con RUT "921004923" no encontrado en BD.
+⚠️ Fila 96325: Paciente con RUT "921004966" no encontrado en BD.
+⚠️ Fila 96326: Paciente con RUT "921005377" no encontrado en BD.
+⚠️ Fila 96327: Paciente con RUT "921005881" no encontrado en BD.
+⚠️ Fila 96328: Paciente con RUT "92100592K" no encontrado en BD.
+⚠️ Fila 96329: Paciente con RUT "921005938" no encontrado en BD.
+⚠️ Fila 96330: Paciente con RUT "921006136" no encontrado en BD.
+⚠️ Fila 96331: Paciente con RUT "921006144" no encontrado en BD.
+⚠️ Fila 96332: Paciente con RUT "921006357" no encontrado en BD.
+⚠️ Fila 96333: Paciente con RUT "921006373" no encontrado en BD.
+⚠️ Fila 96334: Paciente con RUT "921006438" no encontrado en BD.
+⚠️ Fila 96335: Paciente con RUT "921006470" no encontrado en BD.
+⚠️ Fila 96336: Paciente con RUT "921006489" no encontrado en BD.
+⚠️ Fila 96337: Paciente con RUT "921006594" no encontrado en BD.
+⚠️ Fila 96338: Paciente con RUT "921006837" no encontrado en BD.
+⚠️ Fila 96339: Paciente con RUT "921007221" no encontrado en BD.
+⚠️ Fila 96340: Paciente con RUT "921007949" no encontrado en BD.
+⚠️ Fila 96341: Paciente con RUT "921007957" no encontrado en BD.
+⚠️ Fila 96342: Paciente con RUT "921008007" no encontrado en BD.
+⚠️ Fila 96343: Paciente con RUT "921008171" no encontrado en BD.
+⚠️ Fila 96344: Paciente con RUT "921008252" no encontrado en BD.
+⚠️ Fila 96345: Paciente con RUT "921008341" no encontrado en BD.
+⚠️ Fila 96346: Paciente con RUT "921008732" no encontrado en BD.
+⚠️ Fila 96347: Paciente con RUT "92100883K" no encontrado en BD.
+⚠️ Fila 96348: Paciente con RUT "92100897K" no encontrado en BD.
+⚠️ Fila 96349: Paciente con RUT "921009704" no encontrado en BD.
+⚠️ Fila 96350: Paciente con RUT "921009712" no encontrado en BD.
+⚠️ Fila 96351: Paciente con RUT "921009879" no encontrado en BD.
+⚠️ Fila 96352: Paciente con RUT "921010125" no encontrado en BD.
+⚠️ Fila 96353: Paciente con RUT "92101032K" no encontrado en BD.
+⚠️ Fila 96354: Paciente con RUT "921011334" no encontrado en BD.
+⚠️ Fila 96355: Paciente con RUT "92101158K" no encontrado en BD.
+⚠️ Fila 96356: Paciente con RUT "921011598" no encontrado en BD.
+⚠️ Fila 96357: Paciente con RUT "921011601" no encontrado en BD.
+⚠️ Fila 96358: Paciente con RUT "921011636" no encontrado en BD.
+⚠️ Fila 96359: Paciente con RUT "921011709" no encontrado en BD.
+⚠️ Fila 96360: Paciente con RUT "921011938" no encontrado en BD.
+⚠️ Fila 96361: Paciente con RUT "921012179" no encontrado en BD.
+⚠️ Fila 96362: Paciente con RUT "921012683" no encontrado en BD.
+⚠️ Fila 96363: Paciente con RUT "921013019" no encontrado en BD.
+⚠️ Fila 96364: Paciente con RUT "921013744" no encontrado en BD.
+⚠️ Fila 96365: Paciente con RUT "921013779" no encontrado en BD.
+⚠️ Fila 96366: Paciente con RUT "92101385K" no encontrado en BD.
+⚠️ Fila 96367: Paciente con RUT "921014449" no encontrado en BD.
+⚠️ Fila 96368: Paciente con RUT "921014651" no encontrado en BD.
+⚠️ Fila 96369: Paciente con RUT "921014856" no encontrado en BD.
+⚠️ Fila 96370: Paciente con RUT "921014880" no encontrado en BD.
+⚠️ Fila 96371: Paciente con RUT "921015380" no encontrado en BD.
+⚠️ Fila 96372: Paciente con RUT "921015437" no encontrado en BD.
+⚠️ Fila 96373: Paciente con RUT "921015453" no encontrado en BD.
+⚠️ Fila 96374: Paciente con RUT "921016093" no encontrado en BD.
+⚠️ Fila 96375: Paciente con RUT "921016174" no encontrado en BD.
+⚠️ Fila 96376: Paciente con RUT "921017456" no encontrado en BD.
+⚠️ Fila 96377: Paciente con RUT "921017693" no encontrado en BD.
+⚠️ Fila 96378: Paciente con RUT "921018525" no encontrado en BD.
+⚠️ Fila 96379: Paciente con RUT "921018711" no encontrado en BD.
+⚠️ Fila 96380: Paciente con RUT "921019025" no encontrado en BD.
+⚠️ Fila 96381: Paciente con RUT "921019084" no encontrado en BD.
+⚠️ Fila 96382: Paciente con RUT "921019092" no encontrado en BD.
+⚠️ Fila 96383: Paciente con RUT "921019254" no encontrado en BD.
+⚠️ Fila 96384: Paciente con RUT "921019858" no encontrado en BD.
+⚠️ Fila 96385: Paciente con RUT "921020368" no encontrado en BD.
+⚠️ Fila 96386: Paciente con RUT "921020376" no encontrado en BD.
+⚠️ Fila 96387: Paciente con RUT "92102133K" no encontrado en BD.
+⚠️ Fila 96388: Paciente con RUT "921021828" no encontrado en BD.
+⚠️ Fila 96389: Paciente con RUT "92102228K" no encontrado en BD.
+⚠️ Fila 96390: Paciente con RUT "921022395" no encontrado en BD.
+⚠️ Fila 96391: Paciente con RUT "921022999" no encontrado en BD.
+⚠️ Fila 96392: Paciente con RUT "921023103" no encontrado en BD.
+⚠️ Fila 96393: Paciente con RUT "921023235" no encontrado en BD.
+⚠️ Fila 96394: Paciente con RUT "921023448" no encontrado en BD.
+⚠️ Fila 96395: Paciente con RUT "921023634" no encontrado en BD.
+⚠️ Fila 96396: Paciente con RUT "921023642" no encontrado en BD.
+⚠️ Fila 96397: Paciente con RUT "921023650" no encontrado en BD.
+⚠️ Fila 96398: Paciente con RUT "92102388K" no encontrado en BD.
+⚠️ Fila 96399: Paciente con RUT "921023898" no encontrado en BD.
+⚠️ Fila 96400: Paciente con RUT "921024010" no encontrado en BD.
+⚠️ Fila 96401: Paciente con RUT "921024037" no encontrado en BD.
+⚠️ Fila 96402: Paciente con RUT "921024541" no encontrado en BD.
+⚠️ Fila 96403: Paciente con RUT "921024932" no encontrado en BD.
+⚠️ Fila 96404: Paciente con RUT "921025246" no encontrado en BD.
+⚠️ Fila 96405: Paciente con RUT "921026366" no encontrado en BD.
+⚠️ Fila 96406: Paciente con RUT "921026404" no encontrado en BD.
+⚠️ Fila 96407: Paciente con RUT "921026641" no encontrado en BD.
+⚠️ Fila 96408: Paciente con RUT "921026943" no encontrado en BD.
+⚠️ Fila 96409: Paciente con RUT "921027354" no encontrado en BD.
+⚠️ Fila 96410: Paciente con RUT "921027974" no encontrado en BD.
+⚠️ Fila 96411: Paciente con RUT "921028075" no encontrado en BD.
+⚠️ Fila 96412: Paciente con RUT "921028385" no encontrado en BD.
+⚠️ Fila 96413: Paciente con RUT "921028636" no encontrado en BD.
+⚠️ Fila 96414: Paciente con RUT "921029152" no encontrado en BD.
+⚠️ Fila 96415: Paciente con RUT "921029187" no encontrado en BD.
+⚠️ Fila 96416: Paciente con RUT "921029659" no encontrado en BD.
+⚠️ Fila 96417: Paciente con RUT "921029810" no encontrado en BD.
+⚠️ Fila 96418: Paciente con RUT "921030118" no encontrado en BD.
+⚠️ Fila 96419: Paciente con RUT "921030126" no encontrado en BD.
+⚠️ Fila 96420: Paciente con RUT "921030304" no encontrado en BD.
+⚠️ Fila 96421: Paciente con RUT "921030320" no encontrado en BD.
+⚠️ Fila 96422: Paciente con RUT "921030665" no encontrado en BD.
+⚠️ Fila 96423: Paciente con RUT "92103072K" no encontrado en BD.
+⚠️ Fila 96424: Paciente con RUT "921030916" no encontrado en BD.
+⚠️ Fila 96425: Paciente con RUT "921031130" no encontrado en BD.
+⚠️ Fila 96426: Paciente con RUT "921031718" no encontrado en BD.
+⚠️ Fila 96427: Paciente con RUT "921032374" no encontrado en BD.
+⚠️ Fila 96428: Paciente con RUT "921032641" no encontrado en BD.
+⚠️ Fila 96429: Paciente con RUT "921033184" no encontrado en BD.
+⚠️ Fila 96430: Paciente con RUT "921033214" no encontrado en BD.
+⚠️ Fila 96431: Paciente con RUT "921033370" no encontrado en BD.
+⚠️ Fila 96432: Paciente con RUT "921033486" no encontrado en BD.
+⚠️ Fila 96433: Paciente con RUT "921033702" no encontrado en BD.
+⚠️ Fila 96434: Paciente con RUT "921033729" no encontrado en BD.
+⚠️ Fila 96435: Paciente con RUT "921033885" no encontrado en BD.
+⚠️ Fila 96436: Paciente con RUT "921033958" no encontrado en BD.
+⚠️ Fila 96437: Paciente con RUT "921034326" no encontrado en BD.
+⚠️ Fila 96438: Paciente con RUT "921034547" no encontrado en BD.
+⚠️ Fila 96439: Paciente con RUT "921034830" no encontrado en BD.
+⚠️ Fila 96440: Paciente con RUT "921034849" no encontrado en BD.
+⚠️ Fila 96441: Paciente con RUT "921035039" no encontrado en BD.
+⚠️ Fila 96442: Paciente con RUT "921035047" no encontrado en BD.
+⚠️ Fila 96443: Paciente con RUT "921035403" no encontrado en BD.
+⚠️ Fila 96444: Paciente con RUT "921035543" no encontrado en BD.
+⚠️ Fila 96445: Paciente con RUT "921035551" no encontrado en BD.
+⚠️ Fila 96446: Paciente con RUT "921035721" no encontrado en BD.
+⚠️ Fila 96447: Paciente con RUT "921036027" no encontrado en BD.
+⚠️ Fila 96448: Paciente con RUT "921036035" no encontrado en BD.
+⚠️ Fila 96449: Paciente con RUT "921037147" no encontrado en BD.
+⚠️ Fila 96450: Paciente con RUT "921037198" no encontrado en BD.
+⚠️ Fila 96451: Paciente con RUT "921037414" no encontrado en BD.
+⚠️ Fila 96452: Paciente con RUT "921037856" no encontrado en BD.
+⚠️ Fila 96453: Paciente con RUT "921037988" no encontrado en BD.
+⚠️ Fila 96454: Paciente con RUT "921038925" no encontrado en BD.
+⚠️ Fila 96455: Paciente con RUT "921039077" no encontrado en BD.
+⚠️ Fila 96456: Paciente con RUT "921039247" no encontrado en BD.
+⚠️ Fila 96457: Paciente con RUT "921039271" no encontrado en BD.
+⚠️ Fila 96458: Paciente con RUT "921039670" no encontrado en BD.
+⚠️ Fila 96459: Paciente con RUT "921040113" no encontrado en BD.
+⚠️ Fila 96460: Paciente con RUT "921040601" no encontrado en BD.
+⚠️ Fila 96461: Paciente con RUT "921040822" no encontrado en BD.
+⚠️ Fila 96462: Paciente con RUT "921041357" no encontrado en BD.
+⚠️ Fila 96463: Paciente con RUT "921041365" no encontrado en BD.
+⚠️ Fila 96464: Paciente con RUT "921041373" no encontrado en BD.
+⚠️ Fila 96465: Paciente con RUT "921041446" no encontrado en BD.
+⚠️ Fila 96466: Paciente con RUT "921041497" no encontrado en BD.
+⚠️ Fila 96467: Paciente con RUT "921041624" no encontrado en BD.
+⚠️ Fila 96468: Paciente con RUT "921041764" no encontrado en BD.
+⚠️ Fila 96469: Paciente con RUT "921042000" no encontrado en BD.
+⚠️ Fila 96470: Paciente con RUT "921042523" no encontrado en BD.
+⚠️ Fila 96471: Paciente con RUT "921042590" no encontrado en BD.
+⚠️ Fila 96472: Paciente con RUT "921042604" no encontrado en BD.
+⚠️ Fila 96473: Paciente con RUT "92104285K" no encontrado en BD.
+📋 Procesando fichas:  28%|█████████████████████████▍                                                                | 96453/341349 [01:46<13:03, 312.52registro/s, Importadas=96267, Omitidas=208, Duplicadas=0, Pacientes NF=171]⚠️ Fila 96477: Paciente con RUT "963932677" no encontrado en BD.
+⚠️ Fila 96478: Paciente con RUT "963932804" no encontrado en BD.
+⚠️ Fila 96479: Paciente con RUT "963933177" no encontrado en BD.
+⚠️ Fila 96480: Paciente con RUT "963933266" no encontrado en BD.
+⚠️ Fila 96481: Paciente con RUT "963933428" no encontrado en BD.
+⚠️ Fila 96482: Paciente con RUT "963933452" no encontrado en BD.
+⚠️ Fila 96483: Paciente con RUT "963933614" no encontrado en BD.
+⚠️ Fila 96484: Paciente con RUT "963933762" no encontrado en BD.
+⚠️ Fila 96485: Paciente con RUT "963933940" no encontrado en BD.
+⚠️ Fila 96486: Paciente con RUT "963933959" no encontrado en BD.
+⚠️ Fila 96487: Paciente con RUT "963934327" no encontrado en BD.
+⚠️ Fila 96488: Paciente con RUT "963934521" no encontrado en BD.
+⚠️ Fila 96489: Paciente con RUT "963934599" no encontrado en BD.
+⚠️ Fila 96490: Paciente con RUT "963935072" no encontrado en BD.
+⚠️ Fila 96491: Paciente con RUT "963935110" no encontrado en BD.
+⚠️ Fila 96492: Paciente con RUT "963935404" no encontrado en BD.
+⚠️ Fila 96493: Paciente con RUT "963935412" no encontrado en BD.
+⚠️ Fila 96494: Paciente con RUT "963935420" no encontrado en BD.
+⚠️ Fila 96495: Paciente con RUT "963935889" no encontrado en BD.
+⚠️ Fila 96496: Paciente con RUT "963936117" no encontrado en BD.
+⚠️ Fila 96497: Paciente con RUT "963936125" no encontrado en BD.
+⚠️ Fila 96498: Paciente con RUT "96393629K" no encontrado en BD.
+⚠️ Fila 96499: Paciente con RUT "963936737" no encontrado en BD.
+⚠️ Fila 96500: Paciente con RUT "963937296" no encontrado en BD.
+⚠️ Fila 96501: Paciente con RUT "963937458" no encontrado en BD.
+⚠️ Fila 96502: Paciente con RUT "963937636" no encontrado en BD.
+⚠️ Fila 96503: Paciente con RUT "963937881" no encontrado en BD.
+⚠️ Fila 96504: Paciente con RUT "963937970" no encontrado en BD.
+⚠️ Fila 96505: Paciente con RUT "963938225" no encontrado en BD.
+⚠️ Fila 96506: Paciente con RUT "963938519" no encontrado en BD.
+⚠️ Fila 96507: Paciente con RUT "963938691" no encontrado en BD.
+⚠️ Fila 96508: Paciente con RUT "963938810" no encontrado en BD.
+⚠️ Fila 96509: Paciente con RUT "963938837" no encontrado en BD.
+⚠️ Fila 96510: Paciente con RUT "963938845" no encontrado en BD.
+⚠️ Fila 96511: Paciente con RUT "963938853" no encontrado en BD.
+⚠️ Fila 96512: Paciente con RUT "963939450" no encontrado en BD.
+⚠️ Fila 96513: Paciente con RUT "963940203" no encontrado en BD.
+⚠️ Fila 96514: Paciente con RUT "963940599" no encontrado en BD.
+⚠️ Fila 96515: Paciente con RUT "963940688" no encontrado en BD.
+⚠️ Fila 96516: Paciente con RUT "963941110" no encontrado en BD.
+⚠️ Fila 96517: Paciente con RUT "96394117K" no encontrado en BD.
+⚠️ Fila 96518: Paciente con RUT "963941455" no encontrado en BD.
+⚠️ Fila 96519: Paciente con RUT "963941668" no encontrado en BD.
+⚠️ Fila 96520: Paciente con RUT "963941757" no encontrado en BD.
+⚠️ Fila 96521: Paciente con RUT "96394196K" no encontrado en BD.
+⚠️ Fila 96522: Paciente con RUT "963942028" no encontrado en BD.
+⚠️ Fila 96523: Paciente con RUT "963942567" no encontrado en BD.
+⚠️ Fila 96524: Paciente con RUT "963942753" no encontrado en BD.
+⚠️ Fila 96525: Paciente con RUT "963942788" no encontrado en BD.
+⚠️ Fila 96526: Paciente con RUT "963942850" no encontrado en BD.
+⚠️ Fila 96527: Paciente con RUT "963942990" no encontrado en BD.
+⚠️ Fila 96528: Paciente con RUT "963943113" no encontrado en BD.
+⚠️ Fila 96529: Paciente con RUT "963943156" no encontrado en BD.
+⚠️ Fila 96530: Paciente con RUT "963943164" no encontrado en BD.
+⚠️ Fila 96531: Paciente con RUT "963943849" no encontrado en BD.
+⚠️ Fila 96532: Paciente con RUT "963943857" no encontrado en BD.
+⚠️ Fila 96533: Paciente con RUT "963943954" no encontrado en BD.
+⚠️ Fila 96534: Paciente con RUT "96394408K" no encontrado en BD.
+⚠️ Fila 96535: Paciente con RUT "963944098" no encontrado en BD.
+⚠️ Fila 96536: Paciente con RUT "963944217" no encontrado en BD.
+⚠️ Fila 96537: Paciente con RUT "963944349" no encontrado en BD.
+⚠️ Fila 96538: Paciente con RUT "963945639" no encontrado en BD.
+⚠️ Fila 96539: Paciente con RUT "963946023" no encontrado en BD.
+⚠️ Fila 96540: Paciente con RUT "963947429" no encontrado en BD.
+⚠️ Fila 96541: Paciente con RUT "963947437" no encontrado en BD.
+⚠️ Fila 96542: Paciente con RUT "963947666" no encontrado en BD.
+⚠️ Fila 96543: Paciente con RUT "963947755" no encontrado en BD.
+⚠️ Fila 96544: Paciente con RUT "963947941" no encontrado en BD.
+⚠️ Fila 96545: Paciente con RUT "963948174" no encontrado en BD.
+⚠️ Fila 96546: Paciente con RUT "963948646" no encontrado en BD.
+⚠️ Fila 96547: Paciente con RUT "963949073" no encontrado en BD.
+⚠️ Fila 96548: Paciente con RUT "963949227" no encontrado en BD.
+⚠️ Fila 96549: Paciente con RUT "963949359" no encontrado en BD.
+⚠️ Fila 96550: Paciente con RUT "963949405" no encontrado en BD.
+⚠️ Fila 96551: Paciente con RUT "963949480" no encontrado en BD.
+⚠️ Fila 96552: Paciente con RUT "963949863" no encontrado en BD.
+⚠️ Fila 96553: Paciente con RUT "963950314" no encontrado en BD.
+⚠️ Fila 96554: Paciente con RUT "963950462" no encontrado en BD.
+⚠️ Fila 96555: Paciente con RUT "963950713" no encontrado en BD.
+⚠️ Fila 96556: Paciente con RUT "963950942" no encontrado en BD.
+⚠️ Fila 96557: Paciente con RUT "963951027" no encontrado en BD.
+⚠️ Fila 96558: Paciente con RUT "96395106K" no encontrado en BD.
+⚠️ Fila 96559: Paciente con RUT "963951132" no encontrado en BD.
+⚠️ Fila 96560: Paciente con RUT "963951582" no encontrado en BD.
+⚠️ Fila 96561: Paciente con RUT "963951795" no encontrado en BD.
+⚠️ Fila 96562: Paciente con RUT "963951906" no encontrado en BD.
+⚠️ Fila 96563: Paciente con RUT "963952090" no encontrado en BD.
+⚠️ Fila 96564: Paciente con RUT "963952724" no encontrado en BD.
+⚠️ Fila 96565: Paciente con RUT "963952767" no encontrado en BD.
+⚠️ Fila 96566: Paciente con RUT "963953232" no encontrado en BD.
+⚠️ Fila 96567: Paciente con RUT "963953240" no encontrado en BD.
+⚠️ Fila 96568: Paciente con RUT "963953305" no encontrado en BD.
+⚠️ Fila 96569: Paciente con RUT "963953577" no encontrado en BD.
+⚠️ Fila 96570: Paciente con RUT "963954018" no encontrado en BD.
+⚠️ Fila 96571: Paciente con RUT "963954158" no encontrado en BD.
+⚠️ Fila 96572: Paciente con RUT "963954301" no encontrado en BD.
+⚠️ Fila 96573: Paciente con RUT "963954506" no encontrado en BD.
+⚠️ Fila 96574: Paciente con RUT "963954697" no encontrado en BD.
+⚠️ Fila 96575: Paciente con RUT "963955030" no encontrado en BD.
+⚠️ Fila 96576: Paciente con RUT "96395543K" no encontrado en BD.
+⚠️ Fila 96577: Paciente con RUT "963956088" no encontrado en BD.
+⚠️ Fila 96578: Paciente con RUT "96395624K" no encontrado en BD.
+⚠️ Fila 96579: Paciente con RUT "963956673" no encontrado en BD.
+⚠️ Fila 96580: Paciente con RUT "963956770" no encontrado en BD.
+⚠️ Fila 96581: Paciente con RUT "963957084" no encontrado en BD.
+⚠️ Fila 96582: Paciente con RUT "963957092" no encontrado en BD.
+⚠️ Fila 96583: Paciente con RUT "963957122" no encontrado en BD.
+⚠️ Fila 96584: Paciente con RUT "963958013" no encontrado en BD.
+⚠️ Fila 96585: Paciente con RUT "963958226" no encontrado en BD.
+⚠️ Fila 96586: Paciente con RUT "963959087" no encontrado en BD.
+⚠️ Fila 96587: Paciente con RUT "963959095" no encontrado en BD.
+⚠️ Fila 96588: Paciente con RUT "963959109" no encontrado en BD.
+⚠️ Fila 96589: Paciente con RUT "963959168" no encontrado en BD.
+⚠️ Fila 96590: Paciente con RUT "963959443" no encontrado en BD.
+⚠️ Fila 96591: Paciente con RUT "963960115" no encontrado en BD.
+⚠️ Fila 96592: Paciente con RUT "963960255" no encontrado en BD.
+⚠️ Fila 96593: Paciente con RUT "963960778" no encontrado en BD.
+⚠️ Fila 96594: Paciente con RUT "963960972" no encontrado en BD.
+⚠️ Fila 96595: Paciente con RUT "963961073" no encontrado en BD.
+⚠️ Fila 96596: Paciente con RUT "963961472" no encontrado en BD.
+⚠️ Fila 96597: Paciente con RUT "963961634" no encontrado en BD.
+⚠️ Fila 96598: Paciente con RUT "963963211" no encontrado en BD.
+⚠️ Fila 96599: Paciente con RUT "963963459" no encontrado en BD.
+⚠️ Fila 96600: Paciente con RUT "963964099" no encontrado en BD.
+⚠️ Fila 96601: Paciente con RUT "963964625" no encontrado en BD.
+⚠️ Fila 96602: Paciente con RUT "963964668" no encontrado en BD.
+⚠️ Fila 96603: Paciente con RUT "963964765" no encontrado en BD.
+⚠️ Fila 96604: Paciente con RUT "963965109" no encontrado en BD.
+⚠️ Fila 96605: Paciente con RUT "963965222" no encontrado en BD.
+⚠️ Fila 96606: Paciente con RUT "963965451" no encontrado en BD.
+⚠️ Fila 96607: Paciente con RUT "963966725" no encontrado en BD.
+⚠️ Fila 96608: Paciente con RUT "963968191" no encontrado en BD.
+⚠️ Fila 96609: Paciente con RUT "963968248" no encontrado en BD.
+⚠️ Fila 96610: Paciente con RUT "963968256" no encontrado en BD.
+⚠️ Fila 96611: Paciente con RUT "963969287" no encontrado en BD.
+⚠️ Fila 96612: Paciente con RUT "96396935K" no encontrado en BD.
+⚠️ Fila 96613: Paciente con RUT "963969473" no encontrado en BD.
+⚠️ Fila 96614: Paciente con RUT "963969481" no encontrado en BD.
+⚠️ Fila 96615: Paciente con RUT "963969848" no encontrado en BD.
+⚠️ Fila 96616: Paciente con RUT "963969937" no encontrado en BD.
+⚠️ Fila 96617: Paciente con RUT "963970242" no encontrado en BD.
+⚠️ Fila 96618: Paciente con RUT "96397051K" no encontrado en BD.
+⚠️ Fila 96619: Paciente con RUT "963970579" no encontrado en BD.
+⚠️ Fila 96620: Paciente con RUT "963970668" no encontrado en BD.
+⚠️ Fila 96621: Paciente con RUT "963971079" no encontrado en BD.
+⚠️ Fila 96622: Paciente con RUT "963971923" no encontrado en BD.
+⚠️ Fila 96623: Paciente con RUT "963972717" no encontrado en BD.
+⚠️ Fila 96624: Paciente con RUT "963973004" no encontrado en BD.
+⚠️ Fila 96625: Paciente con RUT "96397308K" no encontrado en BD.
+⚠️ Fila 96626: Paciente con RUT "96397339K" no encontrado en BD.
+⚠️ Fila 96627: Paciente con RUT "963973586" no encontrado en BD.
+⚠️ Fila 96628: Paciente con RUT "963973713" no encontrado en BD.
+⚠️ Fila 96629: Paciente con RUT "963973799" no encontrado en BD.
+⚠️ Fila 96630: Paciente con RUT "963974485" no encontrado en BD.
+⚠️ Fila 96631: Paciente con RUT "963975422" no encontrado en BD.
+⚠️ Fila 96632: Paciente con RUT "963975449" no encontrado en BD.
+⚠️ Fila 96633: Paciente con RUT "963976275" no encontrado en BD.
+⚠️ Fila 96634: Paciente con RUT "963976488" no encontrado en BD.
+⚠️ Fila 96635: Paciente con RUT "963976844" no encontrado en BD.
+⚠️ Fila 96636: Paciente con RUT "96397714K" no encontrado en BD.
+⚠️ Fila 96637: Paciente con RUT "963977190" no encontrado en BD.
+⚠️ Fila 96638: Paciente con RUT "963977425" no encontrado en BD.
+⚠️ Fila 96639: Paciente con RUT "963977468" no encontrado en BD.
+⚠️ Fila 96640: Paciente con RUT "963977735" no encontrado en BD.
+⚠️ Fila 96641: Paciente con RUT "963978111" no encontrado en BD.
+⚠️ Fila 96642: Paciente con RUT "96397812K" no encontrado en BD.
+⚠️ Fila 96643: Paciente con RUT "963979037" no encontrado en BD.
+⚠️ Fila 96644: Paciente con RUT "963979282" no encontrado en BD.
+⚠️ Fila 96645: Paciente con RUT "963979614" no encontrado en BD.
+⚠️ Fila 96646: Paciente con RUT "963980361" no encontrado en BD.
+⚠️ Fila 96647: Paciente con RUT "963980744" no encontrado en BD.
+⚠️ Fila 96648: Paciente con RUT "963980884" no encontrado en BD.
+⚠️ Fila 96649: Paciente con RUT "963980981" no encontrado en BD.
+⚠️ Fila 96650: Paciente con RUT "963981619" no encontrado en BD.
+⚠️ Fila 96651: Paciente con RUT "963981635" no encontrado en BD.
+⚠️ Fila 96652: Paciente con RUT "963982038" no encontrado en BD.
+⚠️ Fila 96653: Paciente con RUT "963982364" no encontrado en BD.
+⚠️ Fila 96654: Paciente con RUT "963982666" no encontrado en BD.
+⚠️ Fila 96655: Paciente con RUT "963984235" no encontrado en BD.
+⚠️ Fila 96656: Paciente con RUT "963984413" no encontrado en BD.
+⚠️ Fila 96657: Paciente con RUT "963984693" no encontrado en BD.
+⚠️ Fila 96658: Paciente con RUT "963985282" no encontrado en BD.
+⚠️ Fila 96659: Paciente con RUT "963985576" no encontrado en BD.
+⚠️ Fila 96660: Paciente con RUT "963986769" no encontrado en BD.
+⚠️ Fila 96661: Paciente con RUT "963987315" no encontrado en BD.
+⚠️ Fila 96662: Paciente con RUT "963987706" no encontrado en BD.
+⚠️ Fila 96663: Paciente con RUT "963988362" no encontrado en BD.
+⚠️ Fila 96664: Paciente con RUT "963989032" no encontrado en BD.
+⚠️ Fila 96665: Paciente con RUT "963989369" no encontrado en BD.
+⚠️ Fila 96666: Paciente con RUT "963989989" no encontrado en BD.
+⚠️ Fila 96667: Paciente con RUT "963991649" no encontrado en BD.
+⚠️ Fila 96668: Paciente con RUT "963992076" no encontrado en BD.
+⚠️ Fila 96669: Paciente con RUT "963992351" no encontrado en BD.
+⚠️ Fila 96670: Paciente con RUT "963992831" no encontrado en BD.
+⚠️ Fila 96671: Paciente con RUT "963992904" no encontrado en BD.
+⚠️ Fila 96672: Paciente con RUT "96399379K" no encontrado en BD.
+⚠️ Fila 96673: Paciente con RUT "963994249" no encontrado en BD.
+⚠️ Fila 96674: Paciente con RUT "963994273" no encontrado en BD.
+⚠️ Fila 96675: Paciente con RUT "963994591" no encontrado en BD.
+⚠️ Fila 96676: Paciente con RUT "96399527K" no encontrado en BD.
+⚠️ Fila 96677: Paciente con RUT "963995288" no encontrado en BD.
+⚠️ Fila 96678: Paciente con RUT "963995520" no encontrado en BD.
+⚠️ Fila 96679: Paciente con RUT "963995768" no encontrado en BD.
+⚠️ Fila 96680: Paciente con RUT "963995822" no encontrado en BD.
+⚠️ Fila 96681: Paciente con RUT "963995903" no encontrado en BD.
+⚠️ Fila 96682: Paciente con RUT "963996098" no encontrado en BD.
+⚠️ Fila 96683: Paciente con RUT "963996128" no encontrado en BD.
+⚠️ Fila 96684: Paciente con RUT "963996322" no encontrado en BD.
+⚠️ Fila 96685: Paciente con RUT "963996349" no encontrado en BD.
+⚠️ Fila 96686: Paciente con RUT "963998988" no encontrado en BD.
+⚠️ Fila 96687: Paciente con RUT "963999003" no encontrado en BD.
+⚠️ Fila 96688: Paciente con RUT "963999046" no encontrado en BD.
+⚠️ Fila 96689: Paciente con RUT "963999739" no encontrado en BD.
+⚠️ Fila 96690: Paciente con RUT "964000441" no encontrado en BD.
+⚠️ Fila 96691: Paciente con RUT "964000573" no encontrado en BD.
+📋 Procesando fichas:  28%|█████████████████████████▍                                                                | 96668/341349 [01:46<07:55, 514.86registro/s, Importadas=96267, Omitidas=208, Duplicadas=0, Pacientes NF=171]⚠️ Fila 96692: Paciente con RUT "964000808" no encontrado en BD.
+⚠️ Fila 96693: Paciente con RUT "964002142" no encontrado en BD.
+⚠️ Fila 96694: Paciente con RUT "964002355" no encontrado en BD.
+⚠️ Fila 96695: Paciente con RUT "964002460" no encontrado en BD.
+⚠️ Fila 96696: Paciente con RUT "964002495" no encontrado en BD.
+⚠️ Fila 96697: Paciente con RUT "964003696" no encontrado en BD.
+⚠️ Fila 96698: Paciente con RUT "964005567" no encontrado en BD.
+⚠️ Fila 96699: Paciente con RUT "964005893" no encontrado en BD.
+⚠️ Fila 96700: Paciente con RUT "964006334" no encontrado en BD.
+⚠️ Fila 96701: Paciente con RUT "964006725" no encontrado en BD.
+⚠️ Fila 96702: Paciente con RUT "964006733" no encontrado en BD.
+⚠️ Fila 96703: Paciente con RUT "96400692K" no encontrado en BD.
+⚠️ Fila 96704: Paciente con RUT "964006962" no encontrado en BD.
+⚠️ Fila 96705: Paciente con RUT "964007004" no encontrado en BD.
+⚠️ Fila 96706: Paciente con RUT "964007845" no encontrado en BD.
+⚠️ Fila 96707: Paciente con RUT "964007896" no encontrado en BD.
+⚠️ Fila 96708: Paciente con RUT "964007942" no encontrado en BD.
+⚠️ Fila 96709: Paciente con RUT "964008140" no encontrado en BD.
+⚠️ Fila 96710: Paciente con RUT "964008787" no encontrado en BD.
+⚠️ Fila 96711: Paciente con RUT "964009139" no encontrado en BD.
+⚠️ Fila 96712: Paciente con RUT "964009783" no encontrado en BD.
+⚠️ Fila 96713: Paciente con RUT "964011613" no encontrado en BD.
+⚠️ Fila 96714: Paciente con RUT "964012032" no encontrado en BD.
+⚠️ Fila 96715: Paciente con RUT "96401311K" no encontrado en BD.
+⚠️ Fila 96716: Paciente con RUT "964014205" no encontrado en BD.
+⚠️ Fila 96717: Paciente con RUT "964014663" no encontrado en BD.
+⚠️ Fila 96718: Paciente con RUT "964016038" no encontrado en BD.
+⚠️ Fila 96719: Paciente con RUT "96401714K" no encontrado en BD.
+⚠️ Fila 96720: Paciente con RUT "964018278" no encontrado en BD.
+⚠️ Fila 96721: Paciente con RUT "964020671" no encontrado en BD.
+⚠️ Fila 96722: Paciente con RUT "964021317" no encontrado en BD.
+⚠️ Fila 96723: Paciente con RUT "964022305" no encontrado en BD.
+📋 Procesando fichas:  29%|█████████████████████████▋                                                               | 98395/341349 [01:47<02:59, 1355.70registro/s, Importadas=97962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 97963)
+📋 Procesando fichas:  29%|██████████████████████████                                                               | 99978/341349 [01:47<01:33, 2591.35registro/s, Importadas=99545, Omitidas=455, Duplicadas=0, Pacientes NF=418]🔍 Procesando fila 100002: 128314-2
+📋 Procesando fichas:  29%|██████████████████████████▏                                                              | 100395/341349 [01:48<01:25, 2828.50registro/s, Importadas=1e+5, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 99963)
+📋 Procesando fichas:  30%|██████████████████████████                                                             | 102395/341349 [01:48<01:15, 3159.57registro/s, Importadas=101962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 101963)
+📋 Procesando fichas:  31%|██████████████████████████▌                                                            | 104395/341349 [01:49<01:17, 3055.07registro/s, Importadas=103962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 103963)
+📋 Procesando fichas:  31%|███████████████████████████                                                            | 106395/341349 [01:50<01:12, 3220.98registro/s, Importadas=105962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 105963)
+📋 Procesando fichas:  32%|███████████████████████████▋                                                           | 108395/341349 [01:50<01:09, 3354.99registro/s, Importadas=107962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 107963)
+📋 Procesando fichas:  32%|████████████████████████████                                                           | 109978/341349 [01:51<01:13, 3136.56registro/s, Importadas=109545, Omitidas=455, Duplicadas=0, Pacientes NF=418]🔍 Procesando fila 110002: 150236-2
+📋 Procesando fichas:  32%|████████████████████████████▏                                                          | 110395/341349 [01:51<01:10, 3269.70registro/s, Importadas=109962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 109963)
+📋 Procesando fichas:  33%|████████████████████████████▋                                                          | 112395/341349 [01:52<01:14, 3079.48registro/s, Importadas=111962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 111963)
+📋 Procesando fichas:  34%|█████████████████████████████▏                                                         | 114395/341349 [01:53<01:08, 3301.35registro/s, Importadas=113962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 113963)
+📋 Procesando fichas:  34%|█████████████████████████████▋                                                         | 116395/341349 [01:53<01:08, 3266.55registro/s, Importadas=115962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 115963)
+📋 Procesando fichas:  35%|██████████████████████████████▏                                                        | 118395/341349 [01:54<01:06, 3354.49registro/s, Importadas=117962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 117963)
+📋 Procesando fichas:  35%|██████████████████████████████▌                                                        | 119978/341349 [01:55<01:22, 2670.44registro/s, Importadas=119545, Omitidas=455, Duplicadas=0, Pacientes NF=418]🔍 Procesando fila 120002: 222597-2
+📋 Procesando fichas:  35%|██████████████████████████████▋                                                        | 120395/341349 [01:55<01:16, 2900.87registro/s, Importadas=119962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 119963)
+📋 Procesando fichas:  36%|███████████████████████████████▏                                                       | 122395/341349 [01:56<01:06, 3273.08registro/s, Importadas=121962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 121963)
+📋 Procesando fichas:  36%|███████████████████████████████▋                                                       | 124395/341349 [01:56<01:06, 3245.80registro/s, Importadas=123962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 123963)
+📋 Procesando fichas:  37%|████████████████████████████████▏                                                      | 126395/341349 [01:57<01:04, 3348.82registro/s, Importadas=125962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 125963)
+📋 Procesando fichas:  38%|████████████████████████████████▋                                                      | 128395/341349 [01:58<01:13, 2913.11registro/s, Importadas=127962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 127963)
+📋 Procesando fichas:  38%|█████████████████████████████████▏                                                     | 129978/341349 [01:59<01:06, 3172.65registro/s, Importadas=129545, Omitidas=455, Duplicadas=0, Pacientes NF=418]🔍 Procesando fila 130002: 206469-2
+📋 Procesando fichas:  38%|█████████████████████████████████▏                                                     | 130395/341349 [01:59<01:03, 3300.00registro/s, Importadas=129962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 129963)
+📋 Procesando fichas:  39%|█████████████████████████████████▋                                                     | 132395/341349 [01:59<01:02, 3360.97registro/s, Importadas=131962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 131963)
+📋 Procesando fichas:  39%|██████████████████████████████████▎                                                    | 134395/341349 [02:00<01:02, 3288.02registro/s, Importadas=133962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 133963)
+📋 Procesando fichas:  40%|██████████████████████████████████▊                                                    | 136395/341349 [02:01<01:06, 3079.96registro/s, Importadas=135962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 135963)
+📋 Procesando fichas:  41%|███████████████████████████████████▎                                                   | 138395/341349 [02:02<01:03, 3211.28registro/s, Importadas=137962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 137963)
+📋 Procesando fichas:  41%|███████████████████████████████████▋                                                   | 139978/341349 [02:02<01:02, 3247.75registro/s, Importadas=139545, Omitidas=455, Duplicadas=0, Pacientes NF=418]🔍 Procesando fila 140002: 72824-2
+📋 Procesando fichas:  41%|███████████████████████████████████▊                                                   | 140395/341349 [02:02<00:59, 3356.26registro/s, Importadas=139962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 139963)
+📋 Procesando fichas:  42%|████████████████████████████████████▎                                                  | 142395/341349 [02:03<01:02, 3203.11registro/s, Importadas=141962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 141963)
+📋 Procesando fichas:  42%|████████████████████████████████████▊                                                  | 144395/341349 [02:04<01:04, 3053.84registro/s, Importadas=143962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 143963)
+📋 Procesando fichas:  43%|█████████████████████████████████████▎                                                 | 146395/341349 [02:05<01:01, 3193.00registro/s, Importadas=145962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 145963)
+📋 Procesando fichas:  43%|█████████████████████████████████████▊                                                 | 148395/341349 [02:05<00:57, 3329.85registro/s, Importadas=147962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 147963)
+📋 Procesando fichas:  44%|██████████████████████████████████████▏                                                | 149978/341349 [02:06<00:59, 3194.18registro/s, Importadas=149545, Omitidas=455, Duplicadas=0, Pacientes NF=418]🔍 Procesando fila 150002: 160312-2
+📋 Procesando fichas:  44%|██████████████████████████████████████▎                                                | 150395/341349 [02:06<01:29, 2142.81registro/s, Importadas=149962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 149963)
+📋 Procesando fichas:  45%|██████████████████████████████████████▊                                                | 152395/341349 [02:07<01:03, 2990.10registro/s, Importadas=151962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 151963)
+📋 Procesando fichas:  45%|███████████████████████████████████████▎                                               | 154395/341349 [02:08<00:56, 3290.99registro/s, Importadas=153962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 153963)
+📋 Procesando fichas:  46%|███████████████████████████████████████▊                                               | 156395/341349 [02:08<00:55, 3317.86registro/s, Importadas=155962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 155963)
+📋 Procesando fichas:  46%|████████████████████████████████████████▎                                              | 158395/341349 [02:09<01:03, 2884.78registro/s, Importadas=157962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 157963)
+📋 Procesando fichas:  47%|████████████████████████████████████████▊                                              | 159978/341349 [02:10<00:58, 3125.16registro/s, Importadas=159545, Omitidas=455, Duplicadas=0, Pacientes NF=418]🔍 Procesando fila 160002: 179120-2
+📋 Procesando fichas:  47%|████████████████████████████████████████▉                                              | 160395/341349 [02:10<00:55, 3249.22registro/s, Importadas=159962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 159963)
+📋 Procesando fichas:  48%|█████████████████████████████████████████▍                                             | 162395/341349 [02:10<00:55, 3238.15registro/s, Importadas=161962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 161963)
+📋 Procesando fichas:  48%|█████████████████████████████████████████▉                                             | 164395/341349 [02:11<01:01, 2872.25registro/s, Importadas=163962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 163963)
+📋 Procesando fichas:  49%|██████████████████████████████████████████▍                                            | 166395/341349 [02:12<00:58, 2983.36registro/s, Importadas=165962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 165963)
+📋 Procesando fichas:  49%|██████████████████████████████████████████▉                                            | 168395/341349 [02:13<00:53, 3239.77registro/s, Importadas=167962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 167963)
+📋 Procesando fichas:  50%|███████████████████████████████████████████▎                                           | 169978/341349 [02:14<00:56, 3032.47registro/s, Importadas=169545, Omitidas=455, Duplicadas=0, Pacientes NF=418]🔍 Procesando fila 170002: 198931-2
+📋 Procesando fichas:  50%|███████████████████████████████████████████▍                                           | 170395/341349 [02:14<00:53, 3171.66registro/s, Importadas=169962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 169963)
+📋 Procesando fichas:  51%|███████████████████████████████████████████▉                                           | 172395/341349 [02:14<00:52, 3240.12registro/s, Importadas=171962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 171963)
+📋 Procesando fichas:  51%|████████████████████████████████████████████▍                                          | 174395/341349 [02:15<00:55, 3016.73registro/s, Importadas=173962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 173963)
+📋 Procesando fichas:  52%|████████████████████████████████████████████▉                                          | 176395/341349 [02:16<00:52, 3161.48registro/s, Importadas=175962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 175963)
+📋 Procesando fichas:  52%|█████████████████████████████████████████████▍                                         | 178395/341349 [02:17<00:49, 3277.18registro/s, Importadas=177962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 177963)
+📋 Procesando fichas:  53%|█████████████████████████████████████████████▊                                         | 179978/341349 [02:17<00:50, 3208.39registro/s, Importadas=179545, Omitidas=455, Duplicadas=0, Pacientes NF=418]🔍 Procesando fila 180002: 133713-2
+📋 Procesando fichas:  53%|█████████████████████████████████████████████▉                                         | 180395/341349 [02:17<00:48, 3294.79registro/s, Importadas=179962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 179963)
+📋 Procesando fichas:  53%|██████████████████████████████████████████████▍                                        | 182395/341349 [02:18<00:55, 2883.42registro/s, Importadas=181962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 181963)
+📋 Procesando fichas:  54%|██████████████████████████████████████████████▉                                        | 184395/341349 [02:19<00:47, 3287.69registro/s, Importadas=183962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 183963)
+📋 Procesando fichas:  55%|███████████████████████████████████████████████▌                                       | 186395/341349 [02:20<00:47, 3256.46registro/s, Importadas=185962, Omitidas=455, Duplicadas=0, Pacientes NF=418]✅ Lote creado: 2000 fichas (total: 185963)
+📋 Procesando fichas:  55%|███████████████████████████████████████████████▌                                       | 186802/341349 [02:20<00:57, 2672.95registro/s, Importadas=186369, Omitidas=455, Duplicadas=0, Pacientes NF=418]⚠️ Fila 186826: Paciente con RUT "238848423" no encontrado en BD.
+📋 Procesando fichas:  55%|████████████████████████████████████████████████                                       | 188396/341349 [02:20<00:46, 3316.72registro/s, Importadas=187962, Omitidas=456, Duplicadas=0, Pacientes NF=419]✅ Lote creado: 2000 fichas (total: 187963)
+📋 Procesando fichas:  56%|████████████████████████████████████████████████▍                                      | 189978/341349 [02:21<00:53, 2844.08registro/s, Importadas=189544, Omitidas=456, Duplicadas=0, Pacientes NF=419]🔍 Procesando fila 190002: 184953-2
+📋 Procesando fichas:  56%|████████████████████████████████████████████████▌                                      | 190396/341349 [02:21<00:49, 3031.84registro/s, Importadas=189962, Omitidas=456, Duplicadas=0, Pacientes NF=419]✅ Lote creado: 2000 fichas (total: 189963)
+📋 Procesando fichas:  56%|█████████████████████████████████████████████████                                      | 192396/341349 [02:22<00:45, 3301.96registro/s, Importadas=191962, Omitidas=456, Duplicadas=0, Pacientes NF=419]✅ Lote creado: 2000 fichas (total: 191963)
+📋 Procesando fichas:  57%|█████████████████████████████████████████████████▌                                     | 194396/341349 [02:23<00:43, 3390.46registro/s, Importadas=193962, Omitidas=456, Duplicadas=0, Pacientes NF=419]✅ Lote creado: 2000 fichas (total: 193963)
+📋 Procesando fichas:  58%|██████████████████████████████████████████████████                                     | 196396/341349 [02:23<00:47, 3046.11registro/s, Importadas=195962, Omitidas=456, Duplicadas=0, Pacientes NF=419]✅ Lote creado: 2000 fichas (total: 195963)
+📋 Procesando fichas:  58%|██████████████████████████████████████████████████▌                                    | 198396/341349 [02:24<00:44, 3228.20registro/s, Importadas=197962, Omitidas=456, Duplicadas=0, Pacientes NF=419]✅ Lote creado: 2000 fichas (total: 197963)
+📋 Procesando fichas:  59%|████████████████████████████████████████████████████▏                                    | 199978/341349 [02:25<00:47, 2980.43registro/s, Importadas=2e+5, Omitidas=456, Duplicadas=0, Pacientes NF=419]🔍 Procesando fila 200002: 205405-2
+📋 Procesando fichas:  59%|████████████████████████████████████████████████████▏                                    | 200396/341349 [02:25<00:44, 3137.00registro/s, Importadas=2e+5, Omitidas=456, Duplicadas=0, Pacientes NF=419]✅ Lote creado: 2000 fichas (total: 199963)
+📋 Procesando fichas:  59%|███████████████████████████████████████████████████▌                                   | 202396/341349 [02:26<00:42, 3255.95registro/s, Importadas=201962, Omitidas=456, Duplicadas=0, Pacientes NF=419]✅ Lote creado: 2000 fichas (total: 201963)
+📋 Procesando fichas:  60%|████████████████████████████████████████████████████                                   | 204396/341349 [02:27<00:45, 2989.73registro/s, Importadas=203962, Omitidas=456, Duplicadas=0, Pacientes NF=419]✅ Lote creado: 2000 fichas (total: 203963)
+📋 Procesando fichas:  60%|████████████████████████████████████████████████████▌                                  | 206396/341349 [02:27<00:42, 3189.00registro/s, Importadas=205962, Omitidas=456, Duplicadas=0, Pacientes NF=419]✅ Lote creado: 2000 fichas (total: 205963)
+📋 Procesando fichas:  61%|█████████████████████████████████████████████████████                                  | 208396/341349 [02:28<00:42, 3132.97registro/s, Importadas=207962, Omitidas=456, Duplicadas=0, Pacientes NF=419]✅ Lote creado: 2000 fichas (total: 207963)
+📋 Procesando fichas:  62%|█████████████████████████████████████████████████████▌                                 | 209978/341349 [02:29<00:41, 3184.26registro/s, Importadas=209544, Omitidas=456, Duplicadas=0, Pacientes NF=419]🔍 Procesando fila 210002: 97979-2
+📋 Procesando fichas:  62%|█████████████████████████████████████████████████████▌                                 | 210396/341349 [02:29<00:39, 3304.86registro/s, Importadas=209962, Omitidas=456, Duplicadas=0, Pacientes NF=419]✅ Lote creado: 2000 fichas (total: 209963)
+📋 Procesando fichas:  62%|██████████████████████████████████████████████████████▏                                | 212396/341349 [02:30<00:42, 3028.01registro/s, Importadas=211962, Omitidas=456, Duplicadas=0, Pacientes NF=419]✅ Lote creado: 2000 fichas (total: 211963)
+📋 Procesando fichas:  63%|██████████████████████████████████████████████████████▋                                | 214396/341349 [02:30<00:40, 3155.04registro/s, Importadas=213962, Omitidas=456, Duplicadas=0, Pacientes NF=419]✅ Lote creado: 2000 fichas (total: 213963)
+📋 Procesando fichas:  63%|███████████████████████████████████████████████████████▏                               | 216396/341349 [02:31<00:37, 3312.25registro/s, Importadas=215962, Omitidas=456, Duplicadas=0, Pacientes NF=419]✅ Lote creado: 2000 fichas (total: 215963)
+📋 Procesando fichas:  64%|███████████████████████████████████████████████████████▋                               | 218396/341349 [02:32<00:37, 3298.13registro/s, Importadas=217962, Omitidas=456, Duplicadas=0, Pacientes NF=419]✅ Lote creado: 2000 fichas (total: 217963)
+📋 Procesando fichas:  64%|████████████████████████████████████████████████████████                               | 219978/341349 [02:32<00:46, 2624.51registro/s, Importadas=219544, Omitidas=456, Duplicadas=0, Pacientes NF=419]🔍 Procesando fila 220002: 217372-2
+📋 Procesando fichas:  65%|████████████████████████████████████████████████████████▏                              | 220396/341349 [02:33<00:42, 2842.41registro/s, Importadas=219962, Omitidas=456, Duplicadas=0, Pacientes NF=419]✅ Lote creado: 2000 fichas (total: 219963)
+📋 Procesando fichas:  65%|████████████████████████████████████████████████████████▋                              | 222396/341349 [02:33<00:36, 3239.54registro/s, Importadas=221962, Omitidas=456, Duplicadas=0, Pacientes NF=419]✅ Lote creado: 2000 fichas (total: 221963)
+📋 Procesando fichas:  66%|█████████████████████████████████████████████████████████▏                             | 224396/341349 [02:34<00:36, 3188.26registro/s, Importadas=223962, Omitidas=456, Duplicadas=0, Pacientes NF=419]✅ Lote creado: 2000 fichas (total: 223963)
+📋 Procesando fichas:  66%|█████████████████████████████████████████████████████████▋                             | 226396/341349 [02:35<00:36, 3192.02registro/s, Importadas=225962, Omitidas=456, Duplicadas=0, Pacientes NF=419]✅ Lote creado: 2000 fichas (total: 225963)
+📋 Procesando fichas:  67%|██████████████████████████████████████████████████████████▏                            | 228396/341349 [02:36<00:37, 3003.71registro/s, Importadas=227962, Omitidas=456, Duplicadas=0, Pacientes NF=419]✅ Lote creado: 2000 fichas (total: 227963)
+📋 Procesando fichas:  67%|██████████████████████████████████████████████████████████▌                            | 229978/341349 [02:36<00:37, 2991.83registro/s, Importadas=229544, Omitidas=456, Duplicadas=0, Pacientes NF=419]🔍 Procesando fila 230002: 60672-2
+📋 Procesando fichas:  67%|██████████████████████████████████████████████████████████▋                            | 230396/341349 [02:36<00:33, 3264.93registro/s, Importadas=229962, Omitidas=456, Duplicadas=0, Pacientes NF=419]✅ Lote creado: 2000 fichas (total: 229963)
+📋 Procesando fichas:  68%|███████████████████████████████████████████████████████████▏                           | 232396/341349 [02:37<00:33, 3206.43registro/s, Importadas=231962, Omitidas=456, Duplicadas=0, Pacientes NF=419]✅ Lote creado: 2000 fichas (total: 231963)
+📋 Procesando fichas:  69%|███████████████████████████████████████████████████████████▋                           | 234396/341349 [02:38<00:35, 3021.96registro/s, Importadas=233962, Omitidas=456, Duplicadas=0, Pacientes NF=419]✅ Lote creado: 2000 fichas (total: 233963)
+📋 Procesando fichas:  69%|████████████████████████████████████████████████████████████▎                          | 236396/341349 [02:39<00:32, 3240.44registro/s, Importadas=235962, Omitidas=456, Duplicadas=0, Pacientes NF=419]✅ Lote creado: 2000 fichas (total: 235963)
+📋 Procesando fichas:  70%|████████████████████████████████████████████████████████████▊                          | 238396/341349 [02:39<00:32, 3167.62registro/s, Importadas=237962, Omitidas=456, Duplicadas=0, Pacientes NF=419]✅ Lote creado: 2000 fichas (total: 237963)
+📋 Procesando fichas:  70%|█████████████████████████████████████████████████████████████▏                         | 239978/341349 [02:40<00:32, 3162.19registro/s, Importadas=239544, Omitidas=456, Duplicadas=0, Pacientes NF=419]🔍 Procesando fila 240002: 105545-2
+📋 Procesando fichas:  70%|█████████████████████████████████████████████████████████████▎                         | 240396/341349 [02:40<00:30, 3280.74registro/s, Importadas=239962, Omitidas=456, Duplicadas=0, Pacientes NF=419]✅ Lote creado: 2000 fichas (total: 239963)
+📋 Procesando fichas:  71%|█████████████████████████████████████████████████████████████▌                         | 241725/341349 [02:41<00:37, 2622.37registro/s, Importadas=241291, Omitidas=456, Duplicadas=0, Pacientes NF=419]⚠️ Fila 241749: Paciente con RUT "921012977" no encontrado en BD.
+⚠️ Fila 241750: Paciente con RUT "921013426" no encontrado en BD.
+⚠️ Fila 241751: Paciente con RUT "921016972" no encontrado en BD.
+⚠️ Fila 241752: Paciente con RUT "92102407K" no encontrado en BD.
+⚠️ Fila 241753: Paciente con RUT "921024371" no encontrado en BD.
+⚠️ Fila 241754: Paciente con RUT "921026846" no encontrado en BD.
+⚠️ Fila 241755: Paciente con RUT "921027435" no encontrado en BD.
+⚠️ Fila 241756: Paciente con RUT "921034350" no encontrado en BD.
+⚠️ Fila 241757: Paciente con RUT "921034938" no encontrado en BD.
+⚠️ Fila 241758: Paciente con RUT "921035187" no encontrado en BD.
+⚠️ Fila 241759: Paciente con RUT "921035209" no encontrado en BD.
+⚠️ Fila 241760: Paciente con RUT "921035373" no encontrado en BD.
+⚠️ Fila 241761: Paciente con RUT "921036361" no encontrado en BD.
+⚠️ Fila 241762: Paciente con RUT "92103802K" no encontrado en BD.
+⚠️ Fila 241763: Paciente con RUT "921039859" no encontrado en BD.
+⚠️ Fila 241764: Paciente con RUT "921039867" no encontrado en BD.
+⚠️ Fila 241765: Paciente con RUT "921040024" no encontrado en BD.
+⚠️ Fila 241766: Paciente con RUT "921040547" no encontrado en BD.
+⚠️ Fila 241767: Paciente con RUT "921040938" no encontrado en BD.
+⚠️ Fila 241768: Paciente con RUT "921042566" no encontrado en BD.
+⚠️ Fila 241769: Paciente con RUT "921042655" no encontrado en BD.
+📋 Procesando fichas:  71%|█████████████████████████████████████████████████████████████▌                         | 241749/341349 [02:41<00:37, 2622.37registro/s, Importadas=241294, Omitidas=477, Duplicadas=0, Pacientes NF=440]⚠️ Fila 241773: Paciente con RUT "963932685" no encontrado en BD.
+⚠️ Fila 241774: Paciente con RUT "963933169" no encontrado en BD.
+⚠️ Fila 241775: Paciente con RUT "96393338K" no encontrado en BD.
+⚠️ Fila 241776: Paciente con RUT "963933398" no encontrado en BD.
+⚠️ Fila 241777: Paciente con RUT "963933495" no encontrado en BD.
+⚠️ Fila 241778: Paciente con RUT "963933525" no encontrado en BD.
+⚠️ Fila 241779: Paciente con RUT "963933681" no encontrado en BD.
+⚠️ Fila 241780: Paciente con RUT "963934025" no encontrado en BD.
+⚠️ Fila 241781: Paciente con RUT "96393422K" no encontrado en BD.
+⚠️ Fila 241782: Paciente con RUT "96393548K" no encontrado en BD.
+⚠️ Fila 241783: Paciente con RUT "963935749" no encontrado en BD.
+⚠️ Fila 241784: Paciente con RUT "963935757" no encontrado en BD.
+⚠️ Fila 241785: Paciente con RUT "963936036" no encontrado en BD.
+⚠️ Fila 241786: Paciente con RUT "963936273" no encontrado en BD.
+⚠️ Fila 241787: Paciente con RUT "963936699" no encontrado en BD.
+⚠️ Fila 241788: Paciente con RUT "963938675" no encontrado en BD.
+⚠️ Fila 241789: Paciente con RUT "963940440" no encontrado en BD.
+⚠️ Fila 241790: Paciente con RUT "963940580" no encontrado en BD.
+⚠️ Fila 241791: Paciente con RUT "963940874" no encontrado en BD.
+⚠️ Fila 241792: Paciente con RUT "963940904" no encontrado en BD.
+⚠️ Fila 241793: Paciente con RUT "963941412" no encontrado en BD.
+⚠️ Fila 241794: Paciente con RUT "963942087" no encontrado en BD.
+⚠️ Fila 241795: Paciente con RUT "96394215K" no encontrado en BD.
+⚠️ Fila 241796: Paciente con RUT "963942397" no encontrado en BD.
+⚠️ Fila 241797: Paciente con RUT "963942575" no encontrado en BD.
+⚠️ Fila 241798: Paciente con RUT "963942974" no encontrado en BD.
+⚠️ Fila 241799: Paciente con RUT "963942982" no encontrado en BD.
+⚠️ Fila 241800: Paciente con RUT "963943237" no encontrado en BD.
+⚠️ Fila 241801: Paciente con RUT "963943288" no encontrado en BD.
+⚠️ Fila 241802: Paciente con RUT "963944403" no encontrado en BD.
+⚠️ Fila 241803: Paciente con RUT "963945051" no encontrado en BD.
+⚠️ Fila 241804: Paciente con RUT "963945116" no encontrado en BD.
+⚠️ Fila 241805: Paciente con RUT "963945469" no encontrado en BD.
+⚠️ Fila 241806: Paciente con RUT "963945493" no encontrado en BD.
+⚠️ Fila 241807: Paciente con RUT "963945906" no encontrado en BD.
+⚠️ Fila 241808: Paciente con RUT "963946279" no encontrado en BD.
+⚠️ Fila 241809: Paciente con RUT "96394649K" no encontrado en BD.
+⚠️ Fila 241810: Paciente con RUT "963947399" no encontrado en BD.
+⚠️ Fila 241811: Paciente con RUT "963947607" no encontrado en BD.
+⚠️ Fila 241812: Paciente con RUT "963948700" no encontrado en BD.
+⚠️ Fila 241813: Paciente con RUT "963948964" no encontrado en BD.
+⚠️ Fila 241814: Paciente con RUT "963948999" no encontrado en BD.
+⚠️ Fila 241815: Paciente con RUT "963949006" no encontrado en BD.
+⚠️ Fila 241816: Paciente con RUT "963949014" no encontrado en BD.
+⚠️ Fila 241817: Paciente con RUT "963949049" no encontrado en BD.
+⚠️ Fila 241818: Paciente con RUT "963949243" no encontrado en BD.
+⚠️ Fila 241819: Paciente con RUT "963949715" no encontrado en BD.
+⚠️ Fila 241820: Paciente con RUT "96395011K" no encontrado en BD.
+⚠️ Fila 241821: Paciente con RUT "963950187" no encontrado en BD.
+⚠️ Fila 241822: Paciente con RUT "963950470" no encontrado en BD.
+⚠️ Fila 241823: Paciente con RUT "963950497" no encontrado en BD.
+⚠️ Fila 241824: Paciente con RUT "963950756" no encontrado en BD.
+⚠️ Fila 241825: Paciente con RUT "963951086" no encontrado en BD.
+⚠️ Fila 241826: Paciente con RUT "963951280" no encontrado en BD.
+⚠️ Fila 241827: Paciente con RUT "96395168K" no encontrado en BD.
+⚠️ Fila 241828: Paciente con RUT "963951698" no encontrado en BD.
+⚠️ Fila 241829: Paciente con RUT "963952562" no encontrado en BD.
+⚠️ Fila 241830: Paciente con RUT "963952627" no encontrado en BD.
+⚠️ Fila 241831: Paciente con RUT "96395297K" no encontrado en BD.
+⚠️ Fila 241832: Paciente con RUT "96395316K" no encontrado en BD.
+⚠️ Fila 241833: Paciente con RUT "963953615" no encontrado en BD.
+⚠️ Fila 241834: Paciente con RUT "963953984" no encontrado en BD.
+⚠️ Fila 241835: Paciente con RUT "963954409" no encontrado en BD.
+⚠️ Fila 241836: Paciente con RUT "963954417" no encontrado en BD.
+⚠️ Fila 241837: Paciente con RUT "963954433" no encontrado en BD.
+⚠️ Fila 241838: Paciente con RUT "96395445K" no encontrado en BD.
+⚠️ Fila 241839: Paciente con RUT "963954492" no encontrado en BD.
+⚠️ Fila 241840: Paciente con RUT "963954840" no encontrado en BD.
+⚠️ Fila 241841: Paciente con RUT "963955073" no encontrado en BD.
+⚠️ Fila 241842: Paciente con RUT "963955278" no encontrado en BD.
+⚠️ Fila 241843: Paciente con RUT "963955359" no encontrado en BD.
+⚠️ Fila 241844: Paciente con RUT "963955545" no encontrado en BD.
+⚠️ Fila 241845: Paciente con RUT "963956010" no encontrado en BD.
+⚠️ Fila 241846: Paciente con RUT "963956029" no encontrado en BD.
+⚠️ Fila 241847: Paciente con RUT "963956169" no encontrado en BD.
+⚠️ Fila 241848: Paciente con RUT "963956177" no encontrado en BD.
+⚠️ Fila 241849: Paciente con RUT "963956452" no encontrado en BD.
+⚠️ Fila 241850: Paciente con RUT "963956835" no encontrado en BD.
+⚠️ Fila 241851: Paciente con RUT "963957157" no encontrado en BD.
+⚠️ Fila 241852: Paciente con RUT "963957343" no encontrado en BD.
+⚠️ Fila 241853: Paciente con RUT "963957777" no encontrado en BD.
+⚠️ Fila 241854: Paciente con RUT "963958331" no encontrado en BD.
+⚠️ Fila 241855: Paciente con RUT "963958374" no encontrado en BD.
+⚠️ Fila 241856: Paciente con RUT "96395929K" no encontrado en BD.
+⚠️ Fila 241857: Paciente con RUT "963961782" no encontrado en BD.
+⚠️ Fila 241858: Paciente con RUT "963961979" no encontrado en BD.
+⚠️ Fila 241859: Paciente con RUT "963962150" no encontrado en BD.
+⚠️ Fila 241860: Paciente con RUT "963962541" no encontrado en BD.
+⚠️ Fila 241861: Paciente con RUT "963962762" no encontrado en BD.
+⚠️ Fila 241862: Paciente con RUT "963964862" no encontrado en BD.
+⚠️ Fila 241863: Paciente con RUT "963965214" no encontrado en BD.
+⚠️ Fila 241864: Paciente con RUT "963966512" no encontrado en BD.
+⚠️ Fila 241865: Paciente con RUT "963966601" no encontrado en BD.
+⚠️ Fila 241866: Paciente con RUT "963966628" no encontrado en BD.
+⚠️ Fila 241867: Paciente con RUT "963966881" no encontrado en BD.
+⚠️ Fila 241868: Paciente con RUT "963966954" no encontrado en BD.
+⚠️ Fila 241869: Paciente con RUT "963966989" no encontrado en BD.
+⚠️ Fila 241870: Paciente con RUT "963967268" no encontrado en BD.
+⚠️ Fila 241871: Paciente con RUT "963967276" no encontrado en BD.
+⚠️ Fila 241872: Paciente con RUT "963967926" no encontrado en BD.
+⚠️ Fila 241873: Paciente con RUT "963968140" no encontrado en BD.
+⚠️ Fila 241874: Paciente con RUT "963968159" no encontrado en BD.
+⚠️ Fila 241875: Paciente con RUT "963968183" no encontrado en BD.
+⚠️ Fila 241876: Paciente con RUT "963968450" no encontrado en BD.
+⚠️ Fila 241877: Paciente con RUT "963968604" no encontrado en BD.
+⚠️ Fila 241878: Paciente con RUT "963968663" no encontrado en BD.
+⚠️ Fila 241879: Paciente con RUT "963969449" no encontrado en BD.
+⚠️ Fila 241880: Paciente con RUT "963969511" no encontrado en BD.
+⚠️ Fila 241881: Paciente con RUT "963969546" no encontrado en BD.
+⚠️ Fila 241882: Paciente con RUT "963969694" no encontrado en BD.
+⚠️ Fila 241883: Paciente con RUT "963969708" no encontrado en BD.
+⚠️ Fila 241884: Paciente con RUT "963970293" no encontrado en BD.
+⚠️ Fila 241885: Paciente con RUT "963971702" no encontrado en BD.
+⚠️ Fila 241886: Paciente con RUT "96397213K" no encontrado en BD.
+⚠️ Fila 241887: Paciente con RUT "963973209" no encontrado en BD.
+⚠️ Fila 241888: Paciente con RUT "963973896" no encontrado en BD.
+⚠️ Fila 241889: Paciente con RUT "963974043" no encontrado en BD.
+⚠️ Fila 241890: Paciente con RUT "96397423K" no encontrado en BD.
+⚠️ Fila 241891: Paciente con RUT "963974604" no encontrado en BD.
+⚠️ Fila 241892: Paciente con RUT "96397471K" no encontrado en BD.
+⚠️ Fila 241893: Paciente con RUT "963974841" no encontrado en BD.
+⚠️ Fila 241894: Paciente con RUT "963974884" no encontrado en BD.
+⚠️ Fila 241895: Paciente con RUT "963975082" no encontrado en BD.
+⚠️ Fila 241896: Paciente con RUT "963975260" no encontrado en BD.
+⚠️ Fila 241897: Paciente con RUT "963975279" no encontrado en BD.
+⚠️ Fila 241898: Paciente con RUT "963975368" no encontrado en BD.
+⚠️ Fila 241899: Paciente con RUT "963976089" no encontrado en BD.
+⚠️ Fila 241900: Paciente con RUT "963976143" no encontrado en BD.
+⚠️ Fila 241901: Paciente con RUT "963976348" no encontrado en BD.
+⚠️ Fila 241902: Paciente con RUT "963976674" no encontrado en BD.
+⚠️ Fila 241903: Paciente con RUT "963977476" no encontrado en BD.
+⚠️ Fila 241904: Paciente con RUT "963977743" no encontrado en BD.
+⚠️ Fila 241905: Paciente con RUT "963978170" no encontrado en BD.
+⚠️ Fila 241906: Paciente con RUT "963978219" no encontrado en BD.
+⚠️ Fila 241907: Paciente con RUT "963978367" no encontrado en BD.
+⚠️ Fila 241908: Paciente con RUT "96397860K" no encontrado en BD.
+⚠️ Fila 241909: Paciente con RUT "963978618" no encontrado en BD.
+⚠️ Fila 241910: Paciente con RUT "963978626" no encontrado en BD.
+⚠️ Fila 241911: Paciente con RUT "963978634" no encontrado en BD.
+⚠️ Fila 241912: Paciente con RUT "963978952" no encontrado en BD.
+⚠️ Fila 241913: Paciente con RUT "96397955K" no encontrado en BD.
+⚠️ Fila 241914: Paciente con RUT "963979665" no encontrado en BD.
+⚠️ Fila 241915: Paciente con RUT "963979967" no encontrado en BD.
+⚠️ Fila 241916: Paciente con RUT "963980264" no encontrado en BD.
+⚠️ Fila 241917: Paciente con RUT "963980418" no encontrado en BD.
+⚠️ Fila 241918: Paciente con RUT "963980590" no encontrado en BD.
+⚠️ Fila 241919: Paciente con RUT "963980868" no encontrado en BD.
+⚠️ Fila 241920: Paciente con RUT "96398104K" no encontrado en BD.
+⚠️ Fila 241921: Paciente con RUT "963981260" no encontrado en BD.
+⚠️ Fila 241922: Paciente con RUT "963981767" no encontrado en BD.
+⚠️ Fila 241923: Paciente con RUT "963981775" no encontrado en BD.
+⚠️ Fila 241924: Paciente con RUT "963982917" no encontrado en BD.
+⚠️ Fila 241925: Paciente con RUT "963983395" no encontrado en BD.
+⚠️ Fila 241926: Paciente con RUT "963983506" no encontrado en BD.
+⚠️ Fila 241927: Paciente con RUT "96398359K" no encontrado en BD.
+⚠️ Fila 241928: Paciente con RUT "963983689" no encontrado en BD.
+⚠️ Fila 241929: Paciente con RUT "963983875" no encontrado en BD.
+⚠️ Fila 241930: Paciente con RUT "963984014" no encontrado en BD.
+⚠️ Fila 241931: Paciente con RUT "963984022" no encontrado en BD.
+⚠️ Fila 241932: Paciente con RUT "963984111" no encontrado en BD.
+⚠️ Fila 241933: Paciente con RUT "963984626" no encontrado en BD.
+⚠️ Fila 241934: Paciente con RUT "963984634" no encontrado en BD.
+⚠️ Fila 241935: Paciente con RUT "963984685" no encontrado en BD.
+⚠️ Fila 241936: Paciente con RUT "963985886" no encontrado en BD.
+⚠️ Fila 241937: Paciente con RUT "963986025" no encontrado en BD.
+⚠️ Fila 241938: Paciente con RUT "963986033" no encontrado en BD.
+⚠️ Fila 241939: Paciente con RUT "963986041" no encontrado en BD.
+⚠️ Fila 241940: Paciente con RUT "963986165" no encontrado en BD.
+⚠️ Fila 241941: Paciente con RUT "963986238" no encontrado en BD.
+⚠️ Fila 241942: Paciente con RUT "963987048" no encontrado en BD.
+⚠️ Fila 241943: Paciente con RUT "963987498" no encontrado en BD.
+⚠️ Fila 241944: Paciente con RUT "963987501" no encontrado en BD.
+⚠️ Fila 241945: Paciente con RUT "963988230" no encontrado en BD.
+⚠️ Fila 241946: Paciente con RUT "963988249" no encontrado en BD.
+⚠️ Fila 241947: Paciente con RUT "963988826" no encontrado en BD.
+⚠️ Fila 241948: Paciente con RUT "963988834" no encontrado en BD.
+⚠️ Fila 241949: Paciente con RUT "963989091" no encontrado en BD.
+⚠️ Fila 241950: Paciente con RUT "963989431" no encontrado en BD.
+⚠️ Fila 241951: Paciente con RUT "963989652" no encontrado en BD.
+⚠️ Fila 241952: Paciente con RUT "963989725" no encontrado en BD.
+⚠️ Fila 241953: Paciente con RUT "963990189" no encontrado en BD.
+⚠️ Fila 241954: Paciente con RUT "963990332" no encontrado en BD.
+⚠️ Fila 241955: Paciente con RUT "963990634" no encontrado en BD.
+⚠️ Fila 241956: Paciente con RUT "963990707" no encontrado en BD.
+⚠️ Fila 241957: Paciente con RUT "96399074K" no encontrado en BD.
+⚠️ Fila 241958: Paciente con RUT "963990901" no encontrado en BD.
+⚠️ Fila 241959: Paciente con RUT "96399091K" no encontrado en BD.
+⚠️ Fila 241960: Paciente con RUT "963991061" no encontrado en BD.
+⚠️ Fila 241961: Paciente con RUT "963991274" no encontrado en BD.
+⚠️ Fila 241962: Paciente con RUT "963991533" no encontrado en BD.
+⚠️ Fila 241963: Paciente con RUT "963991576" no encontrado en BD.
+⚠️ Fila 241964: Paciente con RUT "963991584" no encontrado en BD.
+⚠️ Fila 241965: Paciente con RUT "963991843" no encontrado en BD.
+⚠️ Fila 241966: Paciente con RUT "963992025" no encontrado en BD.
+⚠️ Fila 241967: Paciente con RUT "963992084" no encontrado en BD.
+⚠️ Fila 241968: Paciente con RUT "963992572" no encontrado en BD.
+⚠️ Fila 241969: Paciente con RUT "963993056" no encontrado en BD.
+⚠️ Fila 241970: Paciente con RUT "963993196" no encontrado en BD.
+⚠️ Fila 241971: Paciente con RUT "963993358" no encontrado en BD.
+⚠️ Fila 241972: Paciente con RUT "963993749" no encontrado en BD.
+⚠️ Fila 241973: Paciente con RUT "963994036" no encontrado en BD.
+⚠️ Fila 241974: Paciente con RUT "963995083" no encontrado en BD.
+⚠️ Fila 241975: Paciente con RUT "963995172" no encontrado en BD.
+⚠️ Fila 241976: Paciente con RUT "963995474" no encontrado en BD.
+⚠️ Fila 241977: Paciente con RUT "963997051" no encontrado en BD.
+⚠️ Fila 241978: Paciente con RUT "963997116" no encontrado en BD.
+⚠️ Fila 241979: Paciente con RUT "963997213" no encontrado en BD.
+⚠️ Fila 241980: Paciente con RUT "963997221" no encontrado en BD.
+⚠️ Fila 241981: Paciente con RUT "96399754K" no encontrado en BD.
+⚠️ Fila 241982: Paciente con RUT "963998031" no encontrado en BD.
+⚠️ Fila 241983: Paciente con RUT "96399804K" no encontrado en BD.
+⚠️ Fila 241984: Paciente con RUT "963998058" no encontrado en BD.
+⚠️ Fila 241985: Paciente con RUT "964000840" no encontrado en BD.
+⚠️ Fila 241986: Paciente con RUT "964000859" no encontrado en BD.
+⚠️ Fila 241987: Paciente con RUT "964001103" no encontrado en BD.
+⚠️ Fila 241988: Paciente con RUT "964002363" no encontrado en BD.
+⚠️ Fila 241989: Paciente con RUT "964002371" no encontrado en BD.
+⚠️ Fila 241990: Paciente con RUT "964002673" no encontrado en BD.
+⚠️ Fila 241991: Paciente con RUT "964003017" no encontrado en BD.
+⚠️ Fila 241992: Paciente con RUT "964003025" no encontrado en BD.
+⚠️ Fila 241993: Paciente con RUT "964004668" no encontrado en BD.
+⚠️ Fila 241994: Paciente con RUT "964004676" no encontrado en BD.
+⚠️ Fila 241995: Paciente con RUT "964005206" no encontrado en BD.
+⚠️ Fila 241996: Paciente con RUT "964007144" no encontrado en BD.
+⚠️ Fila 241997: Paciente con RUT "96400742K" no encontrado en BD.
+⚠️ Fila 241998: Paciente con RUT "964007721" no encontrado en BD.
+⚠️ Fila 241999: Paciente con RUT "964007780" no encontrado en BD.
+⚠️ Fila 242000: Paciente con RUT "964007888" no encontrado en BD.
+⚠️ Fila 242001: Paciente con RUT "964008507" no encontrado en BD.
+⚠️ Fila 242002: Paciente con RUT "964008795" no encontrado en BD.
+⚠️ Fila 242003: Paciente con RUT "964008809" no encontrado en BD.
+⚠️ Fila 242004: Paciente con RUT "964008817" no encontrado en BD.
+⚠️ Fila 242005: Paciente con RUT "964009813" no encontrado en BD.
+⚠️ Fila 242006: Paciente con RUT "964010323" no encontrado en BD.
+⚠️ Fila 242007: Paciente con RUT "964011133" no encontrado en BD.
+⚠️ Fila 242008: Paciente con RUT "964011508" no encontrado en BD.
+⚠️ Fila 242009: Paciente con RUT "964011605" no encontrado en BD.
+⚠️ Fila 242010: Paciente con RUT "964011761" no encontrado en BD.
+⚠️ Fila 242011: Paciente con RUT "964012253" no encontrado en BD.
+⚠️ Fila 242012: Paciente con RUT "964012393" no encontrado en BD.
+⚠️ Fila 242013: Paciente con RUT "964012970" no encontrado en BD.
+⚠️ Fila 242014: Paciente con RUT "964013144" no encontrado en BD.
+⚠️ Fila 242015: Paciente con RUT "964013152" no encontrado en BD.
+⚠️ Fila 242016: Paciente con RUT "964013160" no encontrado en BD.
+⚠️ Fila 242017: Paciente con RUT "964014582" no encontrado en BD.
+⚠️ Fila 242018: Paciente con RUT "964014701" no encontrado en BD.
+⚠️ Fila 242019: Paciente con RUT "964014760" no encontrado en BD.
+⚠️ Fila 242020: Paciente con RUT "964017816" no encontrado en BD.
+⚠️ Fila 242021: Paciente con RUT "964020736" no encontrado en BD.
+⚠️ Fila 242022: Paciente con RUT "964020949" no encontrado en BD.
+⚠️ Fila 242023: Paciente con RUT "964021538" no encontrado en BD.
+⚠️ Fila 242024: Paciente con RUT "964021635" no encontrado en BD.
+⚠️ Fila 242025: Paciente con RUT "964021759" no encontrado en BD.
+⚠️ Fila 242026: Paciente con RUT "964022038" no encontrado en BD.
+⚠️ Fila 242027: Paciente con RUT "964022054" no encontrado en BD.
+⚠️ Fila 242028: Paciente con RUT "964022127" no encontrado en BD.
+⚠️ Fila 242029: Paciente con RUT "96402216K" no encontrado en BD.
+⚠️ Fila 242030: Paciente con RUT "964022259" no encontrado en BD.
+⚠️ Fila 242031: Paciente con RUT "964022275" no encontrado en BD.
+⚠️ Fila 242032: Paciente con RUT "964022313" no encontrado en BD.
+⚠️ Fila 242033: Paciente con RUT "96402233K" no encontrado en BD.
+⚠️ Fila 242034: Paciente con RUT "964022348" no encontrado en BD.
+⚠️ Fila 242035: Paciente con RUT "964022356" no encontrado en BD.
+⚠️ Fila 242036: Paciente con RUT "964022364" no encontrado en BD.
+⚠️ Fila 242037: Paciente con RUT "964022372" no encontrado en BD.
+⚠️ Fila 242038: Paciente con RUT "964022380" no encontrado en BD.
+⚠️ Fila 242039: Paciente con RUT "964022399" no encontrado en BD.
+⚠️ Fila 242040: Paciente con RUT "964022402" no encontrado en BD.
+⚠️ Fila 242041: Paciente con RUT "964022410" no encontrado en BD.
+⚠️ Fila 242042: Paciente con RUT "964022429" no encontrado en BD.
+⚠️ Fila 242043: Paciente con RUT "964022437" no encontrado en BD.
+⚠️ Fila 242044: Paciente con RUT "964022445" no encontrado en BD.
+📋 Procesando fichas:  71%|█████████████████████████████████████████████████████████████▊                         | 242689/341349 [02:41<00:29, 3379.25registro/s, Importadas=241962, Omitidas=749, Duplicadas=0, Pacientes NF=712]✅ Lote creado: 2000 fichas (total: 241963)
+📋 Procesando fichas:  72%|██████████████████████████████████████████████████████████████▎                        | 244689/341349 [02:42<00:30, 3204.61registro/s, Importadas=243962, Omitidas=749, Duplicadas=0, Pacientes NF=712]✅ Lote creado: 2000 fichas (total: 243963)
+📋 Procesando fichas:  72%|██████████████████████████████████████████████████████████████▊                        | 246689/341349 [02:42<00:29, 3247.73registro/s, Importadas=245962, Omitidas=749, Duplicadas=0, Pacientes NF=712]✅ Lote creado: 2000 fichas (total: 245963)
+📋 Procesando fichas:  73%|███████████████████████████████████████████████████████████████▍                       | 248689/341349 [02:43<00:28, 3268.48registro/s, Importadas=247962, Omitidas=749, Duplicadas=0, Pacientes NF=712]✅ Lote creado: 2000 fichas (total: 247963)
+📋 Procesando fichas:  73%|███████████████████████████████████████████████████████████████▋                       | 249978/341349 [02:44<00:39, 2339.12registro/s, Importadas=249251, Omitidas=749, Duplicadas=0, Pacientes NF=712]🔍 Procesando fila 250002: 60488-3
+📋 Procesando fichas:  73%|███████████████████████████████████████████████████████████████▉                       | 250689/341349 [02:44<00:31, 2844.19registro/s, Importadas=249962, Omitidas=749, Duplicadas=0, Pacientes NF=712]✅ Lote creado: 2000 fichas (total: 249963)
+📋 Procesando fichas:  74%|████████████████████████████████████████████████████████████████▍                      | 252689/341349 [02:45<00:27, 3214.80registro/s, Importadas=251962, Omitidas=749, Duplicadas=0, Pacientes NF=712]✅ Lote creado: 2000 fichas (total: 251963)
+📋 Procesando fichas:  75%|████████████████████████████████████████████████████████████████▉                      | 254689/341349 [02:45<00:26, 3245.90registro/s, Importadas=253962, Omitidas=749, Duplicadas=0, Pacientes NF=712]✅ Lote creado: 2000 fichas (total: 253963)
+📋 Procesando fichas:  75%|█████████████████████████████████████████████████████████████████▍                     | 256689/341349 [02:46<00:27, 3116.99registro/s, Importadas=255962, Omitidas=749, Duplicadas=0, Pacientes NF=712]✅ Lote creado: 2000 fichas (total: 255963)
+📋 Procesando fichas:  76%|█████████████████████████████████████████████████████████████████▉                     | 258689/341349 [02:47<00:27, 3009.34registro/s, Importadas=257962, Omitidas=749, Duplicadas=0, Pacientes NF=712]✅ Lote creado: 2000 fichas (total: 257963)
+📋 Procesando fichas:  76%|██████████████████████████████████████████████████████████████████▎                    | 259978/341349 [02:47<00:27, 2991.49registro/s, Importadas=259251, Omitidas=749, Duplicadas=0, Pacientes NF=712]🔍 Procesando fila 260002: 60342-3
+📋 Procesando fichas:  76%|██████████████████████████████████████████████████████████████████▍                    | 260689/341349 [02:48<00:24, 3244.48registro/s, Importadas=259962, Omitidas=749, Duplicadas=0, Pacientes NF=712]✅ Lote creado: 2000 fichas (total: 259963)
+📋 Procesando fichas:  77%|██████████████████████████████████████████████████████████████████▉                    | 262689/341349 [02:48<00:24, 3168.09registro/s, Importadas=261962, Omitidas=749, Duplicadas=0, Pacientes NF=712]✅ Lote creado: 2000 fichas (total: 261963)
+📋 Procesando fichas:  78%|███████████████████████████████████████████████████████████████████▍                   | 264689/341349 [02:49<00:23, 3242.54registro/s, Importadas=263962, Omitidas=749, Duplicadas=0, Pacientes NF=712]✅ Lote creado: 2000 fichas (total: 263963)
+📋 Procesando fichas:  78%|███████████████████████████████████████████████████████████████████▉                   | 266689/341349 [02:50<00:24, 2997.46registro/s, Importadas=265962, Omitidas=749, Duplicadas=0, Pacientes NF=712]✅ Lote creado: 2000 fichas (total: 265963)
+📋 Procesando fichas:  79%|████████████████████████████████████████████████████████████████████▍                  | 268689/341349 [02:51<00:22, 3184.89registro/s, Importadas=267962, Omitidas=749, Duplicadas=0, Pacientes NF=712]✅ Lote creado: 2000 fichas (total: 267963)
+📋 Procesando fichas:  79%|████████████████████████████████████████████████████████████████████▊                  | 269978/341349 [02:51<00:25, 2808.42registro/s, Importadas=269251, Omitidas=749, Duplicadas=0, Pacientes NF=712]🔍 Procesando fila 270002: 138286-3
+📋 Procesando fichas:  79%|████████████████████████████████████████████████████████████████████▉                  | 270689/341349 [02:51<00:22, 3126.81registro/s, Importadas=269962, Omitidas=749, Duplicadas=0, Pacientes NF=712]✅ Lote creado: 2000 fichas (total: 269963)
+📋 Procesando fichas:  80%|█████████████████████████████████████████████████████████████████████▌                 | 272689/341349 [02:52<00:23, 2961.68registro/s, Importadas=271962, Omitidas=749, Duplicadas=0, Pacientes NF=712]✅ Lote creado: 2000 fichas (total: 271963)
+📋 Procesando fichas:  80%|██████████████████████████████████████████████████████████████████████                 | 274689/341349 [02:53<00:20, 3178.90registro/s, Importadas=273962, Omitidas=749, Duplicadas=0, Pacientes NF=712]✅ Lote creado: 2000 fichas (total: 273963)
+📋 Procesando fichas:  81%|██████████████████████████████████████████████████████████████████████▌                | 276689/341349 [02:54<00:20, 3222.26registro/s, Importadas=275962, Omitidas=749, Duplicadas=0, Pacientes NF=712]✅ Lote creado: 2000 fichas (total: 275963)
+📋 Procesando fichas:  82%|███████████████████████████████████████████████████████████████████████                | 278689/341349 [02:54<00:19, 3159.13registro/s, Importadas=277962, Omitidas=749, Duplicadas=0, Pacientes NF=712]✅ Lote creado: 2000 fichas (total: 277963)
+📋 Procesando fichas:  82%|███████████████████████████████████████████████████████████████████████▎               | 279978/341349 [02:55<00:24, 2542.24registro/s, Importadas=279251, Omitidas=749, Duplicadas=0, Pacientes NF=712]🔍 Procesando fila 280002: 144186-3
+📋 Procesando fichas:  82%|███████████████████████████████████████████████████████████████████████▌               | 280689/341349 [02:55<00:20, 2929.05registro/s, Importadas=279962, Omitidas=749, Duplicadas=0, Pacientes NF=712]✅ Lote creado: 2000 fichas (total: 279963)
+📋 Procesando fichas:  83%|████████████████████████████████████████████████████████████████████████               | 282689/341349 [02:56<00:19, 3016.24registro/s, Importadas=281962, Omitidas=749, Duplicadas=0, Pacientes NF=712]✅ Lote creado: 2000 fichas (total: 281963)
+📋 Procesando fichas:  83%|████████████████████████████████████████████████████████████████████████▌              | 284689/341349 [02:57<00:17, 3147.85registro/s, Importadas=283962, Omitidas=749, Duplicadas=0, Pacientes NF=712]✅ Lote creado: 2000 fichas (total: 283963)
+📋 Procesando fichas:  84%|█████████████████████████████████████████████████████████████████████████              | 286689/341349 [02:58<00:17, 3190.92registro/s, Importadas=285962, Omitidas=749, Duplicadas=0, Pacientes NF=712]✅ Lote creado: 2000 fichas (total: 285963)
+📋 Procesando fichas:  85%|█████████████████████████████████████████████████████████████████████████▌             | 288689/341349 [02:58<00:17, 2968.98registro/s, Importadas=287962, Omitidas=749, Duplicadas=0, Pacientes NF=712]✅ Lote creado: 2000 fichas (total: 287963)
+📋 Procesando fichas:  85%|█████████████████████████████████████████████████████████████████████████▉             | 289978/341349 [02:59<00:18, 2737.07registro/s, Importadas=289251, Omitidas=749, Duplicadas=0, Pacientes NF=712]🔍 Procesando fila 290002: 128377-3
+📋 Procesando fichas:  85%|██████████████████████████████████████████████████████████████████████████             | 290689/341349 [02:59<00:16, 3072.84registro/s, Importadas=289962, Omitidas=749, Duplicadas=0, Pacientes NF=712]✅ Lote creado: 2000 fichas (total: 289963)
+📋 Procesando fichas:  86%|██████████████████████████████████████████████████████████████████████████▌            | 292689/341349 [03:00<00:15, 3185.42registro/s, Importadas=291962, Omitidas=749, Duplicadas=0, Pacientes NF=712]✅ Lote creado: 2000 fichas (total: 291963)
+📋 Procesando fichas:  86%|███████████████████████████████████████████████████████████████████████████            | 294689/341349 [03:01<00:14, 3212.94registro/s, Importadas=293962, Omitidas=749, Duplicadas=0, Pacientes NF=712]✅ Lote creado: 2000 fichas (total: 293963)
+📋 Procesando fichas:  87%|███████████████████████████████████████████████████████████████████████████▌           | 296689/341349 [03:02<00:15, 2939.31registro/s, Importadas=295962, Omitidas=749, Duplicadas=0, Pacientes NF=712]✅ Lote creado: 2000 fichas (total: 295963)
+📋 Procesando fichas:  88%|████████████████████████████████████████████████████████████████████████████▏          | 298689/341349 [03:02<00:13, 3157.80registro/s, Importadas=297962, Omitidas=749, Duplicadas=0, Pacientes NF=712]✅ Lote creado: 2000 fichas (total: 297963)
+📋 Procesando fichas:  88%|████████████████████████████████████████████████████████████████████████████▍          | 299978/341349 [03:03<00:14, 2785.95registro/s, Importadas=299251, Omitidas=749, Duplicadas=0, Pacientes NF=712]🔍 Procesando fila 300002: 61504-3
+📋 Procesando fichas:  88%|██████████████████████████████████████████████████████████████████████████████▍          | 300689/341349 [03:03<00:13, 3096.44registro/s, Importadas=3e+5, Omitidas=749, Duplicadas=0, Pacientes NF=712]✅ Lote creado: 2000 fichas (total: 299963)
+📋 Procesando fichas:  89%|█████████████████████████████████████████████████████████████████████████████▏         | 302689/341349 [03:04<00:12, 3194.28registro/s, Importadas=301962, Omitidas=749, Duplicadas=0, Pacientes NF=712]✅ Lote creado: 2000 fichas (total: 301963)
+📋 Procesando fichas:  89%|█████████████████████████████████████████████████████████████████████████████▋         | 304689/341349 [03:05<00:12, 2929.46registro/s, Importadas=303962, Omitidas=749, Duplicadas=0, Pacientes NF=712]✅ Lote creado: 2000 fichas (total: 303963)
+📋 Procesando fichas:  90%|██████████████████████████████████████████████████████████████████████████████▏        | 306689/341349 [03:05<00:11, 3138.83registro/s, Importadas=305962, Omitidas=749, Duplicadas=0, Pacientes NF=712]✅ Lote creado: 2000 fichas (total: 305963)
+📋 Procesando fichas:  90%|██████████████████████████████████████████████████████████████████████████████▋        | 308689/341349 [03:06<00:10, 3132.57registro/s, Importadas=307962, Omitidas=749, Duplicadas=0, Pacientes NF=712]✅ Lote creado: 2000 fichas (total: 307963)
+📋 Procesando fichas:  91%|███████████████████████████████████████████████████████████████████████████████        | 309978/341349 [03:07<00:15, 1963.07registro/s, Importadas=309251, Omitidas=749, Duplicadas=0, Pacientes NF=712]🔍 Procesando fila 310002: 114195-3
+📋 Procesando fichas:  91%|███████████████████████████████████████████████████████████████████████████████▏       | 310689/341349 [03:07<00:12, 2521.27registro/s, Importadas=309962, Omitidas=749, Duplicadas=0, Pacientes NF=712]✅ Lote creado: 2000 fichas (total: 309963)
+📋 Procesando fichas:  92%|███████████████████████████████████████████████████████████████████████████████▋       | 312689/341349 [03:08<00:09, 3084.52registro/s, Importadas=311962, Omitidas=749, Duplicadas=0, Pacientes NF=712]❌ Error en bulk_create: (1062, "Duplicate entry '143395-3' for key 'unique_ficha_por_establecimiento'")
+🔍 Intentando crear una por una para identificar el problema...
+❌ Error en fila 310823: Ficha #143395 - Establecimiento 3 - Paciente 95479367 - Error: (1062, "Duplicate entry '143395-3' for key 'unique_ficha_por_establecimiento'")
+📋 Procesando fichas:  92%|█████████████████████████████████████████████████████████████████████████████████       | 314284/341349 [03:12<00:36, 738.35registro/s, Importadas=313557, Omitidas=750, Duplicadas=0, Pacientes NF=712]⚠️ Fila 314309: Paciente con RUT "921013256" no encontrado en BD.
+⚠️ Fila 314310: Paciente con RUT "921013884" no encontrado en BD.
+⚠️ Fila 314311: Paciente con RUT "921017006" no encontrado en BD.
+⚠️ Fila 314312: Paciente con RUT "921017111" no encontrado en BD.
+⚠️ Fila 314313: Paciente con RUT "92101922K" no encontrado en BD.
+⚠️ Fila 314314: Paciente con RUT "921020457" no encontrado en BD.
+⚠️ Fila 314315: Paciente con RUT "921020619" no encontrado en BD.
+⚠️ Fila 314316: Paciente con RUT "921020627" no encontrado en BD.
+⚠️ Fila 314317: Paciente con RUT "921024274" no encontrado en BD.
+⚠️ Fila 314318: Paciente con RUT "921024312" no encontrado en BD.
+⚠️ Fila 314319: Paciente con RUT "921024916" no encontrado en BD.
+⚠️ Fila 314320: Paciente con RUT "921025971" no encontrado en BD.
+⚠️ Fila 314321: Paciente con RUT "921027710" no encontrado en BD.
+⚠️ Fila 314322: Paciente con RUT "921030673" no encontrado en BD.
+⚠️ Fila 314323: Paciente con RUT "921030681" no encontrado en BD.
+⚠️ Fila 314324: Paciente con RUT "92103069K" no encontrado en BD.
+⚠️ Fila 314325: Paciente con RUT "921031076" no encontrado en BD.
+⚠️ Fila 314326: Paciente con RUT "921031459" no encontrado en BD.
+⚠️ Fila 314327: Paciente con RUT "921031688" no encontrado en BD.
+⚠️ Fila 314328: Paciente con RUT "921031912" no encontrado en BD.
+⚠️ Fila 314329: Paciente con RUT "921032412" no encontrado en BD.
+⚠️ Fila 314330: Paciente con RUT "921032463" no encontrado en BD.
+⚠️ Fila 314331: Paciente con RUT "921034180" no encontrado en BD.
+⚠️ Fila 314332: Paciente con RUT "921037295" no encontrado en BD.
+⚠️ Fila 314333: Paciente con RUT "921038216" no encontrado en BD.
+⚠️ Fila 314334: Paciente con RUT "921039646" no encontrado en BD.
+⚠️ Fila 314335: Paciente con RUT "921039883" no encontrado en BD.
+⚠️ Fila 314336: Paciente con RUT "921041993" no encontrado en BD.
+⚠️ Fila 314337: Paciente con RUT "921042922" no encontrado en BD.
+📋 Procesando fichas:  92%|█████████████████████████████████████████████████████████████████████████████████       | 314315/341349 [03:12<00:27, 980.08registro/s, Importadas=313559, Omitidas=779, Duplicadas=0, Pacientes NF=741]⚠️ Fila 314340: Paciente con RUT "963932707" no encontrado en BD.
+⚠️ Fila 314341: Paciente con RUT "963932715" no encontrado en BD.
+⚠️ Fila 314342: Paciente con RUT "963934661" no encontrado en BD.
+⚠️ Fila 314343: Paciente con RUT "96393825K" no encontrado en BD.
+⚠️ Fila 314344: Paciente con RUT "963939361" no encontrado en BD.
+⚠️ Fila 314345: Paciente con RUT "96393937K" no encontrado en BD.
+⚠️ Fila 314346: Paciente con RUT "963939426" no encontrado en BD.
+⚠️ Fila 314347: Paciente con RUT "963939469" no encontrado en BD.
+⚠️ Fila 314348: Paciente con RUT "963940025" no encontrado en BD.
+⚠️ Fila 314349: Paciente con RUT "963941390" no encontrado en BD.
+⚠️ Fila 314350: Paciente con RUT "963941404" no encontrado en BD.
+⚠️ Fila 314351: Paciente con RUT "963946732" no encontrado en BD.
+⚠️ Fila 314352: Paciente con RUT "963946740" no encontrado en BD.
+⚠️ Fila 314353: Paciente con RUT "963946759" no encontrado en BD.
+⚠️ Fila 314354: Paciente con RUT "963948999" no encontrado en BD.
+⚠️ Fila 314355: Paciente con RUT "963950004" no encontrado en BD.
+⚠️ Fila 314356: Paciente con RUT "963950551" no encontrado en BD.
+⚠️ Fila 314357: Paciente con RUT "963951329" no encontrado en BD.
+⚠️ Fila 314358: Paciente con RUT "96395154K" no encontrado en BD.
+⚠️ Fila 314359: Paciente con RUT "963951558" no encontrado en BD.
+⚠️ Fila 314360: Paciente con RUT "963951566" no encontrado en BD.
+⚠️ Fila 314361: Paciente con RUT "963953550" no encontrado en BD.
+⚠️ Fila 314362: Paciente con RUT "963955383" no encontrado en BD.
+⚠️ Fila 314363: Paciente con RUT "963955669" no encontrado en BD.
+⚠️ Fila 314364: Paciente con RUT "963958870" no encontrado en BD.
+⚠️ Fila 314365: Paciente con RUT "963960212" no encontrado en BD.
+⚠️ Fila 314366: Paciente con RUT "963964412" no encontrado en BD.
+⚠️ Fila 314367: Paciente con RUT "96396451K" no encontrado en BD.
+⚠️ Fila 314368: Paciente con RUT "963968701" no encontrado en BD.
+⚠️ Fila 314369: Paciente con RUT "963973632" no encontrado en BD.
+⚠️ Fila 314370: Paciente con RUT "963974558" no encontrado en BD.
+⚠️ Fila 314371: Paciente con RUT "963976763" no encontrado en BD.
+⚠️ Fila 314372: Paciente con RUT "96397678K" no encontrado en BD.
+⚠️ Fila 314373: Paciente con RUT "963976798" no encontrado en BD.
+⚠️ Fila 314374: Paciente con RUT "963977417" no encontrado en BD.
+⚠️ Fila 314375: Paciente con RUT "96397762K" no encontrado en BD.
+⚠️ Fila 314376: Paciente con RUT "963977638" no encontrado en BD.
+⚠️ Fila 314377: Paciente con RUT "963977646" no encontrado en BD.
+⚠️ Fila 314378: Paciente con RUT "963978316" no encontrado en BD.
+⚠️ Fila 314379: Paciente con RUT "963978324" no encontrado en BD.
+⚠️ Fila 314380: Paciente con RUT "963978332" no encontrado en BD.
+⚠️ Fila 314381: Paciente con RUT "96398300K" no encontrado en BD.
+⚠️ Fila 314382: Paciente con RUT "963986491" no encontrado en BD.
+⚠️ Fila 314383: Paciente con RUT "963987323" no encontrado en BD.
+⚠️ Fila 314384: Paciente con RUT "963988494" no encontrado en BD.
+⚠️ Fila 314385: Paciente con RUT "96399012K" no encontrado en BD.
+⚠️ Fila 314386: Paciente con RUT "963990138" no encontrado en BD.
+⚠️ Fila 314387: Paciente con RUT "963990340" no encontrado en BD.
+⚠️ Fila 314388: Paciente con RUT "963990359" no encontrado en BD.
+⚠️ Fila 314389: Paciente con RUT "963991150" no encontrado en BD.
+⚠️ Fila 314390: Paciente con RUT "96399236K" no encontrado en BD.
+⚠️ Fila 314391: Paciente con RUT "963992548" no encontrado en BD.
+⚠️ Fila 314392: Paciente con RUT "963992564" no encontrado en BD.
+⚠️ Fila 314393: Paciente con RUT "963992610" no encontrado en BD.
+⚠️ Fila 314394: Paciente con RUT "963992823" no encontrado en BD.
+⚠️ Fila 314395: Paciente con RUT "96399401K" no encontrado en BD.
+⚠️ Fila 314396: Paciente con RUT "963994435" no encontrado en BD.
+⚠️ Fila 314397: Paciente con RUT "963994516" no encontrado en BD.
+⚠️ Fila 314398: Paciente con RUT "963994524" no encontrado en BD.
+⚠️ Fila 314399: Paciente con RUT "963995075" no encontrado en BD.
+⚠️ Fila 314400: Paciente con RUT "96399575K" no encontrado en BD.
+⚠️ Fila 314401: Paciente con RUT "963996896" no encontrado en BD.
+⚠️ Fila 314402: Paciente con RUT "96399690K" no encontrado en BD.
+⚠️ Fila 314403: Paciente con RUT "963997280" no encontrado en BD.
+⚠️ Fila 314404: Paciente con RUT "963997299" no encontrado en BD.
+⚠️ Fila 314405: Paciente con RUT "963997302" no encontrado en BD.
+⚠️ Fila 314406: Paciente con RUT "963998023" no encontrado en BD.
+⚠️ Fila 314407: Paciente con RUT "964000549" no encontrado en BD.
+⚠️ Fila 314408: Paciente con RUT "964000662" no encontrado en BD.
+⚠️ Fila 314409: Paciente con RUT "964000697" no encontrado en BD.
+⚠️ Fila 314410: Paciente con RUT "964001057" no encontrado en BD.
+⚠️ Fila 314411: Paciente con RUT "964001065" no encontrado en BD.
+⚠️ Fila 314412: Paciente con RUT "964001073" no encontrado en BD.
+⚠️ Fila 314413: Paciente con RUT "964001081" no encontrado en BD.
+⚠️ Fila 314414: Paciente con RUT "96400109K" no encontrado en BD.
+⚠️ Fila 314415: Paciente con RUT "964001162" no encontrado en BD.
+⚠️ Fila 314416: Paciente con RUT "964002975" no encontrado en BD.
+⚠️ Fila 314417: Paciente con RUT "964003521" no encontrado en BD.
+⚠️ Fila 314418: Paciente con RUT "964004706" no encontrado en BD.
+⚠️ Fila 314419: Paciente con RUT "964004730" no encontrado en BD.
+⚠️ Fila 314420: Paciente con RUT "964005397" no encontrado en BD.
+⚠️ Fila 314421: Paciente con RUT "964005400" no encontrado en BD.
+⚠️ Fila 314422: Paciente con RUT "964006822" no encontrado en BD.
+⚠️ Fila 314423: Paciente con RUT "964007268" no encontrado en BD.
+⚠️ Fila 314424: Paciente con RUT "964008515" no encontrado en BD.
+⚠️ Fila 314425: Paciente con RUT "964008582" no encontrado en BD.
+⚠️ Fila 314426: Paciente con RUT "964009694" no encontrado en BD.
+⚠️ Fila 314427: Paciente con RUT "964009708" no encontrado en BD.
+⚠️ Fila 314428: Paciente con RUT "964010552" no encontrado en BD.
+⚠️ Fila 314429: Paciente con RUT "964010951" no encontrado en BD.
+⚠️ Fila 314430: Paciente con RUT "964015635" no encontrado en BD.
+⚠️ Fila 314431: Paciente con RUT "964015643" no encontrado en BD.
+⚠️ Fila 314432: Paciente con RUT "964015651" no encontrado en BD.
+⚠️ Fila 314433: Paciente con RUT "964015836" no encontrado en BD.
+⚠️ Fila 314434: Paciente con RUT "964015929" no encontrado en BD.
+⚠️ Fila 314435: Paciente con RUT "964016070" no encontrado en BD.
+⚠️ Fila 314436: Paciente con RUT "964016127" no encontrado en BD.
+⚠️ Fila 314437: Paciente con RUT "964016135" no encontrado en BD.
+⚠️ Fila 314438: Paciente con RUT "964016143" no encontrado en BD.
+⚠️ Fila 314439: Paciente con RUT "964016682" no encontrado en BD.
+⚠️ Fila 314440: Paciente con RUT "964017549" no encontrado en BD.
+⚠️ Fila 314441: Paciente con RUT "964019703" no encontrado en BD.
+⚠️ Fila 314442: Paciente con RUT "964020019" no encontrado en BD.
+⚠️ Fila 314443: Paciente con RUT "964020477" no encontrado en BD.
+⚠️ Fila 314444: Paciente con RUT "964020604" no encontrado en BD.
+⚠️ Fila 314445: Paciente con RUT "964020663" no encontrado en BD.
+⚠️ Fila 314446: Paciente con RUT "964021066" no encontrado en BD.
+⚠️ Fila 314447: Paciente con RUT "964021465" no encontrado en BD.
+⚠️ Fila 314448: Paciente con RUT "964021473" no encontrado en BD.
+⚠️ Fila 314449: Paciente con RUT "964021481" no encontrado en BD.
+⚠️ Fila 314450: Paciente con RUT "96402149K" no encontrado en BD.
+⚠️ Fila 314451: Paciente con RUT "964021600" no encontrado en BD.
+⚠️ Fila 314452: Paciente con RUT "964022291" no encontrado en BD.
+📋 Procesando fichas:  92%|████████████████████████████████████████████████████████████████████████████████▏      | 314830/341349 [03:12<00:19, 1336.51registro/s, Importadas=313961, Omitidas=892, Duplicadas=0, Pacientes NF=854]✅ Lote creado: 2000 fichas (total: 313962)
+📋 Procesando fichas:  93%|████████████████████████████████████████████████████████████████████████████████▊      | 316830/341349 [03:13<00:09, 2569.84registro/s, Importadas=315961, Omitidas=892, Duplicadas=0, Pacientes NF=854]✅ Lote creado: 2000 fichas (total: 315962)
+📋 Procesando fichas:  93%|█████████████████████████████████████████████████████████████████████████████████▎     | 318830/341349 [03:13<00:07, 2931.14registro/s, Importadas=317961, Omitidas=892, Duplicadas=0, Pacientes NF=854]✅ Lote creado: 2000 fichas (total: 317962)
+📋 Procesando fichas:  94%|█████████████████████████████████████████████████████████████████████████████████▌     | 319977/341349 [03:14<00:07, 2753.33registro/s, Importadas=319108, Omitidas=892, Duplicadas=0, Pacientes NF=854]🔍 Procesando fila 320002: 55391-5
+📋 Procesando fichas:  94%|█████████████████████████████████████████████████████████████████████████████████▊     | 320830/341349 [03:14<00:06, 3203.63registro/s, Importadas=319961, Omitidas=892, Duplicadas=0, Pacientes NF=854]✅ Lote creado: 2000 fichas (total: 319962)
+📋 Procesando fichas:  94%|██████████████████████████████████████████████████████████████████████████████████     | 322118/341349 [03:15<00:06, 2819.24registro/s, Importadas=321249, Omitidas=892, Duplicadas=0, Pacientes NF=854]⚠️ Fila 322143: Paciente con RUT "185432785" no encontrado en BD.
+📋 Procesando fichas:  95%|██████████████████████████████████████████████████████████████████████████████████▎    | 322831/341349 [03:15<00:05, 3150.86registro/s, Importadas=321961, Omitidas=893, Duplicadas=0, Pacientes NF=855]✅ Lote creado: 2000 fichas (total: 321962)
+📋 Procesando fichas:  95%|██████████████████████████████████████████████████████████████████████████████████▊    | 324831/341349 [03:16<00:05, 3224.18registro/s, Importadas=323961, Omitidas=893, Duplicadas=0, Pacientes NF=855]❌ Error en bulk_create: (1062, "Duplicate entry '96141-5' for key 'unique_ficha_por_establecimiento'")
+🔍 Intentando crear una por una para identificar el problema...
+❌ Error en fila 324132: Ficha #96141 - Establecimiento 5 - Paciente 225288046 - Error: (1062, "Duplicate entry '96141-5' for key 'unique_ficha_por_establecimiento'")
+📋 Procesando fichas:  96%|███████████████████████████████████████████████████████████████████████████████████▎   | 326830/341349 [03:20<00:11, 1210.51registro/s, Importadas=325960, Omitidas=894, Duplicadas=0, Pacientes NF=855]✅ Lote creado: 2000 fichas (total: 325961)
+📋 Procesando fichas:  96%|███████████████████████████████████████████████████████████████████████████████████▊   | 328830/341349 [03:21<00:04, 2704.98registro/s, Importadas=327960, Omitidas=894, Duplicadas=0, Pacientes NF=855]✅ Lote creado: 2000 fichas (total: 327961)
+📋 Procesando fichas:  97%|████████████████████████████████████████████████████████████████████████████████████   | 329976/341349 [03:21<00:04, 2666.01registro/s, Importadas=329106, Omitidas=894, Duplicadas=0, Pacientes NF=855]🔍 Procesando fila 330002: 99403-5
+📋 Procesando fichas:  97%|████████████████████████████████████████████████████████████████████████████████████▎  | 330830/341349 [03:21<00:03, 3145.60registro/s, Importadas=329960, Omitidas=894, Duplicadas=0, Pacientes NF=855]✅ Lote creado: 2000 fichas (total: 329961)
+📋 Procesando fichas:  98%|████████████████████████████████████████████████████████████████████████████████████▊  | 332830/341349 [03:22<00:02, 3106.79registro/s, Importadas=331960, Omitidas=894, Duplicadas=0, Pacientes NF=855]✅ Lote creado: 2000 fichas (total: 331961)
+📋 Procesando fichas:  98%|█████████████████████████████████████████████████████████████████████████████████████▏ | 334310/341349 [03:23<00:02, 2754.31registro/s, Importadas=333440, Omitidas=894, Duplicadas=0, Pacientes NF=855]⚠️ Fila 334336: Paciente con RUT "921035438" no encontrado en BD.
+⚠️ Fila 334337: Paciente con RUT "921035616" no encontrado en BD.
+⚠️ Fila 334338: Paciente con RUT "921035624" no encontrado en BD.
+⚠️ Fila 334339: Paciente con RUT "921038607" no encontrado en BD.
+⚠️ Fila 334340: Paciente con RUT "921038682" no encontrado en BD.
+⚠️ Fila 334341: Paciente con RUT "921039085" no encontrado en BD.
+⚠️ Fila 334342: Paciente con RUT "921039808" no encontrado en BD.
+⚠️ Fila 334343: Paciente con RUT "92104013K" no encontrado en BD.
+⚠️ Fila 334344: Paciente con RUT "921040202" no encontrado en BD.
+⚠️ Fila 334345: Paciente con RUT "921040210" no encontrado en BD.
+⚠️ Fila 334346: Paciente con RUT "921040229" no encontrado en BD.
+⚠️ Fila 334347: Paciente con RUT "921040237" no encontrado en BD.
+⚠️ Fila 334348: Paciente con RUT "921040245" no encontrado en BD.
+⚠️ Fila 334349: Paciente con RUT "921040482" no encontrado en BD.
+⚠️ Fila 334350: Paciente con RUT "921040830" no encontrado en BD.
+⚠️ Fila 334351: Paciente con RUT "921040865" no encontrado en BD.
+⚠️ Fila 334352: Paciente con RUT "921041101" no encontrado en BD.
+⚠️ Fila 334353: Paciente con RUT "921041721" no encontrado en BD.
+⚠️ Fila 334354: Paciente con RUT "921041942" no encontrado en BD.
+⚠️ Fila 334355: Paciente con RUT "921041950" no encontrado en BD.
+⚠️ Fila 334356: Paciente con RUT "921041969" no encontrado en BD.
+⚠️ Fila 334357: Paciente con RUT "921042043" no encontrado en BD.
+⚠️ Fila 334358: Paciente con RUT "92104223K" no encontrado en BD.
+⚠️ Fila 334359: Paciente con RUT "921042248" no encontrado en BD.
+⚠️ Fila 334360: Paciente con RUT "921042361" no encontrado en BD.
+⚠️ Fila 334361: Paciente con RUT "921042914" no encontrado en BD.
+⚠️ Fila 334362: Paciente con RUT "921043015" no encontrado en BD.
+⚠️ Fila 334363: Paciente con RUT "921043023" no encontrado en BD.
+⚠️ Fila 334364: Paciente con RUT "921043090" no encontrado en BD.
+⚠️ Fila 334365: Paciente con RUT "921043104" no encontrado en BD.
+⚠️ Fila 334366: Paciente con RUT "963932898" no encontrado en BD.
+⚠️ Fila 334367: Paciente con RUT "963932952" no encontrado en BD.
+⚠️ Fila 334368: Paciente con RUT "96393307K" no encontrado en BD.
+⚠️ Fila 334369: Paciente con RUT "963933126" no encontrado en BD.
+⚠️ Fila 334370: Paciente con RUT "963933436" no encontrado en BD.
+⚠️ Fila 334371: Paciente con RUT "963933444" no encontrado en BD.
+⚠️ Fila 334372: Paciente con RUT "963933606" no encontrado en BD.
+⚠️ Fila 334373: Paciente con RUT "963934238" no encontrado en BD.
+⚠️ Fila 334374: Paciente con RUT "963934483" no encontrado en BD.
+⚠️ Fila 334375: Paciente con RUT "963934491" no encontrado en BD.
+⚠️ Fila 334376: Paciente con RUT "963934505" no encontrado en BD.
+⚠️ Fila 334377: Paciente con RUT "963934629" no encontrado en BD.
+⚠️ Fila 334378: Paciente con RUT "963934874" no encontrado en BD.
+⚠️ Fila 334379: Paciente con RUT "963935102" no encontrado en BD.
+⚠️ Fila 334380: Paciente con RUT "963935307" no encontrado en BD.
+⚠️ Fila 334381: Paciente con RUT "963935315" no encontrado en BD.
+⚠️ Fila 334382: Paciente con RUT "963935331" no encontrado en BD.
+⚠️ Fila 334383: Paciente con RUT "963935641" no encontrado en BD.
+⚠️ Fila 334384: Paciente con RUT "963935978" no encontrado en BD.
+⚠️ Fila 334385: Paciente con RUT "963935986" no encontrado en BD.
+⚠️ Fila 334386: Paciente con RUT "963936109" no encontrado en BD.
+⚠️ Fila 334387: Paciente con RUT "963936494" no encontrado en BD.
+⚠️ Fila 334388: Paciente con RUT "963936680" no encontrado en BD.
+⚠️ Fila 334389: Paciente con RUT "963937547" no encontrado en BD.
+⚠️ Fila 334390: Paciente con RUT "963937563" no encontrado en BD.
+⚠️ Fila 334391: Paciente con RUT "963937636" no encontrado en BD.
+⚠️ Fila 334392: Paciente con RUT "963938586" no encontrado en BD.
+⚠️ Fila 334393: Paciente con RUT "963939302" no encontrado en BD.
+⚠️ Fila 334394: Paciente con RUT "963939590" no encontrado en BD.
+⚠️ Fila 334395: Paciente con RUT "963939884" no encontrado en BD.
+⚠️ Fila 334396: Paciente con RUT "963940017" no encontrado en BD.
+⚠️ Fila 334397: Paciente con RUT "963940386" no encontrado en BD.
+⚠️ Fila 334398: Paciente con RUT "963941013" no encontrado en BD.
+⚠️ Fila 334399: Paciente con RUT "963941048" no encontrado en BD.
+⚠️ Fila 334400: Paciente con RUT "963941064" no encontrado en BD.
+⚠️ Fila 334401: Paciente con RUT "963942370" no encontrado en BD.
+⚠️ Fila 334402: Paciente con RUT "963942621" no encontrado en BD.
+⚠️ Fila 334403: Paciente con RUT "963942907" no encontrado en BD.
+⚠️ Fila 334404: Paciente con RUT "963943083" no encontrado en BD.
+⚠️ Fila 334405: Paciente con RUT "963943172" no encontrado en BD.
+⚠️ Fila 334406: Paciente con RUT "963943180" no encontrado en BD.
+⚠️ Fila 334407: Paciente con RUT "963943512" no encontrado en BD.
+⚠️ Fila 334408: Paciente con RUT "963943598" no encontrado en BD.
+⚠️ Fila 334409: Paciente con RUT "963943733" no encontrado en BD.
+⚠️ Fila 334410: Paciente con RUT "963943822" no encontrado en BD.
+⚠️ Fila 334411: Paciente con RUT "963944543" no encontrado en BD.
+⚠️ Fila 334412: Paciente con RUT "963945256" no encontrado en BD.
+⚠️ Fila 334413: Paciente con RUT "963945280" no encontrado en BD.
+⚠️ Fila 334414: Paciente con RUT "963945752" no encontrado en BD.
+⚠️ Fila 334415: Paciente con RUT "963946546" no encontrado en BD.
+⚠️ Fila 334416: Paciente con RUT "963946821" no encontrado en BD.
+⚠️ Fila 334417: Paciente con RUT "96394683K" no encontrado en BD.
+⚠️ Fila 334418: Paciente con RUT "963947259" no encontrado en BD.
+⚠️ Fila 334419: Paciente con RUT "963947402" no encontrado en BD.
+⚠️ Fila 334420: Paciente con RUT "963947410" no encontrado en BD.
+⚠️ Fila 334421: Paciente con RUT "96394747K" no encontrado en BD.
+⚠️ Fila 334422: Paciente con RUT "963947852" no encontrado en BD.
+⚠️ Fila 334423: Paciente con RUT "963948050" no encontrado en BD.
+⚠️ Fila 334424: Paciente con RUT "963948220" no encontrado en BD.
+⚠️ Fila 334425: Paciente con RUT "963948832" no encontrado en BD.
+⚠️ Fila 334426: Paciente con RUT "963949200" no encontrado en BD.
+⚠️ Fila 334427: Paciente con RUT "963949871" no encontrado en BD.
+⚠️ Fila 334428: Paciente con RUT "96394991K" no encontrado en BD.
+⚠️ Fila 334429: Paciente con RUT "963950446" no encontrado en BD.
+⚠️ Fila 334430: Paciente con RUT "963950454" no encontrado en BD.
+⚠️ Fila 334431: Paciente con RUT "963950691" no encontrado en BD.
+⚠️ Fila 334432: Paciente con RUT "963950918" no encontrado en BD.
+⚠️ Fila 334433: Paciente con RUT "963951019" no encontrado en BD.
+⚠️ Fila 334434: Paciente con RUT "963951337" no encontrado en BD.
+⚠️ Fila 334435: Paciente con RUT "963951442" no encontrado en BD.
+⚠️ Fila 334436: Paciente con RUT "963951485" no encontrado en BD.
+⚠️ Fila 334437: Paciente con RUT "963951531" no encontrado en BD.
+⚠️ Fila 334438: Paciente con RUT "963952775" no encontrado en BD.
+⚠️ Fila 334439: Paciente con RUT "963953038" no encontrado en BD.
+⚠️ Fila 334440: Paciente con RUT "963953283" no encontrado en BD.
+⚠️ Fila 334441: Paciente con RUT "963953666" no encontrado en BD.
+⚠️ Fila 334442: Paciente con RUT "963954190" no encontrado en BD.
+⚠️ Fila 334443: Paciente con RUT "96395428K" no encontrado en BD.
+⚠️ Fila 334444: Paciente con RUT "963954298" no encontrado en BD.
+⚠️ Fila 334445: Paciente con RUT "963954328" no encontrado en BD.
+⚠️ Fila 334446: Paciente con RUT "963954549" no encontrado en BD.
+⚠️ Fila 334447: Paciente con RUT "96395459K" no encontrado en BD.
+⚠️ Fila 334448: Paciente con RUT "963954891" no encontrado en BD.
+⚠️ Fila 334449: Paciente con RUT "963955480" no encontrado en BD.
+⚠️ Fila 334450: Paciente con RUT "963955561" no encontrado en BD.
+⚠️ Fila 334451: Paciente con RUT "963955642" no encontrado en BD.
+⚠️ Fila 334452: Paciente con RUT "963955650" no encontrado en BD.
+⚠️ Fila 334453: Paciente con RUT "963956312" no encontrado en BD.
+⚠️ Fila 334454: Paciente con RUT "963956339" no encontrado en BD.
+⚠️ Fila 334455: Paciente con RUT "963956347" no encontrado en BD.
+⚠️ Fila 334456: Paciente con RUT "963956533" no encontrado en BD.
+⚠️ Fila 334457: Paciente con RUT "963956584" no encontrado en BD.
+⚠️ Fila 334458: Paciente con RUT "963956916" no encontrado en BD.
+⚠️ Fila 334459: Paciente con RUT "963958250" no encontrado en BD.
+⚠️ Fila 334460: Paciente con RUT "963958544" no encontrado en BD.
+⚠️ Fila 334461: Paciente con RUT "96395879K" no encontrado en BD.
+⚠️ Fila 334462: Paciente con RUT "963959451" no encontrado en BD.
+⚠️ Fila 334463: Paciente con RUT "963959605" no encontrado en BD.
+⚠️ Fila 334464: Paciente con RUT "96395994K" no encontrado en BD.
+⚠️ Fila 334465: Paciente con RUT "963959958" no encontrado en BD.
+⚠️ Fila 334466: Paciente con RUT "963960158" no encontrado en BD.
+⚠️ Fila 334467: Paciente con RUT "963960328" no encontrado en BD.
+⚠️ Fila 334468: Paciente con RUT "963960379" no encontrado en BD.
+⚠️ Fila 334469: Paciente con RUT "963961014" no encontrado en BD.
+⚠️ Fila 334470: Paciente con RUT "963961286" no encontrado en BD.
+⚠️ Fila 334471: Paciente con RUT "96396188K" no encontrado en BD.
+⚠️ Fila 334472: Paciente con RUT "96396210K" no encontrado en BD.
+⚠️ Fila 334473: Paciente con RUT "963962398" no encontrado en BD.
+⚠️ Fila 334474: Paciente con RUT "963962428" no encontrado en BD.
+⚠️ Fila 334475: Paciente con RUT "963962533" no encontrado en BD.
+⚠️ Fila 334476: Paciente con RUT "963962835" no encontrado en BD.
+⚠️ Fila 334477: Paciente con RUT "963962878" no encontrado en BD.
+⚠️ Fila 334478: Paciente con RUT "963963467" no encontrado en BD.
+⚠️ Fila 334479: Paciente con RUT "963963866" no encontrado en BD.
+⚠️ Fila 334480: Paciente con RUT "963963904" no encontrado en BD.
+⚠️ Fila 334481: Paciente con RUT "96396501K" no encontrado en BD.
+⚠️ Fila 334482: Paciente con RUT "963965206" no encontrado en BD.
+⚠️ Fila 334483: Paciente con RUT "963966466" no encontrado en BD.
+⚠️ Fila 334484: Paciente con RUT "96396708K" no encontrado en BD.
+⚠️ Fila 334485: Paciente con RUT "963967152" no encontrado en BD.
+⚠️ Fila 334486: Paciente con RUT "963967209" no encontrado en BD.
+⚠️ Fila 334487: Paciente con RUT "963967314" no encontrado en BD.
+⚠️ Fila 334488: Paciente con RUT "963967330" no encontrado en BD.
+⚠️ Fila 334489: Paciente con RUT "963967756" no encontrado en BD.
+⚠️ Fila 334490: Paciente con RUT "963968132" no encontrado en BD.
+⚠️ Fila 334491: Paciente con RUT "963968353" no encontrado en BD.
+⚠️ Fila 334492: Paciente con RUT "963968817" no encontrado en BD.
+⚠️ Fila 334493: Paciente con RUT "963969414" no encontrado en BD.
+⚠️ Fila 334494: Paciente con RUT "96396949K" no encontrado en BD.
+⚠️ Fila 334495: Paciente con RUT "963970218" no encontrado en BD.
+⚠️ Fila 334496: Paciente con RUT "963970374" no encontrado en BD.
+⚠️ Fila 334497: Paciente con RUT "963971095" no encontrado en BD.
+⚠️ Fila 334498: Paciente con RUT "963971842" no encontrado en BD.
+⚠️ Fila 334499: Paciente con RUT "963972105" no encontrado en BD.
+⚠️ Fila 334500: Paciente con RUT "963973128" no encontrado en BD.
+⚠️ Fila 334501: Paciente con RUT "963973950" no encontrado en BD.
+⚠️ Fila 334502: Paciente con RUT "963974418" no encontrado en BD.
+⚠️ Fila 334503: Paciente con RUT "963974590" no encontrado en BD.
+⚠️ Fila 334504: Paciente con RUT "96397566K" no encontrado en BD.
+⚠️ Fila 334505: Paciente con RUT "963975678" no encontrado en BD.
+⚠️ Fila 334506: Paciente con RUT "963975686" no encontrado en BD.
+⚠️ Fila 334507: Paciente con RUT "963975694" no encontrado en BD.
+⚠️ Fila 334508: Paciente con RUT "963975880" no encontrado en BD.
+⚠️ Fila 334509: Paciente con RUT "963976119" no encontrado en BD.
+⚠️ Fila 334510: Paciente con RUT "963976771" no encontrado en BD.
+⚠️ Fila 334511: Paciente con RUT "963976941" no encontrado en BD.
+⚠️ Fila 334512: Paciente con RUT "96397695K" no encontrado en BD.
+⚠️ Fila 334513: Paciente con RUT "963976968" no encontrado en BD.
+⚠️ Fila 334514: Paciente con RUT "963976976" no encontrado en BD.
+⚠️ Fila 334515: Paciente con RUT "963977050" no encontrado en BD.
+⚠️ Fila 334516: Paciente con RUT "963977727" no encontrado en BD.
+⚠️ Fila 334517: Paciente con RUT "96397776K" no encontrado en BD.
+⚠️ Fila 334518: Paciente con RUT "963978200" no encontrado en BD.
+⚠️ Fila 334519: Paciente con RUT "963978812" no encontrado en BD.
+⚠️ Fila 334520: Paciente con RUT "963978960" no encontrado en BD.
+⚠️ Fila 334521: Paciente con RUT "963978979" no encontrado en BD.
+⚠️ Fila 334522: Paciente con RUT "963979029" no encontrado en BD.
+⚠️ Fila 334523: Paciente con RUT "963979916" no encontrado en BD.
+⚠️ Fila 334524: Paciente con RUT "963980051" no encontrado en BD.
+⚠️ Fila 334525: Paciente con RUT "963980256" no encontrado en BD.
+⚠️ Fila 334526: Paciente con RUT "96398068K" no encontrado en BD.
+⚠️ Fila 334527: Paciente con RUT "963980892" no encontrado en BD.
+⚠️ Fila 334528: Paciente con RUT "963981317" no encontrado en BD.
+⚠️ Fila 334529: Paciente con RUT "963981910" no encontrado en BD.
+⚠️ Fila 334530: Paciente con RUT "963981988" no encontrado en BD.
+⚠️ Fila 334531: Paciente con RUT "963982763" no encontrado en BD.
+⚠️ Fila 334532: Paciente con RUT "963983190" no encontrado en BD.
+⚠️ Fila 334533: Paciente con RUT "963983336" no encontrado en BD.
+⚠️ Fila 334534: Paciente con RUT "963983549" no encontrado en BD.
+⚠️ Fila 334535: Paciente con RUT "963984499" no encontrado en BD.
+⚠️ Fila 334536: Paciente con RUT "963984642" no encontrado en BD.
+⚠️ Fila 334537: Paciente con RUT "96398474K" no encontrado en BD.
+⚠️ Fila 334538: Paciente con RUT "963984847" no encontrado en BD.
+⚠️ Fila 334539: Paciente con RUT "963985339" no encontrado en BD.
+⚠️ Fila 334540: Paciente con RUT "963985592" no encontrado en BD.
+⚠️ Fila 334541: Paciente con RUT "963986483" no encontrado en BD.
+⚠️ Fila 334542: Paciente con RUT "963986661" no encontrado en BD.
+⚠️ Fila 334543: Paciente con RUT "963986815" no encontrado en BD.
+⚠️ Fila 334544: Paciente con RUT "96398734K" no encontrado en BD.
+⚠️ Fila 334545: Paciente con RUT "963987366" no encontrado en BD.
+⚠️ Fila 334546: Paciente con RUT "963988060" no encontrado en BD.
+⚠️ Fila 334547: Paciente con RUT "963988885" no encontrado en BD.
+⚠️ Fila 334548: Paciente con RUT "963989156" no encontrado en BD.
+⚠️ Fila 334549: Paciente con RUT "963989199" no encontrado en BD.
+⚠️ Fila 334550: Paciente con RUT "963989261" no encontrado en BD.
+⚠️ Fila 334551: Paciente con RUT "963989547" no encontrado en BD.
+⚠️ Fila 334552: Paciente con RUT "963989822" no encontrado en BD.
+⚠️ Fila 334553: Paciente con RUT "963990057" no encontrado en BD.
+⚠️ Fila 334554: Paciente con RUT "963990499" no encontrado en BD.
+⚠️ Fila 334555: Paciente con RUT "963990979" no encontrado en BD.
+⚠️ Fila 334556: Paciente con RUT "963991223" no encontrado en BD.
+⚠️ Fila 334557: Paciente con RUT "963992017" no encontrado en BD.
+⚠️ Fila 334558: Paciente con RUT "963992432" no encontrado en BD.
+⚠️ Fila 334559: Paciente con RUT "963992440" no encontrado en BD.
+⚠️ Fila 334560: Paciente con RUT "963992645" no encontrado en BD.
+⚠️ Fila 334561: Paciente con RUT "96399284K" no encontrado en BD.
+⚠️ Fila 334562: Paciente con RUT "963993447" no encontrado en BD.
+⚠️ Fila 334563: Paciente con RUT "963994028" no encontrado en BD.
+⚠️ Fila 334564: Paciente con RUT "963994117" no encontrado en BD.
+⚠️ Fila 334565: Paciente con RUT "963994257" no encontrado en BD.
+⚠️ Fila 334566: Paciente con RUT "963994265" no encontrado en BD.
+⚠️ Fila 334567: Paciente con RUT "963994478" no encontrado en BD.
+⚠️ Fila 334568: Paciente con RUT "963995237" no encontrado en BD.
+⚠️ Fila 334569: Paciente con RUT "963995512" no encontrado en BD.
+⚠️ Fila 334570: Paciente con RUT "963996004" no encontrado en BD.
+⚠️ Fila 334571: Paciente con RUT "963997027" no encontrado en BD.
+⚠️ Fila 334572: Paciente con RUT "963997760" no encontrado en BD.
+⚠️ Fila 334573: Paciente con RUT "963997922" no encontrado en BD.
+⚠️ Fila 334574: Paciente con RUT "96399799K" no encontrado en BD.
+⚠️ Fila 334575: Paciente con RUT "963998090" no encontrado en BD.
+⚠️ Fila 334576: Paciente con RUT "963999046" no encontrado en BD.
+⚠️ Fila 334577: Paciente con RUT "963999054" no encontrado en BD.
+⚠️ Fila 334578: Paciente con RUT "963999186" no encontrado en BD.
+⚠️ Fila 334579: Paciente con RUT "963999437" no encontrado en BD.
+⚠️ Fila 334580: Paciente con RUT "963999755" no encontrado en BD.
+⚠️ Fila 334581: Paciente con RUT "963999895" no encontrado en BD.
+⚠️ Fila 334582: Paciente con RUT "964000239" no encontrado en BD.
+⚠️ Fila 334583: Paciente con RUT "964000581" no encontrado en BD.
+⚠️ Fila 334584: Paciente con RUT "964001200" no encontrado en BD.
+⚠️ Fila 334585: Paciente con RUT "964001391" no encontrado en BD.
+⚠️ Fila 334586: Paciente con RUT "964001588" no encontrado en BD.
+⚠️ Fila 334587: Paciente con RUT "964001685" no encontrado en BD.
+⚠️ Fila 334588: Paciente con RUT "964002193" no encontrado en BD.
+⚠️ Fila 334589: Paciente con RUT "964002630" no encontrado en BD.
+⚠️ Fila 334590: Paciente con RUT "964004129" no encontrado en BD.
+⚠️ Fila 334591: Paciente con RUT "964005818" no encontrado en BD.
+⚠️ Fila 334592: Paciente con RUT "964006288" no encontrado en BD.
+⚠️ Fila 334593: Paciente con RUT "964006717" no encontrado en BD.
+⚠️ Fila 334594: Paciente con RUT "964007128" no encontrado en BD.
+⚠️ Fila 334595: Paciente con RUT "964007136" no encontrado en BD.
+⚠️ Fila 334596: Paciente con RUT "964007187" no encontrado en BD.
+⚠️ Fila 334597: Paciente con RUT "964007195" no encontrado en BD.
+⚠️ Fila 334598: Paciente con RUT "964007845" no encontrado en BD.
+⚠️ Fila 334599: Paciente con RUT "964008035" no encontrado en BD.
+⚠️ Fila 334600: Paciente con RUT "964008930" no encontrado en BD.
+⚠️ Fila 334601: Paciente con RUT "964009201" no encontrado en BD.
+⚠️ Fila 334602: Paciente con RUT "964009929" no encontrado en BD.
+⚠️ Fila 334603: Paciente con RUT "964009961" no encontrado en BD.
+⚠️ Fila 334604: Paciente con RUT "96401020K" no encontrado en BD.
+⚠️ Fila 334605: Paciente con RUT "964011125" no encontrado en BD.
+⚠️ Fila 334606: Paciente con RUT "964011338" no encontrado en BD.
+⚠️ Fila 334607: Paciente con RUT "964011540" no encontrado en BD.
+⚠️ Fila 334608: Paciente con RUT "964011737" no encontrado en BD.
+⚠️ Fila 334609: Paciente con RUT "964012547" no encontrado en BD.
+⚠️ Fila 334610: Paciente con RUT "964012857" no encontrado en BD.
+⚠️ Fila 334611: Paciente con RUT "964013829" no encontrado en BD.
+⚠️ Fila 334612: Paciente con RUT "964013950" no encontrado en BD.
+⚠️ Fila 334613: Paciente con RUT "964014027" no encontrado en BD.
+⚠️ Fila 334614: Paciente con RUT "964014213" no encontrado en BD.
+⚠️ Fila 334615: Paciente con RUT "964015112" no encontrado en BD.
+⚠️ Fila 334616: Paciente con RUT "964015120" no encontrado en BD.
+⚠️ Fila 334617: Paciente con RUT "964015147" no encontrado en BD.
+⚠️ Fila 334618: Paciente con RUT "964015155" no encontrado en BD.
+⚠️ Fila 334619: Paciente con RUT "964016720" no encontrado en BD.
+⚠️ Fila 334620: Paciente con RUT "964016828" no encontrado en BD.
+⚠️ Fila 334621: Paciente con RUT "964018650" no encontrado en BD.
+⚠️ Fila 334622: Paciente con RUT "964019673" no encontrado en BD.
+⚠️ Fila 334623: Paciente con RUT "964020531" no encontrado en BD.
+⚠️ Fila 334624: Paciente con RUT "964021724" no encontrado en BD.
+⚠️ Fila 334625: Paciente con RUT "964021767" no encontrado en BD.
+⚠️ Fila 334626: Paciente con RUT "964022100" no encontrado en BD.
+⚠️ Fila 334627: Paciente con RUT "964022151" no encontrado en BD.
+📋 Procesando fichas:  98%|███████████████████████████████████████████████████████████████████████████████████▍ | 335122/341349 [03:23<00:01, 3432.02registro/s, Importadas=333960, Omitidas=1186, Duplicadas=0, Pacientes NF=1147]✅ Lote creado: 2000 fichas (total: 333961)
+📋 Procesando fichas:  99%|███████████████████████████████████████████████████████████████████████████████████▉ | 337122/341349 [03:24<00:01, 3297.45registro/s, Importadas=335960, Omitidas=1186, Duplicadas=0, Pacientes NF=1147]✅ Lote creado: 2000 fichas (total: 335961)
+📋 Procesando fichas:  99%|████████████████████████████████████████████████████████████████████████████████████▍| 339122/341349 [03:24<00:00, 3243.81registro/s, Importadas=337960, Omitidas=1186, Duplicadas=0, Pacientes NF=1147]✅ Lote creado: 2000 fichas (total: 337961)
+📋 Procesando fichas: 100%|████████████████████████████████████████████████████████████████████████████████████▋| 339976/341349 [03:25<00:00, 2624.73registro/s, Importadas=338814, Omitidas=1186, Duplicadas=0, Pacientes NF=1147]🔍 Procesando fila 340002: 17095-6
+📋 Procesando fichas: 100%|████████████████████████████████████████████████████████████████████████████████████▉| 341122/341349 [03:25<00:00, 3161.72registro/s, Importadas=339960, Omitidas=1186, Duplicadas=0, Pacientes NF=1147]✅ Lote creado: 2000 fichas (total: 339961)
+📋 Procesando fichas: 100%|████████████████████████████████████████████████████████████████████████████████████▉| 341315/341349 [03:25<00:00, 1694.23registro/s, Importadas=340153, Omitidas=1186, Duplicadas=0, Pacientes NF=1147]⚠️ Fila 341341: Paciente con RUT "963934564" no encontrado en BD.
+📋 Procesando fichas: 100%|████████████████████████████████████████████████████████████████████████████████████▉| 341325/341349 [03:25<00:00, 1694.23registro/s, Importadas=340162, Omitidas=1187, Duplicadas=0, Pacientes NF=1148]✅ Lote final creado: 201 fichas
+📋 Procesando fichas: 100%|████████████████████████████████████████████████████████████████████████████████████▉| 341325/341349 [03:25<00:00, 1657.39registro/s, Importadas=340162, Omitidas=1187, Duplicadas=0, Pacientes NF=1148]
+
+============================================================
+📊 RESUMEN FINAL DE IMPORTACIÓN
+============================================================
+✅ Fichas creadas: 340,162
+⚠️ Fichas omitidas: 1,187
+🔄 Duplicados detectados: 0
+❌ Pacientes no encontrados: 1,148
+📈 Eficiencia: 99.7%
+
+❌ ERRORES DETALLADOS:
+  Fila 7191: Ficha #35214 - Establecimiento 1 - Paciente 116774909 - Error: (1062, "Duplicate entry '35214-1' for key 'unique_ficha_por_establecimiento'")
+  Fila 14556: Ficha #66122 - Establecimiento 1 - Paciente 136066242 - Error: (1062, "Duplicate entry '66122-1' for key 'unique_ficha_por_establecimiento'")
+  Fila 19964: Ficha #60098 - Establecimiento 1 - Paciente 151925642 - Error: (1062, "Duplicate entry '60098-1' for key 'unique_ficha_por_establecimiento'")
+  Fila 22595: Ficha #35534 - Establecimiento 1 - Paciente 161640581 - Error: (1062, "Duplicate entry '35534-1' for key 'unique_ficha_por_establecimiento'")
+  Fila 23483: Ficha #60194 - Establecimiento 1 - Paciente 161640581 - Error: (1062, "Duplicate entry '60194-1' for key 'unique_ficha_por_establecimiento'")
+  Fila 23810: Ficha #58223 - Establecimiento 1 - Paciente 161640581 - Error: (1062, "Duplicate entry '58223-1' for key 'unique_ficha_por_establecimiento'")
+  Fila 25851: Ficha #85795 - Establecimiento 1 - Paciente 16757775K - Error: (1062, "Duplicate entry '85795-1' for key 'unique_ficha_por_establecimiento'")
+  Fila 30491: Ficha #60289 - Establecimiento 1 - Paciente 184150204 - Error: (1062, "Duplicate entry '60289-1' for key 'unique_ficha_por_establecimiento'")
+  Fila 32404: Ficha #39521 - Establecimiento 1 - Paciente 189439628 - Error: (1062, "Duplicate entry '39521-1' for key 'unique_ficha_por_establecimiento'")
+  Fila 39959: Ficha #77012 - Establecimiento 1 - Paciente 27330924 - Error: (1062, "Duplicate entry '77012-1' for key 'unique_ficha_por_establecimiento'")
+  ... y 29 errores más
+
+
+hazme un analisis, los que tienen ruts de 90 millones para arriba significa recien nacidos a los cuales se les colocaron un rut ficticio, ahora bien, hazme un recuento de los no encontrados, los no nacidos y alguna que otra excepcion

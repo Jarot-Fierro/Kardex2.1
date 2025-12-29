@@ -1,0 +1,262 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Movimientos de Ficha - {{ title|default:'Formulario' }}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title mb-0">{{ title }}</h3>
+    </div>
+    <div class="card-body">
+        <!-- Barra de búsqueda estilo Pacientes (inputs pequeños) -->
+        <div class="row g-2 mb-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label mb-1" for="lookup_rut">RUT</label>
+                <input type="text" id="lookup_rut" class="form-control form-control-sm" placeholder="Ingrese RUT">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label mb-1" for="lookup_ficha">N° Ficha</label>
+                <input type="text" id="lookup_ficha" class="form-control form-control-sm" placeholder="Nº Ficha"
+                       readonly>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label mb-1" for="lookup_nombre">Nombres</label>
+                <input type="text" id="lookup_nombre" class="form-control form-control-sm" placeholder="Nombre paciente"
+                       readonly>
+            </div>
+        </div>
+
+        <form id="movimiento-ficha-form" method="post" novalidate>
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            <input type="hidden" name="action" value="{{ action|default:'add' }}">
+
+            <!-- Sección 1: Fechas -->
+            <div class="card mb-3">
+                <div class="card-header">Fechas</div>
+                <div class="card-body row">
+                    <div class="col-md-4 mb-3">
+                        <label for="id_fecha_envio">Fecha de envío</label>
+                        {{ form.fecha_envio }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="id_fecha_recepcion">Fecha de recepción</label>
+                        {{ form.fecha_recepcion }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="id_fecha_traspaso">Fecha de traspaso</label>
+                        {{ form.fecha_traspaso }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección 2: Observaciones -->
+            <div class="card mb-3">
+                <div class="card-header">Observaciones</div>
+                <div class="card-body row">
+                    <div class="col-md-4 mb-3">
+                        <label for="id_observacion_envio">Observación de envío</label>
+                        {{ form.observacion_envio }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="id_observacion_recepcion">Observación de recepción</label>
+                        {{ form.observacion_recepcion }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="id_observacion_traspaso">Observación de traspaso</label>
+                        {{ form.observacion_traspaso }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección 3: Estados -->
+            <div class="card mb-3">
+                <div class="card-header">Estados</div>
+                <div class="card-body row">
+                    <div class="col-md-4 mb-3">
+                        <label for="id_estado_envio">Estado de envío</label>
+                        {{ form.estado_envio }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="id_estado_recepcion">Estado de recepción</label>
+                        {{ form.estado_recepcion }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="id_estado_traspaso">Estado de traspaso</label>
+                        {{ form.estado_traspaso }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección 4: Servicios clínicos -->
+            <div class="card mb-3">
+                <div class="card-header">Servicios clínicos</div>
+                <div class="card-body row">
+                    <div class="col-md-4 mb-3">
+                        <label for="id_servicio_clinico_envio">Servicio clínico de envío</label>
+                        {{ form.servicio_clinico_envio }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="id_servicio_clinico_recepcion">Servicio clínico de recepción</label>
+                        {{ form.servicio_clinico_recepcion }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="id_servicio_clinico_traspaso">Servicio clínico de traspaso</label>
+                        {{ form.servicio_clinico_traspaso }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección 5: Usuarios -->
+            <div class="card mb-3">
+                <div class="card-header">Usuarios</div>
+                <div class="card-body row">
+                    <div class="col-md-4 mb-3">
+                        <label for="id_usuario_envio">Usuario envío</label>
+                        {{ form.usuario_envio }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="id_usuario_recepcion">Usuario recepción</label>
+                        {{ form.usuario_recepcion }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="id_usuario_traspaso">Usuario traspaso</label>
+                        {{ form.usuario_traspaso }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección 6: Profesionales -->
+            <div class="card mb-3">
+                <div class="card-header">Profesionales</div>
+                <div class="card-body row">
+                    <div class="col-md-4 mb-3">
+                        <label for="id_profesional_envio">Profesional envío</label>
+                        {{ form.profesional_envio }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="id_profesional_recepcion">Profesional recepción</label>
+                        {{ form.profesional_recepcion }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="id_profesional_traspaso">Profesional traspaso</label>
+                        {{ form.profesional_traspaso }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección 7: Ficha y establecimiento -->
+            <div class="card mb-3">
+                <div class="card-header">Ficha y establecimiento</div>
+                <div class="card-body row">
+                    <div class="col-md-6 mb-3">
+                        <label for="id_establecimiento">Establecimiento</label>
+                        {{ form.establecimiento }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="id_ficha">Ficha</label>
+                        {{ form.ficha }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones -->
+            <div class="d-flex justify-content-end gap-2">
+                <a href="{% url 'kardex:movimiento_ficha_list' %}" class="btn btn-secondary mx-2">Cancelar</a>
+                <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+        </form>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script src="{% static 'js/apis/apis_movimientos_ficha.js' %}"></script>
+<script>
+    (function(){
+      const $rutLookup = document.getElementById('lookup_rut');
+      const $fichaLookup = document.getElementById('lookup_ficha');
+      const $nombreLookup = document.getElementById('lookup_nombre');
+
+      if (!$rutLookup) return;
+
+      function clearLookup() {
+        if ($fichaLookup) $fichaLookup.value = '';
+        if ($nombreLookup) $nombreLookup.value = '';
+      }
+
+      function setInputValue(selector, value) {
+        const el = document.querySelector(selector);
+        if (!el) return;
+        el.value = value || '';
+        el.dispatchEvent(new Event('change'));
+      }
+
+      function nombreCompleto(p) {
+        if (!p) return '';
+        return [p.nombre, p.apellido_paterno, p.apellido_materno].filter(Boolean).join(' ');
+      }
+
+      function handleFoundFicha(item) {
+        const p = item.paciente || {};
+        if ($fichaLookup) $fichaLookup.value = item.numero_ficha_sistema || item.numero_ficha || item.id;
+        if ($nombreLookup) $nombreLookup.value = nombreCompleto(p);
+
+        setInputValue('#id_rut', p.rut || '');
+        setInputValue('#id_ficha', item.numero_ficha_sistema || item.numero_ficha || item.id);
+        setInputValue('#nombre_mov', nombreCompleto(p));
+      }
+
+      function showInfo(title, text) {
+        if (window.Swal && Swal.fire) {
+          Swal.fire({ title: title, text: text, icon: 'info' });
+        } else {
+          alert(text);
+        }
+      }
+
+      // Aquí cambiamos de 'input' a 'blur'
+      $rutLookup.addEventListener('blur', function () {
+        const rut = ($rutLookup.value || '').trim();
+        if (rut.length < 2) { clearLookup(); return; }
+
+        fetch(`/api/ingreso-paciente-ficha/?search=${encodeURIComponent(rut)}&tipo=rut`, {
+          headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(res => res.json().then(body => ({ status: res.status, body })))
+        .then(resp => {
+          const status = resp.status;
+          const data = resp.body;
+
+          if (data && data.status) {
+            if (data.status === 'missing_ficha') {
+              clearLookup();
+              showInfo('Ficha no encontrada', data.message || 'El paciente no tiene ficha en su establecimiento.');
+              return;
+            }
+            if (data.status === 'not_found') {
+              clearLookup();
+              showInfo('Paciente no existe', 'El paciente con ese RUT no existe en el sistema.');
+              return;
+            }
+          }
+
+          const items = Array.isArray(data) ? data : (data.results || []);
+          if (items.length) {
+            handleFoundFicha(items[0]);
+          } else {
+            clearLookup();
+          }
+        })
+        .catch(err => {
+          console.error('Error consultando Fichas por RUT:', err);
+          clearLookup();
+        });
+      });
+
+    })();
+</script>
+
+{% endblock %}

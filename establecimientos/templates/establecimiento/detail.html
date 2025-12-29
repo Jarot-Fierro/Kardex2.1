@@ -1,0 +1,24 @@
+{% load static %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h5 class="mb-3">Detalle del Establecimiento</h5>
+            <dl class="row mb-0">
+                <dt class="col-sm-4">ID</dt>
+                <dd class="col-sm-8">{{ object.id|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Nombre</dt>
+                <dd class="col-sm-8">{{ object.nombre|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Dirección</dt>
+                <dd class="col-sm-8">{{ object.direccion|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Teléfono</dt>
+                <dd class="col-sm-8">{{ object.telefono|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Comuna</dt>
+                <dd class="col-sm-8">{{ object.comuna.nombre|default:"-" }}</dd>
+            </dl>
+        </div>
+    </div>
+</div>

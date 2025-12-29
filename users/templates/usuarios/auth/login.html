@@ -1,0 +1,122 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Iniciar Sesión | Kardex App</title>
+
+    <!-- Google Font: Source Sans Pro -->
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"
+          rel="stylesheet"/>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="{% static 'adminlte3/plugins/fontawesome-free/css/all.min.css' %}"/>
+
+    <!-- Bootstrap 4 -->
+    <link rel="stylesheet" href="{% static 'adminlte3/plugins/bootstrap/css/bootstrap.min.css' %}"/>
+
+    <!-- AdminLTE -->
+    <link rel="stylesheet" href="{% static 'adminlte3/css/adminlte.min.css' %}"/>
+</head>
+
+<body class="hold-transition login-page bg-light">
+<div class="login-box">
+    <div class="login-logo">
+        <a href="#"><b>Kardex</b>SSA</a>
+    </div>
+
+    <!-- Login card -->
+    <div class="card">
+        {#        {% include 'components/messages/messages.html' %}#}
+
+        <div class="card-body login-card-body">
+            <p class="login-box-msg">Bienvenido! Inicia sesión para continuar</p>
+
+            <!-- Aquí se carga tu formulario de login -->
+            <form method="post" class="form">
+                {% csrf_token %}
+                <div class="alert alert-danger mb-3 p-0" role="alert">
+                    {{ form.non_field_errors }}
+                </div>
+
+                <div class="form-group mb-3">
+                    <label>RUT:</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                        </div>
+                        {{ form.username }}
+                    </div>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label>Contraseña:</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                        </div>
+                        {{ form.password }}
+                    </div>
+                </div>
+
+                <!--begin::Row-->
+                <div class="row">
+                    <div class="col-6">
+                        <!--            <div class="form-check">-->
+                        <!--                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault"/>-->
+                        <!--                <label class="form-check-label" for="flexCheckDefault"> Remember Me </label>-->
+                        <!--            </div>-->
+                    </div>
+                    <!-- /.col -->
+                    <div class="col-6">
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+                        </div>
+                    </div>
+                    <!-- /.col -->
+                </div>
+                <!--end::Row-->
+            </form>
+
+            <!-- Opcional: enlaces extra -->
+            <p class="mb-1 mt-3 text-center">
+                <a href="#">¿Olvidaste tu contraseña?</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- JS -->
+<script src="{% static 'adminlte3/plugins/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'adminlte3/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'adminlte3/js/adminlte.min.js' %}"></script>
+<!-- InputMask -->
+<script src="{% static 'adminlte3/plugins/inputmask/jquery.inputmask.min.js' %}"></script>
+
+<!--    SCRIPT DE RUT PARA INPUTMASK-->
+<script>
+    $(document).ready(function () {
+        const $rut = $('#id_rut');
+        if ($rut.length && typeof $rut.inputmask === 'function') {
+            $rut.inputmask({
+                mask: ['9.999.999-@', '99.999.999-@'],
+                definitions: {
+                    '@': {
+                        validator: '[0-9Kk]',
+                        casing: 'upper'  // Fuerza que "k" se convierta en "K"
+                    }
+                },
+                greedy: false,
+                placeholder: '_',
+                clearIncomplete: false,
+                showMaskOnHover: false,
+                showMaskOnFocus: true
+            });
+        }
+    });
+</script>
+
+
+</body>
+</html>

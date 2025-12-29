@@ -1,0 +1,459 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block content %}
+    <div class="row mx-1">
+        <div class="col-12">
+
+            <div class="card card-info">
+
+                <div class="card-header">
+
+                    <h3 class="card-title">
+                        <i class="fas fa-folder-open mr-2"></i>
+                        Información previa al registro
+
+                        <button type="button"
+                                class="btn btn-tool ml-2"
+                                data-toggle="popover"
+                                data-placement="right"
+                                data-html="true"
+                                title="Información importante"
+                                data-content="Los datos mostrados aquí son solo una previsualización.<br>
+                                  Al crear el paciente podrían variar, ya que los códigos se asignan para todos los establecimientos.">
+                            <i class="fas fa-info-circle text-warning info-glow"></i>
+                        </button>
+                    </h3>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row text-center">
+
+                        <div class="col-md-6 border-right">
+                            <h6 class="text-muted">Número de Ficha a Asignar</h6>
+                            <h1 class="text-info font-weight-bold">
+                                {{ siguiente_numero_ficha|default:"N/A" }}
+                            </h1>
+                        </div>
+
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Código de Paciente</h6>
+                            <h1 class="text-success font-weight-bold">
+                                {{ codigo_paciente_preview|default:"N/A" }}
+                            </h1>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </div>
+    </div>
+
+    <div class="container-fluid py-2 small-input">
+        <div id="mensaje-rut" class="alert mt-2 d-none"></div>
+
+        {% if debug_post %}
+            <div class="alert alert-info mt-2">
+                <strong>Debug POST:</strong>
+                <div class="small mt-2">
+                    <ul class="mb-0">
+                        {% for key, values in debug_post.items %}
+                            <li><strong>{{ key }}:</strong> {{ values|join:", " }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        {% endif %}
+
+        <form method="post" novalidate id="paciente-form">
+            {% csrf_token %}
+
+
+            <!-- ESTADO DEL PACIENTE -->
+            <div class="card mb-2">
+                <div class="card-header">
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="m-0"><i class="fas fa-heartbeat me-2"></i> Estado del Paciente</h6>
+                        <div>
+                            <a href="{% url 'kardex:paciente_query' %}" class="btn btn-secondary btn-sm no-print"
+                               id="btn-cancelar">Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-sm no-print">Guardar</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        <!-- Checkbox 1 -->
+                        <div class="col-md-2">
+                            <div class="form-check mt-2">
+                                {{ form.recien_nacido }}
+                                <label class="form-check-label" for="{{ form.recien_nacido.id_for_label }}">
+                                    Recién Nacido
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Checkbox 2 -->
+                        <div class="col-md-2">
+                            <div class="form-check mt-2">
+                                {{ form.extranjero }}
+                                <label class="form-check-label" for="{{ form.extranjero.id_for_label }}">
+                                    Extranjero
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Checkbox 3 -->
+                        <div class="col-md-2">
+                            <div class="form-check mt-2">
+                                {{ form.pueblo_indigena }}
+                                <label class="form-check-label" for="{{ form.pueblo_indigena.id_for_label }}">
+                                    Pueblo Indígena
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Checkbox 4 + input date -->
+                        <div class="col-md-2">
+                            <div class="form-check mt-2">
+                                {{ form.fallecido }}
+                                <label class="form-check-label" for="{{ form.fallecido.id_for_label }}">
+                                    Fallecido
+                                </label>
+                            </div>
+                        </div>
+                        <!-- Checkbox 4 + input date -->
+                        <div class="col-md-4">
+                            <label class="form-label" for="{{ form.fecha_fallecimiento.id_for_label }}">
+                                Fecha de Fallecimiento
+                            </label>
+                            {{ form.fecha_fallecimiento }}
+                            {% if form.fecha_fallecimiento.errors %}
+                                <div class="text-danger small">{{ form.fecha_fallecimiento.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- IDENTIFICACIÓN -->
+            <div class="card mb-2">
+                <div class="card-header">
+                    <h6 class="m-0"><i class="fas fa-id-card me-2"></i> Identificación</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        <div class="col-md-4 col-sm-6">
+                            <label class="form-label" for="{{ form.nombre.id_for_label }}">
+                                Nombres
+                            </label>
+                            {{ form.nombre }}
+                            {% if form.nombre.errors %}
+                                <div class="text-danger small">{{ form.nombre.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-4 col-sm-6">
+                            <label class="form-label" for="{{ form.apellido_paterno.id_for_label }}">
+                                Apellido Paterno
+                            </label>
+                            {{ form.apellido_paterno }}
+                            {% if form.apellido_paterno.errors %}
+                                <div class="text-danger small">{{ form.apellido_paterno.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-4 col-sm-6">
+                            <label class="form-label" for="{{ form.apellido_materno.id_for_label }}">
+                                Apellido Materno
+                            </label>
+                            {{ form.apellido_materno }}
+                            {% if form.apellido_materno.errors %}
+                                <div class="text-danger small">{{ form.apellido_materno.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-4 col-sm-6">
+                            <label class="form-label" for="{{ form.nombre_social.id_for_label }}">
+                                Nombre Social
+                            </label>
+                            {{ form.nombre_social }}
+                            {% if form.nombre_social.errors %}
+                                <div class="text-danger small">{{ form.nombre_social.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-4 col-sm-6">
+                            <label class="form-label" for="{{ form.pasaporte.id_for_label }}">
+                                Pasaporte
+                            </label>
+                            {{ form.pasaporte }}
+                            {% if form.pasaporte.errors %}
+                                <div class="text-danger small">{{ form.pasaporte.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-4 col-sm-6">
+                            <label class="form-label" for="{{ form.nip.id_for_label }}">
+                                NIP
+                            </label>
+                            {{ form.nip }}
+                            {% if form.nip.errors %}
+                                <div class="text-danger small">{{ form.nip.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DATOS DE NACIMIENTO -->
+            <div class="card mb-2">
+                <div class="card-header">
+                    <h6 class="m-0"><i class="fas fa-baby me-2"></i> Datos de Nacimiento</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        <div class="col-md-3">
+                            <label class="form-label" for="{{ form.fecha_nacimiento.id_for_label }}">
+                                Fecha de Nacimiento
+                            </label>
+                            {{ form.fecha_nacimiento }}
+                            {% if form.fecha_nacimiento.errors %}
+                                <div class="text-danger small">{{ form.fecha_nacimiento.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label" for="{{ form.sexo.id_for_label }}">Sexo</label>
+                            {{ form.sexo }}
+                            {% if form.sexo.errors %}
+                                <div class="text-danger small">{{ form.sexo.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label" for="{{ form.genero.id_for_label }}">Género</label>
+                            {{ form.genero }}
+                            {% if form.genero.errors %}
+                                <div class="text-danger small">{{ form.genero.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label" for="{{ form.estado_civil.id_for_label }}">Estado Civil</label>
+                            {{ form.estado_civil }}
+                            {% if form.estado_civil.errors %}
+                                <div class="text-danger small">{{ form.estado_civil.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DATOS FAMILIARES -->
+            <div class="card mb-2">
+                <div class="card-header">
+                    <h6 class="m-0"><i class="fas fa-users me-2"></i> Datos Familiares</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        <div class="col-md-3">
+                            <label class="form-label" for="{{ form.rut_madre.id_for_label }}">R.U.T. Madre</label>
+                            {{ form.rut_madre }}
+                            {% if form.rut_madre.errors %}
+                                <div class="text-danger small">{{ form.rut_madre.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label" for="{{ form.nombres_madre.id_for_label }}">Nombres de la
+                                Madre</label>
+                            {{ form.nombres_madre }}
+                            {% if form.nombres_madre.errors %}
+                                <div class="text-danger small">{{ form.nombres_madre.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label" for="{{ form.nombres_padre.id_for_label }}">Nombres del
+                                Padre</label>
+                            {{ form.nombres_padre }}
+                            {% if form.nombres_padre.errors %}
+                                <div class="text-danger small">{{ form.nombres_padre.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label" for="{{ form.nombre_pareja.id_for_label }}">Nombre de la
+                                Pareja</label>
+                            {{ form.nombre_pareja }}
+                            {% if form.nombre_pareja.errors %}
+                                <div class="text-danger small">{{ form.nombre_pareja.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label" for="{{ form.representante_legal.id_for_label }}">
+                                Representante Legal
+                            </label>
+                            {{ form.representante_legal }}
+                            {% if form.representante_legal.errors %}
+                                <div class="text-danger small">{{ form.representante_legal.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label" for="{{ form.rut_responsable_temporal.id_for_label }}">
+                                RUT Responsable Temporal
+                            </label>
+                            {{ form.rut_responsable_temporal }}
+                            {% if form.rut_responsable_temporal.errors %}
+                                <div class="text-danger small">{{ form.rut_responsable_temporal.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="form-check mt-2">
+                                {{ form.usar_rut_madre_como_responsable }}
+                                <label class="form-check-label"
+                                       for="{{ form.usar_rut_madre_como_responsable.id_for_label }}">
+                                    Usar RUT de la madre como responsable
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONTACTO Y DIRECCIÓN -->
+            <div class="card mb-2">
+                <div class="card-header">
+                    <h6 class="m-0"><i class="fas fa-map-marker-alt me-2"></i> Contacto y Dirección</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        <div class="col-md-4">
+                            <label class="form-label" for="{{ form.direccion.id_for_label }}">Dirección</label>
+                            {{ form.direccion }}
+                            {% if form.direccion.errors %}
+                                <div class="text-danger small">{{ form.direccion.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label" for="{{ form.comuna.id_for_label }}">Comuna</label>
+                            {{ form.comuna }}
+                            {% if form.comuna.errors %}
+                                <div class="text-danger small">{{ form.comuna.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label" for="{{ form.ocupacion.id_for_label }}">Ocupación</label>
+                            {{ form.ocupacion }}
+                            {% if form.ocupacion.errors %}
+                                <div class="text-danger small">{{ form.ocupacion.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="form-check mt-2">
+                                {{ form.sin_telefono }}
+                                <label class="form-check-label" for="{{ form.sin_telefono.id_for_label }}">
+                                    Paciente Sin Teléfono
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label" for="{{ form.numero_telefono1.id_for_label }}">
+                                Número de Teléfono
+                            </label>
+                            {{ form.numero_telefono1 }}
+                            {% if form.numero_telefono1.errors %}
+                                <div class="text-danger small">{{ form.numero_telefono1.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label" for="{{ form.numero_telefono2.id_for_label }}">
+                                Número de Teléfono 2
+                            </label>
+                            {{ form.numero_telefono2 }}
+                            {% if form.numero_telefono2.errors %}
+                                <div class="text-danger small">{{ form.numero_telefono2.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GESTIÓN -->
+            <div class="card mb-2">
+                <div class="card-header">
+                    <h6 class="m-0"><i class="fas fa-cogs me-2"></i> Gestión</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <label class="form-label" for="{{ form.prevision.id_for_label }}">Previsión</label>
+                            {{ form.prevision }}
+                            {% if form.prevision.errors %}
+                                <div class="text-danger small">{{ form.prevision.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label" for="{{ form.sector.id_for_label }}">Sector</label>
+                            {{ form.sector }}
+                            {% if form.sector.errors %}
+                                <div class="text-danger small">{{ form.sector.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pie del formulario -->
+            <div class="row mt-3 mb-4">
+                <div class="col text-end">
+                    <a href="{% url 'kardex:paciente_query' %}" class="btn btn-secondary btn-sm no-print"
+                       id="btn-cancelar">Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-primary btn-sm no-print">Guardar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Inicialización de Select2
+        $(document).ready(function () {
+            $('.select2').select2({
+                theme: 'bootstrap4',
+                width: '100%'
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block javascript %}
+    <script src="{% static 'js/apis/handle_fichas.js' %}"></script>
+    <script src="{% static 'js/fields_form_paciente.js' %}"></script>
+    <script>
+        $(function () {
+            $('[data-toggle="popover"]').popover()
+        });
+    </script>
+
+
+{% endblock %}

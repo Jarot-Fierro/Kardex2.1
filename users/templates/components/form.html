@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<form method="post" novalidate>
+    {% csrf_token %}
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 w-100">
+                    <div>
+                        <div class="card-title">
+                            Acción: {% if id %}Actualizar Usuario{% else %}Crear Usuario{% endif %}
+                        </div>
+                    </div>
+                    <div class="ms-md-auto py-2 py-md-0">
+                        <button type="submit" class="btn btn-primary btn-round">Guardar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-8 col-md-12">
+                        <div class="row">
+                            {% if id %}
+                            <div class="col-sm-6 col-md-4 col-lg-4 mb-3">
+                                <div class="form-group">
+                                    <label for="disableinput">ID Usuario</label>
+                                    <input type="text" class="form-control" id="disableinput" value="{{ id }}"
+                                           disabled/>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <div class="col-sm-6 col-md-4 col-lg-4 mb-3">
+                                <div class="form-group">
+                                    <label>Nombre de Usuario</label>
+                                    {{ form.username }}
+                                    {% if form.username.errors %}
+                                    <div class="text-danger">{{ form.username.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-md-4 col-lg-4 mb-3">
+                                <div class="form-group">
+                                    <label>Correo Electrónico</label>
+                                    {{ form.email }}
+                                    {% if form.email.errors %}
+                                    <div class="text-danger">{{ form.email.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6 col-md-4 col-lg-4 mb-3">
+                                <div class="form-group">
+                                    <label>Nombre</label>
+                                    {{ form.first_name }}
+                                    {% if form.first_name.errors %}
+                                    <div class="text-danger">{{ form.first_name.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6 col-md-4 col-lg-4 mb-3">
+                                <div class="form-group">
+                                    <label>Apellido</label>
+                                    {{ form.last_name }}
+                                    {% if form.last_name.errors %}
+                                    <div class="text-danger">{{ form.last_name.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-12">
+                        <div class="row">
+                            <div class="col-md-8 col-lg-8 mb-3">
+                                <div class="form-group">
+                                    <label>Esta Cuenta está activa?</label>
+                                    {{ form.is_active }}
+                                    {% if form.is_active.errors %}
+                                    <div class="text-danger">{{ form.is_active.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-8 col-lg-8 mb-3">
+                                <div class="form-group">
+                                    <label>Es parte del equipo?</label>
+                                    {{ form.is_staff }}
+                                    {% if form.is_staff.errors %}
+                                    <div class="text-danger">{{ form.is_staff.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-8 col-lg-8 mb-3">
+                                <div class="form-group">
+                                    <label>Es administrador?</label>
+                                    {{ form.is_superuser }}
+                                    {% if form.is_superuser.errors %}
+                                    <div class="text-danger">{{ form.is_superuser.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+{% endblock %}
+
+

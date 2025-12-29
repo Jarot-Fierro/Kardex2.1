@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Actualizar RUT Paciente{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-2">
+    <div class="row g-3">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="m-0"><i class="fas fa-id-card me-2"></i> Actualizar RUT</h6>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        {{ form.non_field_errors }}
+                        <div class="mb-3">
+                            <label for="id_rut" class="form-label">{{ form.rut.label }}</label>
+                            {{ form.rut }}
+                            {% for error in form.rut.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a href="{{ list_url }}" class="btn btn-outline-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-primary">Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="m-0"><i class="fas fa-user me-2"></i> Datos del Paciente</h6>
+                </div>
+                <div class="card-body">
+                    {% if paciente_fields %}
+                        <div class="row">
+                            {% for label, value in paciente_fields %}
+                                <div class="col-sm-6 mb-2">
+                                    <strong>{{ label }}:</strong>
+                                    <div>{{ value|default:'-' }}</div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No hay datos para mostrar.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

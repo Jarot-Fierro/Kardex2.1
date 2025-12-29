@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5 text-center">
+    <h1 class="display-4">404 - Esta página no existe</h1>
+    <p class="lead">La página a la que intentas acceder no existe.</p>
+    <a href="{% url 'index' %}" class="btn btn-primary">Volver al inicio</a>
+</div>
+{% endblock %}
