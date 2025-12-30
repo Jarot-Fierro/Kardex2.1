@@ -27,7 +27,7 @@ class FormPais(forms.ModelForm):
                 'minlenght': '1',
                 'maxlenght': '100'
             }),
-        required=True
+        required=False
     )
 
     def clean_nombre(self):
@@ -39,12 +39,6 @@ class FormPais(forms.ModelForm):
 
         validate_exists(nombre, exists)
         return nombre
-
-        return nombre
-
-    def clean_cod_pais(self):
-        cod_pais = self.cleaned_data['cod_pais'].strip()
-        return cod_pais
 
     class Meta:
         model = Pais

@@ -59,7 +59,7 @@ class FormServicioClinico(forms.ModelForm):
         model = ServicioClinico
         fields = [
             'nombre',
+            'establecimiento',
             'correo_jefe',
             'telefono',
-            'establecimiento'
         ]

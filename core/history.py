@@ -10,124 +10,142 @@ from kardex.mixin import DataTableMixin
 
 class GenericHistoryListView(PermissionRequiredMixin, DataTableMixin, TemplateView):
     """
-    Vista genérica para listar históricos (django-simple-history) de cualquier modelo.
-
-    Cómo usarla:
-      - Crear una subclase indicando `base_model` (el modelo original con `.history`).
-      - Opcionalmente ajustar `permission_required`, `template_name` y columnas.
-
-    Ejemplo:
-        from kardex.models import Pais
-
-        class PaisHistoryListView(GenericHistoryListView):
-            base_model = Pais
-            permission_required = 'kardex.view_pais'
-            template_name = 'kardex/history/list.html'
-
-    La vista utilizará DataTableMixin para entregar datos a DataTables vía AJAX
-    cuando la petición incluya el flag datatable (GET ?datatable=1) y el header
-    "X-Requested-With: XMLHttpRequest".
+    Vista genérica de historial con django-simple-history
     """
-
-    template_name = 'kardex/history/list.html'
-
-    # Modelo base (no el histórico). La subclase debe definirlo.
     base_model: Optional[Type] = None
 
-    # Columnas por defecto para históricos
-    datatable_columns = ['ID', 'Fecha', 'Usuario', 'Acción', 'Objeto']
-    # Campos para ordenar (usamos nombres del modelo histórico)
-    datatable_order_fields = ['history_id', None, 'history_date', 'history_user__username', 'history_type',
-                              'history_change_reason']
-    # Campos para buscar
-    datatable_search_fields = [
-        'history_user__username__icontains',
-        'history_change_reason__icontains',
-        # Búsqueda por representación string del objeto almacenada en get_object_str()
-    ]
+    # Columnas para DataTable
+    datatable_columns = ['ID', 'Fecha', 'Usuario', 'Acción', 'Objeto', 'Cambios']
+    datatable_order_fields = ['history_id', None, 'history_date', 'history_user__username', 'history_type', None]
+    datatable_search_fields = ['history_user__username__icontains', 'history_change_reason__icontains']
 
-    # Permiso genérico; las subclases deberían establecerlo según su modelo
     permission_required = None
     raise_exception = True
 
-    # URLs de acciones deshabilitadas por defecto para históricos (solo lectura)
-    url_detail = None
-    url_update = None
-    url_delete = None
+    url_detail = url_update = url_delete = None
+
+    # ==============================================================
+    # DISPACH - configuramos el modelo histórico automáticamente
+    # ==============================================================
 
     def dispatch(self, request: HttpRequest, *args, **kwargs):
         if not self.base_model:
-            raise ValueError('Debe definir base_model en la subclase para usar GenericHistoryListView')
-        # Resolver modelo histórico de django-simple-history
+            raise ValueError("Debes definir base_model en la subclase Ej: base_model = Pais")
+
         try:
-            history_model = self.base_model.history.model
+            self.model = self.base_model.history.model
         except Exception as e:
-            raise ValueError(f'El modelo {self.base_model} no tiene históricos configurados: {e}')
+            raise ValueError(f'El modelo {self.base_model} no tiene histórico configurado: {e}')
 
-        # DataTableMixin espera self.model
-        self.model = history_model
-
-        # Ajustar columnas si la subclase definió personalizadas
-        # Nada especial aquí; DataTableMixin tomará self.datatable_columns
         return super().dispatch(request, *args, **kwargs)
 
+    # ==============================================================
+    # GET AJAX / HTML
+    # ==============================================================
+
     def get(self, request, *args, **kwargs):
-        # Soporte para petición AJAX de DataTables
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest' and request.GET.get('datatable'):
             return self.get_datatable_response(request)
         return super().get(request, *args, **kwargs)
 
     def get_base_queryset(self):
-        # Base queryset ordenado por fecha descendente
-        qs = self.model.objects.all().select_related('history_user')
-        return qs.order_by('-history_date')
+        return self.model.objects.all().select_related('history_user').order_by('-history_date')
+
+    # ==============================================================
+    # UTILIDAD - Nombre del usuario
+    # ==============================================================
+
+    def _get_user_display(self, user):
+        if not user:
+            return "Sistema / Script"
+        name = f"{user.first_name} {user.last_name}".strip()
+        return f"{user.username} ({name})" if name else user.username
+
+    # ==============================================================
+    # UTILIDAD - Acción legible
+    # ==============================================================
 
     @staticmethod
     def _history_type_verbose(code: Optional[str]) -> str:
-        mapping = {'+': 'Creado', '~': 'Actualizado', '-': 'Eliminado'}
-        return mapping.get(code or '', code or '')
+        return {'+': 'Creado', '~': 'Modificado', '-': 'Eliminado'}.get(code, code)
 
-    def get_object_str(self, obj) -> str:
-        # Mejor esfuerzo: intentar mostrar algo representativo del objeto
-        # Primero intentamos el mé all instance si está disponible
+    # ==============================================================
+    # 🔥 CAMBIOS DETALLADOS
+    # ==============================================================
+
+    def _get_changes(self, obj) -> str:
+        if not hasattr(obj, 'diff_against'):
+            return ""
+
         try:
-            instance = getattr(obj, 'instance', None)
-            if instance is not None:
-                return str(instance)
-        except Exception:
+            previous = obj.instance.history.filter(history_date__lt=obj.history_date).order_by('-history_date').first()
+            if not previous:
+                return "—"
+        except:
+            return "—"
+
+        diff = obj.diff_against(previous)
+        if not diff.changes:
+            return "—"
+
+        result = []
+        for c in diff.changes:
+            result.append(
+                f"<b>{c.field}</b>: "
+                f"<span style='color:red;'>{c.old}</span> → "
+                f"<span style='color:green;'>{c.new}</span>"
+            )
+        return "<br>".join(result)
+
+    # ==============================================================
+    # Obtener nombre representativo del objeto
+    # ==============================================================
+
+    def get_object_str(self, obj):
+        try:
+            if obj.instance:
+                return str(obj.instance)
+        except:
             pass
-        # Fallback: combinar posibles campos comunes
-        candidates = []
-        for attr in ('nombre', 'codigo', 'id'):
-            if hasattr(obj, attr):
+
+        for field in ['nombre', 'codigo', 'descripcion', 'id']:
+            if hasattr(obj, field):
                 try:
-                    val = getattr(obj, attr)
-                    if val is not None:
-                        candidates.append(str(val))
-                except Exception:
+                    val = getattr(obj, field)
+                    if val:
+                        return str(val)
+                except:
                     pass
-        return ' - '.join(candidates) or str(obj)
+
+        return str(obj)
+
+    # ==============================================================
+    # Render fila para datatable
+    # ==============================================================
 
     def render_row(self, obj):
         return {
-            'ID': getattr(obj, 'history_id', getattr(obj, 'id', None)),
-            'Fecha': obj.history_date.strftime('%Y-%m-%d %H:%M:%S') if getattr(obj, 'history_date', None) else '',
-            'Usuario': getattr(getattr(obj, 'history_user', None), 'username', '') or '',
+            'ID': getattr(obj, 'history_id', obj.id),
+            'Fecha': obj.history_date.strftime('%Y-%m-%d %H:%M:%S') if obj.history_date else '',
+            'Usuario': self._get_user_display(getattr(obj, 'history_user', None)),
             'Acción': self._history_type_verbose(getattr(obj, 'history_type', '')),
-            'Motivo': getattr(obj, 'history_change_reason', '') or '',
             'Objeto': self.get_object_str(obj),
+            'Cambios': self._get_changes(obj),
         }
+
+    # ==============================================================
+    # Contexto para plantilla
+    # ==============================================================
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        base_name = getattr(self.base_model, '__name__', 'Objeto')
+        nombre = getattr(self.base_model, '__name__', 'Objeto')
         context.update({
-            'title': f'Histórico de {base_name}',
-            'list_url': reverse_lazy(self.request.resolver_match.view_name) if hasattr(self.request,
-                                                                                       'resolver_match') else '',
+            'title': f'Historial de {nombre}',
+            'list_url': reverse_lazy(self.request.resolver_match.view_name),
             'datatable_enabled': True,
             'datatable_order': [[0, 'desc']],
-            'datatable_page_length': 100,
+            'datatable_page_length': 50,
             'columns': self.datatable_columns,
         })
         return context

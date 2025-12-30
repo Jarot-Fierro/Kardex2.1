@@ -173,25 +173,37 @@
 </script>
 
 
-<!--    SCRIPT DE RUT PARA INPUTMASK-->
 <script>
     $(document).ready(function () {
         const $rut = $('.id_rut');
 
-        if ($rut.length && typeof $rut.inputmask === 'function') {
-            $rut.inputmask({
-                mask: '9{1,2}.999.999-@',
-                definitions: {
-                    '@': {
-                        validator: '[0-9Kk]'
-                    }
-                },
-                placeholder: '_',
-                showMaskOnHover: false,
-                showMaskOnFocus: true,
-                clearIncomplete: true
-            });
+        // Permitir escribir cualquier formato
+        $rut.on('input', function () {
+            this.value = this.value.replace(/[^0-9kK]/g, '');
+        });
+
+        // Función para formatear
+        function formatRut(input) {
+            let rut = input.value.replace(/\./g, '').replace(/-/g, '').toUpperCase();
+            if (rut.length <= 1) return;
+
+            let body = rut.slice(0, -1);
+            let dv = rut.slice(-1);
+            body = body.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            input.value = body + '-' + dv;
         }
+
+        // Formatear al perder foco
+        $rut.on('blur', function () {
+            formatRut(this);
+        });
+
+        // 🔥 Formatear al cargar la página si el input ya trae un valor
+        $rut.each(function () {
+            if (this.value.trim() !== "") {
+                formatRut(this);
+            }
+        });
     });
 </script>
 
@@ -209,23 +221,6 @@
     });
 </script>
 
-<!-- SCRIPT DE TELEFONO FIJO CON INPUTMASK -->
-<script>
-    $('#telefono_establecimiento').inputmask({
-        mask: "99 999 9999",  // Acepta cualquier red fija con código de área 2 dígitos
-        definitions: {
-            '9': {
-                validator: "[0-9]",
-                cardinality: 1
-            }
-        },
-        placeholder: "_",
-        showMaskOnHover: false,
-        showMaskOnFocus: true,
-        clearIncomplete: true
-    });
-
-</script>
 <!--  SCRIPT DE FECHA CON INPUTMASK  -->
 <script>
     $(document).ready(function () {

@@ -10,13 +10,13 @@ from kardex.views.contacto import ContactoView
 from kardex.views.ficha import *
 from kardex.views.movimiento_fichas import *
 from kardex.views.movimiento_fichas_update import SalidaFicha2View, SalidaTablaFichaView, RecepcionTablaFichaView
-from kardex.views.pacientes import *
 from kardex.views.pdfs import pdf_index, pdf_stickers
-from kardex.views.prevision import *
-from kardex.views.profesion import *
-from kardex.views.profesionales import *
 from kardex.views.soporte import TicketCreateView, SoporteListView
 from kardex.views.tutoriales import TutorialesView
+from personas.views.pacientes import *
+from personas.views.prevision import *
+from personas.views.profesion import *
+from personas.views.profesionales import *
 
 app_name = 'kardex'
 

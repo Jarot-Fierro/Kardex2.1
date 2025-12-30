@@ -17,6 +17,7 @@ def dashboard_view(request):
         'paciente': 0,
         'pais': 0,
         'prevision': 0,
+        'colores_sector': 0,
         'profesion': 0,
         'profesionales': 0,
         'sectores': 0,

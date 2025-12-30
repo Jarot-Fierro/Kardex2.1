@@ -56,6 +56,8 @@ class Role(models.Model):
     paciente = models.IntegerField(choices=PERMISSION_CHOICES, default=0)
     pais = models.IntegerField(choices=PERMISSION_CHOICES, default=0)
     prevision = models.IntegerField(choices=PERMISSION_CHOICES, default=0)
+    colores_sector = models.IntegerField(choices=PERMISSION_CHOICES, default=0)
+    genero = models.IntegerField(choices=PERMISSION_CHOICES, default=0)
     profesion = models.IntegerField(choices=PERMISSION_CHOICES, default=0)
     profesionales = models.IntegerField(choices=PERMISSION_CHOICES, default=0)
     sectores = models.IntegerField(choices=PERMISSION_CHOICES, default=0)

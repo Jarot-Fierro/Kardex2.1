@@ -76,7 +76,7 @@ def validate_email(email):
 
 
 def validate_rut(rut: str) -> bool:
-    """Valida un RUT chileno en formato con o sin puntos y guión."""
+    """Valida un RUT chileno con cuerpo desde 6 dígitos hacia arriba."""
     if not rut:
         return False
 
@@ -87,7 +87,8 @@ def validate_rut(rut: str) -> bool:
 
     body, dv = rut[:-1], rut[-1]
 
-    if not body.isdigit() or len(body) < 7:
+    # Se permite desde 6 dígitos mínimo
+    if not body.isdigit() or len(body) < 6:
         return False
 
     # Cálculo del dígito verificador

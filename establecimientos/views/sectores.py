@@ -44,6 +44,16 @@ class SectorListView(PermissionRequiredMixin, DataTableMixin, TemplateView):
             'Establecimiento': (obj.establecimiento.nombre or '').upper(),
         }
 
+    def get_base_queryset(self):
+        """Filtra por el establecimiento del usuario logueado."""
+        user = getattr(self.request, 'user', None)
+        establecimiento = getattr(user, 'establecimiento', None) if user else None
+        qs = Sector.objects.filter(status=True)
+        if establecimiento:
+            return qs.filter(establecimiento=establecimiento)
+        # Si el usuario no tiene establecimiento, no mostrar registros
+        return qs.none()
+
     def get(self, request, *args, **kwargs):
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest' and request.GET.get('datatable'):
             return self.get_datatable_response(request)
@@ -86,7 +96,7 @@ class SectorCreateView(PermissionRequiredMixin, IncludeUserFormCreate, CreateVie
     permission_required = 'establecimiento:add_sector'
 
     def form_valid(self, form):
-        messages.success(self.request, 'Comuna creada correctamente')
+        messages.success(self.request, 'Sector creado correctamente')
         return super().form_valid(form)
 
     def form_invalid(self, form):
@@ -114,7 +124,7 @@ class SectorUpdateView(PermissionRequiredMixin, IncludeUserFormUpdate, UpdateVie
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
-        messages.success(self.request, 'Comuna creada correctamente')
+        messages.info(self.request, 'Sector actualizado correctamente')
         return super().form_valid(form)
 
     def form_invalid(self, form):
@@ -134,3 +144,10 @@ class SectorHistoryListView(GenericHistoryListView):
     base_model = Sector
     permission_required = 'establecimiento.view_sector'
     template_name = 'history/list.html'
+
+    url_last_page = 'sector_list'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['url_last_page'] = self.url_last_page
+        return context

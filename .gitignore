@@ -34,10 +34,6 @@ uploads/
 staticfiles/
 static/
 
-# Migraciones (si no quieres subirlas)
-# ⚠ OJO: si se trata de un equipo real, SÍ se deben versionar
-**/migrations/*
-!**/migrations/__init__.py   # mantener solo __init__.py
 
 # ==========================
 # 🛠 IDE y editores

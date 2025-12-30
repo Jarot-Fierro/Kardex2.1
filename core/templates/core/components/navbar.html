@@ -21,52 +21,67 @@
                     <a id="dropdownSubMenu1" href="#" data-toggle="dropdown" aria-haspopup="true"
                        aria-expanded="false" class="nav-link dropdown-toggle">Mantenedores</a>
                     <ul aria-labelledby="dropdownSubMenu1" class="dropdown-menu border-0 shadow">
+                        {% if user_permissions.pais > 0 %}
+                            <li>
+                                <a href="{% url 'pais_list' %}" class="dropdown-item">Paises</a>
+                            </li>
+                        {% endif %}
+                        {% if user_permissions.sectores > 0 %}
+                            <li>
+                                <a href="{% url 'sector_list' %}" class="dropdown-item">Sectores</a>
+                            </li>
+                        {% endif %}
+
+                        {% if user_permissions.colores_sector > 0 %}
+                            <li>
+                                <a href="{% url 'color_list' %}" class="dropdown-item">Colores de Sectores</a>
+                            </li>
+                        {% endif %}
+                        {% if user_permissions.profesion > 0 %}
+                            <li>
+                                <a href="{% url 'profesion_list' %}" class="dropdown-item">Profesiones</a>
+                            </li>
+                        {% endif %}
+                        {% if user_permissions.prevision > 0 %}
+                            <li>
+                                <a href="{% url 'prevision_list' %}" class="dropdown-item">Prevision</a>
+                            </li>
+                        {% endif %}
+                        {% if user_permissions.genero > 0 %}
+                            <li>
+                                <a href="{% url 'genero_list' %}" class="dropdown-item">Genero</a>
+                            </li>
+                        {% endif %}
+
+                        <li class="dropdown-divider"></li>
                         {% if user_permissions.comunas > 0 %}
-                            <li><a href="{% url 'list_comunas' %}" class="dropdown-item">Comunas</a></li>
-                            <li class="dropdown-divider"></li>
+                            <li>
+                                <a href="{% url 'list_comunas' %}" class="dropdown-item">Comunas</a>
+                            </li>
                         {% endif %}
-
                         {% if user_permissions.establecimientos > 0 %}
-                            <li><a href="{% url 'establecimiento_list' %}" class="dropdown-item">Establecimientos</a>
+                            <li>
+                                <a href="{% url 'establecimiento_list' %}" class="dropdown-item">Establecimientos</a>
                             </li>
-                            <li class="dropdown-divider"></li>
                         {% endif %}
-
-                        {% if user_permissions.servicios_clinicos > 0 %}
-                            <li><a href="" class="dropdown-item">Servicios Clínicos</a>
+                        {% if user_permissions.servicio_clinico > 0 %}
+                            <li>
+                                <a href="{% url 'servicio_clinico_list' %}" class="dropdown-item">Servicios Clínicos</a>
                             </li>
-                            <li class="dropdown-divider"></li>
-                        {% endif %}
-
-                        {% if user_permissions.profesiones > 0 %}
-                            <li><a href="" class="dropdown-item">Profesiones</a></li>
-                            <li class="dropdown-divider"></li>
                         {% endif %}
 
                         {% if user_permissions.profesionales > 0 %}
-                            <li><a href="" class="dropdown-item">Profesionales</a></li>
-                            <li class="dropdown-divider"></li>
+                            <li>
+                                <a href="" class="dropdown-item">Profesionales</a></li>
                         {% endif %}
-
-
+                        <li class="dropdown-divider"></li>
                         {% if user_permissions.paciente > 0 %}
                             <li><a href="" class="dropdown-item">Pacientes</a></li>
-                            <li class="dropdown-divider"></li>
-                        {% endif %}
 
-                        {% if user_permissions.prevision > 0 %}
-                            <li><a href="" class="dropdown-item">Previsión</a></li>
-                            <li class="dropdown-divider"></li>
                         {% endif %}
 
                         {% if user_permissions.fichas > 0 %}
                             <li><a href="" class="dropdown-item">Fichas</a></li>
-                            <li class="dropdown-divider"></li>
-                        {% endif %}
-
-                        {% if user_permissions.sectores > 0 %}
-                            <li><a href="{% url 'sector_list' %}" class="dropdown-item">Sectores</a></li>
-                            <li class="dropdown-divider"></li>
                         {% endif %}
                     </ul>
                 </li>

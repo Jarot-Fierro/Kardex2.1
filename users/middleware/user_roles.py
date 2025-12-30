@@ -29,6 +29,7 @@ class UserRolesMiddleware(MiddlewareMixin):
                 "pais": 0,
                 "prevision": 0,
                 "profesion": 0,
+                "colores_sector": 0,
                 "profesionales": 0,
                 "sectores": 0,
                 "servicio_clinico": 0,

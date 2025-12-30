@@ -3,17 +3,17 @@
 {% block title %}Eliminar Pais{% endblock %}
 
 {% block content %}
-<div class="card">
-    <div class="card-header">
-        <h3 class="card-title mb-0">Confirmar eliminación</h3>
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title mb-0">Confirmar eliminación</h3>
+        </div>
+        <div class="card-body">
+            <p>¿Estás seguro que deseas eliminar este pais: <strong>{{ object }}</strong>?</p>
+            <form method="post">
+                {% csrf_token %}
+                <a href="{% url 'pais_list' %}" class="btn btn-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-danger">Eliminar</button>
+            </form>
+        </div>
     </div>
-    <div class="card-body">
-        <p>¿Estás seguro que deseas eliminar este pais: <strong>{{ object }}</strong>?</p>
-        <form method="post">
-            {% csrf_token %}
-            <a href="{% url 'kardex:pais_list' %}" class="btn btn-secondary">Cancelar</a>
-            <button type="submit" class="btn btn-danger">Eliminar</button>
-        </form>
-    </div>
-</div>
 {% endblock %}

@@ -1,10 +1,20 @@
-def middleware_login_required(get_response):
-    def middleware(request):
-        response = get_response(request)
+from django.shortcuts import redirect
+from django.urls import reverse
 
-        if not request.user.is_authenticated:
-            return response.redirect('/accounts/login/?next=' + request.path)
 
-        return response
+class LoginRequiredMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
 
-    return middleware
+    def __call__(self, request):
+
+        if request.path.startswith(('/static/', '/media/', '/favicon.ico')):
+            return self.get_response(request)
+
+        if request.user.is_authenticated:
+            return self.get_response(request)
+
+        if request.path not in ['/login/', '/admin/login/']:
+            return redirect(reverse('login'))
+
+        return self.get_response(request)
