@@ -21,6 +21,10 @@
                     <a id="dropdownSubMenu1" href="#" data-toggle="dropdown" aria-haspopup="true"
                        aria-expanded="false" class="nav-link dropdown-toggle">Mantenedores</a>
                     <ul aria-labelledby="dropdownSubMenu1" class="dropdown-menu border-0 shadow">
+                        <li>
+                            <a href="{% url 'usuarios_list' %}" class="dropdown-item">Usuarios</a>
+                        </li>
+                        <li class="dropdown-divider"></li>
                         {% if user_permissions.pais > 0 %}
                             <li>
                                 <a href="{% url 'pais_list' %}" class="dropdown-item">Paises</a>
@@ -72,7 +76,7 @@
 
                         {% if user_permissions.profesionales > 0 %}
                             <li>
-                                <a href="" class="dropdown-item">Profesionales</a></li>
+                                <a href="{% url 'profesional_list' %}" class="dropdown-item">Profesionales</a></li>
                         {% endif %}
                         <li class="dropdown-divider"></li>
                         {% if user_permissions.paciente > 0 %}
@@ -223,7 +227,7 @@
                     <li class="dropdown-divider"></li>
                     <li>
                         <!-- language: html -->
-                        <form id="logout-form" action="" method="post"
+                        <form id="logout-form" action="{% url 'logout' %}" method="post"
                               style="display:inline;">
                             {% csrf_token %}
                             <button type="submit" class="dropdown-item text-danger">

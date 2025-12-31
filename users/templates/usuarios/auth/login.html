@@ -23,12 +23,13 @@
 <body class="hold-transition login-page bg-light">
 <div class="login-box">
     <div class="login-logo">
-        <a href="#"><b>Kardex</b>SSA</a>
+        <a href="#"><b>Kardex</b>SSA<small>v2.1</small></a>
     </div>
+
 
     <!-- Login card -->
     <div class="card">
-        {#        {% include 'components/messages/messages.html' %}#}
+        {% include 'core/components/messages/messages.html' %}
 
         <div class="card-body login-card-body">
             <p class="login-box-msg">Bienvenido! Inicia sesión para continuar</p>
@@ -95,25 +96,38 @@
 <script src="{% static 'adminlte3/plugins/inputmask/jquery.inputmask.min.js' %}"></script>
 
 <!--    SCRIPT DE RUT PARA INPUTMASK-->
+
 <script>
     $(document).ready(function () {
         const $rut = $('#id_rut');
-        if ($rut.length && typeof $rut.inputmask === 'function') {
-            $rut.inputmask({
-                mask: ['9.999.999-@', '99.999.999-@'],
-                definitions: {
-                    '@': {
-                        validator: '[0-9Kk]',
-                        casing: 'upper'  // Fuerza que "k" se convierta en "K"
-                    }
-                },
-                greedy: false,
-                placeholder: '_',
-                clearIncomplete: false,
-                showMaskOnHover: false,
-                showMaskOnFocus: true
-            });
+
+        // Permitir escribir cualquier formato
+        $rut.on('input', function () {
+            this.value = this.value.replace(/[^0-9kK]/g, '');
+        });
+
+        // Función para formatear
+        function formatRut(input) {
+            let rut = input.value.replace(/\./g, '').replace(/-/g, '').toUpperCase();
+            if (rut.length <= 1) return;
+
+            let body = rut.slice(0, -1);
+            let dv = rut.slice(-1);
+            body = body.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            input.value = body + '-' + dv;
         }
+
+        // Formatear al perder foco
+        $rut.on('blur', function () {
+            formatRut(this);
+        });
+
+        // 🔥 Formatear al cargar la página si el input ya trae un valor
+        $rut.each(function () {
+            if (this.value.trim() !== "") {
+                formatRut(this);
+            }
+        });
     });
 </script>
 

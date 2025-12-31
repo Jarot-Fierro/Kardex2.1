@@ -106,7 +106,7 @@ class ComunaUpdateView(PermissionRequiredMixin, IncludeUserFormUpdate, UpdateVie
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
-        messages.success(self.request, 'Comuna creada correctamente')
+        messages.info(self.request, 'Comuna actualizada correctamente')
         return super().form_valid(form)
 
     def form_invalid(self, form):
@@ -126,3 +126,10 @@ class ComunaHistoryListView(GenericHistoryListView):
     base_model = Comuna
     permission_required = 'geografia.view_comuna'
     template_name = 'history/list.html'
+
+    url_last_page = 'list_comunas'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['url_last_page'] = self.url_last_page
+        return context

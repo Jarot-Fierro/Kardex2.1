@@ -78,7 +78,7 @@ class ProfesionCreateView(PermissionRequiredMixin, IncludeUserFormCreate, Create
     raise_exception = True
 
     def form_valid(self, form):
-        messages.success(self.request, 'Profesion creada correctamente')
+        messages.success(self.request, 'Profesión creada correctamente')
         return super().form_valid(form)
 
     def form_invalid(self, form):
@@ -107,7 +107,7 @@ class ProfesionUpdateView(PermissionRequiredMixin, IncludeUserFormUpdate, Update
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
-        messages.info(self.request, 'Profesion actualizada correctamente')
+        messages.info(self.request, 'Profesión actualizada correctamente')
         return super().form_valid(form)
 
     def form_invalid(self, form):

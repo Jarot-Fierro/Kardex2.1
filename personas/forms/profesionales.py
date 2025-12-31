@@ -2,12 +2,20 @@ from django import forms
 from django.core.exceptions import ValidationError
 
 from core.validations import validate_rut, format_rut, validate_spaces, validate_email
-from establecimientos.models.establecimiento import Establecimiento
 from personas.models.profesion import Profesion
 from personas.models.profesionales import Profesional
 
 
 class FormProfesional(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)  # recibir request desde la view
+        super().__init__(*args, **kwargs)
+
+        # Si el usuario tiene establecimiento asignado, lo fijamos en el form
+        if self.request and hasattr(self.request.user, 'establecimiento'):
+            self.fields['establecimiento'].initial = self.request.user.establecimiento
+
     rut = forms.CharField(
         label='R.U.T.',
         widget=forms.TextInput(attrs={
@@ -68,17 +76,6 @@ class FormProfesional(forms.ModelForm):
         required=False
     )
 
-    establecimiento = forms.ModelChoiceField(
-        label='Establecimiento',
-        queryset=Establecimiento.objects.filter(status=True),
-        empty_label='Seleccione un Establecimiento',
-        widget=forms.Select(attrs={
-            'class': 'form-control select2',
-            'id': 'establecimiento_profesional'
-        }),
-        required=True
-    )
-
     def clean_rut(self):
         rut = self.cleaned_data.get('rut')
         if not rut:
@@ -115,6 +112,23 @@ class FormProfesional(forms.ModelForm):
             raise ValidationError("Ya existe un profesional con este correo electrónico.")
         return correo
 
+    def clean(self):
+        cleaned_data = super().clean()
+        rut = cleaned_data.get('rut')
+        establecimiento = cleaned_data.get('establecimiento')
+
+        # Instancia actual para permitir edición sin conflicto
+        current_instance = self.instance if self.instance.pk else None
+
+        if rut and establecimiento:
+            if Profesional.objects.filter(
+                    rut=rut,
+                    establecimiento=establecimiento
+            ).exclude(pk=current_instance.pk if current_instance else None).exists():
+                raise ValidationError("Este profesional ya está registrado en este establecimiento.")
+
+        return cleaned_data
+
     class Meta:
         model = Profesional
         fields = [
@@ -124,5 +138,4 @@ class FormProfesional(forms.ModelForm):
             'telefono',
             'anexo',
             'profesion',
-            'establecimiento'
         ]

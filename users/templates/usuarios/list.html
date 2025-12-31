@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Usuarios - Listado{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-header">
+            <div class="row align-items-center w-100">
+                <div class="col">
+                    <h5 class="mb-0">Listado de Usuarios</h5>
+                </div>
+                <div class="col-auto text-end">
+                    <a href="{% url 'usuarios_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Nuevo Usuario
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <table id="Table" class="table table-bordered table-striped table-sm">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Acciones</th>
+                    {% for col in columns %}
+                        {% if col != 'ID' %}
+                            <th>{{ col }}</th>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

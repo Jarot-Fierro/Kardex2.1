@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.http import HttpResponse
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView, DetailView
 from django.views.generic import TemplateView
@@ -96,9 +97,19 @@ class ProfesionalCreateView(PermissionRequiredMixin, IncludeUserFormCreate, Crea
     success_url = reverse_lazy('profesional_list')
     permission_required = 'personas.add_profesionales'
     raise_exception = True
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['request'] = self.request
+
+        return kwargs
 
     def form_valid(self, form):
-        messages.success(self.request, 'Comuna creada correctamente')
+        if not self.request.user.establecimiento:
+            messages.error(self.request, "No tienes establecimiento asignado.")
+            return redirect('no_establecimiento')
+        form.instance.establecimiento = self.request.user.establecimiento
+        messages.success(self.request, 'Profesional creado correctamente')
         return super().form_valid(form)
 
     def form_invalid(self, form):
@@ -127,7 +138,7 @@ class ProfesionalUpdateView(PermissionRequiredMixin, IncludeUserFormUpdate, Upda
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
-        messages.success(self.request, 'Comuna creada correctamente')
+        messages.info(self.request, 'Profesional actualizado correctamente')
         return super().form_valid(form)
 
     def form_invalid(self, form):
@@ -147,3 +158,10 @@ class ProfesionalHistoryListView(GenericHistoryListView):
     base_model = Profesional
     permission_required = 'personas.view_profesional'
     template_name = 'history/list.html'
+
+    url_last_page = 'profesional_list'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['url_last_page'] = self.url_last_page
+        return context

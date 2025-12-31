@@ -63,6 +63,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'users.middleware.user_roles.UserRolesMiddleware',
+    'core.middleware.establecimiento_required.EstablecimientoRequiredMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
 ]
 

@@ -3,6 +3,7 @@ from django.urls import path
 from personas.views.genero import *
 from personas.views.prevision import *
 from personas.views.profesion import *
+from personas.views.profesionales import *
 
 urlpatterns = [
     # Vistas básicas para Profesiones
@@ -13,11 +14,11 @@ urlpatterns = [
     path('profesiones/historial/', ProfesionHistoryListView.as_view(), name='profesion_history'),
 
     # Vistas básicas para Profesionales
-    # path('profesionales/', ProfesionalListView.as_view(), name='profesional_list'),
-    # path('profesionales/crear/', ProfesionalCreateView.as_view(), name='profesional_create'),
-    # path('profesionales/<int:pk>/editar/', ProfesionalUpdateView.as_view(), name='profesional_update'),
-    # path('profesionales/<int:pk>/detalle/', ProfesionalDetailView.as_view(), name='profesional_detail'),
-    # path('profesionales/history/', ProfesionalHistoryListView.as_view(), name='profesional_history'),
+    path('profesionales/', ProfesionalListView.as_view(), name='profesional_list'),
+    path('profesionales/crear/', ProfesionalCreateView.as_view(), name='profesional_create'),
+    path('profesionales/<int:pk>/editar/', ProfesionalUpdateView.as_view(), name='profesional_update'),
+    path('profesionales/<int:pk>/detalle/', ProfesionalDetailView.as_view(), name='profesional_detail'),
+    path('profesionales/history/', ProfesionalHistoryListView.as_view(), name='profesional_history'),
 
     # Vistas básicas para Prevision
     path('prevision/', PrevisionListView.as_view(), name='prevision_list'),

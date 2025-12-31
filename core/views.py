@@ -33,3 +33,8 @@ def dashboard_view(request):
                 permissions[module] = current_permission
 
     return render(request, 'core/dashboard.html', {'permissions': permissions})
+
+
+@login_required
+def no_establecimiento(request):
+    return render(request, 'core/no_establecimiento.html')
