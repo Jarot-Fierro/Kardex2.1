@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'geografia',
     'establecimientos',
     'personas',
+    'clinica',
 ]
 
 AUTH_USER_MODEL = 'users.User'
@@ -86,6 +87,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
+SIMPLE_HISTORY_ENABLED = False
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases

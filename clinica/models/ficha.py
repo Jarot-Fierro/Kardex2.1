@@ -11,18 +11,19 @@ class Ficha(StandardModel):
     pasivado = models.BooleanField(default=False, verbose_name='Pasivado')
     observacion = models.TextField(null=True, blank=True, verbose_name='Observación')
 
-    usuario = models.ForeignKey('users.UsuarioPersonalizado', on_delete=models.PROTECT, null=True, blank=True,
+    usuario = models.ForeignKey('users.User', on_delete=models.PROTECT, null=True, blank=True,
                                 verbose_name='Usuario', related_name='fichas_usuarios')
 
     fecha_creacion_anterior = models.DateTimeField(null=True, blank=True)
 
-    paciente = models.ForeignKey('kardex.Paciente', on_delete=models.PROTECT, null=True, blank=True,
+    paciente = models.ForeignKey('personas.Paciente', on_delete=models.PROTECT, null=True, blank=True,
                                  verbose_name='Paciente', related_name='fichas_pacientes')
 
-    establecimiento = models.ForeignKey('kardex.Establecimiento', on_delete=models.PROTECT, null=True, blank=True,
+    establecimiento = models.ForeignKey('establecimientos.Establecimiento', on_delete=models.PROTECT, null=True,
+                                        blank=True,
                                         verbose_name='Establecimiento', related_name='fichas_establecimientos')
 
-    sector = models.ForeignKey('kardex.Sector', on_delete=models.PROTECT, null=True, blank=True,
+    sector = models.ForeignKey('establecimientos.Sector', on_delete=models.PROTECT, null=True, blank=True,
                                verbose_name='Sector', related_name='fichas_sectores')
 
     history = HistoricalRecords()

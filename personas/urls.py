@@ -1,5 +1,6 @@
 from django.urls import path
 
+from personas.apis.ficha_paciente import get_paciente_ficha
 from personas.views.genero import *
 from personas.views.prevision import *
 from personas.views.profesion import *
@@ -48,5 +49,9 @@ urlpatterns = [
     # path('pacientes/crear/sin-rut/', PacienteCreateSinRutView.as_view(), name='paciente_create_sin_rut'),
     # path('pacientes-pueblo_indigena/', PacientePuebloIndigenaListView.as_view(), name='paciente_pueblo_indigena_list'),
     # path('pacientes/historial', PacientesHistoryListView.as_view(), name='paciente_history'),
+
+    # APIS
+    path(
+        "paciente/<str:rut>/ficha/", get_paciente_ficha, name="get_paciente_ficha", ),
 
 ]

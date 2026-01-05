@@ -6,7 +6,8 @@ from establecimientos.models.establecimiento import Establecimiento
 
 
 class UsuarioAnterior(StandardModel):
-    rut = models.CharField(primary_key=True, max_length=100, unique=True, null=False, verbose_name='R.U.T.')
+    id = models.AutoField(primary_key=True)
+    rut = models.CharField(max_length=100, null=False, verbose_name='R.U.T.')
     nombre = models.CharField(max_length=100, null=False, verbose_name='Nombre')
     correo = models.EmailField(max_length=100, null=False, verbose_name='Correo')
     establecimiento = models.ForeignKey(Establecimiento, on_delete=models.PROTECT, null=True, blank=True,

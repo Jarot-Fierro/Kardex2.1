@@ -8,6 +8,7 @@ from kardex.choices import ESTADO_CIVIL, GENERO_CHOICES
 class Paciente(StandardModel):
     # IDENTIFICACIÓN
     codigo = models.CharField(max_length=100, unique=True, null=True, blank=True, verbose_name='Código')
+    id_anterior = models.IntegerField(null=True, blank=True, verbose_name='ID Anterior')
     rut = models.CharField(max_length=100, null=True, blank=True, verbose_name='R.U.T.')
     nip = models.CharField(max_length=100, null=True, blank=True, verbose_name='NIP')
     nombre = models.CharField(max_length=100, null=False, verbose_name='Nombre')
@@ -56,15 +57,15 @@ class Paciente(StandardModel):
     fecha_fallecimiento = models.DateField(null=True, blank=True, verbose_name='Fecha de Fallecimiento')
     alergico_a = models.CharField(null=True, blank=True, max_length=200, verbose_name='Alergico a')
 
-    comuna = models.ForeignKey('kardex.Comuna', on_delete=models.PROTECT, null=False,
+    comuna = models.ForeignKey('geografia.Comuna', on_delete=models.PROTECT, null=False,
                                verbose_name='Comuna', related_name='pacientes_comuna', default=1)
-    prevision = models.ForeignKey('kardex.Prevision', on_delete=models.SET_NULL, null=True, blank=True,
+    prevision = models.ForeignKey('personas.Prevision', on_delete=models.SET_NULL, null=True, blank=True,
                                   verbose_name='Previsión', related_name='pacientes_prevision', default=1)
 
-    usuario = models.ForeignKey('users.UsuarioPersonalizado', on_delete=models.SET_NULL, null=True, blank=True,
+    usuario = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True, blank=True,
                                 verbose_name='Usuario', related_name='pacientes_usuario')
 
-    usuario_anterior = models.ForeignKey('kardex.UsuarioAnterior', on_delete=models.PROTECT, null=True, blank=True,
+    usuario_anterior = models.ForeignKey('personas.UsuarioAnterior', on_delete=models.PROTECT, null=True, blank=True,
                                          verbose_name='UsuarioAnterior', related_name='usuarios_anteriores')
 
     history = HistoricalRecords()

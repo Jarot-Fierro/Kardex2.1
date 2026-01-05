@@ -6,6 +6,7 @@ from core.models import StandardModel
 
 class Prevision(StandardModel):
     nombre = models.CharField(max_length=100, unique=True, null=False, verbose_name='Nombre')
+    codigo = models.IntegerField(null=True, blank=True)
 
     history = HistoricalRecords()
 

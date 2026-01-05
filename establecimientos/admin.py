@@ -46,15 +46,35 @@ class EstablecimientoAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
         return False
 
 
+class ServicioClinicoResource(resources.ModelResource):
+    establecimiento = fields.Field(
+        column_name='establecimiento',
+        attribute='establecimiento',
+        widget=ForeignKeyWidget(Establecimiento, 'pk')
+    )
+
+    class Meta:
+        model = ServicioClinico
+        import_id_fields = ['id']
+        fields = (
+            'id', 'establecimiento', 'codigo', 'nombre', 'tiempo_horas', 'correo_jefe',
+        )
+        export_order = ('id', 'establecimiento', 'codigo', 'nombre', 'tiempo_horas', 'correo_jefe',)
+        skip_unchanged = True
+        report_skipped = True
 
 
 @admin.register(ServicioClinico)
-class ServicioClinicoAdmin(SimpleHistoryAdmin):
-    list_display = ("id", "nombre", "tiempo_horas", "correo_jefe", "establecimiento")
-    search_fields = ("nombre", "establecimiento__nombre")
+class ServicioClinicoAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
+    resource_class = ServicioClinicoResource
+
+    list_display = ('id', 'nombre', 'correo_jefe', 'tiempo_horas', 'establecimiento')
+    search_fields = ("nombre", "establecimiento__nombre",)
     autocomplete_fields = ("establecimiento",)
+    list_filter = ("establecimiento",)
     ordering = ("-updated_at",)
 
+    # Evitar borrado desde el admin
     def has_delete_permission(self, request, obj=None):
         return False
 
@@ -64,6 +84,7 @@ class SectorAdmin(SimpleHistoryAdmin):
     list_display = ("id", "codigo", "color", "establecimiento")
     search_fields = ("codigo", "color", "establecimiento")
     autocomplete_fields = ("establecimiento",)
+
     ordering = ("-updated_at",)
 
     def has_delete_permission(self, request, obj=None):
