@@ -1,6 +1,10 @@
 from django.contrib import admin
+from import_export import resources, fields
+from import_export.admin import ImportExportModelAdmin
+from import_export.widgets import ForeignKeyWidget
 from simple_history.admin import SimpleHistoryAdmin
 
+from establecimientos.models.establecimiento import Establecimiento
 from personas.models.genero import Genero
 from personas.models.prevision import Prevision
 from personas.models.profesion import Profesion
@@ -30,14 +34,34 @@ class ProfesionAdmin(SimpleHistoryAdmin):
         return False
 
 
-# === PROFESIONAL ===
+class ProfesionalResource(resources.ModelResource):
+    # Aquí el campo para importación/exportación del establecimiento usando su nombre
+    establecimiento = fields.Field(
+        column_name='establecimiento',
+        attribute='establecimiento',
+        widget=ForeignKeyWidget(Establecimiento, 'pk')
+    )
+
+    class Meta:
+        model = Profesional
+        import_id_fields = ['id']  # Para identificar registros al importar
+        fields = ('id', 'rut', 'nombres', 'correo', 'telefono', 'anexo', 'establecimiento')
+        export_order = ('id', 'rut', 'nombres', 'correo', 'telefono', 'anexo', 'establecimiento')
+        skip_unchanged = True
+        report_skipped = True
+
+
+# === Admin final combinando historial + import/export ===
 @admin.register(Profesional)
-class ProfesionalAdmin(SimpleHistoryAdmin):
-    list_display = ("id", "rut", "nombres", "correo", "telefono", "profesion", "establecimiento")
+class ProfesionalAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
+    resource_class = ProfesionalResource
+
+    list_display = ("id", "rut", "nombres", "correo", "telefono", 'anexo', "profesion", "establecimiento")
     search_fields = ("rut", "nombres", "correo", "profesion__nombre", "establecimiento__nombre")
     autocomplete_fields = ("profesion", "establecimiento")
     ordering = ("-updated_at",)
 
+    # Evitar borrado desde el admin
     def has_delete_permission(self, request, obj=None):
         return False
 

@@ -21,10 +21,15 @@
                     <a id="dropdownSubMenu1" href="#" data-toggle="dropdown" aria-haspopup="true"
                        aria-expanded="false" class="nav-link dropdown-toggle">Mantenedores</a>
                     <ul aria-labelledby="dropdownSubMenu1" class="dropdown-menu border-0 shadow">
-                        <li>
-                            <a href="{% url 'usuarios_list' %}" class="dropdown-item">Usuarios</a>
-                        </li>
-                        <li class="dropdown-divider"></li>
+                        {% if user_permissions.usuarios > 0 %}
+                            <li>
+                                <a href="{% url 'usuarios_list' %}" class="dropdown-item">Usuarios</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'roles_list' %}" class="dropdown-item">Roles</a>
+                            </li>
+                            <li class="dropdown-divider"></li>
+                        {% endif %}
                         {% if user_permissions.pais > 0 %}
                             <li>
                                 <a href="{% url 'pais_list' %}" class="dropdown-item">Paises</a>
@@ -189,24 +194,24 @@
                 <ul aria-labelledby="dropdownUserMenu" class="dropdown-menu dropdown-menu-right border-0 shadow">
                     {% if request.user.is_superuser %}
                         <li>
-                            <a href="" class="dropdown-item">
+                            <a href="{% url 'admin:index' %}" class="dropdown-item">
                                 <i class="fas fa-cog"></i>
                                 Panel de Administrador
                             </a>
                         </li>
-                        <li>
-                            <a href="" class="dropdown-item">
-                                <i class="fas fa-plus"></i>
-                                Crear Usuario
-                            </a>
-                        </li>
                     {% endif %}
-                    <li><a href="" class="dropdown-item"><i class="fas fa-id-badge mr-2"></i>
-                        Perfil</a></li>
                     <li>
-                        <a href="" class="dropdown-item">
-                            <i class="fas fa-key mr-2"></i>Cambiar contraseña</a>
+                        <a href="{% url 'perfil' %}" class="dropdown-item"><i class="fas fa-id-badge mr-2"></i>
+                            Perfil
+                        </a>
                     </li>
+                    <li>
+                        <a href="{% url 'usuarios_change_password' %}" class="dropdown-item">
+                            <i class="fas fa-key mr-2"></i> Cambiar contraseña
+                        </a>
+                    </li>
+
+
                     <li>
                         <a href="" class="dropdown-item">
                             <i class="fas fa-phone-alt"></i>

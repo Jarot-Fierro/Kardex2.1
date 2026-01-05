@@ -10,7 +10,7 @@ class ComunaSerializer(serializers.ModelSerializer):
         fields = ["id", "nombre"]
 
 
-# views.py
+# usuarios.py
 class ComunaViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Comuna.objects.order_by("nombre")
     serializer_class = ComunaSerializer

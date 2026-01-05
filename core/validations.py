@@ -18,18 +18,6 @@ def validate_exists(value, exists):
     return value
 
 
-def validate_date_start_end(start_date, end_date):
-    if not start_date:
-        raise ValidationError("La fecha de inicio es requerida.")
-
-    if not end_date:
-        raise ValidationError("La fecha de fin es requerida.")
-
-    if end_date <= start_date:
-        formatted_date = date_format(start_date, "d \d\e F \d\e Y")
-        raise ValidationError(f"La fecha de fin debe ser posterior a la fecha de inicio ({formatted_date}).")
-
-    return end_date
 
 
 def validate_name(name):

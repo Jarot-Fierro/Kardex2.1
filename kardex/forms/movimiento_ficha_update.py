@@ -1,4 +1,4 @@
-# forms.py
+# usuarios.py
 from django import forms
 
 from kardex.models import MovimientoFicha, ServicioClinico, Profesional
@@ -196,4 +196,3 @@ class FormSalidaFicha(forms.ModelForm):
             'profesional_envio',
             'observacion_envio',
         ]
-

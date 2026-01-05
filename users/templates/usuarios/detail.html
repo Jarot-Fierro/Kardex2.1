@@ -1,0 +1,71 @@
+{% load static %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h5 class="mb-3">Detalle del Usuario</h5>
+
+            <dl class="row mb-0">
+
+                <!-- ID del Usuario -->
+                <dt class="col-sm-4">ID</dt>
+                <dd class="col-sm-8">{{ request.user.id|default:"-" }}</dd>
+
+                <!-- Nombre de Usuario -->
+                <dt class="col-sm-4">Nombre de Usuario</dt>
+                <dd class="col-sm-8">{{ request.user.username|default:"-" }}</dd>
+
+                <!-- Nombre completo -->
+                <dt class="col-sm-4">Nombre Completo</dt>
+                <dd class="col-sm-8">
+                    {{ request.user.first_name }} {{ request.user.last_name }}
+                    {% if not request.user.first_name and not request.user.last_name %}
+                        -
+                    {% endif %}
+                </dd>
+
+                <!-- Correo -->
+                <dt class="col-sm-4">Correo</dt>
+                <dd class="col-sm-8">{{ request.user.email|default:"-" }}</dd>
+
+                <!-- Establecimiento -->
+                <dt class="col-sm-4">Establecimiento</dt>
+                <dd class="col-sm-8">
+                    {% if request.user.establecimiento %}
+                        {{ request.user.establecimiento.nombre }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </dd>
+
+                <!-- Roles -->
+                <dt class="col-sm-4">Roles</dt>
+                <dd class="col-sm-8">
+                    {% for role in request.user.roles.all %}
+                        {{ role.role_name }}{% if not forloop.last %}, {% endif %}
+                    {% empty %}
+                        -
+                    {% endfor %}
+                </dd>
+
+                <!-- Último inicio de sesión -->
+                <dt class="col-sm-4">Último Inicio de Sesión</dt>
+                <dd class="col-sm-8">
+                    {% if request.user.last_login %}
+                        {{ request.user.last_login|date:"d-m-Y H:i" }}
+                    {% else %}
+                        Nunca
+                    {% endif %}
+                </dd>
+
+                <!-- Fecha de creación -->
+                <dt class="col-sm-4">Fecha de Creación</dt>
+                <dd class="col-sm-8">{{ request.user.date_joined|date:"d-m-Y H:i" }}</dd>
+
+                <!-- Estado -->
+                <dt class="col-sm-4">Activo</dt>
+                <dd class="col-sm-8">{{ request.user.is_active|yesno:"Sí,No" }}</dd>
+
+            </dl>
+        </div>
+    </div>
+</div>

@@ -30,14 +30,14 @@ class UserRoleAdmin(admin.ModelAdmin):
 @admin.register(Role)
 class RoleAdmin(admin.ModelAdmin):
     list_display = (
-        'role_name', 'comunas', 'establecimientos', 'fichas', 'genero', 'movimiento_ficha',
+        'role_name', 'usuarios', 'comunas', 'establecimientos', 'fichas', 'genero', 'movimiento_ficha',
         'pais', 'prevision', 'profesion', 'profesionales', 'sectores', 'servicio_clinico', 'soporte'
     )
     search_fields = ('role_name',)
 
     fieldsets = (
         ("Información del Rol", {
-            "fields": ("role_name",)
+            "fields": ("role_name", "establecimiento",)
         }),
 
         ("Mantenedores", {
@@ -49,7 +49,7 @@ class RoleAdmin(admin.ModelAdmin):
 
         ("Gestión General del Sistema", {
             "fields": (
-                "comunas", "establecimientos", "servicio_clinico",
+                "usuarios", "comunas", "establecimientos", "servicio_clinico",
                 "profesionales", "soporte", "reportes"
             ),
         }),

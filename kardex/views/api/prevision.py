@@ -10,7 +10,7 @@ class PrevisionSerializer(serializers.ModelSerializer):
         fields = ["id", "nombre"]
 
 
-# views.py
+# usuarios.py
 class PrevisionViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Prevision.objects.order_by("nombre")
     serializer_class = PrevisionSerializer

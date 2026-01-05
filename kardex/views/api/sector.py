@@ -10,7 +10,7 @@ class SectorSerializer(serializers.ModelSerializer):
         fields = ["id", "color"]
 
 
-# views.py
+# usuarios.py
 class SectorViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Sector.objects.order_by("color")
     serializer_class = SectorSerializer

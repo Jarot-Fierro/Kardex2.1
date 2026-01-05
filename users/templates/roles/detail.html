@@ -1,0 +1,80 @@
+{% load static %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h5 class="mb-3">Detalle del Rol</h5>
+
+            <dl class="row mb-0">
+
+                <!-- ID -->
+                <dt class="col-sm-4">ID</dt>
+                <dd class="col-sm-8">{{ object.rol_id|default:"-" }}</dd>
+
+                <!-- Nombre del Rol -->
+                <dt class="col-sm-4">Nombre del Rol</dt>
+                <dd class="col-sm-8">{{ object.role_name|default:"-" }}</dd>
+
+                <!-- Establecimiento -->
+                <dt class="col-sm-4">Establecimiento</dt>
+                <dd class="col-sm-8">
+                    {% if object.establecimiento %}
+                        {{ object.establecimiento.nombre }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </dd>
+
+                <!-- Permisos -->
+                <dt class="col-sm-4">Usuarios</dt>
+                <dd class="col-sm-8">{{ object.get_usuarios_display }}</dd>
+
+                <dt class="col-sm-4">Comunas</dt>
+                <dd class="col-sm-8">{{ object.get_comunas_display }}</dd>
+
+                <dt class="col-sm-4">Establecimientos</dt>
+                <dd class="col-sm-8">{{ object.get_establecimientos_display }}</dd>
+
+                <dt class="col-sm-4">Fichas</dt>
+                <dd class="col-sm-8">{{ object.get_fichas_display }}</dd>
+
+                <dt class="col-sm-4">Género</dt>
+                <dd class="col-sm-8">{{ object.get_genero_display }}</dd>
+
+                <dt class="col-sm-4">Movimiento Ficha</dt>
+                <dd class="col-sm-8">{{ object.get_movimiento_ficha_display }}</dd>
+
+                <dt class="col-sm-4">Paciente</dt>
+                <dd class="col-sm-8">{{ object.get_paciente_display }}</dd>
+
+                <dt class="col-sm-4">País</dt>
+                <dd class="col-sm-8">{{ object.get_pais_display }}</dd>
+
+                <dt class="col-sm-4">Previsión</dt>
+                <dd class="col-sm-8">{{ object.get_prevision_display }}</dd>
+
+                <dt class="col-sm-4">Colores Sector</dt>
+                <dd class="col-sm-8">{{ object.get_colores_sector_display }}</dd>
+
+                <dt class="col-sm-4">Profesión</dt>
+                <dd class="col-sm-8">{{ object.get_profesion_display }}</dd>
+
+                <dt class="col-sm-4">Profesionales</dt>
+                <dd class="col-sm-8">{{ object.get_profesionales_display }}</dd>
+
+                <dt class="col-sm-4">Sectores</dt>
+                <dd class="col-sm-8">{{ object.get_sectores_display }}</dd>
+
+                <dt class="col-sm-4">Servicio Clínico</dt>
+                <dd class="col-sm-8">{{ object.get_servicio_clinico_display }}</dd>
+
+                <dt class="col-sm-4">Reportes</dt>
+                <dd class="col-sm-8">{{ object.get_reportes_display }}</dd>
+
+                <dt class="col-sm-4">Soporte</dt>
+                <dd class="col-sm-8">{{ object.get_soporte_display }}</dd>
+
+            </dl>
+        </div>
+    </div>
+</div>
+

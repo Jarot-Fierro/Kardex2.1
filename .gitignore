@@ -32,7 +32,6 @@ uploads/
 
 # Staticfiles colectivos (se generan)
 staticfiles/
-static/
 
 
 # ==========================

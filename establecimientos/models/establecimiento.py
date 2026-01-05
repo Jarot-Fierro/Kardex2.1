@@ -6,8 +6,8 @@ from core.models import StandardModel
 
 class Establecimiento(StandardModel):
     nombre = models.CharField(max_length=100, unique=True, null=False, verbose_name='Nombre')
-    direccion = models.CharField(max_length=200, verbose_name='Dirección')
-    telefono = models.CharField(max_length=15, verbose_name='Teléfono')
+    direccion = models.CharField(max_length=200, null=True, blank=True, verbose_name='Dirección')
+    telefono = models.CharField(max_length=15, null=True, blank=True, verbose_name='Teléfono')
     comuna = models.ForeignKey('geografia.Comuna', on_delete=models.PROTECT, null=False, verbose_name='Comuna'
                                , related_name='establecimientos_comuna')
     history = HistoricalRecords()

@@ -1,118 +1,40 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Perfil de usuario{% endblock %}
-
 {% block content %}
-<div class="content-wrapper">
-    <div class="content-header">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1 class="m-0">Mi Perfil</h1>
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title mb-0">Usuarios</h3>
+        </div>
+        <div class="card-body">
+            <form method="post" novalidate>
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+                <input type="hidden" name="action" value="{{ action|default:'add' }}">
+
+                <div class="row">
+                    {% for field in form %}
+                        <div class="col-md-6 mb-3">
+                            <label for="id_{{ field.name }}">{{ field.label }}</label>
+
+                            {{ field }}
+
+                            {% if field.help_text %}
+                                <small class="form-text text-muted">{{ field.help_text }}</small>
+                            {% endif %}
+
+                            {% for error in field.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
                 </div>
-            </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{% url 'usuarios_list' %}" class="btn btn-secondary mx-2">Cancelar</a>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
         </div>
     </div>
-    <section class="content">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-8">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">Datos de usuario</h3>
-                        </div>
-                        <div class="card-body">
-                            <form method="post" novalidate>
-                                {% csrf_token %}
-                                <div class="form-row">
-                                    <div class="form-group col-md-6">
-                                        <label for="id_first_name">{{ form.first_name.label }}</label>
-                                        {{ form.first_name }}
-                                        {% if form.first_name.errors %}
-                                        <div class="text-danger small">{{ form.first_name.errors|striptags }}</div>
-                                        {% endif %}
-                                    </div>
-                                    <div class="form-group col-md-6">
-                                        <label for="id_last_name">{{ form.last_name.label }}</label>
-                                        {{ form.last_name }}
-                                        {% if form.last_name.errors %}
-                                        <div class="text-danger small">{{ form.last_name.errors|striptags }}</div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group col-md-6">
-                                        <label for="id_email">{{ form.email.label }}</label>
-                                        {{ form.email }}
-                                        {% if form.email.errors %}
-                                        <div class="text-danger small">{{ form.email.errors|striptags }}</div>
-                                        {% endif %}
-                                    </div>
-                                    <div class="form-group col-md-6">
-                                        <label for="id_username">{{ form.username.label }}</label>
-                                        {{ form.username }}
-                                        {% if form.username.errors %}
-                                        <div class="text-danger small">{{ form.username.errors|striptags }}</div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-
-                                {% if request.user.is_superuser %}
-                                <div class="form-row">
-                                    <div class="form-group col-md-6">
-                                        <label for="id_tipo_perfil">{{ form.tipo_perfil.label }}</label>
-                                        {{ form.tipo_perfil }}
-                                        {% if form.tipo_perfil.errors %}
-                                        <div class="text-danger small">{{ form.tipo_perfil.errors|striptags }}</div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group col-md-12">
-                                        <label for="id_establecimiento">{{ form.establecimiento.label }}</label>
-                                        {{ form.establecimiento }}
-                                        {% if form.establecimiento.errors %}
-                                        <div class="text-danger small">{{ form.establecimiento.errors|striptags }}</div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                {% endif %}
-                                <div class="text-right">
-                                    <a href="{% url 'users:cambiar_password' %}" class="btn btn-outline-secondary"><i
-                                            class="fas fa-key mr-1"></i> Cambiar contraseña</a>
-                                    <button type="submit" class="btn btn-primary"><i class="fas fa-save mr-1"></i>
-                                        Guardar cambios
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="mr-3">
-                                    <i class="fas fa-user-circle fa-4x text-muted"></i>
-                                </div>
-                                <div>
-                                    <div class="h5 mb-0">
-                                        {{ request.user.get_full_name|default:request.user.username }}
-                                    </div>
-                                    <div class="text-muted small">Rut: {{ request.user.username }}</div>
-                                    <div class="text-muted small">{{ request.user.email }}</div>
-                                    <div class="text-muted small">Establecimiento:
-                                        {{ request.user.establecimiento.nombre }}
-                                    </div>
-                                    <div class="text-muted small">Usuario: {{ request.user.tipo_perfil }}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-</div>
 {% endblock %}

@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Roles - {{ title|default:'Formulario' }}{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title mb-0">{{ title }}</h3>
+        </div>
+        <div class="card-body">
+            <form method="post" novalidate>
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+                <input type="hidden" name="action" value="{{ action|default:'add' }}">
+
+                <!-- Sección: Información del Rol -->
+                <h5 class="mt-3 mb-2">Información del Rol</h5>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="id_role_name">Nombre del Rol</label>
+                        {{ form.role_name }}
+                        {% for error in form.role_name.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="id_establecimiento">Establecimiento</label>
+                        {{ form.establecimiento }}
+                        {% for error in form.establecimiento.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <li class="dropdown-divider"></li>
+
+                <!-- Sección: Mantenedores -->
+                <h5 class="mt-4 mb-2">Mantenedores</h5>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="id_pais">País</label>
+                        {{ form.pais }}
+                        {% for error in form.pais.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="id_sectores">Sectores</label>
+                        {{ form.sectores }}
+                        {% for error in form.sectores.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="id_colores_sector">Colores Sector</label>
+                        {{ form.colores_sector }}
+                        {% for error in form.colores_sector.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="id_profesion">Profesión</label>
+                        {{ form.profesion }}
+                        {% for error in form.profesion.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="id_prevision">Previsión</label>
+                        {{ form.prevision }}
+                        {% for error in form.prevision.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="id_genero">Género</label>
+                        {{ form.genero }}
+                        {% for error in form.genero.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <li class="dropdown-divider"></li>
+                <!-- Sección: Gestión General del Sistema -->
+                <h5 class="mt-4 mb-2">Gestión General del Sistema</h5>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="id_usuarios">Usuarios</label>
+                        {{ form.usuarios }}
+                        {% for error in form.usuarios.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="id_comunas">Comunas</label>
+                        {{ form.comunas }}
+                        {% for error in form.comunas.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="id_establecimientos">Establecimientos</label>
+                        {{ form.establecimientos }}
+                        {% for error in form.establecimientos.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="id_servicio_clinico">Servicio Clínico</label>
+                        {{ form.servicio_clinico }}
+                        {% for error in form.servicio_clinico.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="id_profesionales">Profesionales</label>
+                        {{ form.profesionales }}
+                        {% for error in form.profesionales.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="id_soporte">Soporte</label>
+                        {{ form.soporte }}
+                        {% for error in form.soporte.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="id_reportes">Reportes</label>
+                        {{ form.reportes }}
+                        {% for error in form.reportes.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <li class="dropdown-divider"></li>
+                <!-- Sección: Sección Clínica -->
+                <h5 class="mt-4 mb-2">Sección Clínica</h5>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="id_paciente">Paciente</label>
+                        {{ form.paciente }}
+                        {% for error in form.paciente.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="id_fichas">Fichas</label>
+                        {{ form.fichas }}
+                        {% for error in form.fichas.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="id_movimiento_ficha">Movimiento Ficha</label>
+                        {{ form.movimiento_ficha }}
+                        {% for error in form.movimiento_ficha.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <li class="dropdown-divider"></li>
+                <!-- Botones -->
+                <div class="d-flex justify-content-end gap-2 mt-3">
+                    <a href="{% url 'roles_list' %}" class="btn btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

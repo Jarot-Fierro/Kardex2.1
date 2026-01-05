@@ -1,8 +1,8 @@
-# kardex/forms.py
+# kardex/usuarios.py
 
-# kardex/forms.py
+# kardex/usuarios.py
 
-# kardex/forms.py
+# kardex/usuarios.py
 
 from django import forms
 

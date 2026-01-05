@@ -398,7 +398,7 @@
 #         return context
 #
 #
-# # views.py
+# # usuarios.py
 # from django.http import JsonResponse
 # from django.views.generic.edit import FormView
 # from django.contrib.auth.mixins import PermissionRequiredMixin

@@ -2,21 +2,28 @@ from django.shortcuts import redirect
 from django.urls import reverse
 
 
+from django.shortcuts import redirect
+from django.urls import reverse
+
+
 class EstablecimientoRequiredMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
 
+        path = request.path
+
+        # 🔹 EXCLUIR ADMIN COMPLETO
+        if path.startswith('/admin'):
+            return self.get_response(request)
+
         # rutas que NO deben exigir establecimiento
         exempt_paths = [
             reverse('login'),
             reverse('logout'),
             reverse('no_establecimiento'),
-            '/admin/',  # opcional si usas admin
         ]
-
-        path = request.path
 
         # Si no está autenticado, continuar normal
         if not request.user.is_authenticated:
@@ -31,3 +38,4 @@ class EstablecimientoRequiredMiddleware:
             return redirect('no_establecimiento')
 
         return self.get_response(request)
+

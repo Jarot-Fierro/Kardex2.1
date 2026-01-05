@@ -7,7 +7,7 @@ from personas.models.profesion import Profesion
 
 
 class Profesional(StandardModel):
-    rut = models.CharField(max_length=100, unique=True, null=False, verbose_name='R.U.T.')
+    rut = models.CharField(max_length=100, null=False, verbose_name='R.U.T.')
     nombres = models.CharField(max_length=100, null=False, verbose_name='Nombre')
     correo = models.EmailField(max_length=100, null=False, verbose_name='Correo')
     telefono = models.CharField(max_length=15, null=True, blank=True, verbose_name='Teléfono')

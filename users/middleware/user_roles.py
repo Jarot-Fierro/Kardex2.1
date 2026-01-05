@@ -20,6 +20,7 @@ class UserRolesMiddleware(MiddlewareMixin):
             roles = UserRole.objects.filter(user_id=user).select_related('role_id')
 
             permisos = {
+                "usuarios": 0,
                 "comunas": 0,
                 "establecimientos": 0,
                 "fichas": 0,

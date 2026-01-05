@@ -2,6 +2,8 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from simple_history.models import HistoricalRecords
 
+from establecimientos.models.establecimiento import Establecimiento
+
 
 class User(AbstractUser):
     user_id = models.AutoField(primary_key=True)
@@ -48,6 +50,7 @@ class Role(models.Model):
     ]
 
     role_name = models.CharField(max_length=50, unique=True)
+    usuarios = models.IntegerField(choices=PERMISSION_CHOICES, default=0)
     comunas = models.IntegerField(choices=PERMISSION_CHOICES, default=0)
     establecimientos = models.IntegerField(choices=PERMISSION_CHOICES, default=0)
     fichas = models.IntegerField(choices=PERMISSION_CHOICES, default=0)
@@ -64,6 +67,8 @@ class Role(models.Model):
     servicio_clinico = models.IntegerField(choices=PERMISSION_CHOICES, default=0)
     reportes = models.IntegerField(choices=PERMISSION_CHOICES, default=0)
     soporte = models.IntegerField(choices=PERMISSION_CHOICES, default=0)
+
+    establecimiento = models.ForeignKey(Establecimiento, on_delete=models.PROTECT, null=True, blank=True)
 
     history = HistoricalRecords()
 
