@@ -6,7 +6,6 @@ from personas.models.pacientes import Paciente
 
 
 def get_paciente_ficha(request, rut):
-    print(rut)
     paciente = (
         Paciente.objects.filter(rut=rut)
         .select_related("comuna", "prevision", "usuario", "usuario_anterior")
@@ -84,6 +83,7 @@ def get_paciente_ficha(request, rut):
             "observacion": ficha.observacion,
             "fecha_creacion": ficha.created_at,
             "fecha_modificacion": ficha.updated_at,
+            "fecha_creacion_anterior": ficha.fecha_creacion_anterior,
             "usuario": ficha.usuario.username if ficha.usuario else None,
             "establecimiento": ficha.establecimiento.nombre if ficha.establecimiento else None,
             "sector": ficha.sector.nombre if ficha.sector else None,

@@ -5,7 +5,7 @@ from django.http import HttpRequest
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView
 
-from kardex.mixin import DataTableMixin
+from core.mixin import DataTableMixin
 
 
 class GenericHistoryListView(PermissionRequiredMixin, DataTableMixin, TemplateView):
