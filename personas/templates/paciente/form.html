@@ -3,2156 +3,727 @@
 
 
 {% block content %}
-<div class="container-fluid py-2 small-input">
-    <div id="mensaje-rut" class="alert mt-2 d-none"></div>
+    <div class="container-fluid py-2 small-input">
+        <div id="mensaje-rut" class="alert mt-2 d-none"></div>
 
-    {% if debug_post %}
-    <div class="alert alert-info mt-2">
-        <strong>Debug POST:</strong>
-        <div class="small mt-2">
-            <ul class="mb-0">
-                {% for key, values in debug_post.items %}
-                <li><strong>{{ key }}:</strong> {{ values|join:", " }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
-    {% endif %}
+        <form method="post" novalidate id="paciente-form">
+            {% csrf_token %}
 
-    <form method="post" novalidate id="paciente-form">
-        {% csrf_token %}
+            <!-- Encabezado de la ficha -->
+            <div class="row align-items-center mb-2">
+                <div class="col-md-4 mb-2 mb-md-0">
+                    <div class="ficha-header align-items-center">
+                        <div class="row">
+                            <div class="col-6">
+                                <span>R.U.T:</span><br>
+                                <input type="text" name="rut" id="id_rut" class="form-control form-control-sm "
+                                       maxlength="100">
+                            </div>
+                            <div class="col-6">
+                                <span>N° FICHA:</span><br>
+                                <input type="text" name="ficha" id="id_ficha" class="form-control form-control-sm ">
+                            </div>
+                        </div>
+                        <div class="row mt-1">
+                            <div class="col text-end">
+                                <button type="button" class="btn btn-outline-secondary btn-sm no-print"
+                                        id="btn-limpiar-arriba">Limpiar Todo
+                                </button>
+                                <button type="button" class="btn btn-outline-primary btn-sm no-print"
+                                        id="btn-consultar-denuevo">Consultar Paciente
+                                </button>
+                            </div>
+                        </div>
 
-        <!-- Encabezado de la ficha -->
-        <div class="row align-items-center mb-2">
-            <div class="col-md-4 mb-2 mb-md-0">
-                <div class="ficha-header align-items-center">
+                    </div>
+                </div>
+                <!-- En tu template, modifica la sección de botones así: -->
+                <div class="col-md-8 mb-2 mb-md-0">
+                    <div class="ficha-header align-items-center">
+                        <div class="row g-2">
+                            <!-- ACCIONES -->
+                            <div class="col-md-8">
+                                <span class="fw-semibold d-block mb-1">Acciones</span>
+                                <div class="d-flex w-100">
+                                    <a href="#"
+                                       id="btn-actualizar-rut"
+                                       class="btn btn-sm btn-primary flex-fill mx-1 disabled"
+                                       style="pointer-events: none; opacity: 0.6;">
+                                        Actualizar RUT
+                                    </a>
+
+                                    <a href="#"
+                                       id="btn-pasivar"
+                                       class="btn btn-sm btn-warning flex-fill mx-1 disabled"
+                                       style="pointer-events: none; opacity: 0.6;">
+                                        Pasivar
+                                    </a>
+
+                                    <a href="#"
+                                       id="btn-tarjeta-fisica"
+                                       class="btn btn-sm btn-success flex-fill mx-1 disabled"
+                                       style="pointer-events: none; opacity: 0.6;">
+                                        Tarjeta Física
+                                    </a>
+                                    <a href="#"
+                                       id="btn-numero-ficha"
+                                       class="btn btn-sm btn-info flex-fill mx-1 disabled"
+                                       style="pointer-events: none; opacity: 0.6;">
+                                        N° Ficha
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- IMPRIMIR -->
+                            <div class="col-md-4 p-0">
+                                <span class="fw-semibold d-block mb-1">Imprimir</span>
+                                <div class="d-flex w-100">
+                                    <a id="btn-caratula"
+                                       href="#"
+                                       class="btn btn-sm btn-outline-secondary flex-fill mx-1 disabled"
+                                       style="pointer-events: none; opacity: 0.6;">
+                                        Carátula
+                                    </a>
+
+                                    <a id="btn-stickers"
+                                       href="#"
+                                       class="btn btn-sm btn-outline-secondary flex-fill mx-1 disabled"
+                                       style="pointer-events: none; opacity: 0.6;">
+                                        Stickers
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-1">
+                            <div class="col text-end">
+                                <button type="button" class="btn btn-secondary btn-sm no-print" id="btn-cancelar">
+                                    Cancelar
+                                </button>
+                                <button type="submit" class="btn btn-primary btn-sm no-print">Guardar</button>
+                                <a id="btn-paciente-sin-rut"
+                                   href=""
+                                   class="btn btn-sm btn-outline-danger flex-fill mx-1">
+                                    Crear Paciente sin RUT
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <!-- IDENTIFICACIÓN -->
+                    <div class="card mb-2">
+                        <div class="card-header">
+                            <h6 class="m-0"><i class="fas fa-id-card me-2"></i> Identificación</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-2">
+                                <div class=" col-md-4 col-sm-6">
+                                    <label class="form-label" for="id_nombre">
+                                        Nombres
+                                    </label>
+                                    <input type="text" name="nombre" id="id_nombre"
+                                           class="form-control form-control-sm "
+                                           maxlength="100"
+                                           required>
+                                </div>
+
+                                <div class=" col-md-4 col-sm-6">
+                                    <label class="form-label" for="id_apellido_paterno">
+                                        Apellido Paterno
+                                    </label>
+                                    <input type="text" name="apellido_paterno" id="id_apellido_paterno"
+                                           class="form-control form-control-sm "
+                                           maxlength="100" required>
+                                </div>
+
+                                <div class=" col-md-4 col-sm-6">
+                                    <label class="form-label" for="id_apellido_materno">
+                                        Apellido Materno
+                                    </label>
+                                    <input type="text" name="apellido_materno" id="id_apellido_materno"
+                                           class="form-control form-control-sm "
+                                           maxlength="100" required>
+                                </div>
+
+                                <div class=" col-md-4 col-sm-6">
+                                    <label class="form-label" for="id_nombre_social">
+                                        Nombre Social
+                                    </label>
+                                    <input type="text" name="nombre_social" id="id_nombre_social"
+                                           class="form-control form-control-sm "
+                                           maxlength="100">
+                                </div>
+
+                                <div class=" col-md-4 col-sm-6">
+                                    <label class="form-label" for="id_pasaporte">
+                                        Pasaporte
+                                    </label>
+                                    <input type="text" name="pasaporte" id="id_pasaporte"
+                                           class="form-control form-control-sm "
+                                           maxlength="50">
+                                </div>
+
+                                <div class=" col-md-4 col-sm-6">
+                                    <label class="form-label" for="id_nie">
+                                        NIP
+                                    </label>
+                                    <input type="text" name="nie" id="id_nie" class="form-control form-control-sm ">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-lg-4">
+                    <!-- ESTADO DEL PACIENTE -->
+                    <div class="card mb-2">
+                        <div class="card-header">
+                            <h6 class="m-0"><i class="fas fa-heartbeat me-2"></i> Estado del Paciente</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-2">
+                                <!-- Checkbox 1 -->
+                                <div class="col-md-6">
+                                    <div class="form-check mt-2">
+                                        <input type="checkbox" name="recien_nacido" id="id_recien_nacido"
+                                               class="form-check-input">
+                                        <label class="form-check-label" for="id_recien_nacido">
+                                            Recién Nacido
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Checkbox 2 -->
+                                <div class="col-md-6">
+                                    <div class="form-check mt-2">
+                                        <input type="checkbox" name="extranjero" id="id_extranjero"
+                                               class="form-check-input">
+                                        <label class="form-check-label" for="id_extranjero">
+                                            Extranjero
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Checkbox 3 -->
+                                <div class="col-md-6">
+                                    <div class="form-check mt-2">
+                                        <input type="checkbox" name="pueblo_indigena" id="id_pueblo_indigena"
+                                               class="form-check-input">
+                                        <label class="form-check-label" for="id_pueblo_indigena">
+                                            Pueblo Indígena
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Checkbox 4 + input date -->
+                                <div class="col-md-6">
+                                    <div class="form-check mt-2">
+                                        <input type="checkbox" name="fallecido" id="id_fallecido"
+                                               class="form-check-input">
+                                        <label class="form-check-label" for="id_fallecido">
+                                            Fallecido
+                                        </label>
+                                    </div>
+                                </div>
+                                <!-- Checkbox 4 + input date -->
+                                <div class="col-md-12">
+                                    <label class="form-label" for="id_fecha_fallecimiento">
+                                        Fecha de Fallecimiento
+                                    </label>
+                                    <input type="date" name="fecha_fallecimiento" id="id_fecha_fallecimiento"
+                                           class="form-control form-control-sm ">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <!-- DATOS FAMILIARES -->
+                    <div class="card mb-2">
+                        <div class="card-header">
+                            <h6 class="m-0"><i class="fas fa-users me-2"></i> Datos Familiares</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-2">
+                                <div class="col-md-3">
+                                    <label class="form-label" for="id_rut_madre">R.U.T. Madre</label>
+                                    <input type="text" name="rut_madre" id="id_rut_madre"
+                                           class="form-control form-control-sm "
+                                           maxlength="100">
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label" for="id_nombres_madre">Nombres de la Madre</label>
+                                    <input type="text" name="nombres_madre" id="id_nombres_madre"
+                                           class="form-control form-control-sm "
+                                           maxlength="100">
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label" for="id_nombres_padre">Nombres del Padre</label>
+                                    <input type="text" name="nombres_padre" id="id_nombres_padre"
+                                           class="form-control form-control-sm "
+                                           maxlength="100">
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label" for="id_nombre_pareja">Nombre de la Pareja</label>
+                                    <input type="text" name="nombre_pareja" id="id_nombre_pareja"
+                                           class="form-control form-control-sm "
+                                           maxlength="100">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label" for="id_representante_legal">
+                                        Representante Legal
+                                    </label>
+                                    <input type="text" name="representante_legal" id="id_representante_legal"
+                                           class="form-control form-control-sm " maxlength="100">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label" for="id_rut_responsable_temporal">
+                                        RUT Responsable Temporal
+                                    </label>
+                                    <input type="text" name="rut_responsable_temporal" id="id_rut_responsable_temporal"
+                                           class="form-control form-control-sm " maxlength="100">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="form-check mt-2">
+                                        <input type="checkbox" name="usar_rut_madre_como_responsable"
+                                               id="id_usar_rut_madre_como_responsable" class="form-check-input">
+                                        <label class="form-check-label" for="id_usar_rut_madre_como_responsable">
+                                            Usar RUT de la madre como responsable
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <!-- DATOS DE NACIMIENTO -->
+                    <div class="card mb-2">
+                        <div class="card-header">
+                            <h6 class="m-0"><i class="fas fa-baby me-2"></i> Datos de Nacimiento</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <label class="form-label" for="id_fecha_nacimiento">
+                                        Fecha de Nacimiento
+                                    </label>
+                                    <input type="date" name="fecha_nacimiento" id="id_fecha_nacimiento"
+                                           class="form-control form-control-sm ">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label" for="id_sexo">Sexo</label>
+                                    <select name="sexo" id="id_sexo" class="form-control form-control-sm " required>
+                                        <option value="M">Masculino</option>
+                                        <option value="F">Femenino</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label" for="id_genero">Género</label>
+                                    <select name="genero" id="id_genero" class="form-control form-control-sm  select2">
+                                        <option value="">Seleccione género</option>
+                                        {% for genero in generos %}
+                                            <option value="{{ genero.id }}">
+                                                {{ genero.nombre }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label" for="id_estado_civil">Estado Civil</label>
+                                    <select name="estado_civil" id="id_estado_civil"
+                                            class="form-control form-control-sm "
+                                            required>
+                                        <option value="NO INFORMADO">NO INFORMADO</option>
+                                        <option value="SOLTERO">SOLTERO</option>
+                                        <option value="CASADO">CASADO</option>
+                                        <option value="VIUDO">VIUDO</option>
+                                        <option value="DIVORCIADO">DIVORCIADO</option>
+                                        <option value="SEPARADO">SEPARADO</option>
+                                        <option value="CONVIVIENTE CIVIL">CONVIVIENTE CIVIL</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <!-- CONTACTO Y DIRECCIÓN -->
+                    <div class="card mb-2">
+                        <div class="card-header">
+                            <h6 class="m-0"><i class="fas fa-map-marker-alt me-2"></i> Contacto y Dirección</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-2">
+                                <div class="col-md-5">
+                                    <label class="form-label" for="id_direccion">Dirección</label>
+                                    <input type="text" name="direccion" id="id_direccion"
+                                           class="form-control form-control-sm "
+                                           maxlength="200">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label" for="id_comuna">Comuna</label>
+                                    <select name="comuna" id="id_comuna" class="form-control form-control-sm select2"
+                                            required>
+                                        <option value="">Seleccione una comuna</option>
+
+                                        {% for comuna in comunas %}
+                                            <option value="{{ comuna.id }}">
+                                                {{ comuna.nombre }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label" for="id_ocupacion">Ocupación</label>
+                                    <input type="text" name="ocupacion" id="id_ocupacion"
+                                           class="form-control form-control-sm "
+                                           maxlength="100">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label" for="id_numero_telefono1">
+                                        Número de Teléfono
+                                    </label>
+                                    <input type="text" name="numero_telefono1" id="id_numero_telefono1"
+                                           class="form-control form-control-sm "
+                                           maxlength="15">
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label" for="id_numero_telefono2">
+                                        Número de Teléfono 2
+                                    </label>
+                                    <input type="text" name="numero_telefono2" id="id_numero_telefono2"
+                                           class="form-control form-control-sm "
+                                           maxlength="15">
+                                </div>
+                                <div class="col-md-4 mt-4">
+                                    <div class="form-check">
+                                        <input type="checkbox" name="sin_telefono" id="id_sin_telefono"
+                                               class="form-check-input">
+                                        <label class="form-check-label" for="id_sin_telefono">
+                                            Paciente Sin Teléfono
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-2">
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <div class="row">
+
+                                    <div class="col-md-4">
+                                        <small class="text-muted">Ingresado por</small><br>
+                                        <strong class="text-danger">Juan Pérez</strong>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <small class="text-muted">Fecha de ingreso al sistema</small><br>
+                                        <strong>01-03-2026</strong>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="ml-auto">
+                                            <button type="button" class="btn btn-success btn-sm">
+                                                <i class="fas fa-exchange-alt mr-1"></i> Ver movimientos
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <small class="text-muted">Servicio clínico</small><br>
+                                        <strong class="text-primary">Medicina General</strong>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <small class="text-muted">Profesional a cargo</small><br>
+                                        <strong class="text-primary">Dra. María González</strong>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <small class="text-muted">Fecha y hora de envío</small><br>
+                                        <strong class="text-primary">05-03-2026 14:20</strong>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <!-- Tabla de fichas -->
+                            <div>
+                                <h6 class="text-muted mb-2">
+                                    <i class="fas fa-hospital mr-1"></i> Fichas del paciente
+                                </h6>
+
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-bordered table-hover mb-0">
+                                        <thead class="bg-light">
+                                        <tr>
+                                            <th class="text-center">Establecimiento</th>
+                                            <th class="text-center">N° Ficha</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <td>CESFAM Tirúa</td>
+                                            <td class="text-center">
+                                                <span class="badge badge-primary">000123</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Posta Quidico</td>
+                                            <td class="text-center">
+                                                <span class="badge badge-info">000456</span>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+                <div class="col-lg-4">
+                    <!-- GESTIÓN -->
+                    <div class="card mb-2">
+                        <div class="card-header">
+                            <h6 class="m-0"><i class="fas fa-cogs me-2"></i> Gestión</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <label class="form-label" for="id_prevision">Previsión</label>
+                                    <select name="prevision" id="id_prevision"
+                                            class="form-control form-control-sm  select2">
+                                        <option value="">Seleccione género</option>
+                                        {% for prevision in previsiones %}
+                                            <option value="{{ prevision.id }}">
+                                                {{ prevision.nombre }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+
+
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label" for="id_sector">Sector</label>
+                                    <select name="sector" id="id_sector" class="form-control form-control-sm  select2">
+                                        <option value="">Seleccione sector</option>
+                                        {% for sector in sectores %}
+                                            <option value="{{ sector.id }}">
+                                                {{ sector.color }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="form-label" for="id_observacion">Alergico a</label>
+                                    <input name="observacion" id="id_observacion"
+                                           class="form-control form-control-sm ">
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="form-label" for="id_observacion">Observación</label>
+                                    <textarea name="observacion" id="id_observacion"
+                                              class="form-control form-control-sm "
+                                              rows="2"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="row">
-                        <div class="col-6">
-                            <span>R.U.T:</span><br>
-                            {{ form.rut }}
-                            {% if form.rut.errors %}
-                            <div class="text-danger small">{{ form.rut.errors }}</div>
-                            {% endif %}
-                        </div>
-                        <div class="col-6">
-                            <span>N° FICHA:</span><br>
-                            {{ form.ficha }}
-                            {% if form.ficha.errors %}
-                            <div class="text-danger small">{{ form.ficha.errors }}</div>
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div class="row mt-1">
-                        <div class="col text-end">
-                            <button type="button" class="btn btn-outline-secondary btn-sm no-print"
-                                    id="btn-limpiar-arriba">Limpiar Todo
-                            </button>
-                            <button type="button" class="btn btn-outline-primary btn-sm no-print"
-                                    id="btn-consultar-denuevo">Consultar Paciente
-                            </button>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-            <!-- En tu template, modifica la sección de botones así: -->
-            <div class="col-md-8 mb-2 mb-md-0">
-                <div class="ficha-header align-items-center">
-                    <div class="row g-2">
-                        <!-- ACCIONES -->
-                        <div class="col-md-8">
-                            <span class="fw-semibold d-block mb-1">Acciones</span>
-                            <div class="d-flex w-100">
-                                <a href="#"
-                                   id="btn-actualizar-rut"
-                                   class="btn btn-sm btn-primary flex-fill mx-1 disabled"
-                                   style="pointer-events: none; opacity: 0.6;">
-                                    Actualizar RUT
-                                </a>
-
-                                <a href="#"
-                                   id="btn-pasivar"
-                                   class="btn btn-sm btn-warning flex-fill mx-1 disabled"
-                                   style="pointer-events: none; opacity: 0.6;">
-                                    Pasivar
-                                </a>
-
-                                <a href="#"
-                                   id="btn-tarjeta-fisica"
-                                   class="btn btn-sm btn-success flex-fill mx-1 disabled"
-                                   style="pointer-events: none; opacity: 0.6;">
-                                    Tarjeta Física
-                                </a>
-                                <a href="#"
-                                   id="btn-numero-ficha"
-                                   class="btn btn-sm btn-info flex-fill mx-1 disabled"
-                                   style="pointer-events: none; opacity: 0.6;">
-                                    N° Ficha
-                                </a>
+                        <div class="col-12">
+                            <div class="row mb-4 justify-content-end">
+                                <div class="col-auto">
+                                    <button type="button" class="btn btn-secondary btn-sm no-print" id="btn-cancelar">
+                                        Cancelar
+                                    </button>
+                                    <button type="submit" class="btn btn-primary btn-sm no-print">
+                                        Guardar
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- IMPRIMIR -->
-                        <div class="col-md-4 p-0">
-                            <span class="fw-semibold d-block mb-1">Imprimir</span>
-                            <div class="d-flex w-100">
-                                <a id="btn-caratula"
-                                   href="#"
-                                   class="btn btn-sm btn-outline-secondary flex-fill mx-1 disabled"
-                                   style="pointer-events: none; opacity: 0.6;">
-                                    Carátula
-                                </a>
-
-                                <a id="btn-stickers"
-                                   href="#"
-                                   class="btn btn-sm btn-outline-secondary flex-fill mx-1 disabled"
-                                   style="pointer-events: none; opacity: 0.6;">
-                                    Stickers
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mt-1">
-                        <div class="col text-end">
-                            <button type="button" class="btn btn-secondary btn-sm no-print" id="btn-cancelar">Cancelar
-                            </button>
-                            <button type="submit" class="btn btn-primary btn-sm no-print">Guardar</button>
-                            <a id="btn-paciente-sin-rut"
-                               href="{% url 'kardex:paciente_create_sin_rut' %}"
-                               class="btn btn-sm btn-outline-danger flex-fill mx-1">
-                                Crear Paciente sin RUT
-                            </a>
-                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- ESTADO DEL PACIENTE -->
-        <div class="card mb-2">
-            <div class="card-header">
-                <h6 class="m-0"><i class="fas fa-heartbeat me-2"></i> Estado del Paciente</h6>
-            </div>
-            <div class="card-body">
-                <div class="row g-2">
-                    <!-- Checkbox 1 -->
-                    <div class="col-md-2">
-                        <div class="form-check mt-2">
-                            {{ form.recien_nacido }}
-                            <label class="form-check-label" for="{{ form.recien_nacido.id_for_label }}">
-                                Recién Nacido
-                            </label>
-                        </div>
-                    </div>
+        </form>
+    </div>
 
-                    <!-- Checkbox 2 -->
-                    <div class="col-md-2">
-                        <div class="form-check mt-2">
-                            {{ form.extranjero }}
-                            <label class="form-check-label" for="{{ form.extranjero.id_for_label }}">
-                                Extranjero
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Checkbox 3 -->
-                    <div class="col-md-2">
-                        <div class="form-check mt-2">
-                            {{ form.pueblo_indigena }}
-                            <label class="form-check-label" for="{{ form.pueblo_indigena.id_for_label }}">
-                                Pueblo Indígena
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Checkbox 4 + input date -->
-                    <div class="col-md-2">
-                        <div class="form-check mt-2">
-                            {{ form.fallecido }}
-                            <label class="form-check-label" for="{{ form.fallecido.id_for_label }}">
-                                Fallecido
-                            </label>
-                        </div>
-                    </div>
-                    <!-- Checkbox 4 + input date -->
-                    <div class="col-md-4">
-                        <label class="form-label" for="{{ form.fecha_fallecimiento.id_for_label }}">
-                            Fecha de Fallecimiento
-                        </label>
-                        {{ form.fecha_fallecimiento }}
-                        {% if form.fecha_fallecimiento.errors %}
-                        <div class="text-danger small">{{ form.fecha_fallecimiento.errors }}</div>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- IDENTIFICACIÓN -->
-        <div class="card mb-2">
-            <div class="card-header">
-                <h6 class="m-0"><i class="fas fa-id-card me-2"></i> Identificación</h6>
-            </div>
-            <div class="card-body">
-                <div class="row g-2">
-                    <div class="col-md-4 col-sm-6">
-                        <label class="form-label" for="{{ form.nombre.id_for_label }}">
-                            Nombres
-                        </label>
-                        {{ form.nombre }}
-                        {% if form.nombre.errors %}
-                        <div class="text-danger small">{{ form.nombre.errors }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="col-md-4 col-sm-6">
-                        <label class="form-label" for="{{ form.apellido_paterno.id_for_label }}">
-                            Apellido Paterno
-                        </label>
-                        {{ form.apellido_paterno }}
-                        {% if form.apellido_paterno.errors %}
-                        <div class="text-danger small">{{ form.apellido_paterno.errors }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="col-md-4 col-sm-6">
-                        <label class="form-label" for="{{ form.apellido_materno.id_for_label }}">
-                            Apellido Materno
-                        </label>
-                        {{ form.apellido_materno }}
-                        {% if form.apellido_materno.errors %}
-                        <div class="text-danger small">{{ form.apellido_materno.errors }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="col-md-4 col-sm-6">
-                        <label class="form-label" for="{{ form.nombre_social.id_for_label }}">
-                            Nombre Social
-                        </label>
-                        {{ form.nombre_social }}
-                        {% if form.nombre_social.errors %}
-                        <div class="text-danger small">{{ form.nombre_social.errors }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="col-md-4 col-sm-6">
-                        <label class="form-label" for="{{ form.pasaporte.id_for_label }}">
-                            Pasaporte
-                        </label>
-                        {{ form.pasaporte }}
-                        {% if form.pasaporte.errors %}
-                        <div class="text-danger small">{{ form.pasaporte.errors }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="col-md-4 col-sm-6">
-                        <label class="form-label" for="{{ form.nie.id_for_label }}">
-                            NIE
-                        </label>
-                        {{ form.nie }}
-                        {% if form.nie.errors %}
-                        <div class="text-danger small">{{ form.nie.errors }}</div>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- DATOS DE NACIMIENTO -->
-        <div class="card mb-2">
-            <div class="card-header">
-                <h6 class="m-0"><i class="fas fa-baby me-2"></i> Datos de Nacimiento</h6>
-            </div>
-            <div class="card-body">
-                <div class="row g-2">
-                    <div class="col-md-3">
-                        <label class="form-label" for="{{ form.fecha_nacimiento.id_for_label }}">
-                            Fecha de Nacimiento
-                        </label>
-                        {{ form.fecha_nacimiento }}
-                        {% if form.fecha_nacimiento.errors %}
-                        <div class="text-danger small">{{ form.fecha_nacimiento.errors }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="col-md-3">
-                        <label class="form-label" for="{{ form.sexo.id_for_label }}">Sexo</label>
-                        {{ form.sexo }}
-                        {% if form.sexo.errors %}
-                        <div class="text-danger small">{{ form.sexo.errors }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="col-md-3">
-                        <label class="form-label" for="{{ form.genero.id_for_label }}">Género</label>
-                        {{ form.genero }}
-                        {% if form.genero.errors %}
-                        <div class="text-danger small">{{ form.genero.errors }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="col-md-3">
-                        <label class="form-label" for="{{ form.estado_civil.id_for_label }}">Estado Civil</label>
-                        {{ form.estado_civil }}
-                        {% if form.estado_civil.errors %}
-                        <div class="text-danger small">{{ form.estado_civil.errors }}</div>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- DATOS FAMILIARES -->
-        <div class="card mb-2">
-            <div class="card-header">
-                <h6 class="m-0"><i class="fas fa-users me-2"></i> Datos Familiares</h6>
-            </div>
-            <div class="card-body">
-                <div class="row g-2">
-                    <div class="col-md-3">
-                        <label class="form-label" for="{{ form.rut_madre.id_for_label }}">R.U.T. Madre</label>
-                        {{ form.rut_madre }}
-                        {% if form.rut_madre.errors %}
-                        <div class="text-danger small">{{ form.rut_madre.errors }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="col-md-3">
-                        <label class="form-label" for="{{ form.nombres_madre.id_for_label }}">Nombres de la
-                            Madre</label>
-                        {{ form.nombres_madre }}
-                        {% if form.nombres_madre.errors %}
-                        <div class="text-danger small">{{ form.nombres_madre.errors }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="col-md-3">
-                        <label class="form-label" for="{{ form.nombres_padre.id_for_label }}">Nombres del Padre</label>
-                        {{ form.nombres_padre }}
-                        {% if form.nombres_padre.errors %}
-                        <div class="text-danger small">{{ form.nombres_padre.errors }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="col-md-3">
-                        <label class="form-label" for="{{ form.nombre_pareja.id_for_label }}">Nombre de la
-                            Pareja</label>
-                        {{ form.nombre_pareja }}
-                        {% if form.nombre_pareja.errors %}
-                        <div class="text-danger small">{{ form.nombre_pareja.errors }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="col-md-3">
-                        <label class="form-label" for="{{ form.representante_legal.id_for_label }}">
-                            Representante Legal
-                        </label>
-                        {{ form.representante_legal }}
-                        {% if form.representante_legal.errors %}
-                        <div class="text-danger small">{{ form.representante_legal.errors }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="col-md-3">
-                        <label class="form-label" for="{{ form.rut_responsable_temporal.id_for_label }}">
-                            RUT Responsable Temporal
-                        </label>
-                        {{ form.rut_responsable_temporal }}
-                        {% if form.rut_responsable_temporal.errors %}
-                        <div class="text-danger small">{{ form.rut_responsable_temporal.errors }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="col-md-3">
-                        <div class="form-check mt-2">
-                            {{ form.usar_rut_madre_como_responsable }}
-                            <label class="form-check-label"
-                                   for="{{ form.usar_rut_madre_como_responsable.id_for_label }}">
-                                Usar RUT de la madre como responsable
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- CONTACTO Y DIRECCIÓN -->
-        <div class="card mb-2">
-            <div class="card-header">
-                <h6 class="m-0"><i class="fas fa-map-marker-alt me-2"></i> Contacto y Dirección</h6>
-            </div>
-            <div class="card-body">
-                <div class="row g-2">
-                    <div class="col-md-4">
-                        <label class="form-label" for="{{ form.direccion.id_for_label }}">Dirección</label>
-                        {{ form.direccion }}
-                        {% if form.direccion.errors %}
-                        <div class="text-danger small">{{ form.direccion.errors }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="col-md-4">
-                        <label class="form-label" for="{{ form.comuna.id_for_label }}">Comuna</label>
-                        {{ form.comuna }}
-                        {% if form.comuna.errors %}
-                        <div class="text-danger small">{{ form.comuna.errors }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="col-md-4">
-                        <label class="form-label" for="{{ form.ocupacion.id_for_label }}">Ocupación</label>
-                        {{ form.ocupacion }}
-                        {% if form.ocupacion.errors %}
-                        <div class="text-danger small">{{ form.ocupacion.errors }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="col-md-3">
-                        <div class="form-check mt-2">
-                            {{ form.sin_telefono }}
-                            <label class="form-check-label" for="{{ form.sin_telefono.id_for_label }}">
-                                Paciente Sin Teléfono
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4">
-                        <label class="form-label" for="{{ form.numero_telefono1.id_for_label }}">
-                            Número de Teléfono
-                        </label>
-                        {{ form.numero_telefono1 }}
-                        {% if form.numero_telefono1.errors %}
-                        <div class="text-danger small">{{ form.numero_telefono1.errors }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="col-md-4">
-                        <label class="form-label" for="{{ form.numero_telefono2.id_for_label }}">
-                            Número de Teléfono 2
-                        </label>
-                        {{ form.numero_telefono2 }}
-                        {% if form.numero_telefono2.errors %}
-                        <div class="text-danger small">{{ form.numero_telefono2.errors }}</div>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- GESTIÓN -->
-        <div class="card mb-2">
-            <div class="card-header">
-                <h6 class="m-0"><i class="fas fa-cogs me-2"></i> Gestión</h6>
-            </div>
-            <div class="card-body">
-                <div class="row g-2">
-                    <div class="col-md-3">
-                        <label class="form-label" for="{{ form.prevision.id_for_label }}">Previsión</label>
-                        {{ form.prevision }}
-                        {% if form.prevision.errors %}
-                        <div class="text-danger small">{{ form.prevision.errors }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="col-md-3">
-                        <label class="form-label" for="{{ form.sector.id_for_label }}">Sector</label>
-                        {{ form.sector }}
-                        {% if form.sector.errors %}
-                        <div class="text-danger small">{{ form.sector.errors }}</div>
-                        {% endif %}
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label" for="{{ form.observacion.id_for_label }}">Observación</label>
-                        {{ form.observacion }}
-                        {% if form.observacion.errors %}
-                        <div class="text-danger small">{{ form.observacion.errors }}</div>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Pie del formulario -->
-        <div class="row mt-3 mb-4">
-            <div class="col text-end">
-                <button type="button" class="btn btn-secondary btn-sm no-print" id="btn-cancelar">Cancelar</button>
-                <button type="submit" class="btn btn-primary btn-sm no-print">Guardar</button>
-            </div>
-        </div>
-    </form>
-</div>
-
-<script>
-    // Inicialización de Select2
-    $(document).ready(function () {
-        $('.select2').select2({
-            theme: 'bootstrap4',
-            width: '100%'
-        });
-    });
-</script>
 {% endblock %}
 
 {% block javascript %}
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-    $(document).ready(function () {
-        // Actualizar el selector para el campo RUT del formulario Django
-        const inputRut = $("#{{ form.rut.id_for_label }}");
-        const inputFicha = $("#{{ form.ficha.id_for_label }}");
-        const mensaje = $("#mensaje-rut");
-        const form = $("#paciente-form");
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2({
+                width: '100%',
+                theme: 'default'
+            });
+        });
+    </script>
 
-        // Botones de acción
-        const btnActualizarRut = $("#btn-actualizar-rut");
-        const btnPasivar = $("#btn-pasivar");
-        const btnTarjetaFisica = $("#btn-tarjeta-fisica");
-        const btnNumeroFicha = $("#btn-numero-ficha");
-        const btnCaratula = $("#btn-caratula");
-        const btnStickers = $("#btn-stickers");
-        const btnConsultarDenuevo = $("#btn-consultar-denuevo");
+    <script>
+        function setValue(id, value) {
+            const $el = $('#' + id);
+            if (!$el.length) return;
 
-        let timeout = null;
-        let ultimoRut = "";
-        let ultimaFicha = "";
-        let buscando = false;
-
-        // Variables para almacenar IDs
-        let pacienteId = null;
-        let fichaId = null;
-        let pacienteData = null; // Para almacenar todos los datos del paciente
-
-        /* =============================
-           🔹 FUNCIÓN PARA MANEJAR EL FOCO DEL RUT CON INPUTMASK
-        ============================= */
-        function focusRutInput() {
-            if (!inputRut.length) return;
-
-            inputRut.focus();
-
-            // Obtener el valor actual del RUT
-            const rutValue = inputRut.val();
-            if (!rutValue) return;
-
-            // Para Inputmask, necesitamos manejar los caracteres especiales
-            // Inputmask usa guiones bajos (_) como placeholders
-
-            // 1. Si hay guiones bajos, poner el cursor antes del primer guión bajo
-            if (rutValue.includes('_')) {
-                const firstUnderscore = rutValue.indexOf('_');
-                try {
-                    inputRut[0].setSelectionRange(firstUnderscore, firstUnderscore);
-                } catch (e) {
-                    // Fallback
-                    inputRut[0].setSelectionRange(rutValue.length, rutValue.length);
-                }
-                return;
-            }
-
-            // 2. Si no hay guiones bajos, buscar la última posición útil
-            let lastUsefulPosition = 0;
-
-            // Recorrer de derecha a izquierda para encontrar la última posición útil
-            for (let i = rutValue.length - 1; i >= 0; i--) {
-                const char = rutValue[i];
-                // Considerar útil: números, puntos, guiones, K/k
-                if (/[0-9\.\-kK]/.test(char)) {
-                    lastUsefulPosition = i + 1;
-                    break;
-                }
-            }
-
-            // Si no encontramos nada útil, poner el cursor al final
-            if (lastUsefulPosition === 0) {
-                lastUsefulPosition = rutValue.length;
-            }
-
-            // Establecer la posición del cursor
-            try {
-                inputRut[0].setSelectionRange(lastUsefulPosition, lastUsefulPosition);
-            } catch (e) {
-                // Fallback: poner el cursor al final
-                inputRut[0].setSelectionRange(rutValue.length, rutValue.length);
-            }
-        }
-
-        /* =============================
-           🔹 FUNCIONES PARA MANEJAR BOTONES
-        ============================= */
-        function habilitarBoton(boton, habilitado = true) {
-            if (habilitado) {
-                boton.removeClass("disabled");
-                boton.css({"pointer-events": "auto", "opacity": "1"});
+            if ($el.is(':checkbox')) {
+                $el.prop('checked', !!value);
             } else {
-                boton.addClass("disabled");
-                boton.css({"pointer-events": "none", "opacity": "0.6"});
+                $el.val(value ?? '');
             }
         }
 
-        // Actualiza el texto y estilo del botón Pasivar/Activar según el estado de la ficha
-        function setPasivarVisual(pasivado) {
-            const txt = pasivado ? 'Activar Ficha' : 'Pasivar Ficha';
-            btnPasivar.text(txt);
-            // pasivado=true => accion activar (warning); pasivado=false => accion pasivar (danger)
-            btnPasivar.removeClass('btn-danger btn-warning').addClass(pasivado ? 'btn-warning' : 'btn-danger');
+        function setSelect2(id, value) {
+            const $el = $('#' + id);
+            if (!$el.length) return;
+
+            $el.val(value).trigger('change');
         }
 
-        function actualizarURLsBotones() {
-            // Actualizar RUT - necesita paciente_id
-            if (pacienteId) {
-                btnActualizarRut.attr("href", `/kardex/pacientes/${pacienteId}/actualizar-rut/`);
-                habilitarBoton(btnActualizarRut, true);
-            } else {
-                btnActualizarRut.attr("href", "#");
-                habilitarBoton(btnActualizarRut, false);
-            }
+        function formatearRutString(rut) {
+            rut = rut.replace(/\./g, '').replace(/-/g, '').toUpperCase();
+            if (rut.length <= 1) return rut;
 
-            // Pasivar y Tarjeta Física - necesitan ficha_id
-            if (fichaId) {
-                btnPasivar.attr("href", `/kardex/fichas/${fichaId}/toggle-pasivar/`);
-                habilitarBoton(btnPasivar, true);
-                if (pacienteData && typeof pacienteData.pasivado !== 'undefined') {
-                    setPasivarVisual(Boolean(pacienteData.pasivado));
-                }
+            const cuerpo = rut.slice(0, -1);
+            const dv = rut.slice(-1);
 
-                const tarjetaUrl = `/kardex/fichas/${fichaId}/tarjeta/`;
-                btnTarjetaFisica.attr("href", tarjetaUrl);
-                habilitarBoton(btnTarjetaFisica, true);
-
-                // N° Ficha (sistema) reutiliza la misma vista de tarjeta
-                btnNumeroFicha.attr("href", tarjetaUrl);
-                habilitarBoton(btnNumeroFicha, true);
-
-                // Botones de impresión
-                btnCaratula.attr("href", `/kardex/pdfs/ficha/${fichaId}/`);
-                habilitarBoton(btnCaratula, true);
-
-                btnStickers.attr("href", `/kardex/pdfs/stickers/ficha/${fichaId}/`);
-                habilitarBoton(btnStickers, true);
-            } else {
-                btnPasivar.attr("href", "#");
-                habilitarBoton(btnPasivar, false);
-
-                btnTarjetaFisica.attr("href", "#");
-                habilitarBoton(btnTarjetaFisica, false);
-
-                btnNumeroFicha.attr("href", "#");
-                habilitarBoton(btnNumeroFicha, false);
-
-                btnCaratula.attr("href", "#");
-                habilitarBoton(btnCaratula, false);
-
-                btnStickers.attr("href", "#");
-                habilitarBoton(btnStickers, false);
-            }
+            return cuerpo.replace(/\B(?=(\d{3})+(?!\d))/g, '.') + '-' + dv;
         }
 
-        function limpiarBotones() {
-            pacienteId = null;
-            fichaId = null;
-            pacienteData = null;
-            actualizarURLsBotones();
+    </script>
+
+    <script>
+        function cargarPaciente(data) {
+            const p = data.paciente;
+
+            // IDENTIFICACIÓN
+            setValue('id_nombre', p.nombre);
+            setValue('id_apellido_paterno', p.apellido_paterno);
+            setValue('id_apellido_materno', p.apellido_materno);
+            setValue('id_nombre_social', p.nombre_social);
+            setValue('id_pasaporte', p.pasaporte);
+            setValue('id_nie', p.nip);
+
+            // NACIMIENTO
+            setValue('id_fecha_nacimiento', p.fecha_nacimiento);
+            setValue('id_sexo', p.sexo);
+            setSelect2('id_genero', p.genero);
+            setValue('id_estado_civil', p.estado_civil);
+
+            // ESTADO PACIENTE
+            setValue('id_recien_nacido', p.recien_nacido);
+            setValue('id_extranjero', p.extranjero);
+            setValue('id_pueblo_indigena', p.pueblo_indigena);
+            setValue('id_fallecido', p.fallecido);
+            setValue('id_fecha_fallecimiento', p.fecha_fallecimiento);
+
+            // FAMILIA
+            setValue('id_rut_madre', p.rut_madre);
+            setValue('id_nombres_madre', p.nombres_madre);
+            setValue('id_nombres_padre', p.nombres_padre);
+            setValue('id_nombre_pareja', p.nombre_pareja);
+            setValue('id_representante_legal', p.representante_legal);
+            setValue('id_rut_responsable_temporal', p.rut_responsable_temporal);
+            setValue('id_usar_rut_madre_como_responsable', p.usar_rut_madre_como_responsable);
+
+            // CONTACTO
+            setValue('id_direccion', p.direccion);
+            setSelect2('id_comuna', p.comuna);
+            setValue('id_ocupacion', p.ocupacion);
+            setValue('id_numero_telefono1', p.numero_telefono1);
+            setValue('id_numero_telefono2', p.numero_telefono2);
         }
 
-        /* =============================
-           🔹 UTILIDADES (manteniendo las funciones existentes)
-        ============================= */
-        function setValue(selector, value) {
-            const el = $(selector);
-            if (!el.length) return;
+        function cargarFicha(data) {
+            if (!data.ficha) return;
 
-            const element = el[0];
+            const f = data.ficha;
 
-            if (element.type === "checkbox") {
-                el.prop('checked', Boolean(value));
-            } else if (element.type === "date" && value) {
-                el.val(String(value).split("T")[0]);
-            } else if (element.tagName === "SELECT") {
-                el.val(value).trigger('change');
-            } else if (element.tagName === "TEXTAREA") {  // ← Manejar textarea específicamente
-                el.val(value || "");
-            } else {
-                el.val(value || "");
-            }
+            setValue('id_ficha', f.numero_ficha_sistema);
+            setValue('id_observacion', f.observacion);
+            setSelect2('id_sector', f.sector);
+            setSelect2('id_prevision', f.prevision);
+
+            // aquí después puedes:
+            // - renderizar tabla de otras fichas
+            // - renderizar movimientos
         }
 
-        function mostrarMensaje(texto, tipo) {
-            mensaje.html(texto.replace(/\n/g, "<br>"));
-            mensaje.removeClass("d-none alert-success alert-warning alert-danger alert-info");
-            mensaje.addClass(`alert-${tipo}`);
-            mensaje.show();
-        }
+    </script>
 
-        function ocultarMensaje() {
-            mensaje.hide();
-        }
+    <script>
+        $(document).ready(function () {
 
-        function mostrarMensajeProcesando(titulo = "Buscando...") {
-            Swal.fire({
-                title: titulo,
-                html: '⏳ Por favor espere...',
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-        }
-
-        function cerrarMensajeProcesando() {
-            Swal.close();
-        }
-
-        function limpiarErroresFormulario() {
-            $(".is-invalid").removeClass("is-invalid");
-            $(".invalid-feedback").remove();
-        }
-
-        function mostrarErrorCampo(campoId, mensajeError) {
-            const campo = $(`#${campoId}`);
-            if (campo.length) {
-                campo.addClass("is-invalid");
-
-                let feedback = campo.next(".invalid-feedback");
-                if (!feedback.length) {
-                    feedback = $(`<div class="invalid-feedback"></div>`);
-                    campo.after(feedback);
-                }
-                feedback.text(mensajeError);
-            }
-        }
-
-        function limpiarFormulario() {
-            // Limpiar todos los campos excepto RUT y Ficha
-            $("input:not(#{{ form.rut.id_for_label }}):not(#{{ form.ficha.id_for_label }}), select, textarea", form).each(function () {
-                const el = $(this);
-                if (this.type === "checkbox" || this.type === "radio") {
-                    el.prop('checked', false);
-                } else if (this.tagName === "SELECT") {
-                    el.prop('selectedIndex', 0).trigger('change');
-                } else {
-                    el.val("");
-                }
+            $('.select2').select2({
+                width: '100%',
+                theme: 'default'
             });
 
-            // Limpiar el texto de fecha de creación
-            $("#ficha_created_at_text").text("...");
+            $('#id_rut').on('change', function () {
 
-            // Limpiar errores
-            limpiarErroresFormulario();
+                let rut = $(this).val().trim();
+                if (!rut) return;
 
-            // Actualizar selects con Select2
-            if (window.$) {
-                $('.select2').trigger('change');
-            }
+                rut = formatearRutString(rut);
+                $(this).val(rut);
 
-            // Limpiar botones
-            limpiarBotones();
-
-            // Ocultar cualquier mensaje
-            ocultarMensaje();
-        }
-
-        /* =============================
-           🔹 MAPEO CAMPOS
-        ============================= */
-        const MAPA_CAMPOS = {
-            nombre: "#{{ form.nombre.id_for_label }}",
-            apellido_paterno: "#{{ form.apellido_paterno.id_for_label }}",
-            apellido_materno: "#{{ form.apellido_materno.id_for_label }}",
-            nombre_social: "#{{ form.nombre_social.id_for_label }}",
-            pasaporte: "#{{ form.pasaporte.id_for_label }}",
-            nie: "#{{ form.nie.id_for_label }}",
-            fecha_nacimiento: "#{{ form.fecha_nacimiento.id_for_label }}",
-            sexo: "#{{ form.sexo.id_for_label }}",
-            genero: "#{{ form.genero.id_for_label }}",
-            estado_civil: "#{{ form.estado_civil.id_for_label }}",
-            direccion: "#{{ form.direccion.id_for_label }}",
-            ocupacion: "#{{ form.ocupacion.id_for_label }}",
-            comuna: "#{{ form.comuna.id_for_label }}",
-            prevision: "#{{ form.prevision.id_for_label }}",
-            sector: "#{{ form.sector.id_for_label }}",
-            numero_telefono1: "#{{ form.numero_telefono1.id_for_label }}",
-            numero_telefono2: "#{{ form.numero_telefono2.id_for_label }}",
-            fecha_fallecimiento: "#{{ form.fecha_fallecimiento.id_for_label }}",
-            observacion: "#{{ form.observacion.id_for_label }}"
-        };
-
-        const MAPA_CHECKBOX = {
-            extranjero: "#{{ form.extranjero.id_for_label }}",
-            recien_nacido: "#{{ form.recien_nacido.id_for_label }}",
-            pueblo_indigena: "#{{ form.pueblo_indigena.id_for_label }}",
-            fallecido: "#{{ form.fallecido.id_for_label }}",
-            sin_telefono: "#{{ form.sin_telefono.id_for_label }}",
-            usar_rut_madre_como_responsable: "#{{ form.usar_rut_madre_como_responsable.id_for_label }}"
-        };
-
-        function rellenarFormulario(data) {
-            // Guardar datos del paciente
-            pacienteData = data;
-
-            // Extraer IDs
-            pacienteId = data.paciente_id || null;
-            fichaId = data.ficha_id || null;
-
-            // Llenar campos del formulario
-            for (const campo in MAPA_CAMPOS) {
-                if (MAPA_CAMPOS[campo] && data[campo] !== undefined) {
-                    setValue(MAPA_CAMPOS[campo], data[campo]);
-                }
-            }
-
-            for (const campo in MAPA_CHECKBOX) {
-                if (MAPA_CHECKBOX[campo] && data[campo] !== undefined) {
-                    setValue(MAPA_CHECKBOX[campo], data[campo]);
-                }
-            }
-
-            // Asignar automáticamente selects por IDs
-            try {
-                if (data.prevision_id) {
-                    $('#{{ form.prevision.id_for_label }}').val(String(data.prevision_id)).trigger('change');
-                }
-                if (data.sector_id) {
-                    $('#{{ form.sector.id_for_label }}').val(String(data.sector_id)).trigger('change');
-                }
-                if (data.paciente_comuna_id) {
-                    $('#{{ form.comuna.id_for_label }}').val(String(data.paciente_comuna_id)).trigger('change');
-                }
-            } catch (e) {
-                console.warn('No fue posible setear selects por ID:', e);
-            }
-
-            // Actualizar selects con Select2
-            if (window.$) {
-                $('.select2').trigger('change');
-            }
-
-            // Actualizar URLs de los botones
-            actualizarURLsBotones();
-            // Ajustar visual del botón Pasivar/Activar si viene el estado
-            if (typeof data.pasivado !== 'undefined') {
-                setPasivarVisual(Boolean(data.pasivado));
-            }
-        }
-
-        /* =============================
-           🔹 BUSCAR PACIENTE CON AJAX - VERSIÓN CORREGIDA
-        ============================= */
-        function buscarPaciente(rut = null, numeroFicha = null) {
-            if (buscando) return;
-
-            // ✅ NUEVO: Guardar el valor ACTUAL del RUT antes de buscar
-            const rutActual = inputRut.val();
-            const fichaActual = inputFicha.val();
-
-            buscando = true;
-            mostrarMensajeProcesando(rut ? "Buscando por RUT..." : "Buscando por número de ficha...");
-
-            let url = '/kardex/api/api_pacientes/';
-            if (rut) {
-                url += `?rut=${encodeURIComponent(rut)}`;
-            } else if (numeroFicha) {
-                url += `?numero_ficha=${encodeURIComponent(numeroFicha)}`;
-            }
-
-            $.ajax({
-                url: url,
-                type: 'GET',
-                headers: {
-                    'X-CSRFToken': $('input[name="csrfmiddlewaretoken"]').val() || getCookie('csrftoken')
-                },
-                success: function (data) {
-                    cerrarMensajeProcesando();
-                    buscando = false;
-
-                    if (data.exists && data.has_ficha) {
-                        // Llenar formulario con datos del paciente
-                        rellenarFormulario(data.data);
-
-                        // ✅ CORRECCIÓN: Mantener el RUT que el usuario escribió
-                        // Solo actualizar si el RUT de la API es DIFERENTE
-                        if (data.data.rut && data.data.rut !== rutActual) {
-                            inputRut.val(data.data.rut);
-                            ultimoRut = data.data.rut;
-                        } else {
-                            // Mantener EXACTAMENTE lo que el usuario escribió
-                            ultimoRut = rutActual || data.data.rut;
-                        }
-
-                        // ✅ CORRECCIÓN: Mantener la ficha que el usuario escribió
-                        if (data.data.numero_ficha_sistema) {
-                            // Si buscamos por RUT, actualizar la ficha
-                            if (rut) {
-                                inputFicha.val(data.data.numero_ficha_sistema);
-                                ultimaFicha = data.data.numero_ficha_sistema;
-                            } else {
-                                // Si buscamos por ficha, mantener lo que el usuario escribió
-                                ultimaFicha = fichaActual || data.data.numero_ficha_sistema;
-                            }
-                        }
-
-                        // Actualizar fecha de creación
-                        if (data.data.fecha_creacion_anterior) {
-                            $("#ficha_created_at_text").text(
-                                data.data.fecha_creacion_anterior.split("T")[0]
-                            );
-                        }
-
-                        mostrarMensaje("✅ Paciente encontrado y datos cargados", "success");
-                        return;
-                    }
-
-                    if (data.exists && !data.has_ficha) {
-                        // Paciente existe pero no tiene ficha
-                        pacienteId = data.paciente_id || null;
-                        fichaId = null;
-
-                        // Rellenar el formulario con los datos básicos del paciente recibidos
-                        try {
-                            rellenarFormulario(data);
-                        } catch (e) {
-                            console.warn('No fue posible rellenar el formulario con los datos del paciente sin ficha:', e);
-                        }
-
-                        // ✅ CORRECCIÓN: Mantener el RUT del usuario
-                        if (rutActual) {
-                            inputRut.val(rutActual);
-                            ultimoRut = rutActual;
-                        } else if (data.rut) {
-                            inputRut.val(data.rut);
-                            ultimoRut = data.rut;
-                        } else if (rut) {
-                            inputRut.val(rut);
-                            ultimoRut = rut;
-                        }
-
-                        // Mantener la ficha si se buscó por ella
-                        if (numeroFicha) {
-                            inputFicha.val(numeroFicha);
-                            ultimaFicha = numeroFicha;
-                        } else {
-                            inputFicha.val("");
-                            ultimaFicha = "";
-                        }
-
-                        // Hacer que el campo ficha no sea requerido
-                        try {
-                            inputFicha.prop('readonly', true).attr('placeholder', 'Se generará automáticamente al guardar');
-                            inputFicha.removeAttr('required');
-                        } catch (e) {}
-
-                        actualizarURLsBotones();
-
-                        mostrarMensaje(
-                            "⚠️ El paciente existe pero NO tiene ficha en su establecimiento.<br>Al guardar se generará automáticamente un N° de ficha.",
-                            "warning"
-                        );
-                        return;
-                    }
-
-                    // No se encontró paciente
-                    limpiarBotones();
-
-                    // ✅ CORRECCIÓN: Mantener lo que el usuario escribió
-                    if (rutActual) {
-                        inputRut.val(rutActual);
-                        ultimoRut = rutActual;
-                    }
-
-                    if (fichaActual) {
-                        inputFicha.val(fichaActual);
-                        ultimaFicha = fichaActual;
-                    }
-
-                    // ✅ ENFOCAR EL RUT CON EL CURSOR EN LA POSICIÓN CORRECTA
-                    setTimeout(() => {
-                        focusRutInput();
-                    }, 100);
-
-                    mostrarMensaje(
-                        "❌ Paciente NO encontrado.<br>Complete el formulario para registrarlo.",
-                        "danger"
-                    );
-                },
-                error: function (xhr, status, error) {
-                    cerrarMensajeProcesando();
-                    buscando = false;
-                    console.error("❌ ERROR API →", error);
-
-                    // Limpiar botones en caso de error
-
-                    // ✅ CORRECCIÓN: Mantener lo que el usuario escribió incluso en error
-                    if (rutActual) {
-                        inputRut.val(rutActual);
-                        ultimoRut = rutActual;
-                    }
-
-                    if (fichaActual) {
-                        inputFicha.val(fichaActual);
-                        ultimaFicha = fichaActual;
-                    }
-
-                    // ✅ ENFOCAR EL RUT CON EL CURSOR EN LA POSICIÓN CORRECTA
-                    setTimeout(() => {
-                        focusRutInput();
-                    }, 100);
-
-                    limpiarBotones();
-
-                    if (xhr.status === 400) {
-                        mostrarMensaje("⚠️ " + (xhr.responseJSON?.error || "Parámetro inválido"), "warning");
-                    } else {
-                        mostrarMensaje("🚫 Error al consultar la API.", "danger");
-                    }
-                }
-            });
-        }
-
-        /* =============================
-           🔹 FUNCIÓN PARA DETECTAR Y MANEJAR BÚSQUEDAS
-        ============================= */
-        function manejarBusqueda() {
-            const rut = inputRut.val().trim();
-            const ficha = inputFicha.val().trim();
-
-            // Si ambos campos están vacíos, limpiar formulario
-            if (!rut && !ficha) {
-                if (ultimoRut || ultimaFicha) {
-                    limpiarFormulario();
-                    ultimoRut = "";
-                    ultimaFicha = "";
-                }
-                return;
-            }
-
-            // ✅ CORRECCIÓN: Buscar RUT solo cuando tenga formato COMPLETO
-            if (rut && rut !== ultimoRut) {
-                // Limpiar el RUT para contar dígitos
-                const rutLimpio = rut.replace(/[\.\-]/g, '');
-
-                // Solo buscar si tiene al menos 8 dígitos (RUT completo mínimo)
-                if (rutLimpio.length >= 8) {
-                    // Verificar si ya tiene el guión (formateado completo)
-                    const tieneGuion = rut.includes('-');
-
-                    clearTimeout(timeout);
-
-                    // ✅ Aumentar timeout para dar tiempo al usuario
-                    timeout = setTimeout(() => {
-                        // Solo buscar si tiene guión o 9+ dígitos
-                        if (tieneGuion || rutLimpio.length >= 9) {
-                            buscarPaciente(rut, null);
-                        }
-                    }, 800); // 800ms en lugar de 500ms
-                }
-            }
-
-            // Si se está ingresando número de ficha
-            if (ficha && ficha !== ultimaFicha) {
-                clearTimeout(timeout);
-                timeout = setTimeout(() => {
-                    if (!isNaN(ficha)) {
-                        buscarPaciente(null, ficha);
-                    } else {
-                        mostrarMensaje("⚠️ El número de ficha debe ser numérico", "warning");
-                    }
-                }, 800); // Mismo timeout
-            }
-        }
-
-        /* =============================
-           🔹 EVENTOS PARA LOS CAMPOS DE BÚSQUEDA
-        ============================= */
-        if (inputRut.length) {
-            inputRut.on("keyup", function () {
-                clearTimeout(timeout);
-                timeout = setTimeout(() => {
-                    manejarBusqueda();
-                }, 300);
-            });
-
-            inputRut.on("input", function () {
-                const rut = inputRut.val().trim();
-                if (!rut && ultimoRut) {
-                    if (!inputFicha.val().trim()) {
-                        limpiarFormulario();
-                        ultimoRut = "";
-                        ultimaFicha = "";
-                    }
-                }
-            });
-
-            inputRut.on("blur", function () {
-                const rut = inputRut.val().trim();
-                if (!rut && !inputFicha.val().trim() && (ultimoRut || ultimaFicha)) {
-                    limpiarFormulario();
-                    ultimoRut = "";
-                    ultimaFicha = "";
-                }
-            });
-        }
-
-        if (inputFicha.length) {
-            inputFicha.on("keyup", function () {
-                clearTimeout(timeout);
-                timeout = setTimeout(() => {
-                    manejarBusqueda();
-                }, 300);
-            });
-
-            inputFicha.on("input", function () {
-                const ficha = inputFicha.val().trim();
-                if (!ficha && ultimaFicha) {
-                    if (!inputRut.val().trim()) {
-                        limpiarFormulario();
-                        ultimoRut = "";
-                        ultimaFicha = "";
-                    }
-                }
-            });
-
-            inputFicha.on("blur", function () {
-                const ficha = inputFicha.val().trim();
-                if (!ficha && !inputRut.val().trim() && (ultimoRut || ultimaFicha)) {
-                    limpiarFormulario();
-                    ultimoRut = "";
-                    ultimaFicha = "";
-                }
-            });
-        }
-
-        /* =============================
-           🔹 INICIALIZACIÓN DE SELECT2
-        ============================= */
-        $('#{{ form.comuna.id_for_label }}').select2({
-            theme: 'bootstrap4',
-            width: '100%'
-        });
-
-        $('#{{ form.prevision.id_for_label }}').select2({
-            theme: 'bootstrap4',
-            width: '100%'
-        });
-
-        $('#{{ form.sector.id_for_label }}').select2({
-            theme: 'bootstrap4',
-            width: '100%'
-        });
-
-        /* =============================
-           🔹 EVENTO SUBMIT DEL FORMULARIO
-        ============================= */
-        form.on("submit", function (e) {
-            e.preventDefault();
-
-            const rut = inputRut.val().trim();
-            if (!rut) {
-                mostrarMensaje("⚠️ Por favor ingrese un RUT válido", "warning");
-                focusRutInput();
-                return false;
-            }
-
-            // Mostrar popup de procesando
-            Swal.fire({
-                title: 'Guardando paciente',
-                html: '⏳ Por favor espere...',
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-
-            // Deshabilitar el botón de enviar
-            const submitBtn = form.find('button[type="submit"]');
-            submitBtn.prop('disabled', true);
-            submitBtn.html('<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Guardando...');
-
-            // Limpiar errores anteriores
-            limpiarErroresFormulario();
-            ocultarMensaje();
-
-            // Enviar formulario con AJAX
-            $.ajax({
-                url: form.attr('action') || window.location.href,
-                type: 'POST',
-                data: form.serialize(),
-                headers: {
-                    'X-CSRFToken': $('input[name="csrfmiddlewaretoken"]').val()
-                },
-                success: function (response) {
-                    Swal.close();
-
-                    if (response.success) {
-                        mostrarMensaje("✅ Ficha guardada correctamente.", "success");
-
-                        if (response.numero_ficha_sistema) {
-                            inputFicha.val(response.numero_ficha_sistema);
-                            ultimaFicha = response.numero_ficha_sistema;
-                        }
-
-                        // Si se creó una nueva ficha, buscar datos actualizados
-                        if (response.ficha_id) {
-                            fichaId = response.ficha_id;
-                            // Buscar datos actualizados
-                            buscarPaciente(rut, null);
-                        }
-
-                    } else {
-                        mostrarMensaje("❌ Error al guardar: " + (response.error || "Error desconocido"), "danger");
-                    }
-                },
-                error: function (xhr, status, error) {
-                    console.error("❌ ERROR GUARDANDO →", error);
-                    Swal.close();
-
-                    if (xhr.responseJSON && xhr.responseJSON.errors) {
-                        Swal.fire({
-                            title: '⚠️ Errores en el formulario',
-                            html: 'Se encontraron errores en algunos campos. Por favor revise los campos marcados en rojo.',
-                            icon: 'warning',
-                            confirmButtonText: 'Entendido',
-                            confirmButtonColor: '#3085d6'
-                        }).then((result) => {
-                            procesarErroresFormulario(xhr.responseJSON.errors);
-                        });
-                    } else if (xhr.responseJSON.error) {
-                        // 🚫 PERMISOS U OTRO ERROR CONTROLADO POR BACKEND
-                        Swal.fire({
-                            title: '🚫 Acción no permitida',
-                            text: xhr.responseJSON.error,
-                            icon: 'warning',
-                            confirmButtonText: 'Entendido',
-                            confirmButtonColor: '#FF8800'
-                        });
-                    } else {
-                        Swal.fire({
-                            title: '🚫 Error',
-                            text: 'Ocurrió un error al guardar la ficha. Por favor intente nuevamente.',
-                            icon: 'error',
-                            confirmButtonText: 'Aceptar'
-                        });
-                    }
-                },
-                complete: function () {
-                    submitBtn.prop('disabled', false);
-                    submitBtn.text('Guardar');
-                }
-            });
-        });
-
-        /* =============================
-           🔹 FUNCIÓN PARA PROCESAR ERRORES DEL FORMULARIO
-        ============================= */
-        function procesarErroresFormulario(errores) {
-            const mapeoCampos = {
-                'rut': '{{ form.rut.id_for_label }}',
-                'ficha': '{{ form.ficha.id_for_label }}',
-                'nombre': '{{ form.nombre.id_for_label }}',
-                'apellido_paterno': '{{ form.apellido_paterno.id_for_label }}',
-                'apellido_materno': '{{ form.apellido_materno.id_for_label }}',
-                'fecha_nacimiento': '{{ form.fecha_nacimiento.id_for_label }}',
-                'sexo': '{{ form.sexo.id_for_label }}',
-                'genero': '{{ form.genero.id_for_label }}',
-                'estado_civil': '{{ form.estado_civil.id_for_label }}',
-                'direccion': '{{ form.direccion.id_for_label }}',
-                'comuna': '{{ form.comuna.id_for_label }}',
-                'prevision': '{{ form.prevision.id_for_label }}',
-                'sector': '{{ form.sector.id_for_label }}',
-                'numero_telefono1': '{{ form.numero_telefono1.id_for_label }}',
-                'fecha_fallecimiento': '{{ form.fecha_fallecimiento.id_for_label }}',
-                'observacion': '{{ form.observacion.id_for_label }}'
-            };
-
-            let erroresTexto = "";
-
-            for (const campo in errores) {
-                const campoId = mapeoCampos[campo] || campo;
-                const mensajesError = errores[campo];
-
-                if (mensajesError && mensajesError.length > 0) {
-                    mostrarErrorCampo(campoId, mensajesError.join(', '));
-
-                    erroresTexto += `• <strong>${obtenerNombreCampo(campo)}:</strong> ${mensajesError.join(', ')}<br>`;
-                }
-            }
-
-            if (erroresTexto) {
-                mostrarMensaje(`<strong>❌ Se encontraron los siguientes errores:</strong><br>${erroresTexto}`, "danger");
-            }
-        }
-
-        function obtenerNombreCampo(campo) {
-            const nombres = {
-                'rut': 'RUT',
-                'ficha': 'Número de Ficha',
-                'nombre': 'Nombres',
-                'apellido_paterno': 'Apellido Paterno',
-                'apellido_materno': 'Apellido Materno',
-                'fecha_nacimiento': 'Fecha de Nacimiento',
-                'sexo': 'Sexo',
-                'genero': 'Género',
-                'estado_civil': 'Estado Civil',
-                'direccion': 'Dirección',
-                'comuna': 'Comuna',
-                'prevision': 'Previsión',
-                'sector': 'Sector',
-                'numero_telefono1': 'Número de Teléfono',
-                'fecha_fallecimiento': 'Fecha de Fallecimiento',
-                'sin_telefono': 'Sin Teléfono',
-                'observacion': 'Observación'
-            };
-
-            return nombres[campo] || campo.replace(/_/g, ' ').toUpperCase();
-        }
-
-        /* =============================
-           🔹 BOTÓN CANCELAR
-        ============================= */
-        $("#btn-cancelar").on("click", function () {
-            Swal.fire({
-                title: '¿Cancelar?',
-                text: '¿Está seguro de que desea cancelar? Los datos no guardados se perderán.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Sí, cancelar',
-                cancelButtonText: 'No, continuar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = "{% url 'kardex:paciente_query' %}";
-                }
-            });
-        });
-
-        /* =============================
-           🔹 BOTÓN LIMPIAR - VERSIÓN CORREGIDA
-        ============================= */
-        function agregarBotonLimpiar() {
-            const pieFormulario = $('.row.mt-3.mb-4 .col.text-end');
-            if (pieFormulario.length) {
-                const btnLimpiar = $('<button>', {
-                    type: 'button',
-                    class: 'btn btn-outline-secondary btn-sm no-print me-2',
-                    id: 'btn-limpiar',
-                    text: 'Limpiar Todo'
-                });
-
-                btnLimpiar.on('click', function () {
-                    Swal.fire({
-                        title: '¿Limpiar formulario?',
-                        text: '¿Está seguro de que desea limpiar todos los campos del formulario?',
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'Sí, limpiar',
-                        cancelButtonText: 'Cancelar'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            inputRut.val("");
-                            inputFicha.val("");
-                            limpiarFormulario();
-                            ultimoRut = "";
-                            ultimaFicha = "";
-
-                            // ✅ Usar la nueva función de foco
-                            setTimeout(() => {
-                                focusRutInput();
-                            }, 100);
-
-                            Swal.fire({
-                                title: '¡Formulario limpiado!',
-                                text: 'Todos los campos han sido limpiados.',
-                                icon: 'success',
-                                timer: 1500,
-                                showConfirmButton: false
-                            });
-                        }
-                    });
-                });
-
-                pieFormulario.prepend(btnLimpiar);
-            }
-        }
-
-        agregarBotonLimpiar();
-
-        // Botón Limpiar superior (arriba del RUT) - VERSIÓN CORREGIDA
-        $('#btn-limpiar-arriba').on('click', function () {
-            Swal.fire({
-                title: '¿Limpiar formulario?',
-                text: '¿Está seguro de que desea limpiar todos los campos del formulario?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Sí, limpiar',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    inputRut.val("");
-                    inputFicha.val("");
-                    limpiarFormulario();
-                    ultimoRut = "";
-                    ultimaFicha = "";
-
-                    // ✅ Usar la nueva función de foco
-                    setTimeout(() => {
-                        focusRutInput();
-                    }, 100);
-
-                    Swal.fire({
-                        title: '¡Formulario limpiado!',
-                        text: 'Todos los campos han sido limpiados.',
-                        icon: 'success',
-                        timer: 1500,
-                        showConfirmButton: false
-                    });
-                }
-            });
-        });
-
-        /* =============================
-           🔹 FUNCIÓN AUXILIAR PARA CSRF TOKEN
-        ============================= */
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-
-        /* =============================
-           🔹 INICIALIZACIÓN DESDE URL
-        ============================= */
-        function inicializarDesdeURL() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const rutParam = urlParams.get('rut');
-            const fichaParam = urlParams.get('ficha');
-
-            if (rutParam) {
-                inputRut.val(rutParam);
-                setTimeout(() => {
-                    buscarPaciente(rutParam, null);
-                }, 500);
-            } else if (fichaParam) {
-                inputFicha.val(fichaParam);
-                setTimeout(() => {
-                    buscarPaciente(null, fichaParam);
-                }, 500);
-            }
-        }
-
-        inicializarDesdeURL();
-
-        /* =============================
-           🔹 EVENTOS PARA LOS BOTONES DE ACCIÓN
-        ============================= */
-
-        // Helper para POST AJAX con CSRF
-        function ajaxPostJSON(url, data, onSuccess, onError) {
-            $.ajax({
-                url: url,
-                type: 'POST',
-                data: data,
-                headers: {
-                    'X-CSRFToken': $('input[name="csrfmiddlewaretoken"]').val() || getCookie('csrftoken'),
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                success: function (resp) {
-                    if (onSuccess) onSuccess(resp);
-                },
-                error: function (xhr) {
-                    if (onError) onError(xhr);
-                }
-            });
-        }
-
-        // Actualizar RUT
-        // Botón Consultar Denuevo: vuelve a consumir la API y refresca el formulario y botones
-        btnConsultarDenuevo.on('click', function (e) {
-            e.preventDefault();
-            const rut = (inputRut.val() || '').trim();
-            const ficha = (inputFicha.val() || '').trim();
-
-            if (!rut && !ficha) {
-                mostrarMensaje('⚠️ Ingrese un RUT o un N° de Ficha para consultar.', 'warning');
-                focusRutInput();
-                return;
-            }
-
-            if (buscando) {
-                Swal.fire({
-                    title: 'Consultando...',
-                    text: 'Ya hay una consulta en curso. Por favor espere.',
-                    icon: 'info',
-                    timer: 1200,
-                    showConfirmButton: false
-                });
-                return;
-            }
-
-            clearTimeout(timeout);
-            if (rut) {
-                ultimoRut = rut; // registrar la última consulta
-                buscarPaciente(rut, null);
-            } else if (ficha) {
-                if (isNaN(ficha)) {
-                    mostrarMensaje('⚠️ El número de ficha debe ser numérico', 'warning');
-                    return;
-                }
-                ultimaFicha = ficha; // registrar la última consulta
-                buscarPaciente(null, ficha);
-            }
-        });
-
-        // Actualizar RUT - Versión con JavaScript puro
-        btnActualizarRut.on("click", function (e) {
-            if ($(this).hasClass("disabled")) {
-                e.preventDefault();
-                return false;
-            }
-            e.preventDefault();
-            const href = $(this).attr('href');
-            const rutActual = inputRut.val().trim();
-
-            Swal.fire({
-                title: '¿Desea cambiar el RUT?',
-                text: 'Esta acción actualizará el RUT del paciente.',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Sí, cambiar',
-                cancelButtonText: 'Cancelar'
-            }).then((res) => {
-                if (!res.isConfirmed) return;
-
-                // Crear HTML personalizado para el input
-                Swal.fire({
-                    title: 'Ingrese el nuevo RUT',
-                    html: `
-                <div class="mb-3">
-                    <input type="text"
-                           id="rut-input-sw"
-                           class="form-control text-center"
-                           placeholder="Ej: 12.345.678-9"
-                           value="${rutActual}"
-                           style="font-size: 1.2rem; letter-spacing: 1px; padding: 10px;">
-                    <small class="text-muted mt-2 d-block">
-                        Formato: 9.999.999-9 o 99.999.999-9
-                        <br>Presione Backspace o Delete para borrar
-                    </small>
-                </div>
-            `,
-                    showCancelButton: true,
-                    confirmButtonText: 'Actualizar',
-                    cancelButtonText: 'Cancelar',
-                    focusConfirm: false,
-                    preConfirm: () => {
-                        const input = document.getElementById('rut-input-sw');
-                        const valor = input ? input.value.trim() : '';
-                        const rutLimpio = valor.replace(/[\.\-]/g, '').toUpperCase();
-
-                        if (!rutLimpio) {
-                            Swal.showValidationMessage('Ingrese un RUT');
-                            return false;
-                        }
-
-                        // Validar formato
-                        const rutRegex = /^[0-9]{7,8}[0-9K]$/;
-                        if (!rutRegex.test(rutLimpio)) {
-                            Swal.showValidationMessage('RUT inválido. Ejemplos: 12345678-9 o 9876543-2');
-                            return false;
-                        }
-
-                        // Validar dígito verificador
-                        if (!validarRUTChileno(rutLimpio)) {
-                            Swal.showValidationMessage('Dígito verificador incorrecto');
-                            return false;
-                        }
-
-                        return rutLimpio;
-                    },
-                    didOpen: () => {
-                        const input = document.getElementById('rut-input-sw');
-                        if (input) {
-                            // Formatear valor inicial si existe
-                            if (input.value) {
-                                const rutLimpio = input.value.replace(/[\.\-]/g, '').toUpperCase();
-                                if (/^[0-9]{7,8}[0-9K]$/.test(rutLimpio)) {
-                                    input.value = formatRUTChileno(rutLimpio);
-                                }
-                            }
-
-                            // Configurar evento de entrada
-                            input.addEventListener('input', function (e) {
-                                this.value = formatRUTInput(this.value, e);
-                            });
-
-                            // Configurar evento de teclas
-                            input.addEventListener('keydown', function (e) {
-                                // Permitir todas las teclas de control
-                                const controlKeys = [
-                                    8,   // backspace
-                                    9,   // tab
-                                    13,  // enter
-                                    16,  // shift
-                                    17,  // ctrl
-                                    18,  // alt
-                                    27,  // esc
-                                    37,  // left arrow
-                                    38,  // up arrow
-                                    39,  // right arrow
-                                    40,  // down arrow
-                                    46,  // delete
-                                    35,  // end
-                                    36,  // home
-                                    45,  // insert
-                                    33,  // page up
-                                    34,  // page down
-                                    144, // num lock
-                                    20,  // caps lock
-                                    91,  // left windows
-                                    92,  // right windows
-                                    93,  // select
-                                    112, // F1
-                                    113, // F2
-                                    114, // F3
-                                    115, // F4
-                                    116, // F5
-                                    117, // F6
-                                    118, // F7
-                                    119, // F8
-                                    120, // F9
-                                    121, // F10
-                                    122, // F11
-                                    123  // F12
-                                ];
-
-                                // Permitir teclas de control
-                                if (controlKeys.includes(e.keyCode)) {
-                                    return true;
-                                }
-
-                                // Permitir Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+A
-                                if (e.ctrlKey && [65, 67, 86, 88].includes(e.keyCode)) {
-                                    return true;
-                                }
-
-                                // Solo permitir números y K
-                                const allowedChars = '0123456789kK';
-                                if (!allowedChars.includes(e.key)) {
-                                    e.preventDefault();
-                                    return false;
-                                }
-
-                                return true;
-                            });
-
-                            // Permitir pegar
-                            input.addEventListener('paste', function (e) {
-                                setTimeout(() => {
-                                    this.value = formatRUTInput(this.value, {inputType: 'insertFromPaste'});
-                                }, 10);
-                            });
-
-                            // Enfocar y seleccionar
-                            setTimeout(() => {
-                                input.focus();
-                                input.select();
-                            }, 50);
-                        }
-                    }
-                }).then((r2) => {
-                    if (!r2.isConfirmed) return;
-
-                    mostrarMensajeProcesando('Actualizando RUT...');
-                    ajaxPostJSON(href, {rut: r2.value}, function (resp) {
-                        cerrarMensajeProcesando();
-                        if (resp && resp.success) {
-                            const nuevoRut = resp.rut || r2.value;
-                            const rutFormateado = formatRUTChileno(nuevoRut);
-                            inputRut.val(rutFormateado);
-                            ultimoRut = rutFormateado;
-                            mostrarMensaje('✅ RUT actualizado correctamente.', 'success');
-                        } else {
-                            mostrarMensaje('❌ No se pudo actualizar el RUT', 'danger');
-                        }
-                    }, function (xhr) {
-                        cerrarMensajeProcesando();
-                        const msg = xhr.responseJSON && xhr.responseJSON.errors ? JSON.stringify(xhr.responseJSON.errors) : 'Error inesperado';
-                        mostrarMensaje('🚫 Error al actualizar RUT: ' + msg, 'danger');
-                    });
-                });
-            });
-        });
-
-        // Función para formatear el input de RUT en tiempo real
-        function formatRUTInput(value, event) {
-            if (!value) return '';
-
-            // Guardar posición del cursor
-            const input = event.target;
-            const cursorPos = input.selectionStart;
-            const originalLength = value.length;
-
-            // Limpiar all excepto números y K
-            let cleanValue = value.replace(/[^0-9kK]/g, '').toUpperCase();
-
-            // Limitar a 9 caracteres máximo (8 dígitos + 1 DV)
-            if (cleanValue.length > 9) {
-                cleanValue = cleanValue.substring(0, 9);
-            }
-
-            // Si estamos borrando (backspace o delete), no formatear aún
-            if (event.inputType === 'deleteContentBackward' ||
-                event.inputType === 'deleteContentForward') {
-                // Si el usuario está borrando, mantener el valor limpio
-                // y permitir que borre caracteres individuales
-                return cleanValue;
-            }
-
-            // Solo formatear cuando tenemos suficientes caracteres
-            if (cleanValue.length < 2) {
-                return cleanValue;
-            }
-
-            // Separar cuerpo y DV
-            const cuerpo = cleanValue.slice(0, -1);
-            const dv = cleanValue.slice(-1);
-
-            let cuerpoFormateado = '';
-            const longitud = cuerpo.length;
-
-            // Formatear según la longitud
-            if (longitud <= 3) {
-                cuerpoFormateado = cuerpo;
-            } else if (longitud <= 6) {
-                // 4-6 dígitos: 1.234
-                cuerpoFormateado = cuerpo.slice(0, longitud - 3) + '.' + cuerpo.slice(longitud - 3);
-            } else if (longitud === 7) {
-                // 7 dígitos: 1.234.567
-                cuerpoFormateado = cuerpo.slice(0, 1) + '.' + cuerpo.slice(1, 4) + '.' + cuerpo.slice(4);
-            } else if (longitud === 8) {
-                // 8 dígitos: 12.345.678
-                cuerpoFormateado = cuerpo.slice(0, 2) + '.' + cuerpo.slice(2, 5) + '.' + cuerpo.slice(5);
-            } else {
-                // Más de 8 dígitos (raro, pero por si acaso)
-                cuerpoFormateado = cuerpo;
-            }
-
-            const resultado = cuerpoFormateado + '-' + dv;
-
-            // Ajustar posición del cursor
-            setTimeout(() => {
-                const newCursorPos = calcularNuevaPosicionCursor(
-                    cursorPos, originalLength, value, resultado
-                );
-                input.setSelectionRange(newCursorPos, newCursorPos);
-            }, 0);
-
-            return resultado;
-        }
-
-        // Función para calcular nueva posición del cursor después del formateo
-        function calcularNuevaPosicionCursor(oldPos, oldLength, oldValue, newValue) {
-            if (oldPos <= 0) return 0;
-
-            // Contar caracteres numéricos antes de la posición antigua
-            let numericCharsBefore = 0;
-            for (let i = 0; i < Math.min(oldPos, oldValue.length); i++) {
-                if (/[0-9kK]/i.test(oldValue.charAt(i))) {
-                    numericCharsBefore++;
-                }
-            }
-
-            // Encontrar posición equivalente en el nuevo valor
-            let newPos = 0;
-            let numericCount = 0;
-
-            for (let i = 0; i < newValue.length; i++) {
-                if (/[0-9kK]/i.test(newValue.charAt(i))) {
-                    numericCount++;
-                }
-                if (numericCount >= numericCharsBefore) {
-                    newPos = i + 1;
-                    break;
-                }
-            }
-
-            return Math.min(newPos, newValue.length);
-        }
-
-        // Función para formatear RUT chileno
-        function formatRUTChileno(rut) {
-            if (!rut) return '';
-
-            // Limpiar el RUT
-            let rutLimpio = rut.toString().replace(/[\.\-]/g, '').toUpperCase();
-
-            // Separar cuerpo y dígito verificador
-            const cuerpo = rutLimpio.slice(0, -1);
-            const dv = rutLimpio.slice(-1);
-
-            // Formatear cuerpo con puntos
-            let cuerpoFormateado = '';
-            const longitud = cuerpo.length;
-
-            if (longitud <= 3) {
-                cuerpoFormateado = cuerpo;
-            } else if (longitud <= 6) {
-                // Para 4-6 dígitos: 1.234
-                cuerpoFormateado = cuerpo.slice(0, longitud - 3) + '.' + cuerpo.slice(longitud - 3);
-            } else if (longitud === 7) {
-                // Para 7 dígitos: 1.234.567
-                cuerpoFormateado = cuerpo.slice(0, 1) + '.' + cuerpo.slice(1, 4) + '.' + cuerpo.slice(4);
-            } else if (longitud === 8) {
-                // Para 8 dígitos: 12.345.678
-                cuerpoFormateado = cuerpo.slice(0, 2) + '.' + cuerpo.slice(2, 5) + '.' + cuerpo.slice(5);
-            } else {
-                // Para más de 8 dígitos (caso especial)
-                let contador = 0;
-                for (let i = cuerpo.length - 1; i >= 0; i--) {
-                    cuerpoFormateado = cuerpo[i] + cuerpoFormateado;
-                    contador++;
-                    if (contador === 3 && i !== 0) {
-                        cuerpoFormateado = '.' + cuerpoFormateado;
-                        contador = 0;
-                    }
-                }
-            }
-
-            return cuerpoFormateado + '-' + dv;
-        }
-
-        // Función para validar RUT chileno (algoritmo oficial)
-        function validarRUTChileno(rut) {
-            if (!rut) return false;
-
-            // Limpiar y convertir a mayúsculas
-            const rutLimpio = rut.toString().replace(/[\.\-]/g, '').toUpperCase();
-
-            // Validar formato básico
-            if (!/^[0-9]{7,8}[0-9K]$/.test(rutLimpio)) {
-                return false;
-            }
-
-            // Separar cuerpo y dígito verificador
-            const cuerpo = rutLimpio.slice(0, -1);
-            const dvIngresado = rutLimpio.slice(-1);
-
-            // Calcular dígito verificador esperado
-            let suma = 0;
-            let multiplicador = 2;
-
-            // Recorrer el cuerpo de derecha a izquierda
-            for (let i = cuerpo.length - 1; i >= 0; i--) {
-                suma += parseInt(cuerpo.charAt(i)) * multiplicador;
-                multiplicador = multiplicador === 7 ? 2 : multiplicador + 1;
-            }
-
-            // Calcular dígito verificador
-            const dvEsperado = 11 - (suma % 11);
-            let dvCalculado = dvEsperado.toString();
-
-            // Casos especiales
-            if (dvEsperado === 11) {
-                dvCalculado = '0';
-            } else if (dvEsperado === 10) {
-                dvCalculado = 'K';
-            }
-
-            // Comparar dígito verificador
-            return dvCalculado === dvIngresado;
-        }
-
-        // Pasivar
-        btnPasivar.on("click", function (e) {
-            if ($(this).hasClass("disabled")) {
-                e.preventDefault();
-                return false;
-            }
-            e.preventDefault();
-            const href = $(this).attr('href');
-            Swal.fire({
-                title: '¿Desea cambiar el estado de pasivado?',
-                icon: 'warning', showCancelButton: true,
-                confirmButtonText: 'Sí', cancelButtonText: 'No'
-            }).then((res) => {
-                if (!res.isConfirmed) return;
-                mostrarMensajeProcesando('Actualizando estado...');
                 $.ajax({
-                    url: href,
+                    url: `/personas/ficha-paciente/${rut}`,
                     type: 'GET',
-                    headers: {'X-Requested-With': 'XMLHttpRequest'},
-                    success: function (resp) {
-                        cerrarMensajeProcesando();
-                        if (resp && resp.success) {
-                            const txt = resp.pasivado ? 'La ficha fue pasivada.' : 'La ficha fue despasivada.';
-                            setPasivarVisual(Boolean(resp.pasivado));
-                            mostrarMensaje('✅ ' + txt, 'success');
-                        } else {
-                            mostrarMensaje('❌ No se pudo actualizar el estado de la ficha.', 'danger');
-                        }
+                    dataType: 'json',
+                    success: function (response) {
+                        cargarPaciente(response);
+                        cargarFicha(response);
+
+                        $('#mensaje-rut')
+                            .removeClass('d-none alert-danger')
+                            .addClass('alert-success')
+                            .text('Paciente cargado correctamente');
                     },
-                    error: function () {
-                        cerrarMensajeProcesando();
-                        mostrarMensaje('🚫 Error al cambiar el estado de pasivado.', 'danger');
-                    }
-                });
-            });
-        });
-
-        // Tarjeta Física (numero_ficha_tarjeta)
-        btnTarjetaFisica.on("click", function (e) {
-            if ($(this).hasClass("disabled")) {
-                e.preventDefault();
-                return false;
-            }
-            e.preventDefault();
-            const href = $(this).attr('href');
-            Swal.fire({
-                title: '¿Desea agregar un número de ficha de tarjeta física?',
-                icon: 'question', showCancelButton: true,
-                confirmButtonText: 'Sí', cancelButtonText: 'No'
-            }).then((res) => {
-                if (!res.isConfirmed) return;
-                Swal.fire({
-                    title: 'Ingrese N° de ficha de tarjeta física',
-                    input: 'number', inputAttributes: {min: 1},
-                    showCancelButton: true,
-                    confirmButtonText: 'Guardar', cancelButtonText: 'Cancelar',
-                    preConfirm: (value) => {
-                        if (!value) {
-                            Swal.showValidationMessage('Ingrese un número válido');
-                            return false;
-                        }
-                        return value;
-                    }
-                }).then((r2) => {
-                    if (!r2.isConfirmed) return;
-                    mostrarMensajeProcesando('Guardando número de tarjeta...');
-                    ajaxPostJSON(href, {numero_ficha_tarjeta: r2.value}, function (resp) {
-                        cerrarMensajeProcesando();
-                        if (resp && resp.success) {
-                            // Actualizar el campo N° de Ficha (sistema) del formulario y el estado local sin recargar
-                            if (resp.numero_ficha_sistema) {
-                                inputFicha.val(resp.numero_ficha_sistema);
-                                ultimaFicha = resp.numero_ficha_sistema;
-                            }
-                            // Mantener datos en memoria
-                            if (!pacienteData) pacienteData = {};
-                            if (typeof resp.numero_ficha_sistema !== 'undefined') pacienteData.numero_ficha_sistema = resp.numero_ficha_sistema;
-                            if (typeof resp.numero_ficha_tarjeta !== 'undefined') pacienteData.numero_ficha_tarjeta = resp.numero_ficha_tarjeta;
-
-                            mostrarMensaje(`✅ ${resp.message || 'Número de tarjeta física actualizado.'}`, 'success');
-                        } else {
-                            mostrarMensaje('❌ No se pudo actualizar el número de tarjeta.', 'danger');
-                        }
-                    }, function (xhr) {
-                        cerrarMensajeProcesando();
-                        const msg = xhr.responseJSON && xhr.responseJSON.errors ? JSON.stringify(xhr.responseJSON.errors) : 'Error inesperado';
-                        mostrarMensaje('🚫 Error al actualizar tarjeta: ' + msg, 'danger');
-                    });
-                });
-            });
-        });
-
-        // Número de Ficha (sistema)
-        btnNumeroFicha.on("click", function (e) {
-            if ($(this).hasClass("disabled")) {
-                e.preventDefault();
-                return false;
-            }
-            e.preventDefault();
-            const href = $(this).attr('href');
-            const numeroActual = inputFicha.val().trim();
-
-            Swal.fire({
-                title: '¿Desea cambiar el número de ficha?',
-                text: 'Esta acción actualizará tanto el número de ficha tarjeta como el del sistema.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Sí, cambiar',
-                cancelButtonText: 'Cancelar'
-            }).then((res) => {
-                if (!res.isConfirmed) return;
-
-                Swal.fire({
-                    title: 'Ingrese el nuevo N° de ficha',
-                    input: 'number',
-                    inputValue: numeroActual || '',
-                    inputAttributes: {min: 1},
-                    showCancelButton: true,
-                    confirmButtonText: 'Actualizar',
-                    cancelButtonText: 'Cancelar',
-                    preConfirm: (value) => {
-                        if (!value || isNaN(value)) {
-                            Swal.showValidationMessage('Ingrese un número válido');
-                            return false;
-                        }
-                        if (value <= 0) {
-                            Swal.showValidationMessage('El número debe ser mayor a 0');
-                            return false;
-                        }
-                        return value;
-                    }
-                }).then((r2) => {
-                    if (!r2.isConfirmed) return;
-
-                    mostrarMensajeProcesando('Actualizando N° de ficha...');
-
-                    ajaxPostJSON(href, {numero_ficha_tarjeta: r2.value}, function (resp) {
-                        cerrarMensajeProcesando();
-
-                        if (resp && resp.success) {
-                            // Actualizar ambos campos en el formulario
-                            inputFicha.val(resp.numero_ficha_sistema);
-                            ultimaFicha = resp.numero_ficha_sistema;
-
-                            mostrarMensaje(
-                                `✅ ${resp.message || 'Número de ficha actualizado correctamente.'}`,
-                                'success'
+                    error: function (xhr) {
+                        $('#mensaje-rut')
+                            .removeClass('d-none alert-success')
+                            .addClass('alert-danger')
+                            .text(xhr.status === 404
+                                ? 'Paciente no encontrado'
+                                : 'Error al consultar paciente'
                             );
-
-                            // Si quieres actualizar algún otro campo en la interfaz
-                            if (resp.paciente_nombre) {
-                                console.log(`Ficha actualizada para ${resp.paciente_nombre} (${resp.paciente_rut})`);
-                            }
-
-                        } else {
-                            // Manejar errores específicos
-                            let errorMsg = '❌ No se pudo actualizar el número de ficha.';
-                            if (resp && resp.errors && resp.errors.numero_ficha_tarjeta) {
-                                errorMsg = `❌ ${resp.errors.numero_ficha_tarjeta[0]}`;
-                            }
-                            mostrarMensaje(errorMsg, 'danger');
-                        }
-
-                    }, function (xhr) {
-                        cerrarMensajeProcesando();
-
-                        let errorMsg = '🚫 Error al actualizar N° de ficha';
-                        try {
-                            const resp = JSON.parse(xhr.responseText);
-                            if (resp.errors && resp.errors.numero_ficha_tarjeta) {
-                                errorMsg = `🚫 ${resp.errors.numero_ficha_tarjeta[0]}`;
-                            }
-                        } catch (e) {
-                            console.error('Error parsing response:', e);
-                        }
-
-                        mostrarMensaje(errorMsg, 'danger');
-                    });
+                    }
                 });
             });
+
         });
+    </script>
 
-        // Carátula
-        btnCaratula.on("click", function (e) {
-            if ($(this).hasClass("disabled")) {
-                e.preventDefault();
-                return false;
-            }
-            // Abrir en nueva pestaña
-            e.preventDefault();
-            window.open($(this).attr("href"), '_blank');
-        });
-
-        // Stickers
-        btnStickers.on("click", function (e) {
-            if ($(this).hasClass("disabled")) {
-                e.preventDefault();
-                return false;
-            }
-            // Abrir en nueva pestaña
-            e.preventDefault();
-            window.open($(this).attr("href"), '_blank');
-        });
-
-        // ✅ INICIALIZACIÓN: Auto-focus con posición correcta del cursor
-        setTimeout(() => {
-            focusRutInput();
-        }, 300);
-    });
-</script>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // ... (tu código existente en vanilla JS) ...
-
-        const inputRut = document.getElementById('{{ form.rut.id_for_label }}');
-        const form = document.getElementById('paciente-form');
-
-        /* =============================
-           🔹 BLOQUEO CON JAVASCRIPT PURO
-        ============================= */
-
-        // Función para bloquear Enter agresivamente
-        function bloquearEnter(event) {
-            if (event.key === 'Enter' || event.keyCode === 13) {
-                console.log('🚫 Enter bloqueado');
-
-                // Cancelar el evento completamente
-                event.preventDefault();
-                event.stopPropagation();
-                event.stopImmediatePropagation();
-
-                // Cancelar el evento por defecto
-                event.returnValue = false;
-
-                // Si es en el campo RUT, hacer búsqueda después
-                if (event.target === inputRut) {
-                    setTimeout(() => {
-                        const rut = inputRut.value.trim();
-                        if (rut && rut.length >= 5) {
-                            // Aquí llamarías a tu función buscarPaciente
-                            console.log('🔍 Buscando:', rut);
-                            // buscarPaciente(rut, null);
-                        }
-                    }, 50);
-                }
-
-                return false;
-            }
-        }
-
-        // Aplicar bloqueo en múltiples niveles
-        inputRut.addEventListener('keydown', bloquearEnter, true); // true = capture phase
-        inputRut.addEventListener('keypress', bloquearEnter, true);
-        inputRut.addEventListener('keyup', bloquearEnter, true);
-
-        form.addEventListener('keydown', bloquearEnter, true);
-        form.addEventListener('keypress', bloquearEnter, true);
-
-        // También a nivel de documento
-        document.addEventListener('keydown', bloquearEnter, true);
-
-        // Prevenir submit por Enter
-        form.addEventListener('submit', function (e) {
-            // Verificar si el último evento fue un Enter en RUT
-            e.preventDefault();
-            return false;
-        });
-
-        // Auto-focus
-        setTimeout(() => {
-            inputRut.focus();
-            inputRut.select();
-        }, 300);
-
-        console.log('🛡️ Bloqueo máximo de Enter activado');
-
-    });
-</script>
-<script src="{% static 'js/apis/handle_fichas.js' %}"></script>
-    <script src="{% static 'js/fields_form_paciente.js' %}"></script>
 {% endblock %}

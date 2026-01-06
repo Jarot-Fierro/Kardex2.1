@@ -2,6 +2,7 @@ from django.urls import path
 
 from personas.apis.ficha_paciente import get_paciente_ficha
 from personas.views.genero import *
+from personas.views.pacientes import paciente_view
 from personas.views.prevision import *
 from personas.views.profesion import *
 from personas.views.profesionales import *
@@ -51,7 +52,7 @@ urlpatterns = [
     # path('pacientes/historial', PacientesHistoryListView.as_view(), name='paciente_history'),
 
     # APIS
-    path(
-        "paciente/<str:rut>/ficha/", get_paciente_ficha, name="get_paciente_ficha", ),
+    path("ficha-paciente/<str:rut>/", get_paciente_ficha, name="get_paciente_ficha", ),
+    path("paciente/", paciente_view, name="paciente_view", ),
 
 ]

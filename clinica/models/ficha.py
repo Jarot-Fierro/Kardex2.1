@@ -19,6 +19,8 @@ class Ficha(StandardModel):
     paciente = models.ForeignKey('personas.Paciente', on_delete=models.PROTECT, null=True, blank=True,
                                  verbose_name='Paciente', related_name='fichas_pacientes')
 
+    fecha_mov = models.DateTimeField(null=True, blank=True, verbose_name='Fecha de Movimiento')
+
     establecimiento = models.ForeignKey('establecimientos.Establecimiento', on_delete=models.PROTECT, null=True,
                                         blank=True,
                                         verbose_name='Establecimiento', related_name='fichas_establecimientos')

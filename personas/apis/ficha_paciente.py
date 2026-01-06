@@ -6,6 +6,7 @@ from personas.models.pacientes import Paciente
 
 
 def get_paciente_ficha(request, rut):
+    print(rut)
     paciente = (
         Paciente.objects.filter(rut=rut)
         .select_related("comuna", "prevision", "usuario", "usuario_anterior")
@@ -29,6 +30,11 @@ def get_paciente_ficha(request, rut):
             )
         )
         .first()
+    )
+    todas_las_fichas = (
+        Ficha.objects
+        .filter(paciente=paciente)
+        .select_related("establecimiento")
     )
 
     data = {
@@ -87,9 +93,19 @@ def get_paciente_ficha(request, rut):
                     "origen": m.origen.nombre if m.origen else None,
                     "destino": m.destino.nombre if m.destino else None,
                     "observacion": m.observacion,
+                    "profesional": m.profesional,
                 }
                 for m in getattr(ficha, "movimientos", [])
+            ],
+            "otras_fichas": [
+                {
+                    "numero_ficha_sistema": f.numero_ficha_sistema,
+                    "establecimiento": f.establecimiento.nombre if f.establecimiento else None,
+                }
+                for f in todas_las_fichas
+                if f.id != ficha.id
             ]
+
         }
 
     return JsonResponse(data)

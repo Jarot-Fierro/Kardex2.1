@@ -3,8 +3,8 @@ from django.db import models
 from django.utils import timezone
 from simple_history.models import HistoricalRecords
 
+from core.choices import ESTADO_RESPUESTA
 from core.models import StandardModel
-from kardex.choices import ESTADO_RESPUESTA
 
 
 class MovimientoFicha(StandardModel):

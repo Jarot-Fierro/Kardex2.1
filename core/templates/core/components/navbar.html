@@ -96,7 +96,7 @@
                 </li>
                 {% if user_permissions.paciente > 0 and user_permissions.fichas > 0 %}
                     <li class="nav-item">
-                        <a href="" class="nav-link">Consulta Pacientes</a>
+                        <a href="{% url 'paciente_view' %}" class="nav-link">Consulta Pacientes</a>
                     </li>
                 {% endif %}
                 {% if user_permissions.reportes > 0 %}

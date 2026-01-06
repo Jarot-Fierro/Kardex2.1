@@ -3,13 +3,12 @@ from simple_history.models import HistoricalRecords
 
 from core.models import StandardModel
 from establecimientos.models.colores import Color
-from kardex.choices import SECTOR_COLORS
 
 
 class Sector(StandardModel):
     codigo = models.CharField(null=True, blank=True, verbose_name='Código del Sector', max_length=100)
     color = models.ForeignKey(Color, on_delete=models.PROTECT, null=False, blank=False, verbose_name='Color')
-    observacion = models.TextField(null=True, blank=True, choices=SECTOR_COLORS, verbose_name='Observaciones')
+    observacion = models.TextField(null=True, blank=True, verbose_name='Observaciones')
     establecimiento = models.ForeignKey('establecimientos.Establecimiento', on_delete=models.PROTECT, null=False,
                                         verbose_name='Establecimiento', related_name='sector_establecimiento')
 
