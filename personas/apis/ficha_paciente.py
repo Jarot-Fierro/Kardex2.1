@@ -117,6 +117,4 @@ def get_paciente_ficha(request, rut):
             if f.id != ficha.id
         ]
 
-    print(data)
-
     return JsonResponse(data, safe=True)

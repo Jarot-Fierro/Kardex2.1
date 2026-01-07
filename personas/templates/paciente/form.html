@@ -869,11 +869,6 @@
                 buscarPacientePorRut();
             });
 
-            // Evitar submit automático del form
-            $('form').on('submit', function (e) {
-                e.preventDefault();
-            });
-
             /* ===============================
              * FUNCIÓN PRINCIPAL
              * =============================== */
@@ -915,16 +910,6 @@
                             }
                         }, 0);
 
-                        $('#mensaje-rut')
-                            .removeClass('d-none alert-danger alert-success')
-                            .addClass('alert alert-success alert-dismissible fade show')
-
-                            .html(`
-                            Paciente encontrado correctamente
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        `);
 
                         $('#ver_movimientos')
                             .removeClass('d-none')
@@ -934,26 +919,11 @@
 
                         limpiarFormularioPaciente();
 
-                        const mensaje = xhr.status === 404
-                            ? 'Paciente no encontrado'
-                            : 'Error al consultar paciente';
-
                         setTimeout(() => {
                             if (window.actualizarEstadoFallecimiento) {
                                 window.actualizarEstadoFallecimiento();
                             }
                         }, 0);
-
-                        $('#mensaje-rut')
-                            .removeClass('d-none alert-success alert-danger')
-                            .addClass('alert alert-danger alert-dismissible fade show')
-
-                            .html(`
-                            ${mensaje}
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        `);
 
                         $('#ver_movimientos')
                             .addClass('d-none')
