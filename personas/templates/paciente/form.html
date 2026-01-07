@@ -350,13 +350,11 @@
                                     <select name="estado_civil" id="id_estado_civil"
                                             class="form-control form-control-sm "
                                             required>
-                                        <option value="NO INFORMADO">NO INFORMADO</option>
-                                        <option value="SOLTERO">SOLTERO</option>
-                                        <option value="CASADO">CASADO</option>
-                                        <option value="VIUDO">VIUDO</option>
-                                        <option value="DIVORCIADO">DIVORCIADO</option>
-                                        <option value="SEPARADO">SEPARADO</option>
-                                        <option value="CONVIVIENTE CIVIL">CONVIVIENTE CIVIL</option>
+                                        {% for value, label in estado_civil %}
+                                            <option value="{{ value }}">
+                                                {{ label }}
+                                            </option>
+                                        {% endfor %}
                                     </select>
                                 </div>
                             </div>
@@ -386,7 +384,6 @@
                                     <label class="form-label" for="id_comuna">Comuna</label>
                                     <select name="comuna" id="id_comuna" class="form-control form-control-sm select2"
                                             required>
-                                        <option value="">Seleccione una comuna</option>
 
                                         {% for comuna in comunas %}
                                             <option value="{{ comuna.id }}">
@@ -444,7 +441,7 @@
 
                                     <div class="col-md-4">
                                         <small class="text-muted">Fecha de ingreso al sistema</small><br>
-                                        <strong>01-03-2026</strong>
+                                        <strong id="id_fecha_creacion"></strong>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="ml-auto">
@@ -456,18 +453,19 @@
 
                                     <div class="col-md-4">
                                         <small class="text-muted">Servicio clínico</small><br>
-                                        <strong class="text-primary">Medicina General</strong>
+                                        <strong class="text-primary" id="id_servicio_clinico">—</strong>
                                     </div>
 
                                     <div class="col-md-4">
                                         <small class="text-muted">Profesional a cargo</small><br>
-                                        <strong class="text-primary">Dra. María González</strong>
+                                        <strong class="text-primary" id="id_profesional_cargo">—</strong>
                                     </div>
 
                                     <div class="col-md-4">
                                         <small class="text-muted">Fecha y hora de envío</small><br>
-                                        <strong class="text-primary">05-03-2026 14:20</strong>
+                                        <strong class="text-primary" id="id_fecha_envio">—</strong>
                                     </div>
+
                                 </div>
                             </div>
 
@@ -480,7 +478,7 @@
                                 </h6>
 
                                 <div class="table-responsive">
-                                    <table class="table table-sm table-bordered table-hover mb-0">
+                                    <table id="tabla-fichas" class="table table-sm table-bordered table-hover mb-0">
                                         <thead class="bg-light">
                                         <tr>
                                             <th class="text-center">Establecimiento</th>
@@ -488,21 +486,10 @@
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        <tr>
-                                            <td>CESFAM Tirúa</td>
-                                            <td class="text-center">
-                                                <span class="badge badge-primary">000123</span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Posta Quidico</td>
-                                            <td class="text-center">
-                                                <span class="badge badge-info">000456</span>
-                                            </td>
-                                        </tr>
                                         </tbody>
                                     </table>
                                 </div>
+
                             </div>
 
                         </div>
@@ -546,8 +533,8 @@
                                     </select>
                                 </div>
                                 <div class="col-md-12">
-                                    <label class="form-label" for="id_observacion">Alergico a</label>
-                                    <input name="observacion" id="id_observacion"
+                                    <label class="form-label" for="id_alergico_a">Alergico a</label>
+                                    <input name="alergico_a" id="id_alergico_a"
                                            class="form-control form-control-sm ">
                                 </div>
                                 <div class="col-md-12">
@@ -628,6 +615,35 @@
             $el.text(value ?? '—');
         }
 
+        function formatearFechaHora(fechaIso) {
+            if (!fechaIso) return '—';
+
+            const fecha = new Date(fechaIso);
+
+            if (isNaN(fecha.getTime())) return '—';
+
+            const dia = String(fecha.getDate()).padStart(2, '0');
+            const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+            const anio = fecha.getFullYear();
+
+            const horas = String(fecha.getHours()).padStart(2, '0');
+            const minutos = String(fecha.getMinutes()).padStart(2, '0');
+
+            return `${dia}-${mes}-${anio} ${horas}:${minutos}`;
+        }
+
+        function setSelect2ById(id, value) {
+            const $el = $('#' + id);
+            if (!$el.length) return;
+
+            if (value === null || value === undefined || value === '') {
+                $el.val(null).trigger('change');
+                return;
+            }
+
+            $el.val(String(value)).trigger('change.select2');
+        }
+
 
     </script>
 
@@ -646,7 +662,6 @@
             // NACIMIENTO
             setValue('id_fecha_nacimiento', p.fecha_nacimiento);
             setValue('id_sexo', p.sexo);
-            setSelect2('id_genero', p.genero);
             setValue('id_estado_civil', p.estado_civil);
 
             // ESTADO PACIENTE
@@ -667,7 +682,11 @@
 
             // CONTACTO
             setValue('id_direccion', p.direccion);
-            setSelect2('id_comuna', p.comuna);
+            setSelect2ById('id_comuna', p.comuna_id);
+            setSelect2ById('id_genero', p.genero_id);
+            setSelect2ById('id_prevision', p.prevision_id);
+
+
             setValue('id_ocupacion', p.ocupacion);
             setValue('id_numero_telefono1', p.numero_telefono1);
             setValue('id_numero_telefono2', p.numero_telefono2);
@@ -682,14 +701,112 @@
 
             setValue('id_ficha', f.numero_ficha_sistema);
             setValue('id_observacion', f.observacion);
-            setSelect2('id_sector', f.sector);
-            setSelect2('id_prevision', f.prevision);
+            setSelect2ById('id_sector', f.sector_id);
 
+            const fechaMostrar = f.fecha_creacion_anterior || f.fecha_creacion;
 
-            // aquí después puedes:
-            // - renderizar tabla de otras fichas
-            // - renderizar movimientos
+            setText(
+                'id_fecha_creacion',
+                formatearFechaHora(fechaMostrar)
+            );
         }
+
+        function cargaTabla(data) {
+            const tbody = $('#tabla-fichas tbody');
+            tbody.empty();
+
+            /* =========================
+               1. FICHA PRINCIPAL
+            ========================= */
+            if (data.ficha && data.ficha.numero_ficha_sistema) {
+
+                const trPrincipal = $('<tr class="table-primary font-weight-bold"></tr>');
+
+                trPrincipal.append(
+                    $('<td></td>').text(
+                        data.ficha.establecimiento ?? 'SIN ESTABLECIMIENTO'
+                    )
+                );
+
+                trPrincipal.append(
+                    $('<td class="text-center"></td>').html(
+                        `<span class="badge badge-primary">
+                    ${data.ficha.numero_ficha_sistema}
+                </span>`
+                    )
+                );
+
+                tbody.append(trPrincipal);
+            }
+
+            /* =========================
+               2. OTRAS FICHAS
+            ========================= */
+            if (Array.isArray(data.otras_fichas) && data.otras_fichas.length > 0) {
+
+                data.otras_fichas.forEach(ficha => {
+
+                    // Seguridad extra: no repetir la principal
+                    if (
+                        data.ficha &&
+                        ficha.numero_ficha_sistema === data.ficha.numero_ficha_sistema
+                    ) {
+                        return;
+                    }
+
+                    const tr = $('<tr></tr>');
+
+                    tr.append(
+                        $('<td></td>').text(
+                            ficha.establecimiento ?? 'SIN ESTABLECIMIENTO'
+                        )
+                    );
+
+                    tr.append(
+                        $('<td class="text-center"></td>').html(
+                            `<span class="badge badge-secondary">
+                        ${ficha.numero_ficha_sistema}
+                    </span>`
+                        )
+                    );
+
+                    tbody.append(tr);
+                });
+            }
+        }
+
+        function cargaUbicacionFicha(data) {
+
+            // Validaciones básicas
+            if (!data.ficha || !Array.isArray(data.ficha.movimientos) || data.ficha.movimientos.length === 0) {
+                setText('id_servicio_clinico', 'SIN INFORMACIÓN');
+                setText('id_profesional_cargo', 'SIN INFORMACIÓN');
+                setText('id_fecha_envio', '—');
+                return;
+            }
+
+            // Último movimiento (más reciente)
+            const movimiento = data.ficha.movimientos[0];
+
+            // Servicio clínico actual (destino)
+            setText(
+                'id_servicio_clinico',
+                movimiento.destino ?? 'SIN SERVICIO'
+            );
+
+            // Profesional a cargo
+            setText(
+                'id_profesional_cargo',
+                movimiento.profesional_nombre ?? 'SIN PROFESIONAL'
+            );
+
+            // Fecha y hora de envío
+            setText(
+                'id_fecha_envio',
+                formatearFechaHora(movimiento.fecha_envio)
+            );
+        }
+
 
     </script>
 
@@ -701,13 +818,30 @@
                 theme: 'default'
             });
 
-            $('#id_rut').on('change', function () {
 
-                let rut = $(this).val().trim();
+            $('#id_rut').on('blur', function () {
+                buscarPacientePorRut();
+            });
+
+            $('#id_rut').on('keydown', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault(); // 🚫 evita submit
+                    buscarPacientePorRut();
+                }
+            });
+
+            $('form').on('submit', function (e) {
+                e.preventDefault();
+            });
+
+
+            function buscarPacientePorRut() {
+
+                let rut = $('#id_rut').val().trim();
                 if (!rut) return;
 
                 rut = formatearRutString(rut);
-                $(this).val(rut);
+                $('#id_rut').val(rut);
 
                 $.ajax({
                     url: `/personas/ficha-paciente/${rut}`,
@@ -716,23 +850,33 @@
                     success: function (response) {
                         cargarPaciente(response);
                         cargarFicha(response);
+                        cargaTabla(response);
+                        cargaUbicacionFicha(response);
 
                         $('#mensaje-rut')
                             .removeClass('d-none alert-danger')
-                            .addClass('alert-success')
-                            .text('Paciente cargado correctamente');
+                            .addClass('alert alert-success alert-dismissible fade show')
+                            .html(`
+                    Paciente cargado correctamente
+                    <button type="button" class="close" data-dismiss="alert">
+                        <span>&times;</span>
+                    </button>
+                `);
                     },
                     error: function (xhr) {
                         $('#mensaje-rut')
                             .removeClass('d-none alert-success')
-                            .addClass('alert-danger')
-                            .text(xhr.status === 404
-                                ? 'Paciente no encontrado'
-                                : 'Error al consultar paciente'
-                            );
+                            .addClass('alert alert-danger alert-dismissible fade show')
+                            .html(`
+                    ${xhr.status === 404 ? 'Paciente no encontrado' : 'Error al consultar paciente'}
+                    <button type="button" class="close" data-dismiss="alert">
+                        <span>&times;</span>
+                    </button>
+                `);
                     }
                 });
-            });
+            }
+
 
         });
     </script>

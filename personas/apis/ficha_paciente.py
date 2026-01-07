@@ -45,7 +45,6 @@ def get_paciente_ficha(request, rut):
             "apellido_paterno": paciente.apellido_paterno,
             "apellido_materno": paciente.apellido_materno,
             "nombre_social": paciente.nombre_social,
-            "genero": paciente.genero.nombre if paciente.genero else None,
             "estado_civil": paciente.estado_civil,
             "fecha_nacimiento": paciente.fecha_nacimiento.isoformat() if paciente.fecha_nacimiento else None,
             "sexo": paciente.sexo,
@@ -67,12 +66,20 @@ def get_paciente_ficha(request, rut):
             "extranjero": paciente.extranjero,
             "fallecido": paciente.fallecido,
             "fecha_fallecimiento": paciente.fecha_fallecimiento.isoformat() if paciente.fecha_fallecimiento else None,
-            "comuna": paciente.comuna.nombre if paciente.comuna else None,
-            "prevision": paciente.prevision.nombre if paciente.prevision else None,
+
+            "comuna_id": paciente.comuna_id,
+            "prevision_id": paciente.prevision_id,
+            "genero_id": paciente.genero_id,
+
+            "comuna_nombre": paciente.comuna.nombre if paciente.comuna else "",
+            "prevision_nombre": paciente.prevision.nombre if paciente.prevision else "",
+            "genero_nombre": paciente.genero.nombre if paciente.genero else "",
+
             "usuario_creador": paciente.usuario.username if paciente.usuario else None,
             "usuario_anterior": paciente.usuario_anterior.nombre if paciente.usuario_anterior else None,
         },
-        "ficha": None
+        "ficha": None,
+        "otras_fichas": []
     }
 
     if ficha:
@@ -86,25 +93,28 @@ def get_paciente_ficha(request, rut):
             "fecha_creacion_anterior": ficha.fecha_creacion_anterior.isoformat() if ficha.fecha_creacion_anterior else None,
             "usuario": ficha.usuario.username if ficha.usuario else None,
             "establecimiento": ficha.establecimiento.nombre if ficha.establecimiento else None,
-            "sector": ficha.sector.color.nombre if ficha.sector and ficha.sector.color else None,
+            "sector_id": ficha.sector_id,
+            "sector": ficha.sector.color.nombre if ficha.sector and ficha.sector.color else "",
             "movimientos": [
                 {
                     "fecha_envio": m.fecha_envio.isoformat() if m.fecha_envio else None,
-                    "origen": m.origen.nombre if m.origen else None,
-                    "destino": m.destino.nombre if m.destino else None,
-                    "observacion": m.observacion,
-                    "profesional": m.profesional,
+                    "origen": m.servicio_clinico_envio.nombre if m.servicio_clinico_envio else None,
+                    "destino": m.servicio_clinico_recepcion.nombre if m.servicio_clinico_recepcion else None,
+                    "profesional_id": m.profesional_recepcion_id,
+                    "profesional_nombre": (m.profesional_recepcion.nombres if m.profesional_recepcion else None
+                                           ),
                 }
                 for m in getattr(ficha, "movimientos", [])
             ],
-            "otras_fichas": [
-                {
-                    "numero_ficha_sistema": f.numero_ficha_sistema,
-                    "establecimiento": f.establecimiento.nombre if f.establecimiento else None,
-                }
-                for f in todas_las_fichas
-                if f.id != ficha.id
-            ]
         }
 
-    return JsonResponse(data)
+        data["otras_fichas"] = [
+            {
+                "numero_ficha_sistema": f.numero_ficha_sistema,
+                "establecimiento": f.establecimiento.nombre if f.establecimiento else None,
+            }
+            for f in todas_las_fichas
+            if f.id != ficha.id
+        ]
+
+    return JsonResponse(data, safe=True)
