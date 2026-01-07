@@ -1,7 +1,7 @@
 from django.db import models
 from simple_history.models import HistoricalRecords
 
-from core.choices import ESTADO_CIVIL, GENERO_CHOICES
+from core.choices import ESTADO_CIVIL
 from core.models import StandardModel
 
 
@@ -27,8 +27,6 @@ class Paciente(StandardModel):
 
     pasaporte = models.CharField(max_length=50, null=True, blank=True, verbose_name='Pasaporte')
     nombre_social = models.CharField(max_length=100, null=True, blank=True, verbose_name='Nombre Social')
-    genero = models.CharField(max_length=20, choices=GENERO_CHOICES, default='NO INFORMADO',
-                              verbose_name='Estado Civil')
 
     # DATOS DE NACIMIENTO
     fecha_nacimiento = models.DateField(null=True, blank=True, verbose_name='Fecha de Nacimiento')
@@ -61,6 +59,10 @@ class Paciente(StandardModel):
                                verbose_name='Comuna', related_name='pacientes_comuna', default=1)
     prevision = models.ForeignKey('personas.Prevision', on_delete=models.SET_NULL, null=True, blank=True,
                                   verbose_name='Previsión', related_name='pacientes_prevision', default=1)
+
+    genero = models.ForeignKey('personas.Genero', on_delete=models.SET_NULL, null=True, blank=True,
+                               verbose_name='Género',
+                               related_name='pacientes_genero', )
 
     usuario = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True, blank=True,
                                 verbose_name='Usuario', related_name='pacientes_usuario')
@@ -97,8 +99,6 @@ class Paciente(StandardModel):
             self.pasaporte = self.pasaporte.strip().upper()
         if self.nombre_social:
             self.nombre_social = self.nombre_social.strip().upper()
-        if self.genero:
-            self.genero = self.genero.strip().upper()
         if self.estado_civil:
             self.estado_civil = self.estado_civil.strip().upper()
         if self.nombres_padre:

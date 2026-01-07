@@ -7,19 +7,18 @@ from personas.models.pacientes import Paciente
 
 def get_paciente_ficha(request, rut):
     paciente = (
-        Paciente.objects.filter(rut=rut)
+        Paciente.objects
+        .filter(rut=rut)
         .select_related("comuna", "prevision", "usuario", "usuario_anterior")
         .first()
     )
 
     if not paciente:
-        return JsonResponse(
-            {"error": "Paciente no encontrado"},
-            status=404
-        )
+        return JsonResponse({"error": "Paciente no encontrado"}, status=404)
 
     ficha = (
-        Ficha.objects.filter(paciente=paciente)
+        Ficha.objects
+        .filter(paciente=paciente)
         .select_related("sector", "establecimiento", "usuario")
         .prefetch_related(
             Prefetch(
@@ -30,6 +29,7 @@ def get_paciente_ficha(request, rut):
         )
         .first()
     )
+
     todas_las_fichas = (
         Ficha.objects
         .filter(paciente=paciente)
@@ -45,9 +45,9 @@ def get_paciente_ficha(request, rut):
             "apellido_paterno": paciente.apellido_paterno,
             "apellido_materno": paciente.apellido_materno,
             "nombre_social": paciente.nombre_social,
-            "genero": paciente.genero,
+            "genero": paciente.genero.nombre if paciente.genero else None,
             "estado_civil": paciente.estado_civil,
-            "fecha_nacimiento": paciente.fecha_nacimiento,
+            "fecha_nacimiento": paciente.fecha_nacimiento.isoformat() if paciente.fecha_nacimiento else None,
             "sexo": paciente.sexo,
             "pueblo_indigena": paciente.pueblo_indigena,
             "rut_madre": paciente.rut_madre,
@@ -66,7 +66,7 @@ def get_paciente_ficha(request, rut):
             "recien_nacido": paciente.recien_nacido,
             "extranjero": paciente.extranjero,
             "fallecido": paciente.fallecido,
-            "fecha_fallecimiento": paciente.fecha_fallecimiento,
+            "fecha_fallecimiento": paciente.fecha_fallecimiento.isoformat() if paciente.fecha_fallecimiento else None,
             "comuna": paciente.comuna.nombre if paciente.comuna else None,
             "prevision": paciente.prevision.nombre if paciente.prevision else None,
             "usuario_creador": paciente.usuario.username if paciente.usuario else None,
@@ -81,15 +81,15 @@ def get_paciente_ficha(request, rut):
             "numero_ficha_tarjeta": ficha.numero_ficha_tarjeta,
             "pasivado": ficha.pasivado,
             "observacion": ficha.observacion,
-            "fecha_creacion": ficha.created_at,
-            "fecha_modificacion": ficha.updated_at,
-            "fecha_creacion_anterior": ficha.fecha_creacion_anterior,
+            "fecha_creacion": ficha.created_at.isoformat() if ficha.created_at else None,
+            "fecha_modificacion": ficha.updated_at.isoformat() if ficha.updated_at else None,
+            "fecha_creacion_anterior": ficha.fecha_creacion_anterior.isoformat() if ficha.fecha_creacion_anterior else None,
             "usuario": ficha.usuario.username if ficha.usuario else None,
             "establecimiento": ficha.establecimiento.nombre if ficha.establecimiento else None,
-            "sector": ficha.sector.nombre if ficha.sector else None,
+            "sector": ficha.sector.color.nombre if ficha.sector and ficha.sector.color else None,
             "movimientos": [
                 {
-                    "fecha_envio": m.fecha_envio,
+                    "fecha_envio": m.fecha_envio.isoformat() if m.fecha_envio else None,
                     "origen": m.origen.nombre if m.origen else None,
                     "destino": m.destino.nombre if m.destino else None,
                     "observacion": m.observacion,
@@ -105,7 +105,6 @@ def get_paciente_ficha(request, rut):
                 for f in todas_las_fichas
                 if f.id != ficha.id
             ]
-
         }
 
     return JsonResponse(data)
