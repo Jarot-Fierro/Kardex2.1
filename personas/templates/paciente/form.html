@@ -229,13 +229,14 @@
                                     </div>
                                 </div>
                                 <!-- Checkbox 4 + input date -->
-                                <div class="col-md-12">
-                                    <label class="form-label" for="id_fecha_fallecimiento">
+                                <div class="col-md-12 d-none" id="contenedor-fecha-fallecimiento">
+                                    <label class="form-label text-danger" for="id_fecha_fallecimiento">
                                         Fecha de Fallecimiento
                                     </label>
                                     <input type="date" name="fecha_fallecimiento" id="id_fecha_fallecimiento"
-                                           class="form-control form-control-sm ">
+                                           class="form-control form-control-sm bg-danger text-white border-dange">
                                 </div>
+
                             </div>
                         </div>
                     </div>
@@ -445,8 +446,9 @@
                                     </div>
                                     <div class="col-md-4">
                                         <div class="ml-auto">
-                                            <button type="button" class="btn btn-success btn-sm">
-                                                <i class="fas fa-exchange-alt mr-1"></i> Ver movimientos
+                                            <button id="ver_movimientos" type="button"
+                                                    class="d-none btn btn-secondary btn-sm">
+                                                <i class="fas fa-search mr-1"></i>
                                             </button>
                                         </div>
                                     </div>
@@ -810,6 +812,8 @@
 
     </script>
 
+
+    {#    ESTA ES LA CONSULTA HACIA LA API FICHA-PACIENTE#}
     <script>
         $(document).ready(function () {
 
@@ -818,24 +822,64 @@
                 theme: 'default'
             });
 
+            let consultando = false;
+            let ultimoRutConsultado = null;
 
-            $('#id_rut').on('blur', function () {
-                buscarPacientePorRut();
-            });
+            function limpiarFormularioPaciente() {
 
-            $('#id_rut').on('keydown', function (e) {
+                // guardar rut actual
+                const rutActual = $('#id_rut').val();
+
+                const form = $('#paciente-form');
+                if (form.length) {
+                    form[0].reset();
+                }
+
+                // restaurar rut
+                $('#id_rut').val(rutActual);
+
+                // limpiar select2 (excepto los que quieras conservar)
+                form.find('select.select2')
+                    .val(null)
+                    .trigger('change');
+
+                // limpiar textos informativos
+                setText('id_usuario_anterior', '—');
+                setText('id_fecha_creacion', '—');
+                setText('id_servicio_clinico', '—');
+                setText('id_profesional_cargo', '—');
+                setText('id_fecha_envio', '—');
+
+                // limpiar tabla
+                $('#tabla-fichas tbody').empty();
+            }
+
+
+            // ENTER → buscar
+            $('#id_rut').on('keyup', function (e) {
                 if (e.key === 'Enter') {
-                    e.preventDefault(); // 🚫 evita submit
+                    e.preventDefault();
                     buscarPacientePorRut();
                 }
             });
 
+
+            // CLICK AFUERA → buscar
+            $('#id_rut').on('blur', function () {
+                buscarPacientePorRut();
+            });
+
+            // Evitar submit automático del form
             $('form').on('submit', function (e) {
                 e.preventDefault();
             });
 
-
+            /* ===============================
+             * FUNCIÓN PRINCIPAL
+             * =============================== */
             function buscarPacientePorRut() {
+
+                if (consultando) return;
 
                 let rut = $('#id_rut').val().trim();
                 if (!rut) return;
@@ -843,42 +887,119 @@
                 rut = formatearRutString(rut);
                 $('#id_rut').val(rut);
 
+                // evitar consultar el mismo RUT dos veces seguidas
+                if (rut === ultimoRutConsultado) return;
+
+                consultando = true;
+                ultimoRutConsultado = rut;
+
                 $.ajax({
                     url: `/personas/ficha-paciente/${rut}`,
                     type: 'GET',
                     dataType: 'json',
+
                     success: function (response) {
+
+                        // siempre limpiar antes de cargar
+                        limpiarFormularioPaciente();
+
+                        // cargar datos
                         cargarPaciente(response);
                         cargarFicha(response);
                         cargaTabla(response);
                         cargaUbicacionFicha(response);
 
+                        setTimeout(() => {
+                            if (window.actualizarEstadoFallecimiento) {
+                                window.actualizarEstadoFallecimiento();
+                            }
+                        }, 0);
+
                         $('#mensaje-rut')
-                            .removeClass('d-none alert-danger')
+                            .removeClass('d-none alert-danger alert-success')
                             .addClass('alert alert-success alert-dismissible fade show')
+
                             .html(`
-                    Paciente cargado correctamente
-                    <button type="button" class="close" data-dismiss="alert">
-                        <span>&times;</span>
-                    </button>
-                `);
+                            Paciente encontrado correctamente
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        `);
+
+                        $('#ver_movimientos')
+                            .removeClass('d-none')
                     },
+
                     error: function (xhr) {
+
+                        limpiarFormularioPaciente();
+
+                        const mensaje = xhr.status === 404
+                            ? 'Paciente no encontrado'
+                            : 'Error al consultar paciente';
+
+                        setTimeout(() => {
+                            if (window.actualizarEstadoFallecimiento) {
+                                window.actualizarEstadoFallecimiento();
+                            }
+                        }, 0);
+
                         $('#mensaje-rut')
-                            .removeClass('d-none alert-success')
+                            .removeClass('d-none alert-success alert-danger')
                             .addClass('alert alert-danger alert-dismissible fade show')
+
                             .html(`
-                    ${xhr.status === 404 ? 'Paciente no encontrado' : 'Error al consultar paciente'}
-                    <button type="button" class="close" data-dismiss="alert">
-                        <span>&times;</span>
-                    </button>
-                `);
+                            ${mensaje}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        `);
+
+                        $('#ver_movimientos')
+                            .addClass('d-none')
+
+                        // permitir volver a consultar el mismo RUT si fue error
+                        ultimoRutConsultado = null;
+                    },
+
+                    complete: function () {
+                        consultando = false;
                     }
                 });
             }
 
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+
+            const $checkFallecido = $('#id_fallecido');
+            const $contenedorFecha = $('#contenedor-fecha-fallecimiento');
+            const $fecha = $('#id_fecha_fallecimiento');
+
+            function actualizarEstadoFallecimiento() {
+                if ($checkFallecido.prop('checked')) {
+                    $contenedorFecha.removeClass('d-none');
+                } else {
+                    $fecha.val('');
+                    $contenedorFecha.addClass('d-none');
+                }
+            }
+
+            // estado inicial
+            actualizarEstadoFallecimiento();
+
+            // cambio manual
+            $checkFallecido.on('change', actualizarEstadoFallecimiento);
+
+            // exponer para AJAX
+            window.actualizarEstadoFallecimiento = actualizarEstadoFallecimiento;
 
         });
     </script>
+
+
+
 
 {% endblock %}
