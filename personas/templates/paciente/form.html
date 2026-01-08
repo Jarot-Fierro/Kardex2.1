@@ -9,19 +9,34 @@
         <form method="post" novalidate id="paciente-form">
             {% csrf_token %}
 
+            <input type="hidden" name="paciente_id" id="id_paciente_id">
+
             <!-- Encabezado de la ficha -->
             <div class="row align-items-center mb-2">
                 <div class="col-md-4 mb-2 mb-md-0">
                     <div class="ficha-header align-items-center">
                         <div class="row">
-                            <div class="col-6">
-                                <span>R.U.T:</span><br>
-                                <input type="text" name="rut" id="id_rut" class="form-control form-control-sm "
-                                       maxlength="100">
+                            <div class="col-12 p-0 m-0">
+                                {% if paciente_form.rut.errors %}
+                                    <div class="invalid-feedback d-block p-0 m-0">
+                                        {{ paciente_form.rut.errors }}
+                                    </div>
+                                {% endif %}
+                                {% if paciente_form.numero_ficha_sistema.errors %}
+                                    <div class="invalid-feedback d-block p-0 m-0">
+                                        {{ paciente_form.numero_ficha_sistema.errors }}
+                                    </div>
+                                {% endif %}
                             </div>
                             <div class="col-6">
+                                <span>R.U.T:</span><br>
+                                {{ paciente_form.rut }}
+                            </div>
+                            <div class="col-6">
+
                                 <span>N° FICHA:</span><br>
-                                <input type="text" name="ficha" id="id_ficha" class="form-control form-control-sm ">
+                                {{ ficha_form.numero_ficha_sistema }}
+
                             </div>
                         </div>
                         <div class="row mt-1">
@@ -124,53 +139,73 @@
                                     <label class="form-label" for="id_nombre">
                                         Nombres
                                     </label>
-                                    <input type="text" name="nombre" id="id_nombre"
-                                           class="form-control form-control-sm "
-                                           maxlength="100"
-                                           required>
+                                    {{ paciente_form.nombre }}
+                                    {% if paciente_form.nombre.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ paciente_form.nombre.errors }}
+                                        </div>
+                                    {% endif %}
                                 </div>
 
                                 <div class=" col-md-4 col-sm-6">
                                     <label class="form-label" for="id_apellido_paterno">
                                         Apellido Paterno
                                     </label>
-                                    <input type="text" name="apellido_paterno" id="id_apellido_paterno"
-                                           class="form-control form-control-sm "
-                                           maxlength="100" required>
+                                    {{ paciente_form.apellido_paterno }}
+                                    {% if paciente_form.apellido_paterno.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ paciente_form.apellido_paterno.errors }}
+                                        </div>
+                                    {% endif %}
+
                                 </div>
 
                                 <div class=" col-md-4 col-sm-6">
                                     <label class="form-label" for="id_apellido_materno">
                                         Apellido Materno
                                     </label>
-                                    <input type="text" name="apellido_materno" id="id_apellido_materno"
-                                           class="form-control form-control-sm "
-                                           maxlength="100" required>
+                                    {{ paciente_form.apellido_materno }}
+                                    {% if paciente_form.apellido_materno.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ paciente_form.apellido_materno.errors }}
+                                        </div>
+                                    {% endif %}
                                 </div>
 
-                                <div class=" col-md-4 col-sm-6">
-                                    <label class="form-label" for="id_nombre_social">
-                                        Nombre Social
-                                    </label>
-                                    <input type="text" name="nombre_social" id="id_nombre_social"
-                                           class="form-control form-control-sm "
-                                           maxlength="100">
-                                </div>
 
                                 <div class=" col-md-4 col-sm-6">
                                     <label class="form-label" for="id_pasaporte">
                                         Pasaporte
                                     </label>
-                                    <input type="text" name="pasaporte" id="id_pasaporte"
-                                           class="form-control form-control-sm "
-                                           maxlength="50">
+                                    {{ paciente_form.pasaporte }}
+                                    {% if paciente_form.pasaporte.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ paciente_form.pasaporte.errors }}
+                                        </div>
+                                    {% endif %}
                                 </div>
 
                                 <div class=" col-md-4 col-sm-6">
                                     <label class="form-label" for="id_nie">
                                         NIP
                                     </label>
-                                    <input type="text" name="nie" id="id_nie" class="form-control form-control-sm ">
+                                    {{ paciente_form.nip }}
+                                    {% if paciente_form.nip.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ paciente_form.nip.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class=" col-md-4 col-sm-6">
+                                    <label class="form-label" for="id_nombre_social">
+                                        Nombre Social
+                                    </label>
+                                    {{ paciente_form.nombre_social }}
+                                    {% if paciente_form.nombre_social.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ paciente_form.nombre_social.errors }}
+                                        </div>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -188,44 +223,60 @@
                                 <!-- Checkbox 1 -->
                                 <div class="col-md-6">
                                     <div class="form-check mt-2">
-                                        <input type="checkbox" name="recien_nacido" id="id_recien_nacido"
-                                               class="form-check-input">
+                                        {{ paciente_form.recien_nacido }}
                                         <label class="form-check-label" for="id_recien_nacido">
                                             Recién Nacido
                                         </label>
+                                        {% if paciente_form.recien_nacido.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ paciente_form.recien_nacido.errors }}
+                                            </div>
+                                        {% endif %}
                                     </div>
                                 </div>
 
                                 <!-- Checkbox 2 -->
                                 <div class="col-md-6">
                                     <div class="form-check mt-2">
-                                        <input type="checkbox" name="extranjero" id="id_extranjero"
-                                               class="form-check-input">
+                                        {{ paciente_form.extranjero }}
                                         <label class="form-check-label" for="id_extranjero">
                                             Extranjero
                                         </label>
+                                        {% if paciente_form.extranjero.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ paciente_form.extranjero.errors }}
+                                            </div>
+                                        {% endif %}
                                     </div>
                                 </div>
 
                                 <!-- Checkbox 3 -->
                                 <div class="col-md-6">
                                     <div class="form-check mt-2">
-                                        <input type="checkbox" name="pueblo_indigena" id="id_pueblo_indigena"
-                                               class="form-check-input">
+                                        {{ paciente_form.pueblo_indigena }}
                                         <label class="form-check-label" for="id_pueblo_indigena">
                                             Pueblo Indígena
                                         </label>
+                                        {% if paciente_form.pueblo_indigena.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ paciente_form.pueblo_indigena.errors }}
+                                            </div>
+                                        {% endif %}
                                     </div>
                                 </div>
 
                                 <!-- Checkbox 4 + input date -->
                                 <div class="col-md-6">
                                     <div class="form-check mt-2">
-                                        <input type="checkbox" name="fallecido" id="id_fallecido"
-                                               class="form-check-input">
+                                        {{ paciente_form.fallecido }}
                                         <label class="form-check-label" for="id_fallecido">
                                             Fallecido
                                         </label>
+                                        {% if paciente_form.fallecido.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ paciente_form.fallecido.errors }}
+                                            </div>
+                                        {% endif %}
                                     </div>
                                 </div>
                                 <!-- Checkbox 4 + input date -->
@@ -233,8 +284,12 @@
                                     <label class="form-label text-danger" for="id_fecha_fallecimiento">
                                         Fecha de Fallecimiento
                                     </label>
-                                    <input type="date" name="fecha_fallecimiento" id="id_fecha_fallecimiento"
-                                           class="form-control form-control-sm bg-danger text-white border-dange">
+                                    {{ paciente_form.fecha_fallecimiento }}
+                                    {% if paciente_form.fecha_fallecimiento.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ paciente_form.fecha_fallecimiento.errors }}
+                                        </div>
+                                    {% endif %}
                                 </div>
 
                             </div>
@@ -255,55 +310,79 @@
                             <div class="row g-2">
                                 <div class="col-md-3">
                                     <label class="form-label" for="id_rut_madre">R.U.T. Madre</label>
-                                    <input type="text" name="rut_madre" id="id_rut_madre"
-                                           class="form-control form-control-sm "
-                                           maxlength="100">
+                                    {{ paciente_form.rut_madre }}
+                                    {% if paciente_form.rut_madre.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ paciente_form.rut_madre.errors }}
+                                        </div>
+                                    {% endif %}
                                 </div>
 
                                 <div class="col-md-3">
                                     <label class="form-label" for="id_nombres_madre">Nombres de la Madre</label>
-                                    <input type="text" name="nombres_madre" id="id_nombres_madre"
-                                           class="form-control form-control-sm "
-                                           maxlength="100">
+                                    {{ paciente_form.nombres_madre }}
+                                    {% if paciente_form.nombres_madre.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ paciente_form.nombres_madre.errors }}
+                                        </div>
+                                    {% endif %}
                                 </div>
 
                                 <div class="col-md-3">
                                     <label class="form-label" for="id_nombres_padre">Nombres del Padre</label>
-                                    <input type="text" name="nombres_padre" id="id_nombres_padre"
-                                           class="form-control form-control-sm "
-                                           maxlength="100">
+                                    {{ paciente_form.nombres_padre }}
+                                    {% if paciente_form.nombres_padre.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ paciente_form.nombres_padre.errors }}
+                                        </div>
+                                    {% endif %}
                                 </div>
 
                                 <div class="col-md-3">
                                     <label class="form-label" for="id_nombre_pareja">Nombre de la Pareja</label>
-                                    <input type="text" name="nombre_pareja" id="id_nombre_pareja"
-                                           class="form-control form-control-sm "
-                                           maxlength="100">
+                                    {{ paciente_form.nombre_pareja }}
+                                    {% if paciente_form.nombre_pareja.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ paciente_form.nombre_pareja.errors }}
+                                        </div>
+                                    {% endif %}
                                 </div>
 
                                 <div class="col-md-4">
                                     <label class="form-label" for="id_representante_legal">
                                         Representante Legal
                                     </label>
-                                    <input type="text" name="representante_legal" id="id_representante_legal"
-                                           class="form-control form-control-sm " maxlength="100">
+                                    {{ paciente_form.representante_legal }}
+                                    {% if paciente_form.representante_legal.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ paciente_form.representante_legal.errors }}
+                                        </div>
+                                    {% endif %}
                                 </div>
 
                                 <div class="col-md-4">
                                     <label class="form-label" for="id_rut_responsable_temporal">
                                         RUT Responsable Temporal
                                     </label>
-                                    <input type="text" name="rut_responsable_temporal" id="id_rut_responsable_temporal"
-                                           class="form-control form-control-sm " maxlength="100">
+                                    {{ paciente_form.rut_responsable_temporal }}
+                                    {% if paciente_form.rut_responsable_temporal.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ paciente_form.rut_responsable_temporal.errors }}
+                                        </div>
+                                    {% endif %}
                                 </div>
 
                                 <div class="col-md-4">
                                     <div class="form-check mt-2">
-                                        <input type="checkbox" name="usar_rut_madre_como_responsable"
-                                               id="id_usar_rut_madre_como_responsable" class="form-check-input">
+                                        {{ paciente_form.usar_rut_madre_como_responsable }}
                                         <label class="form-check-label" for="id_usar_rut_madre_como_responsable">
                                             Usar RUT de la madre como responsable
                                         </label>
+                                        {% if paciente_form.usar_rut_madre_como_responsable.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ paciente_form.usar_rut_madre_como_responsable.errors }}
+                                            </div>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
@@ -322,41 +401,42 @@
                                     <label class="form-label" for="id_fecha_nacimiento">
                                         Fecha de Nacimiento
                                     </label>
-                                    <input type="date" name="fecha_nacimiento" id="id_fecha_nacimiento"
-                                           class="form-control form-control-sm ">
+                                    {{ paciente_form.fecha_nacimiento }}
+                                    {% if paciente_form.fecha_nacimiento.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ paciente_form.fecha_nacimiento.errors }}
+                                        </div>
+                                    {% endif %}
                                 </div>
 
                                 <div class="col-md-6">
                                     <label class="form-label" for="id_sexo">Sexo</label>
-                                    <select name="sexo" id="id_sexo" class="form-control form-control-sm " required>
-                                        <option value="M">Masculino</option>
-                                        <option value="F">Femenino</option>
-                                    </select>
+                                    {{ paciente_form.sexo }}
+                                    {% if paciente_form.sexo.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ paciente_form.sexo.errors }}
+                                        </div>
+                                    {% endif %}
                                 </div>
 
                                 <div class="col-md-6">
                                     <label class="form-label" for="id_genero">Género</label>
-                                    <select name="genero" id="id_genero" class="form-control form-control-sm  select2">
-                                        <option value="">Seleccione género</option>
-                                        {% for genero in generos %}
-                                            <option value="{{ genero.id }}">
-                                                {{ genero.nombre }}
-                                            </option>
-                                        {% endfor %}
-                                    </select>
+                                    {{ paciente_form.genero }}
+                                    {% if paciente_form.genero.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ paciente_form.genero.errors }}
+                                        </div>
+                                    {% endif %}
                                 </div>
 
                                 <div class="col-md-6">
                                     <label class="form-label" for="id_estado_civil">Estado Civil</label>
-                                    <select name="estado_civil" id="id_estado_civil"
-                                            class="form-control form-control-sm "
-                                            required>
-                                        {% for value, label in estado_civil %}
-                                            <option value="{{ value }}">
-                                                {{ label }}
-                                            </option>
-                                        {% endfor %}
-                                    </select>
+                                    {{ paciente_form.estado_civil }}
+                                    {% if paciente_form.estado_civil.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ paciente_form.estado_civil.errors }}
+                                        </div>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -376,54 +456,66 @@
                             <div class="row g-2">
                                 <div class="col-md-5">
                                     <label class="form-label" for="id_direccion">Dirección</label>
-                                    <input type="text" name="direccion" id="id_direccion"
-                                           class="form-control form-control-sm "
-                                           maxlength="200">
+                                    {{ paciente_form.direccion }}
+                                    {% if paciente_form.direccion.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ paciente_form.direccion.errors }}
+                                        </div>
+                                    {% endif %}
                                 </div>
 
                                 <div class="col-md-4">
                                     <label class="form-label" for="id_comuna">Comuna</label>
-                                    <select name="comuna" id="id_comuna" class="form-control form-control-sm select2"
-                                            required>
-
-                                        {% for comuna in comunas %}
-                                            <option value="{{ comuna.id }}">
-                                                {{ comuna.nombre }}
-                                            </option>
-                                        {% endfor %}
-                                    </select>
+                                    {{ paciente_form.comuna }}
+                                    {% if paciente_form.comuna.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ paciente_form.comuna.errors }}
+                                        </div>
+                                    {% endif %}
                                 </div>
 
                                 <div class="col-md-3">
                                     <label class="form-label" for="id_ocupacion">Ocupación</label>
-                                    <input type="text" name="ocupacion" id="id_ocupacion"
-                                           class="form-control form-control-sm "
-                                           maxlength="100">
+                                    {{ paciente_form.ocupacion }}
+                                    {% if paciente_form.ocupacion.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ paciente_form.ocupacion.errors }}
+                                        </div>
+                                    {% endif %}
                                 </div>
                                 <div class="col-md-3">
                                     <label class="form-label" for="id_numero_telefono1">
                                         Número de Teléfono
                                     </label>
-                                    <input type="text" name="numero_telefono1" id="id_numero_telefono1"
-                                           class="form-control form-control-sm "
-                                           maxlength="15">
+                                    {{ paciente_form.numero_telefono1 }}
+                                    {% if paciente_form.numero_telefono1.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ paciente_form.numero_telefono1.errors }}
+                                        </div>
+                                    {% endif %}
                                 </div>
 
                                 <div class="col-md-3">
                                     <label class="form-label" for="id_numero_telefono2">
                                         Número de Teléfono 2
                                     </label>
-                                    <input type="text" name="numero_telefono2" id="id_numero_telefono2"
-                                           class="form-control form-control-sm "
-                                           maxlength="15">
+                                    {{ paciente_form.numero_telefono2 }}
+                                    {% if paciente_form.numero_telefono2.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ paciente_form.numero_telefono2.errors }}
+                                        </div>
+                                    {% endif %}
                                 </div>
                                 <div class="col-md-4 mt-4">
                                     <div class="form-check">
-                                        <input type="checkbox" name="sin_telefono" id="id_sin_telefono"
-                                               class="form-check-input">
-                                        <label class="form-check-label" for="id_sin_telefono">
-                                            Paciente Sin Teléfono
+                                        {{ paciente_form.sin_telefono }}
+                                        Paciente Sin Teléfono
                                         </label>
+                                        {% if paciente_form.sin_telefono.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ paciente_form.sin_telefono.errors }}
+                                            </div>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
@@ -510,40 +602,42 @@
                             <div class="row g-2">
                                 <div class="col-md-6">
                                     <label class="form-label" for="id_prevision">Previsión</label>
-                                    <select name="prevision" id="id_prevision"
-                                            class="form-control form-control-sm  select2">
-                                        <option value="">Seleccione género</option>
-                                        {% for prevision in previsiones %}
-                                            <option value="{{ prevision.id }}">
-                                                {{ prevision.nombre }}
-                                            </option>
-                                        {% endfor %}
-                                    </select>
+                                    {{ paciente_form.prevision }}
+                                    {% if paciente_form.prevision.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ paciente_form.prevision.errors }}
+                                        </div>
+                                    {% endif %}
 
 
                                 </div>
 
                                 <div class="col-md-6">
                                     <label class="form-label" for="id_sector">Sector</label>
-                                    <select name="sector" id="id_sector" class="form-control form-control-sm  select2">
-                                        <option value="">Seleccione sector</option>
-                                        {% for sector in sectores %}
-                                            <option value="{{ sector.id }}">
-                                                {{ sector.color }}
-                                            </option>
-                                        {% endfor %}
-                                    </select>
+                                    {{ ficha_form.sector }}
+                                    {% if paciente_form.sector.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ paciente_form.sector.errors }}
+                                        </div>
+                                    {% endif %}
                                 </div>
                                 <div class="col-md-12">
                                     <label class="form-label" for="id_alergico_a">Alergico a</label>
-                                    <input name="alergico_a" id="id_alergico_a"
-                                           class="form-control form-control-sm ">
+                                    {{ paciente_form.alergico_a }}
+                                    {% if paciente_form.alergico_a.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ paciente_form.alergico_a.errors }}
+                                        </div>
+                                    {% endif %}
                                 </div>
                                 <div class="col-md-12">
                                     <label class="form-label" for="id_observacion">Observación</label>
-                                    <textarea name="observacion" id="id_observacion"
-                                              class="form-control form-control-sm "
-                                              rows="2"></textarea>
+                                    {{ ficha_form.observacion }}
+                                    {% if paciente_form.observacion.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ paciente_form.observacion.errors }}
+                                        </div>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -653,6 +747,7 @@
         function cargarPaciente(data) {
             const p = data.paciente;
 
+            setValue('id_paciente_id', p.id);
             // IDENTIFICACIÓN
             setValue('id_nombre', p.nombre);
             setValue('id_apellido_paterno', p.apellido_paterno);
@@ -843,6 +938,8 @@
 
                 // restaurar rut
                 $('#id_rut').val(rutActual);
+
+                $('#id_paciente_id').val('');
 
                 // limpiar select2 (excepto los que quieras conservar)
                 form.find('select.select2')

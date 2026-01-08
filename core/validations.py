@@ -3,7 +3,6 @@ import re
 
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email as django_validate_email
-from django.utils.formats import date_format
 
 
 def validate_spaces(value):
@@ -16,8 +15,6 @@ def validate_exists(value, exists):
     if exists:
         raise ValidationError(f"Ya existe un registro con este nombre.")
     return value
-
-
 
 
 def validate_name(name):
@@ -64,22 +61,23 @@ def validate_email(email):
 
 
 def validate_rut(rut: str) -> bool:
-    """Valida un RUT chileno con cuerpo desde 6 dígitos hacia arriba."""
     if not rut:
         return False
 
-    rut = rut.replace(".", "").replace("-", "").upper()
+    # 🔥 Limpieza TOTAL (incluye unicode raros)
+    rut = str(rut)
+    rut = re.sub(r'[^0-9kK]', '', rut).upper()
 
-    if len(rut) < 2:
+    # Mínimo cuerpo + DV
+    if len(rut) < 7:
         return False
 
-    body, dv = rut[:-1], rut[-1]
+    body = rut[:-1]
+    dv = rut[-1]
 
-    # Se permite desde 6 dígitos mínimo
-    if not body.isdigit() or len(body) < 6:
+    if not body.isdigit():
         return False
 
-    # Cálculo del dígito verificador
     reversed_digits = map(int, reversed(body))
     factors = itertools.cycle(range(2, 8))
     total = sum(d * f for d, f in zip(reversed_digits, factors))

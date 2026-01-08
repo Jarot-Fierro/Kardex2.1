@@ -22,11 +22,7 @@ class EstablecimientoListView(PermissionRequiredMixin, DataTableMixin, TemplateV
     datatable_search_fields = ['nombre__icontains', 'direccion__icontains', 'telefono__icontains',
                                'comuna__nombre__icontains']
 
-    permission_required = 'establecimiento.view_establecimiento'
-    raise_exception = True
-
-    permission_view = 'establecimiento.view_establecimiento'
-    permission_update = 'establecimiento.change_establecimiento'
+    permission_required = 'establecimientos.view_establecimiento'
 
     url_detail = 'establecimiento_detail'
     url_update = 'establecimiento_update'
@@ -62,7 +58,7 @@ class EstablecimientoListView(PermissionRequiredMixin, DataTableMixin, TemplateV
 class EstablecimientoDetailView(PermissionRequiredMixin, DetailView):
     model = Establecimiento
     template_name = 'establecimiento/detail.html'
-    permission_required = 'establecimiento.view_establecimiento'
+    permission_required = 'establecimientos.view_establecimiento'
     raise_exception = True
 
     def render_to_response(self, context, **response_kwargs):
@@ -79,7 +75,7 @@ class EstablecimientoCreateView(PermissionRequiredMixin, IncludeUserFormCreate, 
     model = Establecimiento
     form_class = FormEstablecimiento
     success_url = reverse_lazy('establecimiento_list')
-    permission_required = 'add_establecimiento'
+    permission_required = 'establecimientos.add_establecimiento'
 
     def form_valid(self, form):
         messages.success(self.request, 'Comuna creada correctamente')
@@ -103,7 +99,7 @@ class EstablecimientoUpdateView(PermissionRequiredMixin, IncludeUserFormUpdate, 
     model = Establecimiento
     form_class = FormEstablecimiento
     success_url = reverse_lazy('establecimiento_list')
-    permission_required = 'change_establecimiento'
+    permission_required = 'establecimientos.change_establecimiento'
 
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -128,5 +124,5 @@ class EstablecimientoUpdateView(PermissionRequiredMixin, IncludeUserFormUpdate, 
 
 class EstablecimientoHistoryListView(GenericHistoryListView):
     base_model = Establecimiento
-    permission_required = 'establecimiento.view_establecimiento'
+    permission_required = 'establecimientos.view_establecimiento'
     template_name = 'history/list.html'

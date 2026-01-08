@@ -15,7 +15,7 @@ from establecimientos.models.servicio_clinico import ServicioClinico
 MODULE_NAME = 'Servicios Clínicos'
 
 
-class ServicioClinicoListView(PermissionRequiredMixin, DataTableMixin, TemplateView):
+class ServicioClinicoListView( DataTableMixin, TemplateView):
     template_name = 'servicio_clinico/list.html'
     model = ServicioClinico
     datatable_columns = ['ID', 'Nombre', 'Jefe Área', 'Teléfono', 'Establecimiento']
@@ -71,7 +71,7 @@ class ServicioClinicoListView(PermissionRequiredMixin, DataTableMixin, TemplateV
         return context
 
 
-class ServicioClinicoDetailView(PermissionRequiredMixin, DetailView):
+class ServicioClinicoDetailView( DetailView):
     model = ServicioClinico
     template_name = 'servicio_clinico/detail.html'
     permission_required = 'establecimiento.view_servicio_clinico'
@@ -85,7 +85,7 @@ class ServicioClinicoDetailView(PermissionRequiredMixin, DetailView):
         return super().render_to_response(context, **response_kwargs)
 
 
-class ServicioClinicoCreateView(PermissionRequiredMixin, IncludeUserFormCreate, CreateView):
+class ServicioClinicoCreateView( IncludeUserFormCreate, CreateView):
     template_name = 'servicio_clinico/form.html'
     model = ServicioClinico
     form_class = FormServicioClinico
@@ -120,7 +120,7 @@ class ServicioClinicoCreateView(PermissionRequiredMixin, IncludeUserFormCreate, 
         return context
 
 
-class ServicioClinicoUpdateView(PermissionRequiredMixin, IncludeUserFormUpdate, UpdateView):
+class ServicioClinicoUpdateView( IncludeUserFormUpdate, UpdateView):
     template_name = 'servicio_clinico/form.html'
     model = ServicioClinico
     form_class = FormServicioClinico

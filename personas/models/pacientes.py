@@ -1,7 +1,7 @@
 from django.db import models
 from simple_history.models import HistoricalRecords
 
-from core.choices import ESTADO_CIVIL
+from core.choices import ESTADO_CIVIL, SEXO_CHOICES
 from core.models import StandardModel
 
 
@@ -30,8 +30,8 @@ class Paciente(StandardModel):
 
     # DATOS DE NACIMIENTO
     fecha_nacimiento = models.DateField(null=True, blank=True, verbose_name='Fecha de Nacimiento')
-    sexo = models.CharField(max_length=10, choices=[('M', 'Masculino'), ('F', 'Femenino')], null=False,
-                            verbose_name='Sexo')
+    sexo = models.CharField(max_length=50, choices=SEXO_CHOICES, null=False,
+                            verbose_name='Sexo', default='NO INFORMADO')
     estado_civil = models.CharField(max_length=20, choices=ESTADO_CIVIL, null=False, verbose_name='Estado Civil',
                                     default='NO INFORMADO')
 

@@ -38,6 +38,7 @@ def get_paciente_ficha(request, rut):
 
     data = {
         "paciente": {
+            "id": paciente.id,
             "codigo": paciente.codigo,
             "rut": paciente.rut,
             "nip": paciente.nip,

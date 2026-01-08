@@ -15,6 +15,12 @@ ESTADO_RESPUESTA = [
     ('SIN TRASPASO', 'Sin Traspaso'),
 ]
 
+SEXO_CHOICES = [
+    ('NO INFORMADO', 'No Informado'),
+    ('M', 'Masculino'),
+    ('F', 'Femenino'),
+]
+
 GENERO_CHOICES = [
     ('NO INFORMADO', 'No Informado'),
     ('MASCULINO', 'Masculino'),

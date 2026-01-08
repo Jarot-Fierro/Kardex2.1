@@ -1,15 +1,18 @@
-from django.http import JsonResponse
-from django.shortcuts import render
+from datetime import datetime
 
-from core.choices import ESTADO_CIVIL
-from establecimientos.models.sectores import Sector
-from geografia.models.comuna import Comuna
-from personas.models.genero import Genero
-from personas.models.prevision import Prevision
+from django.contrib import messages
+from django.db import transaction
+from django.shortcuts import redirect, render
+
+from clinica.forms.ficha import FichaForm
+from clinica.models import Ficha
+from personas.forms.pacientes import PacienteForm
+from personas.models.pacientes import Paciente
 
 
 def capturar_datos_paciente(request):
     return {
+        "paciente_id": request.POST.get('paciente_id'),
         "rut": request.POST.get('rut'),
         "nombre": request.POST.get('nombre'),
         "apellido_paterno": request.POST.get('apellido_paterno'),
@@ -50,93 +53,70 @@ def capturar_datos_paciente(request):
     }
 
 
-def paciente_view(request):
-    generos = Genero.objects.filter(status=True)
-    previsiones = Prevision.objects.filter(status=True)
-    comunas = Comuna.objects.filter(status=True)
-    sectores = Sector.objects.filter(
-        status=True,
-        establecimiento=request.user.establecimiento
-    )
-    estado_civil = ESTADO_CIVIL
+def parse_fecha(fecha_str):
+    if not fecha_str:
+        return None
+    try:
+        return datetime.strptime(fecha_str, "%Y-%m-%d").date()
+    except ValueError:
+        return None
+
+
+@transaction.atomic
+def paciente_view(request, paciente_id=None):
+    paciente_instance = None
+    ficha_instance = None
 
     if request.method == 'POST':
-        datos = capturar_datos_paciente(request)
 
-        # with transaction.atomic():
-        #
-        #     paciente_id = datos.get('paciente_id')
-        #
-        #     if paciente_id:
-        #         # 🔁 ACTUALIZACIÓN
-        #         paciente = Paciente.objects.select_for_update().get(
-        #             id=paciente_id
-        #         )
-        #         accion = 'actualizado'
-        #     else:
-        #         # ➕ CREACIÓN
-        #         paciente = Paciente(
-        #             establecimiento=request.user.establecimiento
-        #         )
-        #         accion = 'creado'
-        #
-        #     # asignar campos
-        #     paciente.nombre = datos['nombre']
-        #     paciente.apellido_paterno = datos['apellido_paterno']
-        #     paciente.apellido_materno = datos['apellido_materno']
-        #     paciente.nombre_social = datos['nombre_social']
-        #     paciente.pasaporte = datos['pasaporte']
-        #     paciente.nip = datos['nip']
-        #     paciente.fecha_nacimiento = datos['fecha_nacimiento']
-        #     paciente.sexo = datos['sexo']
-        #     paciente.genero_id = datos['genero']
-        #     paciente.estado_civil = datos['estado_civil']
-        #     paciente.recien_nacido = datos['recien_nacido']
-        #     paciente.extranjero = datos['extranjero']
-        #     paciente.pueblo_indigena = datos['pueblo_indigena']
-        #     paciente.fallecido = datos['fallecido']
-        #     paciente.fecha_fallecimiento = datos['fecha_fallecimiento']
-        #     paciente.rut_madre = datos['rut_madre']
-        #     paciente.nombres_madre = datos['nombres_madre']
-        #     paciente.nombres_padre = datos['nombres_padre']
-        #     paciente.nombre_pareja = datos['nombre_pareja']
-        #     paciente.representante_legal = datos['representante_legal']
-        #     paciente.rut_responsable_temporal = datos['rut_responsable_temporal']
-        #     paciente.usar_rut_madre_como_responsable = datos['usar_rut_madre_como_responsable']
-        #     paciente.direccion = datos['direccion']
-        #     paciente.comuna_id = datos['comuna']
-        #     paciente.ocupacion = datos['ocupacion']
-        #     paciente.numero_telefono1 = datos['numero_telefono1']
-        #     paciente.numero_telefono2 = datos['numero_telefono2']
-        #     paciente.usuario_modifica = request.user
-        #
-        #     paciente.save()
-        #
-        #     ficha = Ficha.objects.filter(
-        #         numero_ficha_sistema=datos['ficha'],
-        #         establecimiento=request.user.establecimiento
-        #     ).first()
-        #
-        #     if ficha:
-        #         ficha.paciente = paciente
-        #     else:
-        #         ficha = Ficha.objects.create(
-        #             numero_ficha_sistema=datos['ficha'],
-        #             paciente=paciente,
-        #             establecimiento=request.user.establecimiento,
-        #             usuario_crea=request.user
-        #         )
+        paciente_id_post = request.POST.get('paciente_id')
 
-        return JsonResponse({
-            'ok': True,
-            'datos': datos,
-        })
+        if paciente_id_post:
+            paciente_instance = Paciente.objects.filter(
+                pk=paciente_id_post
+            ).first()
+
+            if paciente_instance:
+                ficha_instance = Ficha.objects.filter(
+                    paciente=paciente_instance,
+                    establecimiento=request.user.establecimiento
+                ).first()
+
+        paciente_form = PacienteForm(
+            request.POST,
+            instance=paciente_instance
+        )
+        ficha_form = FichaForm(
+            request.POST,
+            instance=ficha_instance
+        )
+
+        if paciente_form.is_valid() and ficha_form.is_valid():
+
+            paciente = paciente_form.save(commit=False)
+            paciente.usuario_modifica = request.user
+            paciente.save()
+
+            ficha = ficha_form.save(commit=False)
+            ficha.paciente = paciente
+            ficha.establecimiento = request.user.establecimiento
+            ficha.usuario = request.user
+            ficha.save()
+
+            messages.success(request, 'Paciente y ficha guardados correctamente.')
+            return redirect('paciente_view')
+
+        else:
+            messages.error(request, 'Por favor corrige los errores.')
+            print(paciente_form.errors)
+            print(ficha_form.errors)
+
+    else:
+        paciente_form = PacienteForm()
+        ficha_form = FichaForm()
 
     return render(request, 'paciente/form.html', {
-        'generos': generos,
-        'previsiones': previsiones,
-        'comunas': comunas,
-        'sectores': sectores,
-        'estado_civil': estado_civil,
-        'title': 'Registro/Consulta de Paciente'
+        'paciente_form': paciente_form,
+        'ficha_form': ficha_form,
+        'title': 'Consulta de pacientes'
     })

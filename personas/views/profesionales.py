@@ -15,7 +15,7 @@ from personas.models.profesionales import Profesional
 MODULE_NAME = 'Profesionales'
 
 
-class ProfesionalListView(PermissionRequiredMixin, DataTableMixin, TemplateView):
+class ProfesionalListView( DataTableMixin, TemplateView):
     template_name = 'profesional/list.html'
     model = Profesional
     datatable_columns = ['ID', 'RUT', 'Nombre', 'Correo', 'Teléfono', 'Anexo', 'Profesión', 'Establecimiento']
@@ -76,7 +76,7 @@ class ProfesionalListView(PermissionRequiredMixin, DataTableMixin, TemplateView)
         return context
 
 
-class ProfesionalDetailView(PermissionRequiredMixin, DetailView):
+class ProfesionalDetailView( DetailView):
     model = Profesional
     template_name = 'profesional/detail.html'
     permission_required = 'personas.view_profesionales'
@@ -90,7 +90,7 @@ class ProfesionalDetailView(PermissionRequiredMixin, DetailView):
         return super().render_to_response(context, **response_kwargs)
 
 
-class ProfesionalCreateView(PermissionRequiredMixin, IncludeUserFormCreate, CreateView):
+class ProfesionalCreateView( IncludeUserFormCreate, CreateView):
     template_name = 'profesional/form.html'
     model = Profesional
     form_class = FormProfesional
@@ -125,7 +125,7 @@ class ProfesionalCreateView(PermissionRequiredMixin, IncludeUserFormCreate, Crea
         return context
 
 
-class ProfesionalUpdateView(PermissionRequiredMixin, IncludeUserFormUpdate, UpdateView):
+class ProfesionalUpdateView( IncludeUserFormUpdate, UpdateView):
     template_name = 'profesional/form.html'
     model = Profesional
     form_class = FormProfesional

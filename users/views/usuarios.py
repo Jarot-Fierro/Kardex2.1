@@ -16,6 +16,11 @@ from users.forms.usuarios import LoginForm, FormUsuario, FormUsuarioUpdate, User
     FormUsuarioProfileUpdate
 from users.models import User, UserRole
 
+from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
+from django.views.generic import TemplateView
+from django.urls import reverse_lazy
+from django.contrib.auth import get_user_model
+
 MODULE_NAME = 'Usuarios'
 
 
@@ -46,10 +51,6 @@ def logout_view(request):
     return redirect('login')
 
 
-from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
-from django.views.generic import TemplateView
-from django.urls import reverse_lazy
-from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
