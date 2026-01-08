@@ -822,6 +822,12 @@
                 theme: 'default'
             });
 
+            $('#btn-consultar-denuevo').on('click', function () {
+                ultimoRutConsultado = null;
+                buscarPacientePorRut();
+            });
+
+
             let consultando = false;
             let ultimoRutConsultado = null;
 
@@ -930,6 +936,8 @@
 
                         // permitir volver a consultar el mismo RUT si fue error
                         ultimoRutConsultado = null;
+
+                        alert('Paciente no encontrado');
                     },
 
                     complete: function () {
