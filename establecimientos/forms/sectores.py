@@ -1,7 +1,6 @@
 from django import forms
 
 from establecimientos.models.colores import Color
-from establecimientos.models.establecimiento import Establecimiento
 from establecimientos.models.sectores import Sector
 
 
@@ -45,18 +44,6 @@ class FormSector(forms.ModelForm):
         required=False
     )
 
-    establecimiento = forms.ModelChoiceField(
-        label="Establecimiento",
-        empty_label="Selecciona una Establecimiento",
-        queryset=Establecimiento.objects.filter(status=True),
-        widget=forms.Select(
-            attrs={
-                'id': 'establecimiento_sector',
-                'class': 'form-control select2',
-            }),
-        required=True
-    )
-
     class Meta:
         model = Sector
-        fields = ['color', 'establecimiento', 'codigo', 'observacion', ]
+        fields = ['color', 'codigo', 'observacion', ]

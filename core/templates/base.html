@@ -270,6 +270,17 @@
         })
     })
 </script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('input[required], select[required], textarea[required]')
+            .forEach(field => {
+                const label = document.querySelector(`label[for="${field.id}"]`);
+                if (label && !label.innerHTML.includes('*')) {
+                    label.innerHTML += ' <span class="text-danger">*</span>';
+                }
+            });
+    });
+</script>
 
 
 {% block javascript %}

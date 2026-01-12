@@ -1,8 +1,8 @@
 from datetime import datetime
 
 from django.contrib import messages
-from django.db import transaction
-from django.shortcuts import redirect, render
+from django.db import transaction, IntegrityError
+from django.shortcuts import render, redirect
 
 from clinica.forms.ficha import FichaForm
 from clinica.models import Ficha
@@ -19,7 +19,7 @@ def capturar_datos_paciente(request):
         "apellido_materno": request.POST.get('apellido_materno'),
         "nombre_social": request.POST.get('nombre_social'),
         "pasaporte": request.POST.get('pasaporte'),
-        "nip": request.POST.get('nie'),
+        "nip": request.POST.get('nip'),
 
         "fecha_nacimiento": request.POST.get('fecha_nacimiento'),
         "sexo": request.POST.get('sexo'),
@@ -62,7 +62,6 @@ def parse_fecha(fecha_str):
         return None
 
 
-@transaction.atomic
 def paciente_view(request, paciente_id=None):
     paciente_instance = None
     ficha_instance = None
@@ -70,6 +69,7 @@ def paciente_view(request, paciente_id=None):
     if request.method == 'POST':
 
         paciente_id_post = request.POST.get('paciente_id')
+        print(paciente_id_post)
 
         if paciente_id_post:
             paciente_instance = Paciente.objects.filter(
@@ -82,38 +82,86 @@ def paciente_view(request, paciente_id=None):
                     establecimiento=request.user.establecimiento
                 ).first()
 
-        paciente_form = PacienteForm(
-            request.POST,
-            instance=paciente_instance
-        )
-        ficha_form = FichaForm(
-            request.POST,
-            instance=ficha_instance
-        )
+        es_actualizacion = paciente_instance is not None
+
+        print("POST keys:", request.POST.keys())
+        print("POST id:", request.POST.get('id'))
+
+        paciente_form = PacienteForm(request.POST, instance=paciente_instance)
+        ficha_form = FichaForm(request.POST, instance=ficha_instance)
 
         if paciente_form.is_valid() and ficha_form.is_valid():
 
-            paciente = paciente_form.save(commit=False)
-            paciente.usuario_modifica = request.user
-            paciente.save()
+            try:
+                with transaction.atomic():
 
-            ficha = ficha_form.save(commit=False)
-            ficha.paciente = paciente
-            ficha.establecimiento = request.user.establecimiento
-            ficha.usuario = request.user
-            ficha.save()
+                    paciente = paciente_form.save(commit=False)
+                    paciente.usuario_modifica = request.user
 
-            messages.success(request, 'Paciente y ficha guardados correctamente.')
-            return redirect('paciente_view')
+                    print("mis mensajes?")
+                    paciente.save()
+
+                    ficha = ficha_form.save(commit=False)
+                    ficha.paciente = paciente
+                    ficha.establecimiento = request.user.establecimiento
+                    ficha.usuario = request.user
+
+                    print("mis fichas?")
+                    ficha.save()
+
+            except IntegrityError:
+                ficha_form.add_error(
+                    'numero_ficha_sistema',
+                    'Ya existe una ficha con este número para este establecimiento.'
+                )
+
+                return render(request, 'paciente/form.html', {
+                    'paciente_form': paciente_form,
+                    'ficha_form': ficha_form,
+                    'title': 'Consulta de pacientes'
+                })
+            print("antes de los mensajes, ahora entramos a los if es_actualizaión")
+
+            if es_actualizacion:
+                print("actualizacion")
+                messages.info(
+                    request,
+                    'Paciente y ficha actualizados correctamente.'
+                )
+            else:
+                print("creaciuón")
+                messages.success(
+                    request,
+                    'Paciente y ficha creados correctamente.'
+                )
+
+            return redirect('paciente_view_param', paciente_id=paciente.id)
+
 
         else:
             messages.error(request, 'Por favor corrige los errores.')
             print(paciente_form.errors)
             print(ficha_form.errors)
 
+
     else:
-        paciente_form = PacienteForm()
-        ficha_form = FichaForm()
+
+        if paciente_id:
+
+            paciente_instance = Paciente.objects.filter(pk=paciente_id).first()
+
+            if paciente_instance:
+                ficha_instance = Ficha.objects.filter(
+
+                    paciente=paciente_instance,
+
+                    establecimiento=request.user.establecimiento
+
+                ).first()
+
+        paciente_form = PacienteForm(instance=paciente_instance)
+
+        ficha_form = FichaForm(instance=ficha_instance)
 
     return render(request, 'paciente/form.html', {
         'paciente_form': paciente_form,

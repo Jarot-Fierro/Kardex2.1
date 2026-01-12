@@ -10,6 +10,28 @@ from personas.models.prevision import Prevision
 
 
 class PacienteForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if not self.instance.pk and not self.is_bound:
+            self._set_default_no_informado('genero', Genero)
+            self._set_default_no_informado('prevision', Prevision)
+            self._set_default_no_informado('comuna', Comuna)
+
+    def _set_default_no_informado(self, field_name, model):
+        try:
+            obj = model.objects.filter(
+                status=True,
+                nombre__iexact='no informado'
+            ).first()
+
+            if obj:
+                self.fields[field_name].initial = obj
+
+        except Exception:
+            pass
+
     fecha_nacimiento = forms.DateField(
         required=False,
         widget=forms.DateInput(attrs={
@@ -38,7 +60,7 @@ class PacienteForm(forms.ModelForm):
             'id': 'id_rut',
             'name': 'rut'
         }),
-        required=True
+        required=False
     )
 
     nombre = forms.CharField(
@@ -49,7 +71,7 @@ class PacienteForm(forms.ModelForm):
             'id': 'id_nombre',
             'name': 'nombre'
         }),
-        required=True
+        required=False
     )
 
     apellido_paterno = forms.CharField(
@@ -59,7 +81,7 @@ class PacienteForm(forms.ModelForm):
             'id': 'id_apellido_paterno',
             'name': 'apellido_paterno'
         }),
-        required=True
+        required=False
     )
 
     apellido_materno = forms.CharField(
@@ -69,7 +91,7 @@ class PacienteForm(forms.ModelForm):
             'id': 'id_apellido_materno',
             'name': 'apellido_materno'
         }),
-        required=True
+        required=False
     )
 
     nombre_social = forms.CharField(
@@ -96,7 +118,7 @@ class PacienteForm(forms.ModelForm):
         label='NIP',
         widget=forms.TextInput(attrs={
             'class': 'form-control form-control-sm',
-            'id': 'id_nie',
+            'id': 'id_nip',
             'name': 'nip'
         }),
         required=False
@@ -233,6 +255,11 @@ class PacienteForm(forms.ModelForm):
         widget=forms.TextInput(
             attrs={'class': 'form-control form-control-sm', 'id': 'id_ocupacion', 'name': 'ocupacion'})
     )
+    alergico_a = forms.CharField(
+        required=False,
+        widget=forms.TextInput(
+            attrs={'class': 'form-control form-control-sm', 'id': 'id_alergico_a', 'name': 'alergico_a'})
+    )
 
     ## FOREINKEYS
 
@@ -245,14 +272,14 @@ class PacienteForm(forms.ModelForm):
 
     prevision = forms.ModelChoiceField(
         label='Previsión',
-        empty_label='Selecciona un Previsión',
+        empty_label='Selecciona una Previsión',
         queryset=Prevision.objects.filter(status=True),
         widget=forms.Select(attrs={'class': 'form-control form-control-sm', 'id': 'id_prevision', 'name': 'prevision'}),
     )
 
     comuna = forms.ModelChoiceField(
         label='Comuna',
-        empty_label='Selecciona un Comuna',
+        empty_label='Selecciona una Comuna',
         queryset=Comuna.objects.filter(status=True),
         widget=forms.Select(attrs={'class': 'form-control form-control-sm', 'id': 'id_comuna', 'name': 'comuna'}),
     )
@@ -265,8 +292,142 @@ class PacienteForm(forms.ModelForm):
             'recien_nacido', 'extranjero', 'pueblo_indigena', 'fallecido', 'fecha_fallecimiento',
             'rut_madre', 'nombres_madre', 'nombres_padre', 'nombre_pareja',
             'representante_legal', 'rut_responsable_temporal', 'usar_rut_madre_como_responsable',
-            'direccion', 'comuna', 'ocupacion', 'numero_telefono1', 'numero_telefono2', 'sin_telefono'
+            'direccion', 'comuna', 'prevision', 'ocupacion', 'numero_telefono1', 'numero_telefono2', 'sin_telefono',
+            'alergico_a',
         ]
+
+    def _clean_files_custom(self, cleaned):
+        rn = cleaned.get('recien_nacido')
+        ext = cleaned.get('extranjero')
+        fal = cleaned.get('fallecido')
+
+        # 1Estándar: no RN, no Extranjero, no Fallecido
+        if not rn and not ext and not fal:
+            cleaned['nip'] = None
+            cleaned['pasaporte'] = None
+            cleaned['rut_responsable_temporal'] = None
+            cleaned['usar_rut_madre_como_responsable'] = False
+            cleaned['fecha_fallecimiento'] = None
+
+        # ️Fallecido solo
+        if not rn and not ext and fal:
+            cleaned['nip'] = None
+            cleaned['pasaporte'] = None
+            cleaned['rut_responsable_temporal'] = None
+            cleaned['usar_rut_madre_como_responsable'] = False
+
+        # Recién nacido solo
+        if rn and not ext and not fal:
+            cleaned['nip'] = None
+            cleaned['pasaporte'] = None
+            cleaned['ocupacion'] = None
+            cleaned['nombre_pareja'] = None
+            cleaned['fecha_fallecimiento'] = None
+            cleaned['rut'] = None
+
+        # Recién nacido + Fallecido
+        if rn and not ext and fal:
+            cleaned['nip'] = None
+            cleaned['pasaporte'] = None
+            cleaned['ocupacion'] = None
+            cleaned['nombre_pareja'] = None
+            cleaned['rut'] = None
+
+        # Extranjero solo
+        if not rn and ext and not fal:
+            cleaned['rut'] = None
+            cleaned['rut_responsable_temporal'] = None
+            cleaned['usar_rut_madre_como_responsable'] = False
+            cleaned['fecha_fallecimiento'] = None
+
+        # Extranjero + Fallecido
+        if not rn and ext and fal:
+            cleaned['rut'] = None
+            cleaned['rut_responsable_temporal'] = None
+            cleaned['usar_rut_madre_como_responsable'] = False
+
+        # Recién nacido + Extranjero
+        if rn and ext and not fal:
+            cleaned['rut'] = None
+            cleaned['ocupacion'] = None
+            cleaned['nombre_pareja'] = None
+            cleaned['fecha_fallecimiento'] = None
+
+        # Recién nacido + Extranjero + Fallecido
+        if rn and ext and fal:
+            cleaned['rut'] = None
+            cleaned['ocupacion'] = None
+            cleaned['nombre_pareja'] = None
+
+    def _clean_fallecimiento(self, cleaned):
+        esta_fallecido = cleaned.get("fallecido")
+        fecha_fallecimiento = cleaned.get("fecha_fallecimiento")
+
+        if esta_fallecido and not fecha_fallecimiento:
+            self.add_error(
+                'fallecido',
+                'Debe indicar la fecha de fallecimiento.'
+            )
+
+        if not esta_fallecido and fecha_fallecimiento:
+            fecha_fallecimiento = None
+
+    def _clean_extranjero(self, cleaned):
+        extranjero = cleaned.get("extranjero")
+        nip = cleaned.get("nip")
+        pasaporte = cleaned.get("pasaporte")
+
+        if extranjero:
+            if not nip:
+                self.add_error(
+                    'nip',
+                    'Debe indicar el Número de identificación Provisorio.'
+                )
+            if not pasaporte:
+                self.add_error(
+                    'pasaporte',
+                    'Debe indicar el Número de pasaporte.'
+                )
+
+    def _clean_recien_nacido(self, cleaned):
+        recien_nacido = cleaned.get("recien_nacido")
+        apellido_paterno = cleaned.get("apellido_paterno")
+        apellido_materno = cleaned.get("apellido_materno")
+        nombre = cleaned.get("nombre")
+        rut = cleaned.get("rut")
+
+        if not recien_nacido and not nombre:
+            self.add_error(
+                'nombre',
+                'Debe indicar el nombre.'
+            )
+
+        if not recien_nacido and not rut:
+            self.add_error(
+                'rut',
+                'Debe indicar el RUT.'
+            )
+        if recien_nacido:
+            if not apellido_materno:
+                self.add_error(
+                    'apellido_materno',
+                    'Debe indicar el apellido materno.'
+                )
+            if not apellido_paterno:
+                self.add_error(
+                    'apellido_paterno',
+                    'Debe indicar el apellido paterno.'
+                )
+
+    def _clean_telefonos(self, cleaned):
+        sin_telefono = cleaned.get("sin_telefono")
+        telefono1 = cleaned.get("numero_telefono1")
+
+        if not sin_telefono and not telefono1:
+            self.add_error(
+                'numero_telefono1',
+                'Debe ingresar un teléfono o indicar que no cuenta con uno.'
+            )
 
     def clean_rut(self):
         rut = self.cleaned_data.get('rut')
@@ -280,3 +441,13 @@ class PacienteForm(forms.ModelForm):
             raise ValidationError(f"El RUT ingresado no es válido.{validate_rut(rut_limpio)} {format_rut(rut_limpio)}")
 
         return format_rut(rut_limpio)
+
+    def clean(self):
+        cleaned = super().clean()
+
+        self._clean_files_custom(cleaned)
+        self._clean_extranjero(cleaned)
+        self._clean_telefonos(cleaned)
+        self._clean_recien_nacido(cleaned)
+
+        return cleaned

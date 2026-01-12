@@ -54,5 +54,6 @@ urlpatterns = [
     # APIS
     path("ficha-paciente/<str:rut>/", get_paciente_ficha, name="get_paciente_ficha", ),
     path("paciente/", paciente_view, name="paciente_view", ),
+    path("paciente/<int:paciente_id>/", paciente_view, name="paciente_view_param", ),
 
 ]

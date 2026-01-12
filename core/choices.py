@@ -1,10 +1,10 @@
 ESTADO_CIVIL = [
-    ('I', 'No Informado'),
-    ('S', 'Soltero(a)'),
-    ('C', 'Casado(a)'),
-    ('D', 'Divorciado(a)'),
-    ('V', 'Viudo(a)'),
-    ('O', 'Conviviente')
+    ('I', 'NO INFORMADO'),
+    ('S', 'SOLTERO(A)'),
+    ('C', 'CASADO(A)'),
+    ('D', 'DIVORCIADO(A)'),
+    ('V', 'VIUDO(A)'),
+    ('O', 'CONVIVIENTE')
 ]
 
 ESTADO_RESPUESTA = [
@@ -16,9 +16,9 @@ ESTADO_RESPUESTA = [
 ]
 
 SEXO_CHOICES = [
-    ('NO INFORMADO', 'No Informado'),
-    ('M', 'Masculino'),
-    ('F', 'Femenino'),
+    ('NO INFORMADO', 'NO INFORMADO'),
+    ('M', 'MASCULINO'),
+    ('F', 'FEMENINO'),
 ]
 
 GENERO_CHOICES = [

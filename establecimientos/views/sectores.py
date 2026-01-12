@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.http import HttpResponse
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView, DetailView
 from django.views.generic import TemplateView
@@ -96,6 +97,10 @@ class SectorCreateView(PermissionRequiredMixin, IncludeUserFormCreate, CreateVie
     permission_required = 'establecimiento:add_sector'
 
     def form_valid(self, form):
+        if not self.request.user.establecimiento:
+            messages.error(self.request, "No tienes establecimiento asignado.")
+            return redirect('no_establecimiento')
+        form.instance.establecimiento = self.request.user.establecimiento
         messages.success(self.request, 'Sector creado correctamente')
         return super().form_valid(form)
 

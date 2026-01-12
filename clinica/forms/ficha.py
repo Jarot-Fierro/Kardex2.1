@@ -52,3 +52,29 @@ class FichaForm(forms.ModelForm):
             'numero_ficha_sistema', 'pasivado', 'observacion',
             'fecha_creacion_anterior', 'paciente', 'sector',
         ]
+
+    def _duplicate_ficha(self, cleaned):
+        numero = cleaned.get('numero_ficha_sistema')
+        establecimiento = cleaned.get('establecimiento')
+
+        if numero and establecimiento:
+            existe = Ficha.objects.filter(
+                numero_ficha_sistema=numero,
+                establecimiento=establecimiento
+            )
+
+            if self.instance.pk:
+                existe = existe.exclude(pk=self.instance.pk)
+
+            if existe.exists():
+                self.add_error(
+                    'numero_ficha_sistema',
+                    'Ya existe una ficha con este número para este establecimiento.'
+                )
+
+    def clean(self):
+        cleaned = super().clean()
+
+        self._duplicate_ficha(cleaned)
+
+        return cleaned
