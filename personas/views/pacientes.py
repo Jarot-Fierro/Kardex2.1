@@ -68,8 +68,13 @@ def paciente_view(request, paciente_id=None):
 
     if request.method == 'POST':
 
-        paciente_id_post = request.POST.get('paciente_id')
-        print(paciente_id_post)
+        if request.POST.get('paciente_id'):
+
+            paciente_id_post = request.POST.get('paciente_id')
+            print(paciente_id_post)
+        else:
+            paciente_id_post = paciente_id
+            print(paciente_id_post)
 
         if paciente_id_post:
             paciente_instance = Paciente.objects.filter(
@@ -82,11 +87,6 @@ def paciente_view(request, paciente_id=None):
                     establecimiento=request.user.establecimiento
                 ).first()
 
-        es_actualizacion = paciente_instance is not None
-
-        print("POST keys:", request.POST.keys())
-        print("POST id:", request.POST.get('id'))
-
         paciente_form = PacienteForm(request.POST, instance=paciente_instance)
         ficha_form = FichaForm(request.POST, instance=ficha_instance)
 
@@ -96,9 +96,10 @@ def paciente_view(request, paciente_id=None):
                 with transaction.atomic():
 
                     paciente = paciente_form.save(commit=False)
+                    es_creacion = paciente.pk is None
+
                     paciente.usuario_modifica = request.user
 
-                    print("mis mensajes?")
                     paciente.save()
 
                     ficha = ficha_form.save(commit=False)
@@ -106,7 +107,6 @@ def paciente_view(request, paciente_id=None):
                     ficha.establecimiento = request.user.establecimiento
                     ficha.usuario = request.user
 
-                    print("mis fichas?")
                     ficha.save()
 
             except IntegrityError:
@@ -122,17 +122,15 @@ def paciente_view(request, paciente_id=None):
                 })
             print("antes de los mensajes, ahora entramos a los if es_actualizaión")
 
-            if es_actualizacion:
-                print("actualizacion")
-                messages.info(
-                    request,
-                    'Paciente y ficha actualizados correctamente.'
-                )
-            else:
-                print("creaciuón")
+            if es_creacion:
                 messages.success(
                     request,
                     'Paciente y ficha creados correctamente.'
+                )
+            else:
+                messages.info(
+                    request,
+                    'Paciente y ficha actualizados correctamente.'
                 )
 
             return redirect('paciente_view_param', paciente_id=paciente.id)

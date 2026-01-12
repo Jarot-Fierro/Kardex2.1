@@ -1074,6 +1074,42 @@
         });
     </script>
 
+    <script>
+        $(document).ready(function () {
+            // Carga solo los datos de Tabla y ubicacion en caso de que Django devuelva el formulario con errores
+            const rut = $('#id_rut').val();
+
+            if (!rut) return;
+
+
+            const hayErrores = $('#paciente-form .invalid-feedback').length > 0;
+
+            if (!hayErrores) return;
+
+            $.ajax({
+                url: `/personas/ficha-paciente/${rut}`,
+                type: 'GET',
+                dataType: 'json',
+
+                success: function (response) {
+
+                    // SOLO datos que no vienen en el POST
+                    cargarFicha(response);
+                    cargaTabla(response);
+                    cargaUbicacionFicha(response);
+
+                    // reactivar botón ver movimientos
+                    $('#ver_movimientos').removeClass('d-none');
+
+                    // estado fallecido (por si aplica)
+                    if (window.actualizarEstadoFallecimiento) {
+                        window.actualizarEstadoFallecimiento();
+                    }
+                }
+            });
+        });
+    </script>
+
 
 
 
