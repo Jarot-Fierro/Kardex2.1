@@ -10,6 +10,8 @@
             {% csrf_token %}
 
             <input type="hidden" name="paciente_id" id="id_paciente_id">
+            <input type="hidden" id="modo-vista" value="{{ modo }}">
+
 
             <!-- Encabezado de la ficha -->
             <div class="row align-items-center mb-2">
@@ -754,7 +756,7 @@
             setValue('id_apellido_materno', p.apellido_materno);
             setValue('id_nombre_social', p.nombre_social);
             setValue('id_pasaporte', p.pasaporte);
-            setValue('id_nie', p.nip);
+            setValue('id_nip', p.nip);
 
             // NACIMIENTO
             setValue('id_fecha_nacimiento', p.fecha_nacimiento);
@@ -928,32 +930,37 @@
 
             function limpiarFormularioPaciente() {
 
-                // guardar rut actual
                 const rutActual = $('#id_rut').val();
 
-                const form = $('#paciente-form');
-                if (form.length) {
-                    form[0].reset();
-                }
+                // inputs normales
+                $('#paciente-form')
+                    .find('input[type="text"], input[type="date"], textarea')
+                    .val('');
+
+                // checkboxes
+                $('#paciente-form')
+                    .find('input[type="checkbox"]')
+                    .prop('checked', false);
+
+                // hidden
+                $('#id_paciente_id').val('');
+
+                // select2
+                $('#paciente-form select')
+                    .val(null)
+                    .trigger('change');
 
                 // restaurar rut
                 $('#id_rut').val(rutActual);
 
-                $('#id_paciente_id').val('');
-
-                // limpiar select2 (excepto los que quieras conservar)
-                form.find('select.select2')
-                    .val(null)
-                    .trigger('change');
-
-                // limpiar textos informativos
+                // textos informativos
                 setText('id_usuario_anterior', '—');
                 setText('id_fecha_creacion', '—');
                 setText('id_servicio_clinico', '—');
                 setText('id_profesional_cargo', '—');
                 setText('id_fecha_envio', '—');
 
-                // limpiar tabla
+                // tabla
                 $('#tabla-fichas tbody').empty();
             }
 
@@ -1007,12 +1014,13 @@
                         cargaTabla(response);
                         cargaUbicacionFicha(response);
 
-                        setTimeout(() => {
-                            if (window.actualizarEstadoFallecimiento) {
-                                window.actualizarEstadoFallecimiento();
-                            }
-                        }, 0);
+                        if (window.actualizarReglasPaciente) {
+                            window.actualizarReglasPaciente();
+                        }
 
+                        if (window.actualizarEstadoFallecimiento) {
+                            window.actualizarEstadoFallecimiento();
+                        }
 
                         $('#ver_movimientos')
                             .removeClass('d-none')
@@ -1110,6 +1118,147 @@
         });
     </script>
 
+    <script>
+        (function () {
+
+            const el = {
+                rut: document.getElementById('id_rut'),
+                nip: document.getElementById('id_nip'),
+                pasaporte: document.getElementById('id_pasaporte'),
+                rut_resp: document.getElementById('id_rut_responsable_temporal'),
+                rut_madre: document.getElementById('id_rut_madre'),
+                fecha_fallecimiento: document.getElementById('id_fecha_fallecimiento'),
+                ocupacion: document.getElementById('id_ocupacion'),
+                nombre_pareja: document.getElementById('id_nombre_pareja'),
+
+                telefono1: document.getElementById('id_numero_telefono1'),
+                telefono2: document.getElementById('id_numero_telefono2'),
+
+                recien_nacido: document.getElementById('id_recien_nacido'),
+                extranjero: document.getElementById('id_extranjero'),
+                fallecido: document.getElementById('id_fallecido'),
+                sin_telefono: document.getElementById('id_sin_telefono'),
+                usar_rut_madre: document.getElementById('id_usar_rut_madre_como_responsable'),
+            };
+
+            function disable(fields) {
+                fields.forEach(f => {
+                    if (!f) return;
+                    f.disabled = true;
+                    f.removeAttribute('required');
+                });
+            }
+
+            function enable(fields) {
+                fields.forEach(f => {
+                    if (!f) return;
+                    f.disabled = false;
+                });
+            }
+
+            function applyRules() {
+
+                const rn = el.recien_nacido.checked;
+                const ext = el.extranjero.checked;
+                const fal = el.fallecido.checked;
+                const sn = el.sin_telefono.checked;
+
+                enable([
+                    el.rut, el.nip, el.pasaporte, el.rut_resp, el.rut_madre,
+                    el.fecha_fallecimiento, el.ocupacion, el.nombre_pareja,
+                    el.telefono1, el.telefono2
+                ]);
+
+                /* REGLAS _clean_files_custom */
+
+                //  Estándar
+                if (!rn && !ext && !fal) {
+                    disable([el.nip, el.pasaporte, el.rut_resp, el.fecha_fallecimiento]);
+                    el.usar_rut_madre.checked = false;
+                    el.rut.required = true;
+                }
+
+                // Fallecido
+                if (!rn && !ext && fal) {
+                    disable([el.nip, el.pasaporte, el.rut_resp]);
+                    el.fecha_fallecimiento.required = true;
+                    el.rut.required = true;
+                }
+
+                //  Recién nacido
+                if (rn && !ext && !fal) {
+                    disable([el.nip, el.pasaporte, el.ocupacion, el.nombre_pareja, el.fecha_fallecimiento]);
+                }
+
+                //  RN + Fallecido
+                if (rn && !ext && fal) {
+                    disable([el.nip, el.pasaporte, el.ocupacion, el.nombre_pareja]);
+                    el.fecha_fallecimiento.required = true;
+                    el.rut.disabled = true;
+                }
+
+                //  Extranjero
+                if (!rn && ext && !fal) {
+                    disable([el.rut_resp, el.fecha_fallecimiento]);
+                }
+
+                //  Extranjero + Fallecido
+                if (!rn && ext && fal) {
+                    disable([el.rut_resp]);
+                    el.fecha_fallecimiento.required = true;
+                }
+
+                //  RN + Extranjero
+                if (rn && ext && !fal) {
+                    disable([el.rut, el.ocupacion, el.nombre_pareja, el.fecha_fallecimiento]);
+                }
+
+                //  RN + Extranjero + Fallecido
+                if (rn && ext && fal) {
+                    disable([el.rut, el.ocupacion, el.nombre_pareja]);
+                    el.fecha_fallecimiento.required = true;
+                }
+
+                /* TELÉFONOS */
+                if (sn) {
+                    disable([el.telefono1, el.telefono2]);
+                } else {
+                    enable([el.telefono1, el.telefono2]);
+                    el.telefono1.required = true;
+                }
+            }
+
+            document.addEventListener('change', function (e) {
+                if (!e.target) return;
+
+                if ([
+                    'id_recien_nacido',
+                    'id_extranjero',
+                    'id_fallecido',
+                    'id_sin_telefono'
+                ].includes(e.target.id)) {
+                    applyRules();
+                }
+            });
+
+            document.addEventListener('DOMContentLoaded', applyRules);
+            window.actualizarReglasPaciente = applyRules;
+
+        })();
+
+
+    </script>
+
+    <script>
+        function ocultarErroresFormulario() {
+            // mensajes de error
+            $('#paciente-form .invalid-feedback').addClass('d-none');
+
+            // quitar borde rojo visual
+            $('#paciente-form .is-invalid').removeClass('is-invalid');
+        }
+
+    </script>
 
 
 

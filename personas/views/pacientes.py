@@ -65,21 +65,15 @@ def parse_fecha(fecha_str):
 def paciente_view(request, paciente_id=None):
     paciente_instance = None
     ficha_instance = None
+    modo = "consulta"
 
     if request.method == 'POST':
 
-        if request.POST.get('paciente_id'):
-
-            paciente_id_post = request.POST.get('paciente_id')
-            print(paciente_id_post)
-        else:
-            paciente_id_post = paciente_id
-            print(paciente_id_post)
+        paciente_id_post = request.POST.get('paciente_id') or paciente_id
+        es_edicion = bool(paciente_id_post)
 
         if paciente_id_post:
-            paciente_instance = Paciente.objects.filter(
-                pk=paciente_id_post
-            ).first()
+            paciente_instance = Paciente.objects.filter(pk=paciente_id_post).first()
 
             if paciente_instance:
                 ficha_instance = Ficha.objects.filter(
@@ -99,14 +93,12 @@ def paciente_view(request, paciente_id=None):
                     es_creacion = paciente.pk is None
 
                     paciente.usuario_modifica = request.user
-
                     paciente.save()
 
                     ficha = ficha_form.save(commit=False)
                     ficha.paciente = paciente
                     ficha.establecimiento = request.user.establecimiento
                     ficha.usuario = request.user
-
                     ficha.save()
 
             except IntegrityError:
@@ -115,54 +107,47 @@ def paciente_view(request, paciente_id=None):
                     'Ya existe una ficha con este número para este establecimiento.'
                 )
 
+                modo = "error_actualizar" if es_edicion else "error_crear"
+
                 return render(request, 'paciente/form.html', {
                     'paciente_form': paciente_form,
                     'ficha_form': ficha_form,
+                    'modo': modo,
                     'title': 'Consulta de pacientes'
                 })
-            print("antes de los mensajes, ahora entramos a los if es_actualizaión")
 
+            # ÉXITO
             if es_creacion:
-                messages.success(
-                    request,
-                    'Paciente y ficha creados correctamente.'
-                )
+                messages.success(request, 'Paciente y ficha creados correctamente.')
+                modo = "creado"
             else:
-                messages.info(
-                    request,
-                    'Paciente y ficha actualizados correctamente.'
-                )
+                messages.info(request, 'Paciente y ficha actualizados correctamente.')
+                modo = "actualizado"
 
             return redirect('paciente_view_param', paciente_id=paciente.id)
 
-
         else:
+            # ERRORES DE VALIDACIÓN
             messages.error(request, 'Por favor corrige los errores.')
-            print(paciente_form.errors)
-            print(ficha_form.errors)
+            modo = "error_actualizar" if es_edicion else "error_crear"
 
-
-    else:
-
+    if request.method == 'GET':
+        # GET
         if paciente_id:
-
             paciente_instance = Paciente.objects.filter(pk=paciente_id).first()
 
             if paciente_instance:
                 ficha_instance = Ficha.objects.filter(
-
                     paciente=paciente_instance,
-
                     establecimiento=request.user.establecimiento
-
                 ).first()
 
         paciente_form = PacienteForm(instance=paciente_instance)
-
         ficha_form = FichaForm(instance=ficha_instance)
 
     return render(request, 'paciente/form.html', {
         'paciente_form': paciente_form,
         'ficha_form': ficha_form,
+        'modo': modo,
         'title': 'Consulta de pacientes'
     })

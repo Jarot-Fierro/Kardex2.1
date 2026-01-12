@@ -323,7 +323,6 @@ class PacienteForm(forms.ModelForm):
             cleaned['ocupacion'] = None
             cleaned['nombre_pareja'] = None
             cleaned['fecha_fallecimiento'] = None
-            cleaned['rut'] = None
 
         # Recién nacido + Fallecido
         if rn and not ext and fal:
@@ -331,31 +330,26 @@ class PacienteForm(forms.ModelForm):
             cleaned['pasaporte'] = None
             cleaned['ocupacion'] = None
             cleaned['nombre_pareja'] = None
-            cleaned['rut'] = None
 
         # Extranjero solo
         if not rn and ext and not fal:
-            cleaned['rut'] = None
             cleaned['rut_responsable_temporal'] = None
             cleaned['usar_rut_madre_como_responsable'] = False
             cleaned['fecha_fallecimiento'] = None
 
         # Extranjero + Fallecido
         if not rn and ext and fal:
-            cleaned['rut'] = None
             cleaned['rut_responsable_temporal'] = None
             cleaned['usar_rut_madre_como_responsable'] = False
 
         # Recién nacido + Extranjero
         if rn and ext and not fal:
-            cleaned['rut'] = None
             cleaned['ocupacion'] = None
             cleaned['nombre_pareja'] = None
             cleaned['fecha_fallecimiento'] = None
 
         # Recién nacido + Extranjero + Fallecido
         if rn and ext and fal:
-            cleaned['rut'] = None
             cleaned['ocupacion'] = None
             cleaned['nombre_pareja'] = None
 
@@ -383,11 +377,6 @@ class PacienteForm(forms.ModelForm):
                     'nip',
                     'Debe indicar el Número de identificación Provisorio.'
                 )
-            if not pasaporte:
-                self.add_error(
-                    'pasaporte',
-                    'Debe indicar el Número de pasaporte.'
-                )
 
     def _clean_recien_nacido(self, cleaned):
         recien_nacido = cleaned.get("recien_nacido")
@@ -395,6 +384,9 @@ class PacienteForm(forms.ModelForm):
         apellido_materno = cleaned.get("apellido_materno")
         nombre = cleaned.get("nombre")
         rut = cleaned.get("rut")
+
+        if 'rut' in self.errors:
+            return
 
         if not recien_nacido and not nombre:
             self.add_error(
@@ -438,7 +430,7 @@ class PacienteForm(forms.ModelForm):
         rut_limpio = rut
 
         if not validate_rut(rut_limpio):
-            raise ValidationError(f"El RUT ingresado no es válido.{validate_rut(rut_limpio)} {format_rut(rut_limpio)}")
+            raise ValidationError(f"El RUT ingresado no es válido en CHILE.")
 
         return format_rut(rut_limpio)
 
