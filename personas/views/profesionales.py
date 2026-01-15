@@ -1,5 +1,4 @@
 from django.contrib import messages
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
@@ -15,7 +14,7 @@ from personas.models.profesionales import Profesional
 MODULE_NAME = 'Profesionales'
 
 
-class ProfesionalListView( DataTableMixin, TemplateView):
+class ProfesionalListView(DataTableMixin, TemplateView):
     template_name = 'profesional/list.html'
     model = Profesional
     datatable_columns = ['ID', 'RUT', 'Nombre', 'Correo', 'Teléfono', 'Anexo', 'Profesión', 'Establecimiento']
@@ -25,12 +24,6 @@ class ProfesionalListView( DataTableMixin, TemplateView):
         'rut__icontains', 'nombres__icontains', 'correo__icontains', 'telefono__icontains', 'anexo__icontains',
         'profesion__nombre__icontains', 'establecimiento__nombre__icontains'
     ]
-
-    permission_required = 'personas.view_profesional'
-    raise_exception = True
-
-    permission_view = 'personas.view_profesional'
-    permission_update = 'personas.change_profesional'
 
     url_detail = 'profesional_detail'
     url_update = 'profesional_update'
@@ -76,11 +69,9 @@ class ProfesionalListView( DataTableMixin, TemplateView):
         return context
 
 
-class ProfesionalDetailView( DetailView):
+class ProfesionalDetailView(DetailView):
     model = Profesional
     template_name = 'profesional/detail.html'
-    permission_required = 'personas.view_profesionales'
-    raise_exception = True
 
     def render_to_response(self, context, **response_kwargs):
         if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -90,14 +81,12 @@ class ProfesionalDetailView( DetailView):
         return super().render_to_response(context, **response_kwargs)
 
 
-class ProfesionalCreateView( IncludeUserFormCreate, CreateView):
+class ProfesionalCreateView(IncludeUserFormCreate, CreateView):
     template_name = 'profesional/form.html'
     model = Profesional
     form_class = FormProfesional
     success_url = reverse_lazy('profesional_list')
-    permission_required = 'personas.add_profesionales'
-    raise_exception = True
-    
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['request'] = self.request
@@ -125,13 +114,11 @@ class ProfesionalCreateView( IncludeUserFormCreate, CreateView):
         return context
 
 
-class ProfesionalUpdateView( IncludeUserFormUpdate, UpdateView):
+class ProfesionalUpdateView(IncludeUserFormUpdate, UpdateView):
     template_name = 'profesional/form.html'
     model = Profesional
     form_class = FormProfesional
     success_url = reverse_lazy('profesional_list')
-    permission_required = 'personas.change_profesionales'
-    raise_exception = True
 
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -156,7 +143,6 @@ class ProfesionalUpdateView( IncludeUserFormUpdate, UpdateView):
 
 class ProfesionalHistoryListView(GenericHistoryListView):
     base_model = Profesional
-    permission_required = 'personas.view_profesional'
     template_name = 'history/list.html'
 
     url_last_page = 'profesional_list'

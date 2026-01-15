@@ -1,5 +1,4 @@
 from django.contrib import messages
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView, DetailView, TemplateView
@@ -21,10 +20,6 @@ class ComunaListView(DataTableMixin, TemplateView):
     datatable_order_fields = ['id', 'nombre', ]
 
     datatable_only = ['id', 'nombre', ]
-
-    permission_required = 'view_comuna'
-    permission_view = 'geografia.view_comuna'
-    permission_update = 'geografia.change_comuna'
 
     url_detail = 'detail_comunas'
     url_update = 'update_comunas'
@@ -54,11 +49,9 @@ class ComunaListView(DataTableMixin, TemplateView):
         return context
 
 
-class ComunaDetailView(PermissionRequiredMixin, DetailView):
+class ComunaDetailView(DetailView):
     model = Comuna
     template_name = 'comuna/detail.html'
-    permission_required = 'geografia.view_comuna'
-    raise_exception = True
 
     def render_to_response(self, context, **response_kwargs):
         # Si es una solicitud AJAX, devolvemos solo el fragmento HTML
@@ -69,13 +62,11 @@ class ComunaDetailView(PermissionRequiredMixin, DetailView):
         return super().render_to_response(context, **response_kwargs)
 
 
-class ComunaCreateView(PermissionRequiredMixin, IncludeUserFormCreate, CreateView):
+class ComunaCreateView(IncludeUserFormCreate, CreateView):
     template_name = 'comuna/form.html'
     model = Comuna
     form_class = FormComuna
     success_url = reverse_lazy('list_comunas')
-    permission_required = 'geografia.add_comuna'
-    raise_exception = True
 
     def form_valid(self, form):
         messages.success(self.request, 'Comuna creada correctamente')
@@ -94,12 +85,11 @@ class ComunaCreateView(PermissionRequiredMixin, IncludeUserFormCreate, CreateVie
         return context
 
 
-class ComunaUpdateView(PermissionRequiredMixin, IncludeUserFormUpdate, UpdateView):
+class ComunaUpdateView(IncludeUserFormUpdate, UpdateView):
     template_name = 'comuna/form.html'
     model = Comuna
     form_class = FormComuna
     success_url = reverse_lazy('list_comunas')
-    permission_required = 'geografia:change_comuna'
 
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -124,7 +114,6 @@ class ComunaUpdateView(PermissionRequiredMixin, IncludeUserFormUpdate, UpdateVie
 
 class ComunaHistoryListView(GenericHistoryListView):
     base_model = Comuna
-    permission_required = 'geografia.view_comuna'
     template_name = 'history/list.html'
 
     url_last_page = 'list_comunas'

@@ -1,5 +1,4 @@
 from django.contrib import messages
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView, DetailView
@@ -14,15 +13,13 @@ from establecimientos.models.establecimiento import Establecimiento
 MODULE_NAME = 'Establecimientos'
 
 
-class EstablecimientoListView(PermissionRequiredMixin, DataTableMixin, TemplateView):
+class EstablecimientoListView(DataTableMixin, TemplateView):
     template_name = 'establecimiento/list.html'
     model = Establecimiento
     datatable_columns = ['ID', 'Nombre', 'Dirección', 'Teléfono', 'Comuna']
     datatable_order_fields = ['id', None, 'nombre', 'direccion', 'telefono', 'comuna__nombre']
     datatable_search_fields = ['nombre__icontains', 'direccion__icontains', 'telefono__icontains',
                                'comuna__nombre__icontains']
-
-    permission_required = 'establecimientos.view_establecimiento'
 
     url_detail = 'establecimiento_detail'
     url_update = 'establecimiento_update'
@@ -55,11 +52,9 @@ class EstablecimientoListView(PermissionRequiredMixin, DataTableMixin, TemplateV
         return context
 
 
-class EstablecimientoDetailView(PermissionRequiredMixin, DetailView):
+class EstablecimientoDetailView(DetailView):
     model = Establecimiento
     template_name = 'establecimiento/detail.html'
-    permission_required = 'establecimientos.view_establecimiento'
-    raise_exception = True
 
     def render_to_response(self, context, **response_kwargs):
         # Si es una solicitud AJAX, devolvemos solo el fragmento HTML
@@ -70,12 +65,11 @@ class EstablecimientoDetailView(PermissionRequiredMixin, DetailView):
         return super().render_to_response(context, **response_kwargs)
 
 
-class EstablecimientoCreateView(PermissionRequiredMixin, IncludeUserFormCreate, CreateView):
+class EstablecimientoCreateView(IncludeUserFormCreate, CreateView):
     template_name = 'establecimiento/form.html'
     model = Establecimiento
     form_class = FormEstablecimiento
     success_url = reverse_lazy('establecimiento_list')
-    permission_required = 'establecimientos.add_establecimiento'
 
     def form_valid(self, form):
         messages.success(self.request, 'Comuna creada correctamente')
@@ -94,12 +88,11 @@ class EstablecimientoCreateView(PermissionRequiredMixin, IncludeUserFormCreate, 
         return context
 
 
-class EstablecimientoUpdateView(PermissionRequiredMixin, IncludeUserFormUpdate, UpdateView):
+class EstablecimientoUpdateView(IncludeUserFormUpdate, UpdateView):
     template_name = 'establecimiento/form.html'
     model = Establecimiento
     form_class = FormEstablecimiento
     success_url = reverse_lazy('establecimiento_list')
-    permission_required = 'establecimientos.change_establecimiento'
 
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -124,5 +117,4 @@ class EstablecimientoUpdateView(PermissionRequiredMixin, IncludeUserFormUpdate, 
 
 class EstablecimientoHistoryListView(GenericHistoryListView):
     base_model = Establecimiento
-    permission_required = 'establecimientos.view_establecimiento'
     template_name = 'history/list.html'

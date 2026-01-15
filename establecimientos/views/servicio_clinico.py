@@ -1,5 +1,4 @@
 from django.contrib import messages
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
@@ -15,7 +14,7 @@ from establecimientos.models.servicio_clinico import ServicioClinico
 MODULE_NAME = 'Servicios Clínicos'
 
 
-class ServicioClinicoListView( DataTableMixin, TemplateView):
+class ServicioClinicoListView(DataTableMixin, TemplateView):
     template_name = 'servicio_clinico/list.html'
     model = ServicioClinico
     datatable_columns = ['ID', 'Nombre', 'Jefe Área', 'Teléfono', 'Establecimiento']
@@ -23,12 +22,6 @@ class ServicioClinicoListView( DataTableMixin, TemplateView):
                               'establecimiento__nombre']
     datatable_search_fields = ['nombre__icontains', 'correo_jefe__icontains',
                                'telefono__icontains', 'establecimiento__nombre__icontains']
-
-    permission_required = 'establecimiento.view_servicioclinico'
-    raise_exception = True
-
-    permission_view = 'establecimiento.view_servicioclinico'
-    permission_update = 'establecimiento.change_servicioclinico'
 
     url_detail = 'servicio_clinico_detail'
     url_update = 'servicio_clinico_update'
@@ -71,11 +64,9 @@ class ServicioClinicoListView( DataTableMixin, TemplateView):
         return context
 
 
-class ServicioClinicoDetailView( DetailView):
+class ServicioClinicoDetailView(DetailView):
     model = ServicioClinico
     template_name = 'servicio_clinico/detail.html'
-    permission_required = 'establecimiento.view_servicio_clinico'
-    raise_exception = True
 
     def render_to_response(self, context, **response_kwargs):
         if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -85,13 +76,11 @@ class ServicioClinicoDetailView( DetailView):
         return super().render_to_response(context, **response_kwargs)
 
 
-class ServicioClinicoCreateView( IncludeUserFormCreate, CreateView):
+class ServicioClinicoCreateView(IncludeUserFormCreate, CreateView):
     template_name = 'servicio_clinico/form.html'
     model = ServicioClinico
     form_class = FormServicioClinico
     success_url = reverse_lazy('servicio_clinico_list')
-    permission_required = 'establecimiento.add_servicio_clinico'
-    raise_exception = True
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -120,13 +109,11 @@ class ServicioClinicoCreateView( IncludeUserFormCreate, CreateView):
         return context
 
 
-class ServicioClinicoUpdateView( IncludeUserFormUpdate, UpdateView):
+class ServicioClinicoUpdateView(IncludeUserFormUpdate, UpdateView):
     template_name = 'servicio_clinico/form.html'
     model = ServicioClinico
     form_class = FormServicioClinico
     success_url = reverse_lazy('servicio_clinico_list')
-    permission_required = 'establecimiento.change_servicio_clinico'
-    raise_exception = True
 
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -151,7 +138,6 @@ class ServicioClinicoUpdateView( IncludeUserFormUpdate, UpdateView):
 
 class ServicioClinicoHistoryListView(GenericHistoryListView):
     base_model = ServicioClinico
-    permission_required = 'establecimiento.view_servicio_clinico'
     template_name = 'history/list.html'
 
     url_last_page = 'servicio_clinico_list'

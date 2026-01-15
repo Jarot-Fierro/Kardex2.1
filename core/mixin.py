@@ -53,26 +53,17 @@ class DataTableMixin:
         user = self.request.user
         actions = []
 
-        if self.permission_view and user.has_perm(self.permission_view):
-            actions.append(f"""
-                <a href="{reverse_lazy(f'{self.url_detail}', kwargs={'pk': obj.pk})}"
-                   class="btn p-1 btn-sm btn-secondary view-btn" title="Ver detalle">
-                   <i class="fas fa-search"></i></a>
-            """)
+        actions.append(f"""
+            <a href="{reverse_lazy(f'{self.url_detail}', kwargs={'pk': obj.pk})}"
+               class="btn p-1 btn-sm btn-secondary view-btn" title="Ver detalle">
+               <i class="fas fa-search"></i></a>
+        """)
 
-        if self.permission_update and user.has_perm(self.permission_update):
-            actions.append(f"""
-                <a href="{reverse_lazy(f'{self.url_update}', kwargs={'pk': obj.pk})}"
-                   class="btn p-1 btn-sm btn-info" title="Editar">
-                   <i class="fas fa-edit"></i></a>
-            """)
-
-        if self.permission_delete and user.has_perm(self.permission_delete):
-            actions.append(f"""
-                <a href="{reverse_lazy(f'{self.url_delete}', kwargs={'pk': obj.pk})}"
-                   class="btn p-1 btn-sm btn-danger" title="Eliminar">
-                   <i class="fas fa-trash"></i></a>
-            """)
+        actions.append(f"""
+            <a href="{reverse_lazy(f'{self.url_update}', kwargs={'pk': obj.pk})}"
+               class="btn p-1 btn-sm btn-info" title="Editar">
+               <i class="fas fa-edit"></i></a>
+        """)
 
         return ''.join(actions)
 

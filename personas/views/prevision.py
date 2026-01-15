@@ -1,5 +1,4 @@
 from django.contrib import messages
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView, DetailView
@@ -14,18 +13,12 @@ from personas.models.prevision import Prevision
 MODULE_NAME = 'Previsiones'
 
 
-class PrevisionListView(PermissionRequiredMixin, DataTableMixin, TemplateView):
+class PrevisionListView(DataTableMixin, TemplateView):
     template_name = 'prevision/list.html'
     model = Prevision
     datatable_columns = ['ID', 'Nombre']
     datatable_order_fields = ['id', None, 'nombre']
     datatable_search_fields = ['nombre__icontains']
-
-    permission_required = 'personas.view_prevision'
-    raise_exception = True
-
-    permission_view = 'personas.view_prevision'
-    permission_update = 'personas.change_prevision'
 
     url_detail = 'prevision_detail'
     url_update = 'prevision_update'
@@ -55,11 +48,9 @@ class PrevisionListView(PermissionRequiredMixin, DataTableMixin, TemplateView):
         return context
 
 
-class PrevisionDetailView(PermissionRequiredMixin, DetailView):
+class PrevisionDetailView(DetailView):
     model = Prevision
     template_name = 'prevision/detail.html'
-    permission_required = 'personas.view_prevision'
-    raise_exception = True
 
     def render_to_response(self, context, **response_kwargs):
         if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -69,13 +60,11 @@ class PrevisionDetailView(PermissionRequiredMixin, DetailView):
         return super().render_to_response(context, **response_kwargs)
 
 
-class PrevisionCreateView(PermissionRequiredMixin, IncludeUserFormCreate, CreateView):
+class PrevisionCreateView(IncludeUserFormCreate, CreateView):
     template_name = 'prevision/form.html'
     model = Prevision
     form_class = FormPrevision
     success_url = reverse_lazy('prevision_list')
-    permission_required = 'personas.add_prevision'
-    raise_exception = True
 
     def form_valid(self, form):
         messages.success(self.request, 'Previsión creada correctamente')
@@ -94,13 +83,11 @@ class PrevisionCreateView(PermissionRequiredMixin, IncludeUserFormCreate, Create
         return context
 
 
-class PrevisionUpdateView(PermissionRequiredMixin, IncludeUserFormUpdate, UpdateView):
+class PrevisionUpdateView(IncludeUserFormUpdate, UpdateView):
     template_name = 'prevision/form.html'
     model = Prevision
     form_class = FormPrevision
     success_url = reverse_lazy('prevision_list')
-    permission_required = 'personas.change_prevision'
-    raise_exception = True
 
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -125,7 +112,6 @@ class PrevisionUpdateView(PermissionRequiredMixin, IncludeUserFormUpdate, Update
 
 class PrevisionHistoryListView(GenericHistoryListView):
     base_model = Prevision
-    permission_required = 'personas.view_prevision'
     template_name = 'history/list.html'
 
     url_last_page = 'prevision_list'

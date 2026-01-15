@@ -1,5 +1,4 @@
 from django.contrib import messages
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView, DetailView
@@ -14,18 +13,12 @@ from personas.models.profesion import Profesion
 MODULE_NAME = 'Profesiones'
 
 
-class ProfesionListView(PermissionRequiredMixin, DataTableMixin, TemplateView):
+class ProfesionListView(DataTableMixin, TemplateView):
     template_name = 'profesion/list.html'
     model = Profesion
     datatable_columns = ['ID', 'Nombre']
     datatable_order_fields = ['id', None, 'nombre']
     datatable_search_fields = ['nombre__icontains']
-
-    permission_required = 'personas.view_profesion'
-    raise_exception = True
-
-    permission_view = 'personas.view_profesion'
-    permission_update = 'personas.change_profesion'
 
     url_detail = 'profesion_detail'
     url_update = 'profesion_update'
@@ -55,11 +48,9 @@ class ProfesionListView(PermissionRequiredMixin, DataTableMixin, TemplateView):
         return context
 
 
-class ProfesionDetailView(PermissionRequiredMixin, DetailView):
+class ProfesionDetailView(DetailView):
     model = Profesion
     template_name = 'profesion/detail.html'
-    permission_required = 'personas.view_profesion'
-    raise_exception = True
 
     def render_to_response(self, context, **response_kwargs):
         if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -69,13 +60,11 @@ class ProfesionDetailView(PermissionRequiredMixin, DetailView):
         return super().render_to_response(context, **response_kwargs)
 
 
-class ProfesionCreateView(PermissionRequiredMixin, IncludeUserFormCreate, CreateView):
+class ProfesionCreateView(IncludeUserFormCreate, CreateView):
     template_name = 'profesion/form.html'
     model = Profesion
     form_class = FormProfesion
     success_url = reverse_lazy('profesion_list')
-    permission_required = 'personas.add_profesion'
-    raise_exception = True
 
     def form_valid(self, form):
         messages.success(self.request, 'Profesión creada correctamente')
@@ -94,13 +83,11 @@ class ProfesionCreateView(PermissionRequiredMixin, IncludeUserFormCreate, Create
         return context
 
 
-class ProfesionUpdateView(PermissionRequiredMixin, IncludeUserFormUpdate, UpdateView):
+class ProfesionUpdateView(IncludeUserFormUpdate, UpdateView):
     template_name = 'profesion/form.html'
     model = Profesion
     form_class = FormProfesion
     success_url = reverse_lazy('profesion_list')
-    permission_required = 'personas.change_profesion'
-    raise_exception = True
 
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -125,7 +112,6 @@ class ProfesionUpdateView(PermissionRequiredMixin, IncludeUserFormUpdate, Update
 
 class ProfesionHistoryListView(GenericHistoryListView):
     base_model = Profesion
-    permission_required = 'personas.view_profesion'
     template_name = 'history/list.html'
 
     url_last_page = 'profesion_list'

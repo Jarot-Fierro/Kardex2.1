@@ -1,5 +1,4 @@
 from django.contrib import messages
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView, DetailView
@@ -14,18 +13,12 @@ from establecimientos.models.colores import Color
 MODULE_NAME = 'Colores'
 
 
-class ColorListView(PermissionRequiredMixin, DataTableMixin, TemplateView):
+class ColorListView(DataTableMixin, TemplateView):
     template_name = 'color/list.html'
     model = Color
     datatable_columns = ['ID', 'Nombre', ]
     datatable_order_fields = ['id', None, 'nombre', ]
     datatable_search_fields = ['nombre__icontains', ]
-
-    permission_required = 'geografia.view_color'
-    raise_exception = True
-
-    permission_view = 'geografia.view_color'
-    permission_update = 'geografia.change_color'
 
     url_detail = 'color_detail'
     url_update = 'color_update'
@@ -55,11 +48,10 @@ class ColorListView(PermissionRequiredMixin, DataTableMixin, TemplateView):
         return context
 
 
-class ColorDetailView(PermissionRequiredMixin, DetailView):
+class ColorDetailView(DetailView):
     model = Color
     template_name = 'color/detail.html'
     permission_required = 'geografia.view_color'
-    raise_exception = True
 
     def render_to_response(self, context, **response_kwargs):
         # Si es una solicitud AJAX, devolvemos solo el fragmento HTML
@@ -70,13 +62,11 @@ class ColorDetailView(PermissionRequiredMixin, DetailView):
         return super().render_to_response(context, **response_kwargs)
 
 
-class ColorCreateView(PermissionRequiredMixin, IncludeUserFormCreate, CreateView):
+class ColorCreateView(IncludeUserFormCreate, CreateView):
     template_name = 'color/form.html'
     model = Color
     form_class = FormColor
     success_url = reverse_lazy('color_list')
-    permission_required = 'add_color'
-    raise_exception = True
 
     def form_valid(self, form):
         messages.success(self.request, 'Color creado correctamente')
@@ -95,13 +85,11 @@ class ColorCreateView(PermissionRequiredMixin, IncludeUserFormCreate, CreateView
         return context
 
 
-class ColorUpdateView(PermissionRequiredMixin, IncludeUserFormUpdate, UpdateView):
+class ColorUpdateView(IncludeUserFormUpdate, UpdateView):
     template_name = 'color/form.html'
     model = Color
     form_class = FormColor
     success_url = reverse_lazy('color_list')
-    permission_required = 'change_color'
-    raise_exception = True
 
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -126,7 +114,6 @@ class ColorUpdateView(PermissionRequiredMixin, IncludeUserFormUpdate, UpdateView
 
 class ColorHistoryListView(GenericHistoryListView):
     base_model = Color
-    permission_required = 'geografia.view_color'
     template_name = 'history/list.html'
 
     url_last_page = 'color_list'

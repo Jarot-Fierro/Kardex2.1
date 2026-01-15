@@ -1,25 +1,24 @@
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.shortcuts import render
 from django.template.loader import render_to_string
+from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import CreateView, DetailView
+from django.views.generic import TemplateView
 from django.views.generic import UpdateView
 
 from core.mixin import DataTableMixin
 from users.forms.usuarios import LoginForm, FormUsuario, FormUsuarioUpdate, UserResetPasswordForm, \
     FormUsuarioProfileUpdate
 from users.models import User, UserRole
-
-from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
-from django.views.generic import TemplateView
-from django.urls import reverse_lazy
-from django.contrib.auth import get_user_model
 
 MODULE_NAME = 'Usuarios'
 
@@ -51,11 +50,10 @@ def logout_view(request):
     return redirect('login')
 
 
-
 User = get_user_model()
 
 
-class UserListView(PermissionRequiredMixin, DataTableMixin, TemplateView):
+class UserListView(DataTableMixin, TemplateView):
     template_name = 'usuarios/list.html'
     model = User
 
@@ -70,12 +68,6 @@ class UserListView(PermissionRequiredMixin, DataTableMixin, TemplateView):
         'username__icontains', 'first_name__icontains', 'last_name__icontains',
         'email__icontains', 'establecimiento__nombre__icontains'
     ]
-
-    permission_required = 'auth.view_user'
-
-    permission_view = 'auth.view_user'
-    permission_update = 'auth.change_user'
-    raise_exception = True
 
     url_update = 'usuarios_update'
     url_detail = 'usuarios_detail'
@@ -123,11 +115,9 @@ class UserListView(PermissionRequiredMixin, DataTableMixin, TemplateView):
         return context
 
 
-class UserDetailView(PermissionRequiredMixin, DetailView):
+class UserDetailView(DetailView):
     model = User
     template_name = 'usuarios/detail.html'
-    permission_required = 'auth.view_user'
-    raise_exception = True
 
     def render_to_response(self, context, **response_kwargs):
         # Si es una solicitud AJAX, devolvemos solo el fragmento HTML
@@ -137,14 +127,11 @@ class UserDetailView(PermissionRequiredMixin, DetailView):
         return super().render_to_response(context, **response_kwargs)
 
 
-class UserCreateView(PermissionRequiredMixin, CreateView):
+class UserCreateView(CreateView):
     template_name = 'usuarios/form.html'
     model = User
     form_class = FormUsuario
     success_url = reverse_lazy('usuarios_list')
-
-    permission_required = 'auth.view_user'
-    raise_exception = True
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -187,14 +174,11 @@ class UserCreateView(PermissionRequiredMixin, CreateView):
         return context
 
 
-class UserUpdateView(PermissionRequiredMixin, UpdateView):
+class UserUpdateView(UpdateView):
     template_name = 'usuarios/form.html'
     model = User
     form_class = FormUsuarioUpdate
     success_url = reverse_lazy('usuarios_list')
-
-    permission_required = 'auth.view_user'
-    raise_exception = True
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -238,9 +222,7 @@ class UserUpdateView(PermissionRequiredMixin, UpdateView):
         return context
 
 
-class UserResetPasswordView(PermissionRequiredMixin, View):
-    permission_required = 'auth.change_user'
-    raise_exception = True
+class UserResetPasswordView(View):
     template_name = 'usuarios/reset_password.html'
 
     def get(self, request, pk, *args, **kwargs):
@@ -262,13 +244,11 @@ class UserResetPasswordView(PermissionRequiredMixin, View):
         return render(request, self.template_name, {'form': form, 'user_obj': user})
 
 
-class UserProfileUpdateView(PermissionRequiredMixin, UpdateView):
+class UserProfileUpdateView(UpdateView):
     template_name = 'usuarios/perfil.html'
     model = User
     form_class = FormUsuarioProfileUpdate
     success_url = reverse_lazy('perfil')
-    permission_required = 'auth.change_user'
-    raise_exception = True
 
     def get_object(self, queryset=None):
         return self.request.user

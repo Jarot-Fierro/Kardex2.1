@@ -14,18 +14,12 @@ from personas.models.genero import Genero
 MODULE_NAME = 'Generoes'
 
 
-class GeneroListView(PermissionRequiredMixin, DataTableMixin, TemplateView):
+class GeneroListView(DataTableMixin, TemplateView):
     template_name = 'genero/list.html'
     model = Genero
     datatable_columns = ['ID', 'Nombre', ]
     datatable_order_fields = ['id', None, 'nombre', ]
     datatable_search_fields = ['nombre__icontains', ]
-
-    permission_required = 'geografia.view_genero'
-    raise_exception = True
-
-    permission_view = 'geografia.view_genero'
-    permission_update = 'geografia.change_genero'
 
     url_detail = 'genero_detail'
     url_update = 'genero_update'
@@ -58,8 +52,6 @@ class GeneroListView(PermissionRequiredMixin, DataTableMixin, TemplateView):
 class GeneroDetailView(PermissionRequiredMixin, DetailView):
     model = Genero
     template_name = 'genero/detail.html'
-    permission_required = 'geografia.view_genero'
-    raise_exception = True
 
     def render_to_response(self, context, **response_kwargs):
         # Si es una solicitud AJAX, devolvemos solo el fragmento HTML
@@ -70,13 +62,11 @@ class GeneroDetailView(PermissionRequiredMixin, DetailView):
         return super().render_to_response(context, **response_kwargs)
 
 
-class GeneroCreateView(PermissionRequiredMixin, IncludeUserFormCreate, CreateView):
+class GeneroCreateView(IncludeUserFormCreate, CreateView):
     template_name = 'genero/form.html'
     model = Genero
     form_class = FormGenero
     success_url = reverse_lazy('genero_list')
-    permission_required = 'add_genero'
-    raise_exception = True
 
     def form_valid(self, form):
         messages.success(self.request, 'Genero creado correctamente')
@@ -95,13 +85,11 @@ class GeneroCreateView(PermissionRequiredMixin, IncludeUserFormCreate, CreateVie
         return context
 
 
-class GeneroUpdateView(PermissionRequiredMixin, IncludeUserFormUpdate, UpdateView):
+class GeneroUpdateView(IncludeUserFormUpdate, UpdateView):
     template_name = 'genero/form.html'
     model = Genero
     form_class = FormGenero
     success_url = reverse_lazy('genero_list')
-    permission_required = 'change_genero'
-    raise_exception = True
 
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -126,7 +114,6 @@ class GeneroUpdateView(PermissionRequiredMixin, IncludeUserFormUpdate, UpdateVie
 
 class GeneroHistoryListView(GenericHistoryListView):
     base_model = Genero
-    permission_required = 'geografia.view_genero'
     template_name = 'history/list.html'
 
     url_last_page = 'genero_list'

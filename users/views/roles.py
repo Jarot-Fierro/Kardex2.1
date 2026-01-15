@@ -1,5 +1,4 @@
 from django.contrib import messages
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView, CreateView, UpdateView, DetailView
@@ -17,10 +16,6 @@ class RoleListView(DataTableMixin, TemplateView):
     datatable_order_fields = ['rol_id', 'role_name', 'establecimiento__nombre']
 
     datatable_only = ['rol_id', 'role_name', 'establecimiento']
-
-    permission_required = 'view_role'
-    permission_view = 'roles.view_role'
-    permission_update = 'roles.change_role'
 
     url_detail = 'roles_detail'
     url_update = 'roles_update'
@@ -51,13 +46,11 @@ class RoleListView(DataTableMixin, TemplateView):
         return context
 
 
-class RoleCreateView(PermissionRequiredMixin, CreateView):
+class RoleCreateView(CreateView):
     template_name = 'roles/form.html'
     model = Role
     form_class = RoleForm
     success_url = reverse_lazy('roles_list')
-    permission_required = 'roles.add_role'
-    raise_exception = True
 
     def form_valid(self, form):
         messages.success(self.request, 'Rol creado correctamente')
@@ -75,13 +68,11 @@ class RoleCreateView(PermissionRequiredMixin, CreateView):
         return context
 
 
-class RoleUpdateView(PermissionRequiredMixin, UpdateView):
+class RoleUpdateView(UpdateView):
     template_name = 'roles/form.html'
     model = Role
     form_class = RoleForm
     success_url = reverse_lazy('roles_list')
-    permission_required = 'roles.change_role'
-    raise_exception = True
 
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -103,11 +94,9 @@ class RoleUpdateView(PermissionRequiredMixin, UpdateView):
         return context
 
 
-class RoleDetailView(PermissionRequiredMixin, DetailView):
+class RoleDetailView(DetailView):
     model = Role
     template_name = 'roles/detail.html'
-    permission_required = 'roles.view_role'
-    raise_exception = True
 
     def render_to_response(self, context, **response_kwargs):
         if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':

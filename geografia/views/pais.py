@@ -1,5 +1,4 @@
 from django.contrib import messages
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView, DetailView
@@ -14,18 +13,12 @@ from geografia.models.pais import Pais
 MODULE_NAME = 'Paises'
 
 
-class PaisListView(PermissionRequiredMixin, DataTableMixin, TemplateView):
+class PaisListView(DataTableMixin, TemplateView):
     template_name = 'pais/list.html'
     model = Pais
     datatable_columns = ['ID', 'Nombre', 'Código']
     datatable_order_fields = ['id', None, 'nombre', 'cod_pais']
     datatable_search_fields = ['nombre__icontains', 'cod_pais__icontains']
-
-    permission_required = 'geografia.view_pais'
-    raise_exception = True
-
-    permission_view = 'geografia.view_pais'
-    permission_update = 'geografia.change_pais'
 
     url_detail = 'pais_detail'
     url_update = 'pais_update'
@@ -56,11 +49,9 @@ class PaisListView(PermissionRequiredMixin, DataTableMixin, TemplateView):
         return context
 
 
-class PaisDetailView(PermissionRequiredMixin, DetailView):
+class PaisDetailView(DetailView):
     model = Pais
     template_name = 'pais/detail.html'
-    permission_required = 'geografia.view_pais'
-    raise_exception = True
 
     def render_to_response(self, context, **response_kwargs):
         # Si es una solicitud AJAX, devolvemos solo el fragmento HTML
@@ -71,12 +62,11 @@ class PaisDetailView(PermissionRequiredMixin, DetailView):
         return super().render_to_response(context, **response_kwargs)
 
 
-class PaisCreateView(PermissionRequiredMixin, IncludeUserFormCreate, CreateView):
+class PaisCreateView(IncludeUserFormCreate, CreateView):
     template_name = 'pais/form.html'
     model = Pais
     form_class = FormPais
     success_url = reverse_lazy('pais_list')
-    permission_required = 'add_pais'
     raise_exception = True
 
     def form_valid(self, form):
@@ -96,13 +86,11 @@ class PaisCreateView(PermissionRequiredMixin, IncludeUserFormCreate, CreateView)
         return context
 
 
-class PaisUpdateView(PermissionRequiredMixin, IncludeUserFormUpdate, UpdateView):
+class PaisUpdateView(IncludeUserFormUpdate, UpdateView):
     template_name = 'pais/form.html'
     model = Pais
     form_class = FormPais
     success_url = reverse_lazy('pais_list')
-    permission_required = 'change_pais'
-    raise_exception = True
 
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -127,7 +115,6 @@ class PaisUpdateView(PermissionRequiredMixin, IncludeUserFormUpdate, UpdateView)
 
 class PaisHistoryListView(GenericHistoryListView):
     base_model = Pais
-    permission_required = 'geografia.view_pais'
     template_name = 'history/list.html'
 
     url_last_page = 'pais_list'

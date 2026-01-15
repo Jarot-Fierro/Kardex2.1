@@ -1,5 +1,4 @@
 from django.contrib import messages
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
@@ -15,7 +14,7 @@ from establecimientos.models.sectores import Sector
 MODULE_NAME = 'Sectors'
 
 
-class SectorListView(PermissionRequiredMixin, DataTableMixin, TemplateView):
+class SectorListView(DataTableMixin, TemplateView):
     template_name = 'sector/list.html'
     model = Sector
     datatable_columns = ['ID', 'Color', 'Establecimiento', 'Código', 'Observación', ]
@@ -26,12 +25,6 @@ class SectorListView(PermissionRequiredMixin, DataTableMixin, TemplateView):
         'codigo__icontains',
         'observacion__icontains',
     ]
-
-    permission_required = 'establecimiento.view_sector'
-    raise_exception = True
-
-    permission_view = 'establecimiento.view_sector'
-    permission_update = 'establecimiento.change_sector'
 
     url_detail = 'sector_detail'
     url_update = 'sector_update'
@@ -74,11 +67,9 @@ class SectorListView(PermissionRequiredMixin, DataTableMixin, TemplateView):
         return context
 
 
-class SectorDetailView(PermissionRequiredMixin, DetailView):
+class SectorDetailView(DetailView):
     model = Sector
     template_name = 'sector/detail.html'
-    permission_required = 'establecimiento.view_sector'
-    raise_exception = True
 
     def render_to_response(self, context, **response_kwargs):
         # Si es una solicitud AJAX, devolvemos solo el fragmento HTML
@@ -89,12 +80,11 @@ class SectorDetailView(PermissionRequiredMixin, DetailView):
         return super().render_to_response(context, **response_kwargs)
 
 
-class SectorCreateView(PermissionRequiredMixin, IncludeUserFormCreate, CreateView):
+class SectorCreateView(IncludeUserFormCreate, CreateView):
     template_name = 'sector/form.html'
     model = Sector
     form_class = FormSector
     success_url = reverse_lazy('sector_list')
-    permission_required = 'establecimiento:add_sector'
 
     def form_valid(self, form):
         if not self.request.user.establecimiento:
@@ -117,12 +107,11 @@ class SectorCreateView(PermissionRequiredMixin, IncludeUserFormCreate, CreateVie
         return context
 
 
-class SectorUpdateView(PermissionRequiredMixin, IncludeUserFormUpdate, UpdateView):
+class SectorUpdateView(IncludeUserFormUpdate, UpdateView):
     template_name = 'sector/form.html'
     model = Sector
     form_class = FormSector
     success_url = reverse_lazy('sector_list')
-    permission_required = 'change_sector'
 
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -147,7 +136,6 @@ class SectorUpdateView(PermissionRequiredMixin, IncludeUserFormUpdate, UpdateVie
 
 class SectorHistoryListView(GenericHistoryListView):
     base_model = Sector
-    permission_required = 'establecimiento.view_sector'
     template_name = 'history/list.html'
 
     url_last_page = 'sector_list'

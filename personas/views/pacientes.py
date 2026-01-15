@@ -69,10 +69,11 @@ def paciente_view(request, paciente_id=None):
 
     if request.method == 'POST':
 
+        accion = request.POST.get('accion')
         paciente_id_post = request.POST.get('paciente_id') or paciente_id
-        es_edicion = bool(paciente_id_post)
+        es_edicion = (accion == 'ACTUALIZAR') or bool(paciente_id_post)
 
-        if paciente_id_post:
+        if es_edicion and paciente_id_post:
             paciente_instance = Paciente.objects.filter(pk=paciente_id_post).first()
 
             if paciente_instance:
@@ -85,6 +86,26 @@ def paciente_view(request, paciente_id=None):
         ficha_form = FichaForm(request.POST, instance=ficha_instance)
 
         if paciente_form.is_valid() and ficha_form.is_valid():
+
+            # Verificación de consistencia Accion vs Instancia
+            rut_post = paciente_form.cleaned_data.get('rut')
+            if accion == 'CREAR':
+                if Paciente.objects.filter(rut=rut_post).exists():
+                    paciente_form.add_error('rut',
+                                            'Ya existe un paciente con este RUT. Por favor, consúltelo antes de intentar crear uno nuevo.')
+                    return render(request, 'paciente/form.html', {
+                        'paciente_form': paciente_form,
+                        'ficha_form': ficha_form,
+                        'modo': 'error_crear',
+                        'accion': accion,
+                        'paciente_id': paciente_id_post,
+                        'title': 'Consulta de pacientes'
+                    })
+            elif accion == 'ACTUALIZAR':
+                if not paciente_instance:
+                    messages.error(request,
+                                   'Error de consistencia: Se intentó actualizar un paciente que no existe o no fue cargado correctamente.')
+                    return redirect('paciente_view')
 
             try:
                 with transaction.atomic():
@@ -113,6 +134,8 @@ def paciente_view(request, paciente_id=None):
                     'paciente_form': paciente_form,
                     'ficha_form': ficha_form,
                     'modo': modo,
+                    'accion': accion,
+                    'paciente_id': paciente_id_post,
                     'title': 'Consulta de pacientes'
                 })
 
@@ -149,5 +172,7 @@ def paciente_view(request, paciente_id=None):
         'paciente_form': paciente_form,
         'ficha_form': ficha_form,
         'modo': modo,
+        'accion': request.POST.get('accion', 'ACTUALIZAR' if paciente_id else 'CREAR'),
+        'paciente_id': request.POST.get('paciente_id', paciente_id),
         'title': 'Consulta de pacientes'
     })
