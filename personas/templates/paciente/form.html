@@ -664,6 +664,48 @@
 
         </form>
     </div>
+    <div class="modal fade" id="modalPacienteNoEncontrado" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title">
+                        Paciente no encontrado
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <p>
+                        No se encontró un paciente con el RUT ingresado.
+                    </p>
+                    <p>
+                        ¿Desea limpiar el formulario para ingresar un nuevo paciente?
+                    </p>
+                </div>
+
+                <div class="modal-footer">
+                    <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-dismiss="modal">
+                        No, continuar editando
+                    </button>
+
+                    <button
+                            type="button"
+                            class="btn btn-danger"
+                            id="btnConfirmarLimpiarFormulario">
+                        Sí, limpiar formulario
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
 
 {% endblock %}
 
@@ -676,7 +718,27 @@
             });
         });
     </script>
+    <script>
+        {#    Botones #}
+        $('#btnConfirmarLimpiarFormulario').on('click', function () {
 
+            limpiarFormularioPaciente();
+
+            // cerrar modal
+            const modalElement = document.getElementById('modalPacienteNoEncontrado');
+            const modalInstance = bootstrap.Modal.getInstance(modalElement);
+            modalInstance.hide();
+
+
+            // asegurar estado
+            if (window.actualizarEstadoFallecimiento) {
+                window.actualizarEstadoFallecimiento();
+            }
+        });
+
+    </script>
+
+    {#  Funciones que Sirve, Reutilizables #}
     <script>
         function setValue(id, value) {
             const $el = $('#' + id);
@@ -744,7 +806,7 @@
 
 
     </script>
-
+    {#  Carga de DATOS en el formulario y tabla #}
     <script>
         function cargarPaciente(data) {
             const p = data.paciente;
@@ -908,7 +970,76 @@
 
 
     </script>
+    {#  Mostrar la Fecha en caso de que el paciente se ecneutre fallecido #}
+    <script>
+        $(document).ready(function () {
 
+            const $checkFallecido = $('#id_fallecido');
+            const $contenedorFecha = $('#contenedor-fecha-fallecimiento');
+            const $fecha = $('#id_fecha_fallecimiento');
+
+            function actualizarEstadoFallecimiento() {
+                if ($checkFallecido.prop('checked')) {
+                    $contenedorFecha.removeClass('d-none');
+                } else {
+                    $fecha.val('');
+                    $contenedorFecha.addClass('d-none');
+                }
+            }
+
+            // estado inicial
+            actualizarEstadoFallecimiento();
+
+            // cambio manual
+            $checkFallecido.on('change', actualizarEstadoFallecimiento);
+
+            // exponer para AJAX
+            window.actualizarEstadoFallecimiento = actualizarEstadoFallecimiento;
+
+        });
+    </script>
+    {#    Funcion que detecta si el formulario previamente ya contenia datos, si sí tenia, mostrar modal para limpiar el formulario #}
+    <script>
+        function formularioTieneDatos() {
+
+            const camposClave = [
+                'id_nombre',
+                'id_apellido_paterno',
+                'id_apellido_materno',
+                'id_nombre_social',
+                'id_pasaporte',
+                'id_nip',
+                'id_fecha_fallecimiento',
+                'id_rut_madre',
+                'id_nombres_madre',
+                'id_nombres_padre',
+                'id_nombre_pareja',
+                'id_direccion',
+                'id_ocupacion',
+                'id_numero_telefono1',
+                'id_numero_telefono2',
+                'id_alergico_a'
+            ];
+
+            // inputs / textarea / date
+            for (let i = 0; i < camposClave.length; i++) {
+                const $campo = $('#' + camposClave[i]);
+
+                if ($campo.length && $campo.val() && $campo.val().toString().trim() !== '') {
+                    return true;
+                }
+            }
+
+            // checkbox específico
+            if ($('#id_sin_telefono').is(':checked')) {
+                return true;
+            }
+
+            return false;
+        }
+
+
+    </script>
 
     {#    ESTA ES LA CONSULTA HACIA LA API FICHA-PACIENTE#}
     <script>
@@ -1028,22 +1159,31 @@
 
                     error: function (xhr) {
 
-                        limpiarFormularioPaciente();
+                        $('#ver_movimientos').addClass('d-none');
+                        ultimoRutConsultado = null;
 
-                        setTimeout(() => {
+                        // 🔍 ¿Hay datos que se perderían?
+                        if (formularioTieneDatos()) {
+
+                            // Mostrar modal SOLO si hay datos
+                            const modal = new bootstrap.Modal(
+                                document.getElementById('modalPacienteNoEncontrado')
+                            );
+                            modal.show();
+
+
+                        } else {
+
+                            // Formulario limpio → se asume creación
                             if (window.actualizarEstadoFallecimiento) {
                                 window.actualizarEstadoFallecimiento();
                             }
-                        }, 0);
 
-                        $('#ver_movimientos')
-                            .addClass('d-none')
-
-                        // permitir volver a consultar el mismo RUT si fue error
-                        ultimoRutConsultado = null;
-
-                        alert('Paciente no encontrado');
+                            // opcional: foco al primer campo
+                            $('#id_nombre').focus();
+                        }
                     },
+
 
                     complete: function () {
                         consultando = false;
@@ -1054,34 +1194,7 @@
         });
     </script>
 
-    <script>
-        $(document).ready(function () {
-
-            const $checkFallecido = $('#id_fallecido');
-            const $contenedorFecha = $('#contenedor-fecha-fallecimiento');
-            const $fecha = $('#id_fecha_fallecimiento');
-
-            function actualizarEstadoFallecimiento() {
-                if ($checkFallecido.prop('checked')) {
-                    $contenedorFecha.removeClass('d-none');
-                } else {
-                    $fecha.val('');
-                    $contenedorFecha.addClass('d-none');
-                }
-            }
-
-            // estado inicial
-            actualizarEstadoFallecimiento();
-
-            // cambio manual
-            $checkFallecido.on('change', actualizarEstadoFallecimiento);
-
-            // exponer para AJAX
-            window.actualizarEstadoFallecimiento = actualizarEstadoFallecimiento;
-
-        });
-    </script>
-
+    {#  Solo carga la tabla en caso de que Django devuelva el fromulario con los datos pero sin la ubicación del registro #}
     <script>
         $(document).ready(function () {
             // Carga solo los datos de Tabla y ubicacion en caso de que Django devuelva el formulario con errores
@@ -1118,6 +1231,7 @@
         });
     </script>
 
+    {#  Reglas del formulario, campos que estarán con DISABLE y campos que serpan REQUIRED    #}
     <script>
         (function () {
 
@@ -1249,6 +1363,7 @@
 
     </script>
 
+    {#    En caso de que se consulte otro paciente y el formulario previamente haya mandado errores, estos se ocultan para no visiaulizarlos con la consulta del otro paciente#}
     <script>
         function ocultarErroresFormulario() {
             // mensajes de error
