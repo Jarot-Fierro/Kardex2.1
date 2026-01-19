@@ -57,37 +57,41 @@
                 <!-- En tu template, modifica la sección de botones así: -->
                 <div class="col-md-8 mb-2 mb-md-0">
                     <div class="ficha-header align-items-center">
-                        <div class="row g-2">
+                        <div class="row">
                             <!-- ACCIONES -->
                             <div class="col-md-8">
                                 <span class="fw-semibold d-block mb-1">Acciones</span>
                                 <div class="d-flex w-100">
-                                    <a href="#"
-                                       id="btn-actualizar-rut"
-                                       class="btn btn-sm btn-primary flex-fill mx-1 disabled"
-                                       style="pointer-events: none; opacity: 0.6;">
+                                    <!-- Botones en tu template -->
+                                    <button type="button"
+                                            id="btn-actualizar-rut"
+                                            class="btn btn-sm btn-primary flex-fill mx-1 btn-botonera-clinica"
+                                            disabled>
                                         Actualizar RUT
-                                    </a>
+                                    </button>
 
-                                    <a href="#"
-                                       id="btn-pasivar"
-                                       class="btn btn-sm btn-warning flex-fill mx-1 disabled"
-                                       style="pointer-events: none; opacity: 0.6;">
+                                    <button type="button"
+                                            id="btn-pasivar"
+                                            class="btn btn-sm btn-warning flex-fill mx-1 btn-botonera-clinica"
+                                            disabled>
                                         Pasivar
-                                    </a>
+                                    </button>
 
-                                    <a href="#"
-                                       id="btn-tarjeta-fisica"
-                                       class="btn btn-sm btn-success flex-fill mx-1 disabled"
-                                       style="pointer-events: none; opacity: 0.6;">
+                                    <button type="button"
+                                            id="btn-tarjeta-fisica"
+                                            class="btn btn-sm btn-success flex-fill mx-1 btn-botonera-clinica"
+                                            disabled>
                                         Tarjeta Física
-                                    </a>
-                                    <a href="#"
-                                       id="btn-numero-ficha"
-                                       class="btn btn-sm btn-info flex-fill mx-1 disabled"
-                                       style="pointer-events: none; opacity: 0.6;">
+                                    </button>
+
+                                    <button type="button"
+                                            id="btn-numero-ficha"
+                                            class="btn btn-sm btn-info flex-fill mx-1 btn-botonera-clinica"
+                                            disabled>
                                         N° Ficha
-                                    </a>
+                                    </button>
+
+
                                 </div>
                             </div>
 
@@ -95,16 +99,17 @@
                             <div class="col-md-4 p-0">
                                 <span class="fw-semibold d-block mb-1">Imprimir</span>
                                 <div class="d-flex w-100">
+                                    <!-- Links para imprimir -->
                                     <a id="btn-caratula"
                                        href="#"
-                                       class="btn btn-sm btn-outline-secondary flex-fill mx-1 disabled"
+                                       class="btn btn-sm btn-outline-secondary flex-fill mx-1 btn-botonera-clinica"
                                        style="pointer-events: none; opacity: 0.6;">
                                         Carátula
                                     </a>
 
                                     <a id="btn-stickers"
                                        href="#"
-                                       class="btn btn-sm btn-outline-secondary flex-fill mx-1 disabled"
+                                       class="btn btn-sm btn-outline-secondary flex-fill mx-1 btn-botonera-clinica"
                                        style="pointer-events: none; opacity: 0.6;">
                                         Stickers
                                     </a>
@@ -136,9 +141,9 @@
                             <h6 class="m-0"><i class="fas fa-id-card me-2"></i> Identificación</h6>
                         </div>
                         <div class="card-body">
-                            <div class="row g-2">
+                            <div class="row">
                                 <div class=" col-md-4 col-sm-6">
-                                    <label class="form-label" for="id_nombre">
+                                    <label for="id_nombre">
                                         Nombres
                                     </label>
                                     {{ paciente_form.nombre }}
@@ -150,7 +155,7 @@
                                 </div>
 
                                 <div class=" col-md-4 col-sm-6">
-                                    <label class="form-label" for="id_apellido_paterno">
+                                    <label for="id_apellido_paterno">
                                         Apellido Paterno
                                     </label>
                                     {{ paciente_form.apellido_paterno }}
@@ -163,7 +168,7 @@
                                 </div>
 
                                 <div class=" col-md-4 col-sm-6">
-                                    <label class="form-label" for="id_apellido_materno">
+                                    <label for="id_apellido_materno">
                                         Apellido Materno
                                     </label>
                                     {{ paciente_form.apellido_materno }}
@@ -176,7 +181,7 @@
 
 
                                 <div class=" col-md-4 col-sm-6">
-                                    <label class="form-label" for="id_pasaporte">
+                                    <label for="id_pasaporte">
                                         Pasaporte
                                     </label>
                                     {{ paciente_form.pasaporte }}
@@ -188,7 +193,7 @@
                                 </div>
 
                                 <div class=" col-md-4 col-sm-6">
-                                    <label class="form-label" for="id_nie">
+                                    <label for="id_nie">
                                         NIP
                                     </label>
                                     {{ paciente_form.nip }}
@@ -199,7 +204,7 @@
                                     {% endif %}
                                 </div>
                                 <div class=" col-md-4 col-sm-6">
-                                    <label class="form-label" for="id_nombre_social">
+                                    <label for="id_nombre_social">
                                         Nombre Social
                                     </label>
                                     {{ paciente_form.nombre_social }}
@@ -221,7 +226,7 @@
                             <h6 class="m-0"><i class="fas fa-heartbeat me-2"></i> Estado del Paciente</h6>
                         </div>
                         <div class="card-body">
-                            <div class="row g-2">
+                            <div class="row">
                                 <!-- Checkbox 1 -->
                                 <div class="col-md-6">
                                     <div class="form-check mt-2">
@@ -309,9 +314,9 @@
                             <h6 class="m-0"><i class="fas fa-users me-2"></i> Datos Familiares</h6>
                         </div>
                         <div class="card-body">
-                            <div class="row g-2">
+                            <div class="row">
                                 <div class="col-md-3">
-                                    <label class="form-label" for="id_rut_madre">R.U.T. Madre</label>
+                                    <label for="id_rut_madre">R.U.T. Madre</label>
                                     {{ paciente_form.rut_madre }}
                                     {% if paciente_form.rut_madre.errors %}
                                         <div class="invalid-feedback d-block">
@@ -398,9 +403,9 @@
                             <h6 class="m-0"><i class="fas fa-baby me-2"></i> Datos de Nacimiento</h6>
                         </div>
                         <div class="card-body">
-                            <div class="row g-2">
+                            <div class="row">
                                 <div class="col-md-6">
-                                    <label class="form-label" for="id_fecha_nacimiento">
+                                    <label for="id_fecha_nacimiento">
                                         Fecha de Nacimiento
                                     </label>
                                     {{ paciente_form.fecha_nacimiento }}
@@ -455,9 +460,9 @@
                             <h6 class="m-0"><i class="fas fa-map-marker-alt me-2"></i> Contacto y Dirección</h6>
                         </div>
                         <div class="card-body">
-                            <div class="row g-2">
+                            <div class="row">
                                 <div class="col-md-5">
-                                    <label class="form-label" for="id_direccion">Dirección</label>
+                                    <label for="id_direccion">Dirección</label>
                                     {{ paciente_form.direccion }}
                                     {% if paciente_form.direccion.errors %}
                                         <div class="invalid-feedback d-block">
@@ -511,7 +516,8 @@
                                 <div class="col-md-4 mt-4">
                                     <div class="form-check">
                                         {{ paciente_form.sin_telefono }}
-                                        Paciente Sin Teléfono
+                                        <label class="form-check-label" for="id_sin_telefono">
+                                            Paciente Sin Teléfono
                                         </label>
                                         {% if paciente_form.sin_telefono.errors %}
                                             <div class="invalid-feedback d-block">
@@ -541,7 +547,8 @@
                                     <div class="col-md-4">
                                         <div class="ml-auto">
                                             <button id="ver_movimientos" type="button"
-                                                    class="d-none btn btn-secondary btn-sm">
+                                                    disabled
+                                                    class="btn btn-secondary btn-sm disabled">
                                                 <i class="fas fa-search mr-1"></i>
                                             </button>
                                         </div>
@@ -601,9 +608,9 @@
                             <h6 class="m-0"><i class="fas fa-cogs me-2"></i> Gestión</h6>
                         </div>
                         <div class="card-body">
-                            <div class="row g-2">
+                            <div class="row">
                                 <div class="col-md-6">
-                                    <label class="form-label" for="id_prevision">Previsión</label>
+                                    <label for="id_prevision">Previsión</label>
                                     {{ paciente_form.prevision }}
                                     {% if paciente_form.prevision.errors %}
                                         <div class="invalid-feedback d-block">
@@ -694,18 +701,146 @@
                         No, continuar editando
                     </button>
 
-                    <a href="{% url 'paciente_view' %}"
-                       class="btn btn-danger">
+                    <button type="button" id="btn-confirmar-limpiar-formulario"
+                            class="btn btn-danger">
                         Sí, limpiar formulario
-                    </a>
+                    </button>
                 </div>
 
+            </div>
+        </div>
+    </div>
+    <!-- Modal Actualizar RUT -->
+    <div class="modal fade" id="modalActualizarRut" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Actualizar RUT del Paciente</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="nuevo_rut_input">Nuevo RUT</label>
+                        <input type="text" class="form-control" id="nuevo_rut_input" placeholder="12.345.678-9">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="btnEnviarActualizarRut">Enviar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Pasivar/Activar -->
+    <div class="modal fade" id="modalPasivarActivar" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar Acción</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p id="mensajePasivarActivar"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="btnConfirmarPasivarActivar">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Número de Ficha -->
+    <div class="modal fade" id="modalNumeroFicha" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tituloModalFicha">Asignar Número de Ficha</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="nuevo_numero_ficha_input">Nuevo Número</label>
+                        <input type="number" class="form-control" id="nuevo_numero_ficha_input">
+                        <input type="hidden" id="tipo_asignacion_ficha">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="btnEnviarNumeroFicha">Continuar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Confirmación Genérica -->
+    <div class="modal fade" id="modalConfirmacionClinica" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title">Confirmación Requerida</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p id="mensajeConfirmacionClinica"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No, cancelar</button>
+                    <button type="button" class="btn btn-danger" id="btnAceptarConfirmacionClinica">Sí, confirmar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Movimientos de Ficha -->
+    <div class="modal fade" id="modalMovimientosFicha" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-secondary">
+                    <h5 class="modal-title"><i class="fas fa-exchange-alt mr-2"></i> Movimientos de Ficha</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table id="tabla-movimientos-ficha-modal" class="table table-sm table-bordered table-striped">
+                            <thead class="bg-light">
+                            <tr>
+                                <th>Fecha Envío</th>
+                                <th>Origen</th>
+                                <th>Fecha Recep.</th>
+                                <th>Destino</th>
+                                <th>Usuario Envío</th>
+                                <th>Usuario Recep.</th>
+                                <th>Estado</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                </div>
             </div>
         </div>
     </div>
 
 
 {% endblock %}
+
 
 {% block javascript %}
     <script>
@@ -718,14 +853,14 @@
     </script>
     <script>
         {#    Botones #}
-        $('#btnConfirmarLimpiarFormulario').on('click', function () {
+        $('#btn-confirmar-limpiar-formulario').on('click', function () {
 
-            limpiarFormularioPaciente();
+            if (window.limpiarFormularioPacienteGlobal) {
+                window.limpiarFormularioPacienteGlobal();
+            }
 
             // cerrar modal
-            const modalElement = document.getElementById('modalPacienteNoEncontrado');
-            const modalInstance = bootstrap.Modal.getInstance(modalElement);
-            modalInstance.hide();
+            $('#modalPacienteNoEncontrado').modal('hide');
 
 
             // asegurar estado
@@ -1094,6 +1229,8 @@
             }
 
 
+            window.limpiarFormularioPacienteGlobal = limpiarFormularioPaciente;
+
             // ENTER → buscar
             $('#id_rut').on('keyup', function (e) {
                 if (e.key === 'Enter') {
@@ -1151,6 +1288,10 @@
                             window.actualizarEstadoFallecimiento();
                         }
 
+                        if (window.habilitarBotoneraClinica) {
+                            window.habilitarBotoneraClinica(response);
+                        }
+
                         $('#ver_movimientos')
                             .removeClass('d-none')
                     },
@@ -1164,10 +1305,7 @@
                         if (formularioTieneDatos()) {
 
                             // Mostrar modal SOLO si hay datos
-                            const modal = new bootstrap.Modal(
-                                document.getElementById('modalPacienteNoEncontrado')
-                            );
-                            modal.show();
+                            $('#modalPacienteNoEncontrado').modal('show');
 
 
                         } else {
@@ -1188,6 +1326,11 @@
                     }
                 });
             }
+
+            window.buscarPacientePorRutGlobal = buscarPacientePorRut;
+            window.limpiarEstadoBusqueda = function () {
+                ultimoRutConsultado = null;
+            };
 
         });
     </script>
@@ -1216,6 +1359,10 @@
                     cargarFicha(response);
                     cargaTabla(response);
                     cargaUbicacionFicha(response);
+
+                    if (window.habilitarBotoneraClinica) {
+                        window.habilitarBotoneraClinica(response);
+                    }
 
                     // reactivar botón ver movimientos
                     $('#ver_movimientos').removeClass('d-none');
@@ -1329,12 +1476,12 @@
 
                 //  RN + Extranjero
                 if (rn && ext && !fal) {
-                    disable([el.rut, el.ocupacion, el.nombre_pareja, el.fecha_fallecimiento]);
+                    disable([el.ocupacion, el.nombre_pareja, el.fecha_fallecimiento]);
                 }
 
                 //  RN + Extranjero + Fallecido
                 if (rn && ext && fal) {
-                    disable([el.rut, el.ocupacion, el.nombre_pareja]);
+                    disable([el.ocupacion, el.nombre_pareja]);
                     el.fecha_fallecimiento.required = true;
                 }
 
@@ -1380,6 +1527,319 @@
 
     </script>
 
+
+    <!-- BOTONERA CLÍNICA DINÁMICA -->
+    <script>
+        $(document).ready(function () {
+            // Referencias a botones
+            const btnActualizarRut = $('#btn-actualizar-rut');
+            const btnPasivar = $('#btn-pasivar');
+            const btnTarjetaFisica = $('#btn-tarjeta-fisica');
+            const btnNumeroFicha = $('#btn-numero-ficha');
+            const btnCaratula = $('#btn-caratula');
+            const btnStickers = $('#btn-stickers');
+            const btnVerMovimientos = $('#ver_movimientos');
+
+            let pacienteActual = null;
+            let fichaActual = null;
+
+            // Función global para habilitar botonera
+            window.habilitarBotoneraClinica = function (data) {
+                console.log('Habilitando botonera con datos:', data);
+
+                if (data && data.paciente && data.paciente.id) {
+                    pacienteActual = data.paciente;
+                    fichaActual = data.ficha;
+
+                    const botones = [btnActualizarRut, btnPasivar, btnTarjetaFisica, btnNumeroFicha, btnCaratula, btnStickers, btnVerMovimientos];
+                    botones.forEach($btn => {
+                        $btn.removeClass('disabled')
+                            .prop('disabled', false)
+                            .css({
+                                'pointer-events': 'auto',
+                                'opacity': '1',
+                                'cursor': 'pointer'
+                            });
+                    });
+
+                    // Actualizar RUT en el input por si acaso
+                    if (data.paciente.rut) {
+                        $('#id_rut').val(formatearRutString(data.paciente.rut));
+                    }
+
+                    // Configurar botón Pasivar/Activar
+                    actualizarEstadoBotonPasivado(fichaActual ? fichaActual.pasivado : false);
+
+                    // Configurar Links dinámicos
+                    btnCaratula.attr('href', `/clinica/pdfs/ficha/paciente/${pacienteActual.id}/`);
+                    btnStickers.attr('href', `/clinica/pdfs/stickers/paciente/${pacienteActual.id}/`);
+                    btnCaratula.attr('target', '_blank');
+                    btnStickers.attr('target', '_blank');
+
+                }
+            };
+
+            function actualizarEstadoBotonPasivado(pasivado) {
+                if (pasivado) {
+                    btnPasivar.text('Activar')
+                        .removeClass('btn-warning')
+                        .addClass('btn-danger');
+                } else {
+                    btnPasivar.text('Pasivar')
+                        .removeClass('btn-danger')
+                        .addClass('btn-warning');
+                }
+            }
+
+            // --- EVENT DELEGATION PARA TODOS LOS BOTONES ---
+
+            // ACTUALIZAR RUT
+            $(document).on('click', '#btn-actualizar-rut:not(:disabled):not(.disabled)', function (e) {
+                e.preventDefault();
+                console.log('Click en Actualizar RUT');
+                $('#nuevo_rut_input').val('');
+                $('#modalActualizarRut').modal('show');
+            });
+
+            // PASIVAR/ACTIVAR
+            $(document).on('click', '#btn-pasivar:not(:disabled):not(.disabled)', function (e) {
+                e.preventDefault();
+                console.log('Click en Pasivar/Activar');
+                const accion = (fichaActual && fichaActual.pasivado) ? 'activar' : 'pasivar';
+                $('#mensajePasivarActivar').text(`¿Desea ${accion} al paciente en este establecimiento?`);
+                $('#modalPasivarActivar').modal('show');
+            });
+
+            // TARJETA FÍSICA
+            $(document).on('click', '#btn-tarjeta-fisica:not(:disabled):not(.disabled)', function (e) {
+                e.preventDefault();
+                console.log('Click en Tarjeta Física');
+                $('#tituloModalFicha').text('Asignar Número desde Tarjeta Física');
+                $('#tipo_asignacion_ficha').val('tarjeta');
+                $('#nuevo_numero_ficha_input').val('');
+                $('#modalNumeroFicha').modal('show');
+            });
+
+            // N° FICHA
+            $(document).on('click', '#btn-numero-ficha:not(:disabled):not(.disabled)', function (e) {
+                e.preventDefault();
+                console.log('Click en N° Ficha');
+                $('#tituloModalFicha').text('Asignar Nuevo Número de Ficha');
+                $('#tipo_asignacion_ficha').val('sistema');
+                $('#nuevo_numero_ficha_input').val('');
+                $('#modalNumeroFicha').modal('show');
+            });
+
+            // --- EVENT HANDLERS PARA BOTONES DE MODALES ---
+
+            // Botón Enviar en modal Actualizar RUT
+            $('#btnEnviarActualizarRut').on('click', function () {
+                const nuevoRut = $('#nuevo_rut_input').val().trim();
+                if (!nuevoRut) {
+                    alert('Ingrese un RUT');
+                    return;
+                }
+
+                $('#modalActualizarRut').modal('hide');
+
+                $('#mensajeConfirmacionClinica').text('¿Está seguro que desea cambiar el RUT del paciente?');
+                $('#btnAceptarConfirmacionClinica').off('click').on('click', function () {
+                    const btn = $(this);
+                    btn.prop('disabled', true).text('Procesando...');
+
+                    ejecutarAccionClinica('/personas/api/paciente/actualizar-rut/', {
+                        paciente_id: pacienteActual.id,
+                        nuevo_rut: nuevoRut
+                    }, function (response) {
+                        $('#modalConfirmacionClinica').modal('hide');
+                        $('#id_rut').val(response.rut);
+                        if (window.limpiarEstadoBusqueda) window.limpiarEstadoBusqueda();
+                        if (window.buscarPacientePorRutGlobal) window.buscarPacientePorRutGlobal();
+                    });
+                });
+                $('#modalConfirmacionClinica').modal('show');
+            });
+
+            // Botón Confirmar en modal Pasivar/Activar
+            $('#btnConfirmarPasivarActivar').on('click', function () {
+                const btn = $(this);
+                btn.prop('disabled', true).text('Procesando...');
+
+                ejecutarAccionClinica('/personas/api/ficha/toggle-pasivado/', {
+                    paciente_id: pacienteActual.id
+                }, function (response) {
+                    $('#modalPasivarActivar').modal('hide');
+                    actualizarEstadoBotonPasivado(response.pasivado);
+                    if (window.limpiarEstadoBusqueda) window.limpiarEstadoBusqueda();
+                    if (window.buscarPacientePorRutGlobal) window.buscarPacientePorRutGlobal();
+                });
+            });
+
+            // Botón Enviar en modal Número Ficha
+            $('#btnEnviarNumeroFicha').on('click', function () {
+                const nuevoNumero = $('#nuevo_numero_ficha_input').val();
+                const tipo = $('#tipo_asignacion_ficha').val();
+                if (!nuevoNumero) {
+                    alert('Ingrese un número');
+                    return;
+                }
+
+                $('#modalNumeroFicha').modal('hide');
+
+                const msg = tipo === 'tarjeta'
+                    ? '¿Está seguro de asignar este número de ficha desde tarjeta física?'
+                    : '¿Está seguro que desea cambiar el número de ficha del sistema?';
+
+                $('#mensajeConfirmacionClinica').text(msg);
+                $('#btnAceptarConfirmacionClinica').off('click').on('click', function () {
+                    const btn = $(this);
+                    btn.prop('disabled', true).text('Procesando...');
+
+                    ejecutarAccionClinica('/personas/api/ficha/asignar-numero/', {
+                        paciente_id: pacienteActual.id,
+                        nuevo_numero: nuevoNumero,
+                        es_tarjeta: (tipo === 'tarjeta')
+                    }, function (response) {
+                        $('#modalConfirmacionClinica').modal('hide');
+                        if (window.limpiarEstadoBusqueda) window.limpiarEstadoBusqueda();
+                        if (window.buscarPacientePorRutGlobal) window.buscarPacientePorRutGlobal();
+                    });
+                });
+                $('#modalConfirmacionClinica').modal('show');
+            });
+
+            // Helper para peticiones AJAX
+            function ejecutarAccionClinica(url, data, callback) {
+                console.log('Ejecutando acción clínica:', url, data);
+
+                // Bloquear botones para evitar doble clic
+                const botones = [btnActualizarRut, btnPasivar, btnTarjetaFisica, btnNumeroFicha, btnVerMovimientos];
+                botones.forEach($b => {
+                    $b.addClass('disabled')
+                        .prop('disabled', true)
+                        .css('pointer-events', 'none');
+                });
+
+                // Reiniciar estados de botones en modales
+                $('#btnAceptarConfirmacionClinica, #btnConfirmarPasivarActivar')
+                    .prop('disabled', false)
+                    .text(function () {
+                        return $(this).attr('id') === 'btnConfirmarPasivarActivar' ? 'Confirmar' : 'Sí, confirmar';
+                    });
+
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: JSON.stringify(data),
+                    contentType: 'application/json',
+                    headers: {
+                        'X-CSRFToken': $('[name=csrfmiddlewaretoken]').val()
+                    },
+                    success: function (response) {
+                        console.log('Respuesta recibida:', response);
+                        if (response.success) {
+                            if (callback) callback(response);
+                        } else {
+                            alert('Error: ' + (response.error || 'Ocurrió un error inesperado'));
+                        }
+                    },
+                    error: function (xhr) {
+                        console.error('Error en petición:', xhr);
+                        const errorMsg = xhr.responseJSON ? xhr.responseJSON.error : 'Error en la petición';
+                        alert('Error: ' + errorMsg);
+                    },
+                    complete: function () {
+                        console.log('Petición completada');
+                        // Los botones se re-habilitarán cuando se vuelva a cargar el paciente
+                    }
+                });
+            }
+
+            // Función para deshabilitar botonera (cuando se limpia el formulario)
+            window.deshabilitarBotoneraClinica = function () {
+                console.log('Deshabilitando botonera clínica');
+                const botones = [btnActualizarRut, btnPasivar, btnTarjetaFisica, btnNumeroFicha, btnCaratula, btnStickers, btnVerMovimientos];
+                botones.forEach($btn => {
+                    $btn.addClass('disabled')
+                        .prop('disabled', true)
+                        .css({
+                            'pointer-events': 'none',
+                            'opacity': '0.6',
+                            'cursor': 'not-allowed'
+                        });
+                });
+
+                // Restaurar texto original del botón pasivar
+                btnPasivar.text('Pasivar')
+                    .removeClass('btn-danger')
+                    .addClass('btn-warning');
+
+                // Limpiar links
+                btnCaratula.attr('href', '#');
+                btnStickers.attr('href', '#');
+
+                pacienteActual = null;
+                fichaActual = null;
+            };
+
+            // VER MOVIMIENTOS
+            $(document).on('click', '#ver_movimientos:not(:disabled):not(.disabled)', function (e) {
+                e.preventDefault();
+                if (!pacienteActual || !pacienteActual.rut) return;
+
+                const rut = pacienteActual.rut;
+                const $tabla = $('#tabla-movimientos-ficha-modal tbody');
+                $tabla.html('<tr><td colspan="7" class="text-center">Cargando movimientos...</td></tr>');
+                $('#modalMovimientosFicha').modal('show');
+
+                $.ajax({
+                    url: `/clinica/api/movimientos/paciente/${rut}/`,
+                    type: 'GET',
+                    success: function (response) {
+                        $tabla.empty();
+                        if (response.movimientos && response.movimientos.length > 0) {
+                            response.movimientos.forEach(m => {
+                                const fechaEnvio = m.fecha_envio ? new Date(m.fecha_envio).toLocaleString() : '---';
+                                const fechaRecep = m.fecha_recepcion ? new Date(m.fecha_recepcion).toLocaleString() : '---';
+
+                                let badgeClass = 'badge-secondary';
+                                let estado = 'Pendiente';
+
+                                if (m.estado_recepcion === 'RECIBIDO') {
+                                    badgeClass = 'badge-success';
+                                    estado = 'Recibido';
+                                } else if (m.estado_envio === 'ENVIADO') {
+                                    badgeClass = 'badge-primary';
+                                    estado = 'Enviado';
+                                }
+
+                                $tabla.append(`
+                                    <tr>
+                                        <td>${fechaEnvio}</td>
+                                        <td>${m.servicio_envio || '---'}</td>
+                                        <td>${fechaRecep}</td>
+                                        <td>${m.servicio_recepcion || '---'}</td>
+                                        <td>${m.usuario_envio || '---'}</td>
+                                        <td>${m.usuario_recepcion || '---'}</td>
+                                        <td class="text-center"><span class="badge ${badgeClass}">${estado}</span></td>
+                                    </tr>
+                                `);
+                            });
+                        } else {
+                            $tabla.html('<tr><td colspan="7" class="text-center">No se encontraron movimientos para este paciente en este establecimiento.</td></tr>');
+                        }
+                    },
+                    error: function (xhr) {
+                        console.error('Error al consultar movimientos:', xhr);
+                        $tabla.html('<tr><td colspan="7" class="text-center text-danger">Error al cargar los movimientos.</td></tr>');
+                    }
+                });
+            });
+
+            // Inicialmente deshabilitar la botonera
+            window.deshabilitarBotoneraClinica();
+        });
+    </script>
 
 
 {% endblock %}

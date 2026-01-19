@@ -1,0 +1,160 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Stickers</title>
+
+    <!-- Bootstrap 4 -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <style>
+        /* RESET */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            font-family: Calibri, sans-serif;
+            font-size: 14px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* BOTÓN */
+        .no-print {
+            padding: 5px 0;
+        }
+
+        /* CONTENEDOR PRINCIPAL */
+        .page {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            flex: 1;
+            max-width: 100%;
+            padding: 0;
+            margin: 0;
+        }
+
+        .row {
+            flex: 1;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .col-4 {
+            padding: 2px;
+            display: flex;
+        }
+
+        /* STICKER */
+        .sticker {
+            width: 100%;
+            text-align: center;
+            padding: 4px;
+            line-height: 1.1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .nombre {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .info {
+            font-size: 18px;
+        }
+
+        .ficha {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .rut {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .barcode {
+            margin-top: 3px;
+            max-height: 45px;
+            align-self: center;
+        }
+
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+
+            html, body {
+                height: auto;
+            }
+
+            .sticker {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- BOTÓN -->
+<div class="text-center no-print">
+    <button onclick="window.print()" class="btn btn-sm btn-primary">
+        Guardar como PDF / Imprimir
+    </button>
+</div>
+
+<!-- CONTENIDO -->
+<div class="page">
+    <div class="container">
+        <div class="row">
+            {% for i in sticker_range %}
+                <div class="col-4">
+                    <div class="sticker">
+
+                        <div class="nombre">
+                            {{ paciente.nombre }}
+                            {{ paciente.apellido_paterno }}
+                            {{ paciente.apellido_materno }}
+                        </div>
+
+                        <div class="info">
+                            Nac.: {{ paciente.fecha_nacimiento|date:"d/m/Y" }}
+                            {% if paciente.comuna %}
+                                · {{ paciente.comuna.nombre }}
+                            {% endif %}
+                        </div>
+
+                        <div class="ficha">
+                            FICHA {{ ficha.numero_ficha }}
+                        </div>
+
+                        <div class="rut">
+                            {{ paciente.rut|default:"SIN RUT" }}
+                        </div>
+
+                        <img class="barcode" src="{{ codigo_barras_base64 }}" alt="Código de barras">
+
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

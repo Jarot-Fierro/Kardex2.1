@@ -1,8 +1,9 @@
 from django.urls import path
 
+from personas.apis.acciones_clinicas import actualizar_rut_paciente, toggle_pasivado_ficha, asignar_numero_ficha
 from personas.apis.ficha_paciente import get_paciente_ficha
 from personas.views.genero import *
-from personas.views.pacientes import paciente_view
+from personas.views.pacientes import *
 from personas.views.prevision import *
 from personas.views.profesion import *
 from personas.views.profesionales import *
@@ -37,18 +38,20 @@ urlpatterns = [
     path('genero/historial', GeneroHistoryListView.as_view(), name='genero_history'),
 
     # Vistas básicas para Pacientes
-    # path('pacientes/', PacienteListView.as_view(), name='paciente_list'),
-    # path('pacientes/recien-nacidos/', PacienteRecienNacidoListView.as_view(), name='paciente_recien_nacido_list'),
-    # path('pacientes/extranjeros/', PacienteExtranjeroListView.as_view(), name='paciente_extranjero_list'),
-    # path('pacientes/rut-madre-reponsable/', PacienteRutMadreListView.as_view(), name='paciente_rut_madre_list'),
-    # path('pacientes/fallecidos/', PacienteFallecidoListView.as_view(), name='paciente_fallecido_list'),
+    path('pacientes/', PacienteListView.as_view(), name='paciente_list'),
+    path('pacientes/recien-nacidos/', PacienteRecienNacidoListView.as_view(), name='paciente_recien_nacido_list'),
+    path('pacientes/extranjeros/', PacienteExtranjeroListView.as_view(), name='paciente_extranjero_list'),
+    path('pacientes/rut-madre-reponsable/', PacienteRutMadreListView.as_view(), name='paciente_rut_madre_list'),
+    path('pacientes/fallecidos/', PacienteFallecidoListView.as_view(), name='paciente_fallecido_list'),
+    path('pacientes-pueblo_indigena/', PacientePuebloIndigenaListView.as_view(), name='paciente_pueblo_indigena_list'),
+    path('pacientes/<int:pk>/detalle/', PacienteDetailView.as_view(), name='paciente_detail'),
     # path('pacientes/por-fecha/', PacientePorFechaListView.as_view(), name='paciente_por_fecha_list'),
     # path('pacientes/por-fecha/form/', PacienteFechaFormView.as_view(), name='paciente_fecha_form'),
-    # path('pacientes/<int:pk>/detalle/', PacienteDetailView.as_view(), name='paciente_detail'),
+
     # path('consulta-pacientes/', PacienteQueryView.as_view(), name='paciente_query'),
     # path('pacientes/<int:pk>/actualizar-rut/', PacienteActualizarRut.as_view(), name='paciente_actualizar_rut'),
     # path('pacientes/crear/sin-rut/', PacienteCreateSinRutView.as_view(), name='paciente_create_sin_rut'),
-    # path('pacientes-pueblo_indigena/', PacientePuebloIndigenaListView.as_view(), name='paciente_pueblo_indigena_list'),
+
     # path('pacientes/historial', PacientesHistoryListView.as_view(), name='paciente_history'),
 
     # APIS
@@ -56,4 +59,8 @@ urlpatterns = [
     path("paciente/", paciente_view, name="paciente_view", ),
     path("paciente/<int:paciente_id>/", paciente_view, name="paciente_view_param", ),
 
+    # ACCIONES CLÍNICAS
+    path("api/paciente/actualizar-rut/", actualizar_rut_paciente, name="api_actualizar_rut"),
+    path("api/ficha/toggle-pasivado/", toggle_pasivado_ficha, name="api_toggle_pasivado"),
+    path("api/ficha/asignar-numero/", asignar_numero_ficha, name="api_asignar_numero_ficha"),
 ]

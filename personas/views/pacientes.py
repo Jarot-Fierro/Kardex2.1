@@ -2,10 +2,14 @@ from datetime import datetime
 
 from django.contrib import messages
 from django.db import transaction, IntegrityError
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
+from django.views.generic import TemplateView, DetailView
 
 from clinica.forms.ficha import FichaForm
 from clinica.models import Ficha
+from core.mixin import DataTableMixin
 from personas.forms.pacientes import PacienteForm
 from personas.models.pacientes import Paciente
 
@@ -70,11 +74,11 @@ def paciente_view(request, paciente_id=None):
     modo = "consulta"
 
     if request.method == 'POST':
-        if request.method == 'POST':
-            print("========== POST RAW ==========")
-            for k, v in request.POST.items():
-                print(f"{k} = {v}")
-            print("================================")
+        # if request.method == 'POST':
+        #     print("========== POST RAW ==========")
+        #     for k, v in request.POST.items():
+        #         print(f"{k} = {v}")
+        #     print("================================")
 
         accion = request.POST.get('accion')
         paciente_id_post = request.POST.get('paciente_id') or paciente_id
@@ -185,3 +189,363 @@ def paciente_view(request, paciente_id=None):
         'paciente_id': request.POST.get('paciente_id', paciente_id),
         'title': 'Consulta de pacientes'
     })
+
+
+class PacienteListView(DataTableMixin, TemplateView):
+    template_name = 'paciente/list.html'
+    model = Paciente
+    datatable_columns = ['ID', 'N° Ficha', 'RUT', 'Nombre', 'Sexo', 'Estado Civil', 'Comuna', 'Observación']
+    datatable_order_fields = [
+        'id',
+        None,
+        'rut',
+        None,
+        'sexo',
+        'estado_civil',
+        'comuna__nombre',
+        None,
+    ]
+
+    datatable_search_fields = [
+        'rut__icontains',
+        'nombre__icontains',
+        'apellido_paterno__icontains',
+        'apellido_materno__icontains',
+        'sexo__icontains',
+        'estado_civil__icontains',
+        'comuna__nombre__icontains',
+    ]
+
+    url_detail = 'paciente_detail'
+    url_update = 'paciente_view_param'
+
+    def get_base_queryset(self):
+        # Vista libre: no limitar por establecimiento, mostrar todos los pacientes
+        return Paciente.objects.filter(status='ACTIVE')
+
+    def render_row(self, obj):
+        nombre_completo = f"{(obj.nombre or '').upper()} {(obj.apellido_paterno or '').upper()} {(obj.apellido_materno or '').upper()}".strip()
+        ficha = Ficha.objects.filter(paciente=obj, establecimiento=self.request.user.establecimiento).first()
+
+        return {
+            'ID': obj.id,
+            'N° Ficha': (str(ficha.numero_ficha_sistema) if ficha and ficha.numero_ficha_sistema else 'SIN FICHA'),
+            'RUT': obj.rut or 'Sin RUT',
+            'Nombre': nombre_completo or 'Sin Nombre',
+            'Sexo': obj.sexo or '',
+            'Estado Civil': obj.estado_civil or '',
+            'Comuna': (getattr(obj.comuna, 'nombre', '') or '').upper(),
+            'Observación': (ficha.observacion.lower() if ficha and ficha.observacion else 'SIN OBSERVACIÓN'),
+        }
+
+    def get(self, request, *args, **kwargs):
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest' and request.GET.get('datatable'):
+            return self.get_datatable_response(request)
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'title': 'Listado de Pacientes',
+            'list_url': reverse_lazy('paciente_list'),
+            'create_url': reverse_lazy('paciente_query'),
+            'datatable_enabled': True,
+            'datatable_order': [[0, 'desc']],
+            'datatable_page_length': 100,
+            'columns': self.datatable_columns,
+            'export_csv_url': reverse_lazy('export_paciente_csv'),
+        })
+        return context
+
+
+class PacienteDetailView(DetailView):
+    model = Paciente
+    template_name = 'kardex/paciente/detail.html'
+    permission_required = 'kardex.view_paciente'
+    raise_exception = True
+
+    def render_to_response(self, context, **response_kwargs):
+        if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            from django.template.loader import render_to_string
+            html = render_to_string(self.template_name, context=context, request=self.request)
+            return HttpResponse(html)
+        return super().render_to_response(context, **response_kwargs)
+
+
+class PacienteRecienNacidoListView(PacienteListView):
+    datatable_columns = [
+        'ID',
+        'Código',
+        'N° Ficha',
+        'Nombre',
+        'Apellidos',
+        'F. Nacimiento',
+        'Sexo',
+        'Rut Responsable',
+        'Comuna',
+        'Observación',
+    ]
+
+    datatable_order_fields = [
+        'id',
+        'codigo',
+        None,
+        'nombre',
+        None,
+        'fecha_nacimiento',
+        'sexo',
+        'rut_responsable_temporal',
+        'comuna__nombre',
+        None,
+    ]
+
+    datatable_search_fields = [
+        'codigo__icontains',
+        'rut__icontains',
+        'nombre__icontains',
+        'apellido_paterno__icontains',
+        'apellido_materno__icontains',
+        'sexo__icontains',
+        'rut_responsable_temporal__icontains',
+        'comuna__nombre__icontains',
+    ]
+
+    def render_row(self, obj):
+        apellidos = f"{obj.apellido_paterno or ''} {obj.apellido_materno or ''}".strip()
+        ficha = Ficha.objects.filter(paciente=obj, establecimiento=self.request.user.establecimiento).first()
+
+        return {
+            'ID': obj.id,
+            'Código': (obj.codigo or '').upper(),
+            'N° Ficha': (str(ficha.numero_ficha_sistema) if ficha and ficha.numero_ficha_sistema else 'SIN FICHA'),
+            'Nombre': (obj.nombre or '').upper(),
+            'Apellidos': apellidos.upper(),
+            'F. Nacimiento': obj.fecha_nacimiento.strftime('%d/%m/%Y') if obj.fecha_nacimiento else '---',
+            'Sexo': (obj.sexo or '').upper(),
+            'Rut Responsable': (
+                obj.rut_responsable_temporal.upper()
+                if obj.rut_responsable_temporal and obj.rut_responsable_temporal.lower() != 'nan'
+                else 'SIN RUT'
+            ),
+            'Comuna': (getattr(obj.comuna, 'nombre', '') or '').upper(),
+            'Observación': (ficha.observacion.lower() if ficha and ficha.observacion else 'SIN OBSERVACIÓN'),
+        }
+
+    def get_base_queryset(self):
+        return Paciente.objects.filter(recien_nacido=True)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'title': 'Pacientes Recién Nacidos',
+            'list_url': reverse_lazy('paciente_recien_nacido_list'),
+            'export_csv_url': reverse_lazy('export_paciente_recien_nacido_csv'),
+        })
+        return context
+
+
+class PacienteExtranjeroListView(PacienteListView):
+    datatable_columns = ['ID', 'N° Ficha', 'Código', 'RUT', 'Nombre', 'NIP', 'Pasaporte', 'Sexo', 'Estado Civil',
+                         'Comuna',
+                         'Previsión', 'Observación']
+    datatable_order_fields = [
+        'id',
+        None,
+        'codigo',
+        'rut',
+        'nombre',
+        'nip',
+        'pasaporte',
+        'sexo',
+        'estado_civil',
+        'comuna__nombre',
+        'prevision__nombre',
+        None
+    ]
+
+    datatable_search_fields = [
+        'codigo__icontains',
+        'rut__icontains',
+        'nombre__icontains',
+        'nip__icontains',
+        'pasaporte__icontains',
+        'apellido_paterno__icontains',
+        'apellido_materno__icontains',
+        'sexo__icontains',
+        'estado_civil__icontains',
+        'comuna__nombre__icontains',
+        'prevision__nombre__icontains'
+    ]
+
+    def render_row(self, obj):
+        ficha = Ficha.objects.filter(paciente=obj, establecimiento=self.request.user.establecimiento).first()
+        return {
+            'ID': obj.id,
+            'N° Ficha': (str(ficha.numero_ficha_sistema) if ficha and ficha.numero_ficha_sistema else 'SIN FICHA'),
+            'Código': (obj.codigo or '').upper(),
+            'RUT': (obj.rut or '').upper(),
+            'Nombre': (obj.nombre or '').upper(),
+            'NIP': (obj.nip or '').upper(),
+            'Pasaporte': (obj.pasaporte or '').upper(),
+            'Sexo': (obj.sexo or '').upper(),
+            'Estado Civil': (obj.estado_civil or '').upper(),
+            'Comuna': (getattr(obj.comuna, 'nombre', '') or '').upper(),
+            'Previsión': (getattr(obj.prevision, 'nombre', '') or '').upper(),
+            'Observación': (ficha.observacion.lower() if ficha and ficha.observacion else 'SIN OBSERVACIÓN'),
+        }
+
+    def get_base_queryset(self):
+        return Paciente.objects.filter(extranjero=True)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'title': 'Pacientes Extranjeros',
+            'list_url': reverse_lazy('kardex:paciente_extranjero_list'),
+            'export_csv_url': reverse_lazy('reports:export_paciente_extranjero_csv'),
+        })
+        return context
+
+
+class PacienteRutMadreListView(PacienteListView):
+    datatable_columns = ['ID', 'N° Ficha', 'Código', 'Nombre', 'Sexo', 'Rut Responsable', 'Comuna', 'Previsión',
+                         'Observación']
+    datatable_order_fields = [
+        'id',
+        None,
+        'codigo',
+        'nombre',
+        'sexo',
+        'rut_responsable_temporal',
+        'comuna__nombre',
+        'prevision__nombre',
+        None
+    ]
+
+    datatable_search_fields = [
+        'codigo__icontains',
+        'rut__icontains',
+        'nombre__icontains',
+        'apellido_paterno__icontains',
+        'apellido_materno__icontains',
+        'sexo__icontains',
+        'rut_responsable_temporal__icontains',
+        'comuna__nombre__icontains',
+        'prevision__nombre__icontains'
+    ]
+
+    def render_row(self, obj):
+        ficha = Ficha.objects.filter(paciente=obj, establecimiento=self.request.user.establecimiento).first()
+        return {
+            'ID': obj.id,
+            'N° Ficha': (str(ficha.numero_ficha_sistema) if ficha and ficha.numero_ficha_sistema else 'SIN FICHA'),
+            'Código': (obj.codigo or '').upper(),
+            'Nombre': (obj.nombre or '').upper(),
+            'Sexo': (obj.sexo or '').upper(),
+            'Rut Responsable': (
+                obj.rut_responsable_temporal.upper()
+                if obj.rut_responsable_temporal and obj.rut_responsable_temporal.lower() != 'nan'
+                else 'SIN RUT'
+            ),
+            'Comuna': (getattr(obj.comuna, 'nombre', '') or '').upper(),
+            'Previsión': (getattr(obj.prevision, 'nombre', '') or '').upper(),
+            'Observación': (ficha.observacion.lower() if ficha and ficha.observacion else 'SIN OBSERVACIÓN'),
+        }
+
+    def get_base_queryset(self):
+        return Paciente.objects.filter(usar_rut_madre_como_responsable=True)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'title': 'Pacientes que utilizan el rut de la madre como reponsable',
+            'list_url': reverse_lazy('kardex:paciente_rut_madre_list'),
+        })
+        return context
+
+
+class PacienteFallecidoListView(PacienteListView):
+    datatable_columns = ['ID', 'N° Ficha', 'RUT', 'Nombre', 'Apellidos', 'F. Fallecimiento', 'Sexo', 'Estado Civil',
+                         'Comuna', 'Observación']
+    datatable_order_fields = [
+        'id',
+        None,
+        'rut',
+        'nombre',
+        None,
+        'fecha_fallecimiento',
+        'sexo',
+        'estado_civil',
+        'comuna__nombre',
+        None,
+    ]
+
+    datatable_search_fields = [
+        'rut__icontains',
+        'nombre__icontains',
+        'apellido_paterno__icontains',
+        'apellido_materno__icontains',
+        'sexo__icontains',
+        'estado_civil__icontains',
+        'comuna__nombre__icontains',
+    ]
+
+    def get_base_queryset(self):
+        return Paciente.objects.filter(fallecido=True)
+
+    def render_row(self, obj):
+        apellidos = f"{obj.apellido_paterno or ''} {obj.apellido_materno or ''}".strip()
+        ficha = Ficha.objects.filter(paciente=obj, establecimiento=self.request.user.establecimiento).first()
+
+        return {
+            'ID': obj.id,
+            'N° Ficha': (str(ficha.numero_ficha_sistema) if ficha and ficha.numero_ficha_sistema else 'SIN FICHA'),
+            'RUT': (obj.rut or '').upper(),
+            'Nombre': (obj.nombre or '').upper(),
+            'Apellidos': apellidos.upper(),
+            'F. Fallecimiento': obj.fecha_fallecimiento.strftime('%d/%m/%Y') if obj.fecha_fallecimiento else '---',
+            'Sexo': (obj.sexo or '').upper(),
+            'Estado Civil': (obj.estado_civil or '').upper(),
+            'Comuna': (getattr(obj.comuna, 'nombre', '') or '').upper(),
+            'Observación': (ficha.observacion.lower() if ficha and ficha.observacion else 'SIN OBSERVACIÓN'),
+        }
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'title': 'Pacientes Fallecidos',
+            'list_url': reverse_lazy('kardex:paciente_fallecido_list'),
+            'export_csv_url': reverse_lazy('reports:export_paciente_fallecido_csv'),
+        })
+        return context
+
+
+class PacientePuebloIndigenaListView(PacienteListView):
+    datatable_columns = ['ID', 'N° Ficha', 'RUT', 'Nombre', 'Sexo', 'Estado Civil', 'Comuna', 'Observación']
+
+    def render_row(self, obj):
+        ficha = Ficha.objects.filter(paciente=obj, establecimiento=self.request.user.establecimiento).first()
+        nombre_completo = f"{(obj.nombre or '').upper()} {(obj.apellido_paterno or '').upper()} {(obj.apellido_materno or '').upper()}".strip()
+
+        return {
+            'ID': obj.id,
+            'N° Ficha': (str(ficha.numero_ficha_sistema) if ficha and ficha.numero_ficha_sistema else 'SIN FICHA'),
+            'RUT': obj.rut or 'Sin RUT',
+            'Nombre': nombre_completo or 'Sin Nombre',
+            'Sexo': obj.sexo or '',
+            'Estado Civil': obj.estado_civil or '',
+            'Comuna': (getattr(obj.comuna, 'nombre', '') or '').upper(),
+            'Observación': (ficha.observacion.lower() if ficha and ficha.observacion else 'SIN OBSERVACIÓN'),
+        }
+
+    def get_base_queryset(self):
+        return Paciente.objects.filter(pueblo_indigena=True)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'title': 'Pacientes Pertenecientes a Pueblos Indigenas',
+            'list_url': reverse_lazy('kardex:paciente_pueblo_indigena_list'),
+            'export_csv_url': reverse_lazy('reports:export_paciente_pueblo_indigena_csv'),
+        })
+        return context

@@ -33,7 +33,7 @@ class PacienteForm(forms.ModelForm):
             pass
 
     fecha_nacimiento = forms.DateField(
-        required=False,
+        required=True,
         widget=forms.DateInput(attrs={
             'type': 'date',
             'class': 'form-control form-control-sm',
@@ -125,6 +125,7 @@ class PacienteForm(forms.ModelForm):
     )
 
     sexo = forms.ChoiceField(
+        required=True,
         choices=SEXO_CHOICES,
         widget=forms.Select(attrs={
             'class': 'form-control form-control-sm',
@@ -134,6 +135,7 @@ class PacienteForm(forms.ModelForm):
     )
 
     estado_civil = forms.ChoiceField(
+        required=True,
         choices=ESTADO_CIVIL,
         widget=forms.Select(attrs={
             'class': 'form-control form-control-sm',
@@ -233,7 +235,7 @@ class PacienteForm(forms.ModelForm):
     )
 
     direccion = forms.CharField(
-        required=False,
+        required=True,
         widget=forms.TextInput(
             attrs={'class': 'form-control form-control-sm', 'id': 'id_direccion', 'name': 'direccion'})
     )
@@ -371,6 +373,7 @@ class PacienteForm(forms.ModelForm):
     def _clean_fallecimiento(self, cleaned):
         esta_fallecido = cleaned.get("fallecido")
         fecha_fallecimiento = cleaned.get("fecha_fallecimiento")
+        print(esta_fallecido)
 
         if esta_fallecido and not fecha_fallecimiento:
             self.add_error(
@@ -464,5 +467,6 @@ class PacienteForm(forms.ModelForm):
         self._clean_extranjero(cleaned)
         self._clean_telefonos(cleaned)
         self._clean_recien_nacido(cleaned)
+        self._clean_fallecimiento(cleaned)
 
         return cleaned
