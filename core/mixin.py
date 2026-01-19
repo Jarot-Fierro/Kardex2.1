@@ -53,17 +53,29 @@ class DataTableMixin:
         user = self.request.user
         actions = []
 
-        actions.append(f"""
-            <a href="{reverse_lazy(f'{self.url_detail}', kwargs={'pk': obj.pk})}"
-               class="btn p-1 btn-sm btn-secondary view-btn" title="Ver detalle">
-               <i class="fas fa-search"></i></a>
-        """)
+        if self.url_detail:
+            # Check if url_detail is 'paciente_view_param' to use 'paciente_id' instead of 'pk'
+            detail_kwargs = {'pk': obj.pk}
+            if self.url_detail == 'paciente_view_param':
+                detail_kwargs = {'paciente_id': obj.pk}
 
-        actions.append(f"""
-            <a href="{reverse_lazy(f'{self.url_update}', kwargs={'pk': obj.pk})}"
-               class="btn p-1 btn-sm btn-info" title="Editar">
-               <i class="fas fa-edit"></i></a>
-        """)
+            actions.append(f"""
+                <a href="{reverse_lazy(f'{self.url_detail}', kwargs=detail_kwargs)}"
+                   class="btn p-1 btn-sm btn-secondary view-btn" title="Ver detalle">
+                   <i class="fas fa-search"></i></a>
+            """)
+
+        if self.url_update:
+            # Check if url_update is 'paciente_view_param' to use 'paciente_id' instead of 'pk'
+            update_kwargs = {'pk': obj.pk}
+            if self.url_update == 'paciente_view_param':
+                update_kwargs = {'paciente_id': obj.pk}
+
+            actions.append(f"""
+                <a href="{reverse_lazy(f'{self.url_update}', kwargs=update_kwargs)}"
+                   class="btn p-1 btn-sm btn-info" title="Editar">
+                   <i class="fas fa-edit"></i></a>
+            """)
 
         return ''.join(actions)
 

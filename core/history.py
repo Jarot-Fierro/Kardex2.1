@@ -1,6 +1,5 @@
 from typing import Type, Optional
 
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.http import HttpRequest
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView
@@ -8,7 +7,7 @@ from django.views.generic import TemplateView
 from core.mixin import DataTableMixin
 
 
-class GenericHistoryListView(PermissionRequiredMixin, DataTableMixin, TemplateView):
+class GenericHistoryListView(DataTableMixin, TemplateView):
     """
     Vista genérica de historial con django-simple-history
     """
@@ -18,9 +17,6 @@ class GenericHistoryListView(PermissionRequiredMixin, DataTableMixin, TemplateVi
     datatable_columns = ['ID', 'Fecha', 'Usuario', 'Acción', 'Objeto', 'Cambios']
     datatable_order_fields = ['history_id', None, 'history_date', 'history_user__username', 'history_type', None]
     datatable_search_fields = ['history_user__username__icontains', 'history_change_reason__icontains']
-
-    permission_required = None
-    raise_exception = True
 
     url_detail = url_update = url_delete = None
 

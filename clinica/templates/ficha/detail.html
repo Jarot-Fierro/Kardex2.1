@@ -1,0 +1,33 @@
+{% load static %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h5 class="mb-3">Detalle de Ficha</h5>
+            <dl class="row mb-0">
+                <dt class="col-sm-4">ID</dt>
+                <dd class="col-sm-8">{{ object.id|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Número</dt>
+                <dd class="col-sm-8">{{ object.numero_ficha|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Observación</dt>
+                <dd class="col-sm-8">{{ object.observacion|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Fecha Creación</dt>
+                <dd class="col-sm-8">{{ object.fecha_creacion|date:'Y-m-d'|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Fecha Movimiento</dt>
+                <dd class="col-sm-8">{{ object.fecha_mov|date:'Y-m-d'|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Usuario</dt>
+                <dd class="col-sm-8">{{ object.usuario.username|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Profesional</dt>
+                <dd class="col-sm-8">{{ object.profesional.nombres|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Paciente</dt>
+                <dd class="col-sm-8">{{ object.ingreso_paciente.paciente.rut|default:"-" }}</dd>
+            </dl>
+        </div>
+    </div>
+</div>

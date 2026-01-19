@@ -1,5 +1,7 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
+from django.views.generic.base import TemplateView
 
 from users.models import UserRole
 
@@ -38,3 +40,14 @@ def dashboard_view(request):
 @login_required
 def no_establecimiento(request):
     return render(request, 'core/no_establecimiento.html')
+
+
+class ContactoView(LoginRequiredMixin, TemplateView):
+    template_name = 'contacto/contacto.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'title': 'Contacto',
+        })
+        return context

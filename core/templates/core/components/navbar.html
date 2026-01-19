@@ -85,12 +85,12 @@
                         {% endif %}
                         <li class="dropdown-divider"></li>
                         {% if user_permissions.paciente > 0 %}
-                            <li><a href="" class="dropdown-item">Pacientes</a></li>
+                            <li><a href="{% url 'paciente_list' %}" class="dropdown-item">Pacientes</a></li>
 
                         {% endif %}
 
                         {% if user_permissions.fichas > 0 %}
-                            <li><a href="" class="dropdown-item">Fichas</a></li>
+                            <li><a href="{% url 'ficha_list' %}" class="dropdown-item">Fichas</a></li>
                         {% endif %}
                     </ul>
                 </li>
@@ -105,7 +105,7 @@
                            aria-expanded="false" class="nav-link dropdown-toggle">Reportes</a>
                         <ul aria-labelledby="dropdownSubMenu2" class="dropdown-menu border-0 shadow">
                             <li>
-                                <a href="" class="dropdown-item">Ingresos por rango de
+                                <a href="{% url 'paciente_fecha_form' %}" class="dropdown-item">Ingresos por rango de
                                     fechas
                                 </a>
                             </li>
@@ -138,16 +138,16 @@
                             </li>
                             <li class="dropdown-divider"></li>
                             <li>
-                                <a href="" class="dropdown-item">Reporte
+                                <a href="{% url 'ficha_pasivados_list' %}" class="dropdown-item">Reporte
                                     Fichas Pasivadas
                                 </a>
                             </li>
                             <li class="dropdown-divider"></li>
-                            <li>
-                                <a href="" class="dropdown-item">Reporte
-                                    Movimientos Clínicos
-                                </a>
-                            </li>
+                            {#                            <li>#}
+                            {#                                <a href="" class="dropdown-item">Reporte#}
+                            {#                                    Movimientos Clínicos#}
+                            {#                                </a>#}
+                            {#                            </li>#}
 
                         </ul>
                     </li>
@@ -159,15 +159,17 @@
                            aria-expanded="false" class="nav-link dropdown-toggle">Movimiento Ficha</a>
                         <ul aria-labelledby="dropdownSubMenu3" class="dropdown-menu border-0 shadow">
                             <li>
-                                <a href="" class="dropdown-item">Recepción fichas</a>
-                            </li>
-                            <li>
-                                <a href="" class="dropdown-item">Envío fichas
+                                <a href="{% url 'salida_ficha_masiva' %}" class="dropdown-item">Envío fichas
                                 </a>
                             </li>
+                            <li>
+                                <a href="{% url 'entrada_tabla_ficha' %}" class="dropdown-item">Recepción fichas</a>
+                            </li>
+
                             <li class="dropdown-divider"></li>
                             <li>
-                                <a href="" class="dropdown-item">Ficha en transito</a>
+                                <a href="" class="dropdown-item">Ficha en
+                                    transito</a>
                             </li>
                             <li class="dropdown-divider"></li>
                             <li>
@@ -213,20 +215,20 @@
 
 
                     <li>
-                        <a href="" class="dropdown-item">
+                        <a href="{% url 'contacto' %}" class="dropdown-item">
                             <i class="fas fa-phone-alt"></i>
                             Contacto</a>
                     </li>
-                    <li>
-                        <a href="" class="dropdown-item">
-                            <i class="fas fa-headset"></i>
-                            Soporte</a>
-                    </li>
-                    <li>
-                        <a href="" class="dropdown-item">
-                            <i class="fas fa-video"></i>
-                            Tutoriales</a>
-                    </li>
+                    {#                    <li>#}
+                    {#                        <a href="" class="dropdown-item">#}
+                    {#                            <i class="fas fa-headset"></i>#}
+                    {#                            Soporte</a>#}
+                    {#                    </li>#}
+                    {#                    <li>#}
+                    {#                        <a href="" class="dropdown-item">#}
+                    {#                            <i class="fas fa-video"></i>#}
+                    {#                            Tutoriales</a>#}
+                    {#                    </li>#}
 
 
                     <li class="dropdown-divider"></li>

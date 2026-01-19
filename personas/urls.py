@@ -45,14 +45,13 @@ urlpatterns = [
     path('pacientes/fallecidos/', PacienteFallecidoListView.as_view(), name='paciente_fallecido_list'),
     path('pacientes-pueblo_indigena/', PacientePuebloIndigenaListView.as_view(), name='paciente_pueblo_indigena_list'),
     path('pacientes/<int:pk>/detalle/', PacienteDetailView.as_view(), name='paciente_detail'),
-    # path('pacientes/por-fecha/', PacientePorFechaListView.as_view(), name='paciente_por_fecha_list'),
-    # path('pacientes/por-fecha/form/', PacienteFechaFormView.as_view(), name='paciente_fecha_form'),
+    path('pacientes/historial', PacientesHistoryListView.as_view(), name='paciente_history'),
+    path('pacientes/por-fecha/', PacientePorFechaListView.as_view(), name='paciente_por_fecha_list'),
+    path('pacientes/por-fecha/form/', PacienteFechaFormView.as_view(), name='paciente_fecha_form'),
 
     # path('consulta-pacientes/', PacienteQueryView.as_view(), name='paciente_query'),
     # path('pacientes/<int:pk>/actualizar-rut/', PacienteActualizarRut.as_view(), name='paciente_actualizar_rut'),
     # path('pacientes/crear/sin-rut/', PacienteCreateSinRutView.as_view(), name='paciente_create_sin_rut'),
-
-    # path('pacientes/historial', PacientesHistoryListView.as_view(), name='paciente_history'),
 
     # APIS
     path("ficha-paciente/<str:rut>/", get_paciente_ficha, name="get_paciente_ficha", ),

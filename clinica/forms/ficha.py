@@ -10,7 +10,6 @@ class FichaForm(forms.ModelForm):
         widget=forms.NumberInput(attrs={
             'class': 'form-control form-control-sm',
             'id': 'id_ficha',
-            'name': 'ficha',
             'placeholder': 'Número de ficha sistema'
         })
     )
@@ -19,8 +18,7 @@ class FichaForm(forms.ModelForm):
         required=False,
         widget=forms.CheckboxInput(attrs={
             'class': 'form-check-input',
-            'id': 'id_pasivado',
-            'name': 'pasivado'
+            'id': 'id_pasivado'
         })
     )
 
@@ -28,10 +26,16 @@ class FichaForm(forms.ModelForm):
         required=False,
         widget=forms.Textarea(attrs={
             'class': 'form-control form-control-sm',
-            'id': 'id_observacion',
-            'name': 'observacion',
             'rows': 3,
             'placeholder': 'Observaciones de la ficha'
+        })
+    )
+
+    fecha_creacion_anterior = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={
+            'type': 'date',
+            'class': 'form-control form-control-sm',
         })
     )
 
@@ -41,40 +45,88 @@ class FichaForm(forms.ModelForm):
         empty_label='Selecciona un Sector',
         widget=forms.Select(attrs={
             'class': 'form-control form-control-sm',
-            'id': 'id_sector',
-            'name': 'sector'
+        })
+    )
+
+    paciente = forms.ModelChoiceField(
+        queryset=None,  # 👈 IMPORTANTE
+        required=False,
+        empty_label='Selecciona un Paciente',
+        widget=forms.Select(attrs={
+            'class': 'form-control form-control-sm select2',
         })
     )
 
     class Meta:
         model = Ficha
         fields = [
-            'numero_ficha_sistema', 'pasivado', 'observacion',
-            'fecha_creacion_anterior', 'paciente', 'sector',
+            'numero_ficha_sistema',
+            'pasivado',
+            'observacion',
+            'fecha_creacion_anterior',
+            'paciente',
+            'sector',
         ]
 
-    def _duplicate_ficha(self, cleaned):
-        numero = cleaned.get('numero_ficha_sistema')
-        establecimiento = cleaned.get('establecimiento')
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-        if numero and establecimiento:
-            existe = Ficha.objects.filter(
-                numero_ficha_sistema=numero,
-                establecimiento=establecimiento
-            )
+        from personas.models.pacientes import Paciente  # 👈 import diferido
 
-            if self.instance.pk:
-                existe = existe.exclude(pk=self.instance.pk)
+        self.fields['paciente'].queryset = Paciente.objects.filter(status=True)
 
-            if existe.exists():
-                self.add_error(
-                    'numero_ficha_sistema',
-                    'Ya existe una ficha con este número para este establecimiento.'
-                )
 
-    def clean(self):
-        cleaned = super().clean()
+class FormFichaTarjeta(forms.ModelForm):
+    """
+    Formulario para asignar/editar N° de Ficha (sistema) y N° de Ficha de Tarjeta.
+    Muestra además: ID de la ficha, RUT del paciente y Nombre completo como sólo lectura.
+    Siempre trabaja en modo actualización (UpdateView).
+    """
+    # Campos de solo visualización (no mapean al modelo)
+    ficha_id_display = forms.CharField(
+        label='ID Ficha',
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'})
+    )
+    rut_display = forms.CharField(
+        label='RUT Paciente',
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'})
+    )
+    nombre_display = forms.CharField(
+        label='Nombre Completo',
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'})
+    )
 
-        self._duplicate_ficha(cleaned)
+    # Campos editables del modelo
+    numero_ficha_sistema = forms.IntegerField(
+        label='Número de Ficha (Sistema)',
+        required=False,
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'autocomplete': 'off'})
+    )
+    numero_ficha_tarjeta = forms.IntegerField(
+        label='Número de Ficha de Tarjeta',
+        required=False,
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'autocomplete': 'off'})
+    )
 
-        return cleaned
+    class Meta:
+        model = Ficha
+        fields = ['numero_ficha_sistema', 'numero_ficha_tarjeta']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Prefill de campos de sólo lectura
+        instance = getattr(self, 'instance', None)
+        if instance is not None:
+            self.fields['ficha_id_display'].initial = instance.pk
+            pac = getattr(instance, 'paciente', None)
+            rut = getattr(pac, 'rut', '') if pac else ''
+            nombre = ''
+            if pac:
+                nombre = f"{pac.nombre or ''} {pac.apellido_paterno or ''} {pac.apellido_materno or ''}".strip()
+            self.fields['rut_display'].initial = rut
+            self.fields['nombre_display'].initial = nombre
+        # Si ya tiene número de ficha, mantenerlo en el input
+        # (Django ya setea initial para campos del modelo con instance)

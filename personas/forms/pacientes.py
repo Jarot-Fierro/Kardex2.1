@@ -295,7 +295,7 @@ class PacienteForm(forms.ModelForm):
             'rut_madre', 'nombres_madre', 'nombres_padre', 'nombre_pareja',
             'representante_legal', 'rut_responsable_temporal', 'usar_rut_madre_como_responsable',
             'direccion', 'comuna', 'prevision', 'ocupacion', 'numero_telefono1', 'numero_telefono2', 'sin_telefono',
-            'alergico_a',
+            'alergico_a', 'fecha_nacimiento',
         ]
 
     def _clean_checkboxes(self, cleaned):
@@ -470,3 +470,16 @@ class PacienteForm(forms.ModelForm):
         self._clean_fallecimiento(cleaned)
 
         return cleaned
+
+
+class PacienteFechaRangoForm(forms.Form):
+    fecha_inicio = forms.DateField(
+        label='Fecha inicio',
+        widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+        required=True,
+    )
+    fecha_fin = forms.DateField(
+        label='Fecha fin',
+        widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+        required=True,
+    )

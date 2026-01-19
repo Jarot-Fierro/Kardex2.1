@@ -122,11 +122,11 @@
                                     Cancelar
                                 </button>
                                 <button type="submit" class="btn btn-primary btn-sm no-print">Guardar</button>
-                                <a id="btn-paciente-sin-rut"
-                                   href=""
-                                   class="btn btn-sm btn-outline-danger flex-fill mx-1">
-                                    Crear Paciente sin RUT
-                                </a>
+                                {#                                <a id="btn-paciente-sin-rut"#}
+                                {#                                   href=""#}
+                                {#                                   class="btn btn-sm btn-outline-danger flex-fill mx-1">#}
+                                {#                                    Crear Paciente sin RUT#}
+                                {#                                </a>#}
                             </div>
                         </div>
                     </div>
@@ -1840,6 +1840,28 @@
             window.deshabilitarBotoneraClinica();
         });
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            const inputRut = document.getElementById('id_rut'); // 🔁 cambia al ID real
+            const form = inputRut.closest('form');
+
+            // Evita que el ENTER enviado por la pistola envíe el formulario
+            form.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    // Quitar foco del input (simula clic afuera)
+                    document.activeElement.blur();
+
+                    return false;
+                }
+            });
+
+        });
+    </script>
+
 
 
 {% endblock %}
