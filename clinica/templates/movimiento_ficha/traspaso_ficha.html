@@ -4,165 +4,133 @@
 {% block title %}Traspaso de Fichas{% endblock %}
 
 {% block content %}
-<div class="container-fluid small-input">
-    <div class="row">
-        <div class="col-12">
-            <div class="card card-primary">
-                <div class="card-header">
-                    <h3 class="card-title">Registro de Traspaso de Ficha</h3>
-                </div>
-                <div class="card-body">
-                    <form id="form-traspaso" class="form" method="post" novalidate>
-                        {% csrf_token %}
-                        {{ form.non_field_errors }}
-                        <div class="form-row">
-                            <div class="form-group col-md-3">
-                                <label class="form-check-label">{{ form.rut.label }}</label>
+    <div class="container-fluid small-input">
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Registro de Traspaso de Ficha</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="form-traspaso" class="form" method="post" novalidate>
+                            {% csrf_token %}
+                            {{ form.non_field_errors }}
+                            <input type="hidden" name="movimiento_id" id="id_movimiento_id">
+
+                            <div class="form-group">
+                                <label>{{ form.rut.label }}</label>
                                 {{ form.rut }}
                                 {% for error in form.rut.errors %}
-                                <span class="text-danger small d-block">{{ error }}</span>
+                                    <span class="text-danger small d-block">{{ error }}</span>
                                 {% endfor %}
                             </div>
-                            <div class="form-group col-md-3">
-                                <label class="form-check-label">{{ form.ficha.label }}</label>
+
+                            <div class="form-group">
+                                <label>{{ form.ficha.label }}</label>
                                 {{ form.ficha }}
                                 {% for error in form.ficha.errors %}
-                                <span class="text-danger small d-block">{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label class="form-check-label">{{ form.nombre.label }}</label>
-                                {{ form.nombre }}
-                                {% for error in form.nombre.errors %}
-                                <span class="text-danger small d-block">{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="col-md-6">
-                                <div class="form-check">
-                                    <label class="form-check-label">{{ form.profesional_traspaso.label }}</label>
-                                    {{ form.profesional_traspaso }}
-                                    {% for error in form.profesional_traspaso.errors %}
                                     <span class="text-danger small d-block">{{ error }}</span>
-                                    {% endfor %}
-                                </div>
+                                {% endfor %}
                             </div>
-                        </div>
 
-                        <!-- Campos informativos y de traspaso que la API rellenará -->
-                        <div class="form-row">
-                            <div class="col-md-4">
+                            <div class="form-group">
+                                <label>{{ form.nombre.label }}</label>
+                                {{ form.nombre }}
+                            </div>
+
+                            <div class="form-group">
+                                <label>{{ form.profesional_traspaso.label }}</label>
+                                {{ form.profesional_traspaso }}
+                                {% for error in form.profesional_traspaso.errors %}
+                                    <span class="text-danger small d-block">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+
+                            <div class="form-group">
+                                <label>{{ form.servicio_clinico_traspaso.label }}</label>
+                                {{ form.servicio_clinico_traspaso }}
+                                {% for error in form.servicio_clinico_traspaso.errors %}
+                                    <span class="text-danger small d-block">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+
+                            <div class="form-group">
+                                <label>{{ form.observacion_traspaso.label }}</label>
+                                {{ form.observacion_traspaso }}
+                            </div>
+
+                            <button type="submit" id="btn-guardar" class="btn btn-primary btn-block">
+                                <i class="fas fa-save"></i> Registrar traspaso
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="card card-outline card-secondary">
+                    <div class="card-header">
+                        <h3 class="card-title">Detalles del Movimiento Actual (En Tránsito)</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
                                 <div class="form-group">
                                     <label>{{ form.servicio_clinico_envio.label }}</label>
                                     {{ form.servicio_clinico_envio }}
                                 </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>{{ form.servicio_clinico_recepcion.label }}</label>
-                                    {{ form.servicio_clinico_recepcion }}
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>{{ form.servicio_clinico_traspaso.label }}</label>
-                                    {{ form.servicio_clinico_traspaso }}
-                                    {% for error in form.servicio_clinico_traspaso.errors %}
-                                    <span class="text-danger small d-block">{{ error }}</span>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label>{{ form.fecha_envio.label }}</label>
                                     {{ form.fecha_envio }}
                                 </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>{{ form.fecha_recepcion.label }}</label>
-                                    {{ form.fecha_recepcion }}
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>{{ form.fecha_traspaso.label }}</label>
-                                    {{ form.fecha_traspaso }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label>{{ form.estado_envio.label }}</label>
                                     {{ form.estado_envio }}
                                 </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>{{ form.estado_recepcion.label }}</label>
-                                    {{ form.estado_recepcion }}
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>{{ form.estado_traspaso.label }}</label>
-                                    {{ form.estado_traspaso }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label>{{ form.observacion_envio.label }}</label>
                                     {{ form.observacion_envio }}
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>{{ form.servicio_clinico_recepcion.label }}</label>
+                                    {{ form.servicio_clinico_recepcion }}
+                                </div>
+                                <div class="form-group">
+                                    <label>{{ form.fecha_recepcion.label }}</label>
+                                    {{ form.fecha_recepcion }}
+                                </div>
+                                <div class="form-group">
+                                    <label>{{ form.estado_recepcion.label }}</label>
+                                    {{ form.estado_recepcion }}
+                                </div>
                                 <div class="form-group">
                                     <label>{{ form.observacion_recepcion.label }}</label>
                                     {{ form.observacion_recepcion }}
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>{{ form.observacion_traspaso.label }}</label>
-                                    {{ form.observacion_traspaso }}
-                                </div>
-                            </div>
                         </div>
-
-                        <button type="submit" id="btn-guardar" class="btn btn-primary mt-3"><i class="fas fa-save"></i>
-                            Guardar
-                        </button>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 {% endblock %}
 
 {% block javascript %}
-<script>
-    $('.select2').select2({
-        theme: 'bootstrap4',
-        width: '100%'
-    });
-</script>
-<script>
-    // Ajustes de UI para mantener consistencia con otros formularios
-    $('#servicio_clinico_ficha').prop('disabled', false);
-    $('#id_ficha').prop('disabled', false);
-    $('#nombre_mov').prop('readonly', true);
-    $('#id_rut').prop('disabled', false);
-</script>
-<script src="{% static 'js/apis/api_traspaso_ficha.js' %}"></script>
+    <script>
+        $('.select2').select2({
+            theme: 'bootstrap4',
+            width: '100%'
+        });
+    </script>
+    <script>
+        // Ajustes de UI para mantener consistencia con otros formularios
+        $('#servicio_clinico_ficha').prop('disabled', false);
+        $('#id_ficha').prop('disabled', false);
+        $('#nombre_mov').prop('readonly', true);
+        $('#id_rut').prop('disabled', false);
+    </script>
+    <script src="{% static 'js/apis/api_traspaso_ficha.js' %}"></script>
 {% endblock %}

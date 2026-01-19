@@ -81,8 +81,9 @@ class Paciente(StandardModel):
 
     def save(self, *args, **kwargs):
         # Normalizar campos texto
+        # El usuario indica que el RUT debe guardarse con puntos y guion (ej: 20.930.055-9)
         if self.rut:
-            self.rut = self.rut.strip().lower()
+            self.rut = self.rut.strip().upper()
         if self.nip:
             self.nip = self.nip.strip().upper()
         if self.nombre:

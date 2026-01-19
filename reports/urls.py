@@ -2,8 +2,6 @@ from django.urls import path
 
 from . import views
 
-app_name = 'reports'
-
 urlpatterns = [
     # MANTENEDORES
     path('export/pais/', views.export_pais, name='export_pais'),

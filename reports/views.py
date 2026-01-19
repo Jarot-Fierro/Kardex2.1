@@ -1,4 +1,13 @@
-from kardex.models import *
+from clinica.models import Ficha, MovimientoFicha
+from establecimientos.models.establecimiento import Establecimiento
+from establecimientos.models.sectores import Sector
+from establecimientos.models.servicio_clinico import ServicioClinico
+from geografia.models.comuna import Comuna
+from geografia.models.pais import Pais
+from personas.models.pacientes import Paciente
+from personas.models.prevision import Prevision
+from personas.models.profesion import Profesion
+from personas.models.profesionales import Profesional
 from .fields_export_csv import *
 from .utils import export_queryset_to_excel, export_queryset_to_csv_fast
 

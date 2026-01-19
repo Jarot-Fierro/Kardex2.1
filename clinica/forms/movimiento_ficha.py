@@ -150,16 +150,21 @@ class FormSalidaFicha(forms.ModelForm):
         self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
 
+        # Si el usuario tiene un servicio asignado, usarlo como inicial para envío
+        if self.user and hasattr(self.user, 'servicio_clinico') and self.user.servicio_clinico:
+            self.fields['servicio_clinico_envio'].initial = self.user.servicio_clinico
+
     rut = forms.CharField(
         label='RUT',
-        required=False,
+        required=True,
         widget=forms.TextInput(
             attrs={
                 'id': 'id_rut',
                 'class': 'form-control id_rut',
                 'name': 'rut',
                 'autocomplete': 'off',
-                'inputmode': 'text'
+                'inputmode': 'text',
+                'placeholder': '12.345.678-9'
             }
         )
     )
@@ -237,62 +242,52 @@ class FormSalidaFicha(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        print("---- DEBUG POST DATA ----")
-        print(self.data)
-        print("--------------------------")
+        envio = cleaned_data.get('servicio_clinico_envio')
+        recepcion = cleaned_data.get('servicio_clinico_recepcion')
+
+        if envio and recepcion and envio == recepcion:
+            self.add_error('servicio_clinico_recepcion', 'El servicio de recepción no puede ser igual al de envío.')
+
         return cleaned_data
 
+    ficha_id_hidden = forms.CharField(
+        widget=forms.HiddenInput(attrs={'id': 'id_ficha_hidden'}),
+        required=False
+    )
+
     def clean_ficha(self):
-        ficha_value = self.cleaned_data.get('ficha')
-        rut_value = self.cleaned_data.get('rut')  # El nombre del campo es 'rut', no 'id_rut'
+        # El campo 'ficha' es un CharField en el formulario para mostrar el número de ficha del sistema,
+        # pero el modelo MovimientoFicha espera una instancia de Ficha (ForeignKey).
+        # Aquí validamos y retornamos la instancia si es posible.
+        raw_ficha = self.cleaned_data.get('ficha')
+        ficha_id = self.data.get('ficha_id_hidden') or self.data.get('ficha_id')
 
-        print(ficha_value)
-        print(rut_value)
+        if ficha_id:
+            try:
+                return Ficha.objects.get(pk=ficha_id)
+            except (Ficha.DoesNotExist, ValueError):
+                pass
 
-        try:
-            # Validaciones básicas
-            if not ficha_value or not rut_value:
-                raise forms.ValidationError("Debe ingresar el número de ficha y el RUT del paciente.")
+        # Si no hay ficha_id_hidden, intentamos buscar por número de ficha del sistema
+        if raw_ficha:
+            user = getattr(self, 'user', None)
+            if user and user.establecimiento:
+                try:
+                    return Ficha.objects.get(
+                        numero_ficha_sistema=raw_ficha,
+                        establecimiento=user.establecimiento
+                    )
+                except (Ficha.DoesNotExist, Ficha.MultipleObjectsReturned, ValueError):
+                    pass
 
-            # Conversión a tipos adecuados
-            ficha_numero = int(ficha_value)
-
-            # ✅ Obtenemos el establecimiento del usuario logueado
-            if not self.user or not hasattr(self.user, 'establecimiento'):
-                raise forms.ValidationError("No se encontró el establecimiento asociado al usuario.")
-
-            # Filtro compuesto: ficha + rut + establecimiento
-            filtro = {
-                'numero_ficha_sistema': ficha_numero,
-                'paciente__rut': rut_value,
-                'establecimiento': self.user.establecimiento,
-            }
-
-            qs = Ficha.objects.filter(**filtro)
-
-            # Validaciones de resultados
-            if not qs.exists():
-                raise forms.ValidationError("No se encontró ninguna ficha que coincida con los datos ingresados.")
-
-            if qs.count() > 1:
-                raise forms.ValidationError(
-                    "Existen múltiples fichas con los mismos datos. Contacte al administrador."
-                )
-
-            ficha_instance = qs.get()
-
-        except ValueError:
-            raise forms.ValidationError("El número de ficha debe ser un valor numérico válido.")
-        except Ficha.DoesNotExist:
-            raise forms.ValidationError("Ficha no válida o no encontrada.")
-
-        return ficha_instance
+        return raw_ficha
 
     class Meta:
         model = MovimientoFicha
         fields = [
             'rut',
             'ficha',
+            'ficha_id_hidden',
             'servicio_clinico_envio',
             'servicio_clinico_recepcion',
             'observacion_envio',
