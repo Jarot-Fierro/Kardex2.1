@@ -59,6 +59,7 @@ def get_paciente_ficha(request, rut):
             "nombre_pareja": paciente.nombre_pareja,
             "representante_legal": paciente.representante_legal,
             "direccion": paciente.direccion,
+            "sin_telefono": paciente.sin_telefono,
             "numero_telefono1": paciente.numero_telefono1,
             "numero_telefono2": paciente.numero_telefono2,
             "ocupacion": paciente.ocupacion,

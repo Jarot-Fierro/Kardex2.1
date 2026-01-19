@@ -43,9 +43,9 @@
                         </div>
                         <div class="row mt-1">
                             <div class="col text-end">
-                                <button type="button" class="btn btn-outline-secondary btn-sm no-print"
-                                        id="btn-limpiar-arriba">Limpiar Todo
-                                </button>
+                                <a href="{% url 'paciente_view' %}" class="btn btn-outline-secondary btn-sm no-print">
+                                    Limpiar Todo
+                                </a>
                                 <button type="button" class="btn btn-outline-primary btn-sm no-print"
                                         id="btn-consultar-denuevo">Consultar Paciente
                                 </button>
@@ -694,12 +694,10 @@
                         No, continuar editando
                     </button>
 
-                    <button
-                            type="button"
-                            class="btn btn-danger"
-                            id="btnConfirmarLimpiarFormulario">
+                    <a href="{% url 'paciente_view' %}"
+                       class="btn btn-danger">
                         Sí, limpiar formulario
-                    </button>
+                    </a>
                 </div>
 
             </div>
@@ -1237,6 +1235,12 @@
 
             const el = {
                 rut: document.getElementById('id_rut'),
+                nombres: document.getElementById('id_nombre'),
+                apellido_paterno: document.getElementById('id_apellido_paterno'),
+                apellido_materno: document.getElementById('id_apellido_materno'),
+                nombres_padre: document.getElementById('id_nombres_padre'),
+                nombres_madre: document.getElementById('id_nombres_madre'),
+                direccion: document.getElementById('id_direccion'),
                 nip: document.getElementById('id_nip'),
                 pasaporte: document.getElementById('id_pasaporte'),
                 rut_resp: document.getElementById('id_rut_responsable_temporal'),
@@ -1283,13 +1287,14 @@
                     el.telefono1, el.telefono2
                 ]);
 
-                /* REGLAS _clean_files_custom */
-
                 //  Estándar
                 if (!rn && !ext && !fal) {
                     disable([el.nip, el.pasaporte, el.rut_resp, el.fecha_fallecimiento]);
                     el.usar_rut_madre.checked = false;
                     el.rut.required = true;
+                    el.apellido_paterno.required = true;
+                    el.apellido_materno.required = true;
+                    el.direccion.required = true;
                 }
 
                 // Fallecido

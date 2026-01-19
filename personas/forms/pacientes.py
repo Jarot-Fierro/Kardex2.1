@@ -147,7 +147,7 @@ class PacienteForm(forms.ModelForm):
         widget=forms.CheckboxInput(attrs={
             'class': 'form-check-input',
             'id': 'id_recien_nacido',
-            'name': 'recien_nacido'
+            'name': 'recien_nacido',
         })
     )
 
@@ -156,7 +156,7 @@ class PacienteForm(forms.ModelForm):
         widget=forms.CheckboxInput(attrs={
             'class': 'form-check-input',
             'id': 'id_extranjero',
-            'name': 'extranjero'
+            'name': 'extranjero',
         })
     )
 
@@ -165,7 +165,7 @@ class PacienteForm(forms.ModelForm):
         widget=forms.CheckboxInput(attrs={
             'class': 'form-check-input',
             'id': 'id_pueblo_indigena',
-            'name': 'pueblo_indigena'
+            'name': 'pueblo_indigena',
         })
     )
 
@@ -174,7 +174,7 @@ class PacienteForm(forms.ModelForm):
         widget=forms.CheckboxInput(attrs={
             'class': 'form-check-input',
             'id': 'id_fallecido',
-            'name': 'fallecido'
+            'name': 'fallecido',
         })
     )
 
@@ -183,7 +183,7 @@ class PacienteForm(forms.ModelForm):
         widget=forms.CheckboxInput(attrs={
             'class': 'form-check-input',
             'id': 'id_usar_rut_madre_como_responsable',
-            'name': 'usar_rut_madre_como_responsable'
+            'name': 'usar_rut_madre_como_responsable',
         })
     )
 
@@ -192,7 +192,7 @@ class PacienteForm(forms.ModelForm):
         widget=forms.CheckboxInput(attrs={
             'class': 'form-check-input',
             'id': 'id_sin_telefono',
-            'name': 'sin_telefono'
+            'name': 'sin_telefono',
         })
     )
 
@@ -296,62 +296,77 @@ class PacienteForm(forms.ModelForm):
             'alergico_a',
         ]
 
-    def _clean_files_custom(self, cleaned):
-        rn = cleaned.get('recien_nacido')
-        ext = cleaned.get('extranjero')
-        fal = cleaned.get('fallecido')
+    def _clean_checkboxes(self, cleaned):
+        checkboxes = [
+            'recien_nacido', 'extranjero', 'pueblo_indigena', 'fallecido',
+            'usar_rut_madre_como_responsable', 'sin_telefono'
+        ]
+        for field in checkboxes:
+            if not cleaned.get(field):
+                raw_val = self.data.get(field)
+                if raw_val in ['on', 'true', 'True', '1']:
+                    cleaned[field] = True
+            # Forzar limpieza si es False (evita arrastrar valores viejos si el POST los omite por alguna razón)
+            elif cleaned.get(field) is None:
+                cleaned[field] = False
 
-        # 1Estándar: no RN, no Extranjero, no Fallecido
-        if not rn and not ext and not fal:
-            cleaned['nip'] = None
-            cleaned['pasaporte'] = None
-            cleaned['rut_responsable_temporal'] = None
-            cleaned['usar_rut_madre_como_responsable'] = False
-            cleaned['fecha_fallecimiento'] = None
-
-        # ️Fallecido solo
-        if not rn and not ext and fal:
-            cleaned['nip'] = None
-            cleaned['pasaporte'] = None
-            cleaned['rut_responsable_temporal'] = None
-            cleaned['usar_rut_madre_como_responsable'] = False
-
-        # Recién nacido solo
-        if rn and not ext and not fal:
-            cleaned['nip'] = None
-            cleaned['pasaporte'] = None
-            cleaned['ocupacion'] = None
-            cleaned['nombre_pareja'] = None
-            cleaned['fecha_fallecimiento'] = None
-
-        # Recién nacido + Fallecido
-        if rn and not ext and fal:
-            cleaned['nip'] = None
-            cleaned['pasaporte'] = None
-            cleaned['ocupacion'] = None
-            cleaned['nombre_pareja'] = None
-
-        # Extranjero solo
-        if not rn and ext and not fal:
-            cleaned['rut_responsable_temporal'] = None
-            cleaned['usar_rut_madre_como_responsable'] = False
-            cleaned['fecha_fallecimiento'] = None
-
-        # Extranjero + Fallecido
-        if not rn and ext and fal:
-            cleaned['rut_responsable_temporal'] = None
-            cleaned['usar_rut_madre_como_responsable'] = False
-
-        # Recién nacido + Extranjero
-        if rn and ext and not fal:
-            cleaned['ocupacion'] = None
-            cleaned['nombre_pareja'] = None
-            cleaned['fecha_fallecimiento'] = None
-
-        # Recién nacido + Extranjero + Fallecido
-        if rn and ext and fal:
-            cleaned['ocupacion'] = None
-            cleaned['nombre_pareja'] = None
+    # def _clean_files_custom(self, cleaned):
+    #     self._clean_checkboxes(cleaned)
+    #     rn = cleaned.get('recien_nacido')
+    #     ext = cleaned.get('extranjero')
+    #     fal = cleaned.get('fallecido')
+    #
+    #     # Estándar: no RN, no Extranjero, no Fallecido
+    #     if not rn and not ext and not fal:
+    #         cleaned['nip'] = None
+    #         cleaned['pasaporte'] = None
+    #         cleaned['rut_responsable_temporal'] = None
+    #         cleaned['usar_rut_madre_como_responsable'] = False
+    #         cleaned['fecha_fallecimiento'] = None
+    #
+    #     # ️Fallecido solo
+    #     if not rn and not ext and fal:
+    #         cleaned['nip'] = None
+    #         cleaned['pasaporte'] = None
+    #         cleaned['rut_responsable_temporal'] = None
+    #         cleaned['usar_rut_madre_como_responsable'] = False
+    #
+    #     # Recién nacido solo
+    #     if rn and not ext and not fal:
+    #         cleaned['nip'] = None
+    #         cleaned['pasaporte'] = None
+    #         cleaned['ocupacion'] = None
+    #         cleaned['nombre_pareja'] = None
+    #         cleaned['fecha_fallecimiento'] = None
+    #
+    #     # Recién nacido + Fallecido
+    #     if rn and not ext and fal:
+    #         cleaned['nip'] = None
+    #         cleaned['pasaporte'] = None
+    #         cleaned['ocupacion'] = None
+    #         cleaned['nombre_pareja'] = None
+    #
+    #     # Extranjero solo
+    #     if not rn and ext and not fal:
+    #         cleaned['rut_responsable_temporal'] = None
+    #         cleaned['usar_rut_madre_como_responsable'] = False
+    #         cleaned['fecha_fallecimiento'] = None
+    #
+    #     # Extranjero + Fallecido
+    #     if not rn and ext and fal:
+    #         cleaned['rut_responsable_temporal'] = None
+    #         cleaned['usar_rut_madre_como_responsable'] = False
+    #
+    #     # Recién nacido + Extranjero
+    #     if rn and ext and not fal:
+    #         cleaned['ocupacion'] = None
+    #         cleaned['nombre_pareja'] = None
+    #         cleaned['fecha_fallecimiento'] = None
+    #
+    #     # Recién nacido + Extranjero + Fallecido
+    #     if rn and ext and fal:
+    #         cleaned['ocupacion'] = None
+    #         cleaned['nombre_pareja'] = None
 
     def _clean_fallecimiento(self, cleaned):
         esta_fallecido = cleaned.get("fallecido")
@@ -413,13 +428,21 @@ class PacienteForm(forms.ModelForm):
 
     def _clean_telefonos(self, cleaned):
         sin_telefono = cleaned.get("sin_telefono")
+
         telefono1 = cleaned.get("numero_telefono1")
 
+        # Caso inválido: no tiene teléfono y no marcó "sin teléfono"
         if not sin_telefono and not telefono1:
             self.add_error(
                 'numero_telefono1',
                 'Debe ingresar un teléfono o indicar que no cuenta con uno.'
             )
+
+        # Caso válido: marcó sin teléfono
+        if sin_telefono:
+            cleaned['sin_telefono'] = True
+            cleaned['numero_telefono1'] = None
+            cleaned['numero_telefono2'] = None
 
     def clean_rut(self):
         rut = self.cleaned_data.get('rut')
@@ -437,7 +460,7 @@ class PacienteForm(forms.ModelForm):
     def clean(self):
         cleaned = super().clean()
 
-        self._clean_files_custom(cleaned)
+        # self._clean_files_custom(cleaned)
         self._clean_extranjero(cleaned)
         self._clean_telefonos(cleaned)
         self._clean_recien_nacido(cleaned)

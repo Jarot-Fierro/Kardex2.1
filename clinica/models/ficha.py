@@ -8,6 +8,8 @@ class Ficha(StandardModel):
     numero_ficha_sistema = models.IntegerField(null=True, blank=True, verbose_name='Número de Ficha')
     numero_ficha_tarjeta = models.IntegerField(null=True, blank=True,
                                                verbose_name='Número de Ficha Tarjeta')
+    numero_ficha_respaldo = models.IntegerField(null=True, blank=True,
+                                                verbose_name='Número de Ficha Respaldo')
     pasivado = models.BooleanField(default=False, verbose_name='Pasivado')
     observacion = models.TextField(null=True, blank=True, verbose_name='Observación')
 
