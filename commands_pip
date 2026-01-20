@@ -1,0 +1,18 @@
+pip install django
+pip install djangorestframework
+pip install django-filter
+pip install django-simple-history
+pip install django-dbbackup
+pip install django-dotenv
+pip install mysqlclient
+pip install pandas
+pip install openpyxl
+pip install xlsxwriter
+pip install pillow
+pip install python-barcode
+pip install markdown
+pip install tqdm
+pip install git-filter-repo
+
+
+pip install django djangorestframework django-filter django-simple-history django-dbbackup django-dotenv mysqlclient pandas openpyxl xlsxwriter pillow python-barcode markdown tqdm git-filter-repo

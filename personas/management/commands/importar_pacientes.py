@@ -10,6 +10,10 @@ from personas.models.prevision import Prevision
 from personas.models.usuario_anterior import UsuarioAnterior
 
 
+# Comando para ejecutar la migración de pacientes en la consola
+# python manage.py importar_pacientes "E:\Importación\pacientes.csv"
+
+
 class Command(BaseCommand):
     help = 'Importa pacientes desde un archivo CSV SOME.'
 
