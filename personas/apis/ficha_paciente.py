@@ -18,7 +18,10 @@ def get_paciente_ficha(request, rut):
 
     ficha = (
         Ficha.objects
-        .filter(paciente=paciente)
+        .filter(
+            paciente=paciente,
+            establecimiento=request.user.establecimiento
+        )
         .select_related("sector", "establecimiento", "usuario")
         .prefetch_related(
             Prefetch(
@@ -29,6 +32,12 @@ def get_paciente_ficha(request, rut):
         )
         .first()
     )
+
+    # if not ficha:
+    #     return JsonResponse(
+    #         {"error": "El paciente no tiene ficha en este establecimiento"},
+    #         status=404
+    #     )
 
     todas_las_fichas = (
         Ficha.objects

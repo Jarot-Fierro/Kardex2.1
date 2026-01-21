@@ -4,11 +4,9 @@ import json
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
-from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
-from django.views.generic import CreateView
 from django.views.generic.base import TemplateView
 
 from clinica.forms.movimiento_ficha import (
@@ -414,117 +412,231 @@ class RecepcionTablaFichaView(LoginRequiredMixin, DataTableMixin, TemplateView):
         }
 
     def post(self, request, *args, **kwargs):
+        """Manejar el POST para registrar la recepción vía AJAX"""
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            try:
+                if request.content_type == 'application/json':
+                    data = json.loads(request.body)
+                else:
+                    data = request.POST
+
+                movimiento_id = data.get('movimiento_id')
+                if not movimiento_id:
+                    return JsonResponse({'success': False, 'error': 'No se especificó el movimiento a recibir.'},
+                                        status=400)
+
+                try:
+                    movimiento = MovimientoFicha.objects.get(
+                        pk=movimiento_id,
+                        establecimiento=request.user.establecimiento,
+                        estado_recepcion='EN ESPERA'
+                    )
+                except MovimientoFicha.DoesNotExist:
+                    return JsonResponse({'success': False, 'error': 'Movimiento no encontrado o ya procesado.'},
+                                        status=404)
+
+                form = FormEntradaFicha(data, instance=movimiento, user=request.user)
+                if form.is_valid():
+                    movimiento = form.save(commit=False)
+                    movimiento.estado_recepcion = 'RECIBIDO'
+                    movimiento.usuario_recepcion = request.user
+                    movimiento.save()
+                    return JsonResponse({
+                        'success': True,
+                        'message': 'Recepción registrada exitosamente',
+                        'movimiento_id': movimiento.id
+                    })
+                else:
+                    error_msg = ""
+                    for field, errors in form.errors.items():
+                        for error in errors:
+                            error_msg += f"{error['message']} " if isinstance(error, dict) else f"{error} "
+                    return JsonResponse({'success': False, 'error': error_msg.strip()}, status=400)
+
+            except Exception as e:
+                return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+        # Comportamiento estándar para POST no-AJAX
         form = FormEntradaFicha(request.POST, user=request.user)
         if form.is_valid():
+            # Nota: El form original no maneja el movimiento_id para actualización en modo no-AJAX fácilmente
+            # pero mantendremos la lógica básica por compatibilidad si fuera necesario.
             movimiento = form.save(commit=False)
             movimiento.estado_recepcion = 'RECIBIDO'
             movimiento.usuario_recepcion = request.user
             movimiento.save()
             return redirect('entrada_tabla_ficha')
 
-        # Si no es válido, renderizar con errores
-        # Para TemplateView necesitamos simular el comportamiento de ListView o manejar object_list
         context = self.get_context_data(form=form)
         return self.render_to_response(context)
 
 
-class TraspasoFichaView(LoginRequiredMixin, CreateView):
-    model = MovimientoFicha
-    form_class = FormTraspasoFicha
+class TraspasoFichaView(LoginRequiredMixin, DataTableMixin, TemplateView):
     template_name = 'movimiento_ficha/traspaso_ficha.html'
-    success_url = reverse_lazy('traspaso_ficha')
+    model = MovimientoFicha
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['user'] = self.request.user
-        return kwargs
+    datatable_columns = ['ID', 'RUT', 'Ficha', 'Nombre completo', 'Servicio Clínico Envío',
+                         'Servicio Clínico Recepción',
+                         'Servicio Clínico Traspaso', 'Fecha Traspaso', 'Estado']
+    datatable_order_fields = ['id', None, 'ficha__paciente__rut', 'ficha__numero_ficha_sistema',
+                              'ficha__paciente__apellido_paterno',
+                              'servicio_clinico_envio__nombre', 'servicio_clinico_recepcion__nombre',
+                              'servicio_clinico_traspaso__nombre', 'fecha_traspaso', 'estado_traspaso']
+    datatable_search_fields = [
+        'ficha__paciente__rut__icontains',
+        'ficha__numero_ficha_sistema__icontains',
+        'ficha__paciente__nombre__icontains',
+        'ficha__paciente__apellido_paterno__icontains',
+        'ficha__paciente__apellido_materno__icontains',
+        'servicio_clinico_envio__nombre__icontains',
+        'servicio_clinico_recepcion__nombre__icontains',
+        'servicio_clinico_traspaso__nombre__icontains',
+    ]
+
+    def get(self, request, *args, **kwargs):
+        # Soporte para AJAX DataTable
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest' and request.GET.get('datatable'):
+            return self.get_datatable_response(request)
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Traspaso de Fichas'
+        establecimiento = getattr(self.request.user, 'establecimiento', None)
+
+        if 'form' not in context:
+            context['form'] = FormTraspasoFicha(user=self.request.user)
+
+        filter_form = FiltroSalidaFichaForm(self.request.GET or None)
+        if establecimiento and 'profesional' in filter_form.fields:
+            filter_form.fields['profesional'].queryset = Profesional.objects.filter(establecimiento=establecimiento)
+
+        context.update({
+            'title': 'Traspaso de Fichas',
+            'list_url': reverse_lazy('traspaso_ficha'),
+            'datatable_enabled': True,
+            'datatable_order': [[0, 'desc']],
+            'columns': self.datatable_columns,
+            'filter_form': filter_form,
+        })
         return context
 
-    def get(self, request, *args, **kwargs):
-        # API Traspaso
-        search = request.GET.get('search')
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest' and search:
-            establecimiento = getattr(self.request.user, 'establecimiento', None)
-            # Buscar movimientos en espera o recibidos para traspaso
-            qs = MovimientoFicha.objects.filter(
-                establecimiento=establecimiento,
-                estado_recepcion__in=['EN ESPERA', 'RECIBIDO']
-            ).filter(
-                Q(ficha__paciente__rut__icontains=search) |
-                Q(ficha__numero_ficha_sistema__icontains=search)
-            ).select_related('ficha__paciente', 'servicio_clinico_envio', 'servicio_clinico_recepcion')
+    def get_base_queryset(self):
+        establecimiento = getattr(self.request.user, 'establecimiento', None)
+        qs = MovimientoFicha.objects.filter(
+            ficha__establecimiento=establecimiento
+        ).select_related(
+            'ficha__paciente',
+            'servicio_clinico_envio',
+            'servicio_clinico_recepcion',
+            'servicio_clinico_traspaso',
+            'usuario_traspaso'
+        )
 
-            results = []
-            for m in qs:
-                p = m.ficha.paciente
-                results.append({
-                    'id': m.id,
-                    'ficha': {
-                        'numero_ficha_sistema': m.ficha.numero_ficha_sistema,
-                        'paciente': {
-                            'rut': p.rut,
-                            'nombre': p.nombre,
-                            'apellido_paterno': p.apellido_paterno,
-                            'apellido_materno': p.apellido_materno
-                        }
-                    }
-                })
-            return JsonResponse({'results': results})
+        inicio = self.request.GET.get('hora_inicio')
+        termino = self.request.GET.get('hora_termino')
+        servicio_id = self.request.GET.get('servicio_clinico')
+        profesional_id = self.request.GET.get('profesional')
 
-        # Detalle de un movimiento específico
-        mov_id = kwargs.get('mov_id') or request.GET.get('mov_id')
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest' and mov_id:
+        if inicio:
             try:
-                m = MovimientoFicha.objects.select_related(
-                    'ficha__paciente', 'servicio_clinico_envio', 'servicio_clinico_recepcion'
-                ).get(pk=mov_id)
-                p = m.ficha.paciente
-                return JsonResponse({
-                    'id': m.id,
-                    'ficha': {
-                        'numero_ficha_sistema': m.ficha.numero_ficha_sistema,
-                        'paciente': {
-                            'rut': p.rut,
-                            'nombre': p.nombre,
-                            'apellido_paterno': p.apellido_paterno,
-                            'apellido_materno': p.apellido_materno
-                        }
-                    },
-                    'servicio_clinico_envio': m.servicio_clinico_envio_id,
-                    'servicio_clinico_envio_nombre': getattr(m.servicio_clinico_envio, 'nombre', ''),
-                    'servicio_clinico_recepcion': m.servicio_clinico_recepcion_id,
-                    'servicio_clinico_recepcion_nombre': getattr(m.servicio_clinico_recepcion, 'nombre', ''),
-                    'fecha_envio': m.fecha_envio.isoformat() if m.fecha_envio else '',
-                    'fecha_recepcion': m.fecha_recepcion.isoformat() if m.fecha_recepcion else '',
-                    'estado_envio': m.estado_envio,
-                    'estado_recepcion': m.estado_recepcion,
-                    'observacion_envio': m.observacion_envio,
-                    'observacion_recepcion': m.observacion_recepcion
-                })
-            except MovimientoFicha.DoesNotExist:
-                return JsonResponse({'error': 'No encontrado'}, status=404)
+                from datetime import datetime
+                dt = datetime.fromisoformat(inicio)
+                qs = qs.filter(fecha_traspaso__gte=dt)
+            except Exception:
+                pass
+        if termino:
+            try:
+                from datetime import datetime
+                dt = datetime.fromisoformat(termino)
+                qs = qs.filter(fecha_traspaso__lte=dt)
+            except Exception:
+                pass
+        if servicio_id:
+            qs = qs.filter(servicio_clinico_traspaso_id=servicio_id)
+        if profesional_id:
+            qs = qs.filter(usuario_traspaso_id=profesional_id)
 
-        return super().get(request, *args, **kwargs)
+        return qs
+
+    def render_row(self, obj):
+        pac = obj.ficha.paciente if obj.ficha else None
+        nombre = f"{getattr(pac, 'nombre', '')} {getattr(pac, 'apellido_paterno', '')} {getattr(pac, 'apellido_materno', '')}" if pac else ''
+
+        # Generar HTML para acciones
+        actions_html = f'''
+            <div class="btn-group">
+                <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
+                    <i class="fas fa-cog"></i>
+                </button>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="/clinica/pdfs/ficha/{obj.id}/" target="_blank">
+                        <i class="fas fa-file-pdf mr-1 text-danger"></i> Ver PDF
+                    </a>
+                    <a class="dropdown-item btn-edit" href="#" data-id="{obj.id}" data-rut="{getattr(pac, 'rut', '')}">
+                        <i class="fas fa-edit mr-1 text-primary"></i> Editar/Completar
+                    </a>
+                </div>
+            </div>
+        '''
+
+        # Generar HTML para Estado (Badge)
+        estado = obj.estado_traspaso
+        badge_class = 'badge-success' if estado == 'TRASPASADO' else 'badge-secondary'
+        estado_html = f'<span class="badge {badge_class}">{estado}</span>'
+
+        return {
+            'ID': obj.id,
+            'actions': actions_html,
+            'RUT': getattr(pac, 'rut', '') if pac else '',
+            'Ficha': getattr(obj.ficha, 'numero_ficha_sistema', '') if obj.ficha else '',
+            'Nombre completo': nombre.strip(),
+            'Servicio Clínico Envío': getattr(obj.servicio_clinico_envio, 'nombre', ''),
+            'Servicio Clínico Recepción': getattr(obj.servicio_clinico_recepcion, 'nombre', ''),
+            'Servicio Clínico Traspaso': getattr(obj.servicio_clinico_traspaso, 'nombre', ''),
+            'Fecha Traspaso': obj.fecha_traspaso.strftime('%Y-%m-%d %H:%M') if obj.fecha_traspaso else '',
+            'Estado': estado_html,
+        }
 
     def post(self, request, *args, **kwargs):
-        # El formulario Traspaso requiere una instancia de MovimientoFicha existente para actualizarla
-        # pero FormTraspasoFicha en su Meta tiene model = MovimientoFicha y fields que sugieren creación o actualización.
-        # Si se usa AJAX para cargar, el ID viene en un campo oculto o se deduce.
-        mov_id = request.POST.get('movimiento_id')
-        instance = None
-        if mov_id:
-            instance = MovimientoFicha.objects.filter(pk=mov_id).first()
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            try:
+                if request.content_type == 'application/json':
+                    data = json.loads(request.body)
+                else:
+                    data = request.POST
 
-        form = FormTraspasoFicha(request.POST, instance=instance, user=request.user)
-        if form.is_valid():
-            movimiento = form.save(commit=False)
-            movimiento.estado_traspaso = 'TRASPASADO'
-            movimiento.usuario_traspaso = request.user
-            movimiento.save()
-            return redirect('traspaso_ficha')
+                movimiento_id = data.get('movimiento_id')
+                if not movimiento_id:
+                    return JsonResponse({'success': False, 'error': 'No se especificó el movimiento a traspasar.'},
+                                        status=400)
 
-        return self.render_to_response(self.get_context_data(form=form))
+                try:
+                    movimiento = MovimientoFicha.objects.get(
+                        pk=movimiento_id,
+                        establecimiento=request.user.establecimiento
+                    )
+                except MovimientoFicha.DoesNotExist:
+                    return JsonResponse({'success': False, 'error': 'Movimiento no encontrado.'}, status=404)
+
+                form = FormTraspasoFicha(data, instance=movimiento, user=request.user)
+                if form.is_valid():
+                    movimiento = form.save(commit=False)
+                    movimiento.estado_traspaso = 'TRASPASADO'
+                    movimiento.usuario_traspaso = request.user
+                    movimiento.save()
+                    return JsonResponse({
+                        'success': True,
+                        'message': 'Traspaso registrado exitosamente',
+                        'movimiento_id': movimiento.id
+                    })
+                else:
+                    error_msg = ""
+                    for field, errors in form.errors.items():
+                        for error in errors:
+                            error_msg += f"{error['message']} " if isinstance(error, dict) else f"{error} "
+                    return JsonResponse({'success': False, 'error': error_msg.strip()}, status=400)
+
+            except Exception as e:
+                return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+        return super().get(request, *args, **kwargs)

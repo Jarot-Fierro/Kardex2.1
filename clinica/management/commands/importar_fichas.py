@@ -28,7 +28,7 @@ def normalize_rut(value):
 
 
 class Command(BaseCommand):
-    help = 'Importa fichas desde un archivo CSV'
+    help = 'Importa fichas desde CSV con auditoría de omitidas'
 
     def add_arguments(self, parser):
         parser.add_argument('csv_path', type=str)
@@ -38,18 +38,14 @@ class Command(BaseCommand):
         csv_path = options['csv_path']
         batch_size = options['batch_size']
 
-        try:
-            self.stdout.write(self.style.SUCCESS(f'📖 Leyendo CSV: {csv_path}'))
-            df = pd.read_csv(
-                csv_path,
-                sep=',',
-                dtype=str,
-                na_values=['NULL', 'null', '']
-            )
+        self.stdout.write(self.style.SUCCESS(f'📖 Leyendo CSV: {csv_path}'))
 
-        except Exception as e:
-            self.stderr.write(self.style.ERROR(f'❌ Error CSV: {e}'))
-            return
+        df = pd.read_csv(
+            csv_path,
+            sep=',',
+            dtype=str,
+            na_values=['NULL', 'null', '']
+        )
 
         total_filas = len(df)
 
@@ -57,17 +53,15 @@ class Command(BaseCommand):
 
         df['paciente_rut'] = df['rut'].apply(normalize_rut)
         df['usuario_rut'] = df['usuario'].apply(normalize_rut)
-
         df['establecimiento'] = pd.to_numeric(df['establecimiento'], errors='coerce')
 
-        # 🔥 PARSEO CORRECTO FECHA MOV
         df['fecha_mov'] = pd.to_datetime(
             df['fecha_mov'],
             errors='coerce',
             format='%Y-%m-%d %H:%M:%S.%f'
         )
 
-        # ====================================================
+        # ================= CACHÉS =================
 
         pacientes_dict = {
             normalize_rut(p.rut): p for p in Paciente.objects.all()
@@ -89,34 +83,68 @@ class Command(BaseCommand):
         )
 
         fichas_a_crear = []
-        total_importados = total_omitidos = total_duplicados = 0
+        errores = []
+
+        total_importadas = 0
+        total_omitidas = 0
+        total_duplicadas = 0
+        err_paciente = 0
+        err_establecimiento = 0
 
         self.stdout.write(self.style.SUCCESS('🚀 Importando fichas...'))
 
         with tqdm(total=total_filas, unit='reg') as pbar:
             for idx, row in df.iterrows():
-                fila_excel = idx + 2
 
                 paciente_rut = row['paciente_rut']
-                numero_ficha = str(row['numero_ficha_sistema'])
+                numero_ficha = str(row['numero_ficha_sistema']).strip()
                 est_id = row['establecimiento']
 
+                # ---------- PACIENTE ----------
                 if not paciente_rut or paciente_rut not in pacientes_dict:
-                    total_omitidos += 1
+                    total_omitidas += 1
+                    err_paciente += 1
+                    errores.append({
+                        'fila_csv': idx + 2,
+                        'motivo': 'PACIENTE_NO_EXISTE',
+                        'rut': row.get('rut'),
+                        'numero_ficha': numero_ficha,
+                        'establecimiento': est_id,
+                    })
                     pbar.update(1)
                     continue
 
-                if pd.isna(est_id) or est_id not in establecimientos_dict:
-                    total_omitidos += 1
+                # ---------- ESTABLECIMIENTO ----------
+                if pd.isna(est_id) or int(est_id) not in establecimientos_dict:
+                    total_omitidas += 1
+                    err_establecimiento += 1
+                    errores.append({
+                        'fila_csv': idx + 2,
+                        'motivo': 'ESTABLECIMIENTO_INVALIDO',
+                        'rut': row.get('rut'),
+                        'numero_ficha': numero_ficha,
+                        'establecimiento': est_id,
+                    })
                     pbar.update(1)
                     continue
 
                 clave = (numero_ficha, int(est_id))
+
+                # ---------- DUPLICADOS ----------
                 if clave in fichas_existentes:
-                    total_duplicados += 1
-                    total_omitidos += 1
+                    total_omitidas += 1
+                    total_duplicadas += 1
+                    errores.append({
+                        'fila_csv': idx + 2,
+                        'motivo': 'DUPLICADA',
+                        'rut': row.get('rut'),
+                        'numero_ficha': numero_ficha,
+                        'establecimiento': est_id,
+                    })
                     pbar.update(1)
                     continue
+
+                fichas_existentes.add(clave)
 
                 fecha_mov = None
                 if pd.notna(row['fecha_mov']):
@@ -127,7 +155,8 @@ class Command(BaseCommand):
                     paciente=pacientes_dict[paciente_rut],
                     establecimiento=establecimientos_dict[int(est_id)],
                     usuario=usuarios_dict.get(row['usuario_rut']),
-                    observacion=str(row['observacion']).strip().upper() if pd.notna(row['observacion']) else '',
+                    observacion=str(row['observacion']).strip().upper()
+                    if pd.notna(row['observacion']) else '',
                     fecha_mov=fecha_mov
                 )
 
@@ -135,19 +164,43 @@ class Command(BaseCommand):
 
                 if len(fichas_a_crear) >= batch_size:
                     with transaction.atomic():
-                        Ficha.objects.bulk_create(fichas_a_crear, batch_size=batch_size)
-                    total_importados += len(fichas_a_crear)
-                    fichas_a_crear = []
+                        Ficha.objects.bulk_create(
+                            fichas_a_crear,
+                            batch_size=batch_size,
+                            ignore_conflicts=True
+                        )
+                    total_importadas += len(fichas_a_crear)
+                    fichas_a_crear.clear()
 
                 pbar.update(1)
 
         if fichas_a_crear:
             with transaction.atomic():
-                Ficha.objects.bulk_create(fichas_a_crear, batch_size=batch_size)
-            total_importados += len(fichas_a_crear)
+                Ficha.objects.bulk_create(
+                    fichas_a_crear,
+                    batch_size=batch_size,
+                    ignore_conflicts=True
+                )
+            total_importadas += len(fichas_a_crear)
 
-        self.stdout.write(self.style.SUCCESS(''))
+        # ================= CSV ERRORES =================
+
+        if errores:
+            df_err = pd.DataFrame(errores)
+            df_err.to_csv(
+                'errores_importacion_fichas.csv',
+                index=False,
+                encoding='utf-8-sig'
+            )
+
+        # ================= RESUMEN =================
+
+        self.stdout.write(self.style.SUCCESS('\n' + '=' * 60))
         self.stdout.write(self.style.SUCCESS('📊 RESUMEN FINAL'))
-        self.stdout.write(self.style.SUCCESS(f'✅ Importadas: {total_importados:,}'))
-        self.stdout.write(self.style.WARNING(f'⚠️ Omitidas: {total_omitidos:,}'))
-        self.stdout.write(self.style.WARNING(f'🔁 Duplicadas: {total_duplicados:,}'))
+        self.stdout.write(self.style.SUCCESS(f'✅ Importadas: {total_importadas:,}'))
+        self.stdout.write(self.style.WARNING(f'⚠️ Omitidas: {total_omitidas:,}'))
+        self.stdout.write(self.style.WARNING(f'🔁 Duplicadas: {total_duplicadas:,}'))
+        self.stdout.write(self.style.WARNING(f'👤 Sin paciente: {err_paciente:,}'))
+        self.stdout.write(self.style.WARNING(f'🏥 Establecimiento inválido: {err_establecimiento:,}'))
+        self.stdout.write(self.style.SUCCESS('📁 CSV: errores_importacion_fichas.csv'))
+        self.stdout.write(self.style.SUCCESS('=' * 60))

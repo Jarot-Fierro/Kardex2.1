@@ -1,284 +1,192 @@
 import pandas as pd
 from django.core.management.base import BaseCommand
-from django.utils import timezone
+from django.db import transaction
 from django.utils.timezone import make_aware
 from tqdm import tqdm
 
-from kardex.models import (
-    MovimientoFicha,
-    ServicioClinico,
-    Ficha,
-    Profesional,
-    Establecimiento,
-    UsuarioAnterior,
-)
+from clinica.models import Ficha, MovimientoFicha
+from establecimientos.models.establecimiento import Establecimiento
+from establecimientos.models.servicio_clinico import ServicioClinico
+from personas.models.profesionales import Profesional
+from personas.models.usuario_anterior import UsuarioAnterior
+
+
+def normalize_rut(value):
+    if value is None:
+        return ''
+    s = str(value).strip().upper()
+    if not s or s in ('NAN', 'NULL', 'SIN RUT', '0'):
+        return ''
+    return ''.join(ch for ch in s if ch.isalnum())
 
 
 class Command(BaseCommand):
-    help = 'Importa movimientos de fichas desde un archivo CSV.'
+    help = 'Importa movimientos de fichas desde CSV con auditoría de omitidos'
 
     def add_arguments(self, parser):
-        parser.add_argument(
-            'csv_path',
-            type=str,
-            help='Ruta al archivo CSV que contiene los movimientos de fichas',
-        )
-        parser.add_argument(
-            '--batch-size',
-            type=int,
-            default=1000,
-            help='Tamaño del lote para procesamiento (por defecto: 1000)',
-        )
+        parser.add_argument('csv_path', type=str)
+        parser.add_argument('--batch-size', type=int, default=1000)
 
     def handle(self, *args, **options):
         csv_path = options['csv_path']
         batch_size = options['batch_size']
 
-        try:
-            self.stdout.write(self.style.SUCCESS(f'📖 Leyendo archivo CSV: {csv_path}'))
-            df = pd.read_csv(csv_path, sep=';', dtype=str, engine='python', on_bad_lines='skip')
-        except Exception as e:
-            self.stderr.write(self.style.ERROR(f'❌ Error al leer el archivo: {e}'))
-            return
+        self.stdout.write(self.style.SUCCESS(f'📖 Leyendo CSV: {csv_path}'))
 
-        # Limpiar nombres de columnas
+        df = pd.read_csv(
+            csv_path,
+            sep=',',
+            dtype=str,
+            na_values=['NULL', 'null', '']
+        )
+
         df.columns = df.columns.str.strip()
-        total_registros = len(df)
+        total_filas = len(df)
 
-        self.stdout.write(f'📊 Total de registros encontrados: {total_registros:,}')
-        self.stdout.write('🔄 Procesando movimientos...')
+        # ================= PREPROCESAMIENTO =================
+
+        df['rut_paciente'] = df['rut_paciente'].apply(normalize_rut)
+        df['usuario_entrega'] = df['usuario_entrega'].apply(normalize_rut)
+        df['usuario_entrada'] = df['usuario_entrada'].apply(normalize_rut)
+        df['profesional'] = df['profesional'].apply(normalize_rut)
+
+        df['establecimiento'] = pd.to_numeric(df['establecimiento'], errors='coerce')
+        df['ficha'] = pd.to_numeric(df['ficha'], errors='coerce')
+        df['servicio_clinico'] = pd.to_numeric(df['servicio_clinico'], errors='coerce')
+
+        df['fecha_salida'] = pd.to_datetime(df['fecha_salida'], errors='coerce')
+        df['fecha_entrada'] = pd.to_datetime(df['fecha_entrada'], errors='coerce')
+
+        # ================= CACHÉS =================
+
+        fichas_dict = {
+            (f.numero_ficha_sistema, f.establecimiento_id): f
+            for f in Ficha.objects.all()
+        }
+
+        establecimientos_dict = {e.id: e for e in Establecimiento.objects.all()}
+        servicios_dict = {s.id: s for s in ServicioClinico.objects.all()}
+        usuarios_ant_dict = {normalize_rut(u.rut): u for u in UsuarioAnterior.objects.all()}
+        profesionales_dict = {normalize_rut(p.rut): p for p in Profesional.objects.all()}
+
+        movimientos_existentes = set(
+            MovimientoFicha.objects.values_list(
+                'ficha_id',
+                'fecha_envio'
+            )
+        )
 
         movimientos_a_crear = []
+        errores = []
+
         total_importados = 0
-        total_actualizados = 0
-        total_errores = 0
+        total_omitidos = 0
+        total_duplicados = 0
 
-        # Configurar barra de progreso
-        with tqdm(
-                total=total_registros,
-                desc='📋 Procesando movimientos',
-                unit='registro',
-                ncols=100
-        ) as pbar:
+        self.stdout.write(self.style.SUCCESS('🚀 Importando movimientos...'))
 
-            for index, row in df.iterrows():
-                try:
-                    # === Limpieza general de datos ===
-                    row = row.fillna('')
+        with tqdm(total=total_filas, unit='reg') as pbar:
+            for idx, row in df.iterrows():
 
-                    # === Lectura de campos ===
-                    establecimiento_id = self.to_int_or_none(row.get('establecimiento'))
-                    rut_anterior = str(row.get('rut_anterior', '')).strip() or 'SIN RUT'
-                    numero_ficha_sistema = self.to_int_or_none(row.get('ficha'))  # Cambiado el nombre
+                ficha_num = row['ficha']
+                est_id = row['establecimiento']
 
-                    fecha_envio = self.parse_fecha(row.get('fecha_envio'))
-                    fecha_recepcion = self.parse_fecha(row.get('fecha_recepcion'))
+                # ---------- VALIDAR FICHA ----------
+                ficha = fichas_dict.get((ficha_num, est_id))
+                if not ficha:
+                    total_omitidos += 1
+                    errores.append({
+                        'fila_csv': idx + 2,
+                        'motivo': 'FICHA_NO_EXISTE',
+                        'ficha': ficha_num,
+                        'establecimiento': est_id
+                    })
+                    pbar.update(1)
+                    continue
 
-                    usuario_envio_anterior_rut = str(row.get('usuario_envio_anterior', '')).strip()
-                    usuario_recepcion_anterior_rut = str(row.get('usuario_recepcion_anterior', '')).strip()
-                    profesional_recepcion_rut = str(row.get('profesional_recepcion', '')).strip()
-                    servicio_recepcion_id = self.to_int_or_none(row.get('servicio_clinico_recepcion'))
+                fecha_envio = None
+                if pd.notna(row['fecha_salida']):
+                    fecha_envio = make_aware(row['fecha_salida'])
 
-                    observacion_envio = str(row.get('observacion_envio', '')).strip()
-                    observacion_recepcion = str(row.get('observacion_recepcion', '')).strip()
-                    observacion_traspaso = str(row.get('observacion_traspaso', '')).strip()
+                clave = (ficha.id, fecha_envio)
 
-                    # === Estado ===
-                    estado_raw = str(row.get('estado_recepcion', '')).strip().upper()
-                    estado_recepcion = self.map_estado(estado_raw)
-                    estado_envio = 'ENVIADO'
-                    estado_traspaso = 'SIN TRASPASO'
+                # ---------- DUPLICADO ----------
+                if clave in movimientos_existentes:
+                    total_omitidos += 1
+                    total_duplicados += 1
+                    errores.append({
+                        'fila_csv': idx + 2,
+                        'motivo': 'MOVIMIENTO_DUPLICADO',
+                        'ficha': ficha_num,
+                        'establecimiento': est_id
+                    })
+                    pbar.update(1)
+                    continue
 
-                    # === Relaciones - CAMBIO IMPORTANTE AQUÍ ===
-                    # Buscar la ficha por numero_ficha_sistema en lugar de id
-                    ficha_obj = Ficha.objects.filter(
-                        numero_ficha_sistema=numero_ficha_sistema).first() if numero_ficha_sistema else None
-                    if not ficha_obj:
-                        self.stdout.write(self.style.WARNING(
-                            f'⚠️ Fila {index + 2}: Ficha con número {numero_ficha_sistema} no encontrada. Se omite.'
-                        ))
-                        total_errores += 1
-                        pbar.update(1)
-                        continue
+                movimientos_existentes.add(clave)
 
-                    establecimiento = self.safe_get(Establecimiento, establecimiento_id, 'establecimiento', index)
-                    servicio_recepcion = self.safe_get(ServicioClinico, servicio_recepcion_id,
-                                                       'servicio_clinico_recepcion',
-                                                       index)
-                    usuario_envio_anterior = self.safe_get_by_rut(UsuarioAnterior, usuario_envio_anterior_rut,
-                                                                  'usuario_envio_anterior', index)
-                    usuario_recepcion_anterior = self.safe_get_by_rut(UsuarioAnterior, usuario_recepcion_anterior_rut,
-                                                                      'usuario_recepcion_anterior', index)
+                # ---------- RELACIONES ----------
+                establecimiento = establecimientos_dict.get(est_id)
+                servicio = servicios_dict.get(row['servicio_clinico'])
+                usuario_envio = usuarios_ant_dict.get(row['usuario_entrega'])
+                usuario_recepcion = usuarios_ant_dict.get(row['usuario_entrada'])
+                profesional = profesionales_dict.get(row['profesional'])
 
-                    # === Lógica especial para profesional_recepcion ===
-                    profesional_recepcion = self.safe_get_by_rut(Profesional, profesional_recepcion_rut,
-                                                                 'profesional_recepcion', index)
-                    if not profesional_recepcion and profesional_recepcion_rut not in ('', '0', 'SIN RUT', 'NULL'):
-                        rut_anterior_profesional = profesional_recepcion_rut
-                    else:
-                        rut_anterior_profesional = 'SIN RUT'
+                # ---------- ESTADO ----------
+                estado = row['estado'].upper() if row['estado'] else 'EN ESPERA'
 
-                    # === Crear movimiento ===
-                    movimiento = MovimientoFicha(
-                        ficha=ficha_obj,
-                        fecha_envio=fecha_envio,
-                        fecha_recepcion=fecha_recepcion,
-                        observacion_envio=observacion_envio,
-                        observacion_recepcion=observacion_recepcion,
-                        observacion_traspaso=observacion_traspaso,
-                        estado_envio=estado_envio,
-                        estado_recepcion=estado_recepcion,
-                        estado_traspaso=estado_traspaso,
-                        servicio_clinico_recepcion=servicio_recepcion,
-                        usuario_envio_anterior=usuario_envio_anterior,
-                        usuario_recepcion_anterior=usuario_recepcion_anterior,
-                        profesional_recepcion=profesional_recepcion,
-                        establecimiento=establecimiento,
-                        rut_anterior=rut_anterior or 'SIN RUT',
-                        rut_anterior_profesional=rut_anterior_profesional,
-                    )
+                # ---------- FECHAS ----------
+                fecha_recepcion = make_aware(row['fecha_entrada']) if pd.notna(row['fecha_entrada']) else None
 
-                    movimientos_a_crear.append(movimiento)
+                movimiento = MovimientoFicha(
+                    ficha=ficha,
+                    establecimiento=establecimiento,
+                    fecha_envio=fecha_envio,
+                    fecha_recepcion=fecha_recepcion,
+                    usuario_envio_anterior=usuario_envio,
+                    usuario_recepcion_anterior=usuario_recepcion,
+                    profesional_recepcion=profesional,
+                    servicio_clinico_recepcion=servicio,
+                    observacion_envio=row.get('observacion_salida', ''),
+                    observacion_recepcion=row.get('observacion_entrada', ''),
+                    observacion_traspaso=row.get('observacion_traspaso', ''),
+                    estado_envio='ENVIADO',
+                    estado_recepcion=estado,
+                    estado_traspaso='SIN TRASPASO',
+                    rut_anterior=row.get('rut_paciente', 'SIN RUT'),
+                    rut_anterior_profesional=row.get('profesional', 'SIN RUT')
+                )
 
-                    # Procesar por lotes
-                    if len(movimientos_a_crear) >= batch_size:
-                        creados, actualizados = self.procesar_lote(movimientos_a_crear)
-                        total_importados += creados
-                        total_actualizados += actualizados
-                        movimientos_a_crear = []
+                movimientos_a_crear.append(movimiento)
 
-                        # Actualizar barra de progreso con estadísticas
-                        pbar.set_postfix({
-                            'Importados': total_importados,
-                            'Actualizados': total_actualizados,
-                            'Errores': total_errores
-                        })
-
-                except Exception as e:
-                    self.stdout.write(self.style.ERROR(
-                        f'❌ Error en fila {index + 2}: {str(e)}'
-                    ))
-                    total_errores += 1
+                if len(movimientos_a_crear) >= batch_size:
+                    with transaction.atomic():
+                        MovimientoFicha.objects.bulk_create(movimientos_a_crear)
+                    total_importados += len(movimientos_a_crear)
+                    movimientos_a_crear.clear()
 
                 pbar.update(1)
 
-            # Procesar último lote
-            if movimientos_a_crear:
-                creados, actualizados = self.procesar_lote(movimientos_a_crear)
-                total_importados += creados
-                total_actualizados += actualizados
+        if movimientos_a_crear:
+            with transaction.atomic():
+                MovimientoFicha.objects.bulk_create(movimientos_a_crear)
+            total_importados += len(movimientos_a_crear)
 
-        # Mostrar resumen final
-        self.stdout.write(self.style.SUCCESS('\n' + '=' * 50))
-        self.stdout.write(self.style.SUCCESS('📊 RESUMEN FINAL DE IMPORTACIÓN'))
-        self.stdout.write(self.style.SUCCESS('=' * 50))
-        self.stdout.write(self.style.SUCCESS(f'✅ Movimientos creados: {total_importados:,}'))
-        self.stdout.write(self.style.SUCCESS(f'🔄 Movimientos actualizados: {total_actualizados:,}'))
-        self.stdout.write(self.style.SUCCESS(f'❌ Errores: {total_errores:,}'))
-        self.stdout.write(self.style.SUCCESS(
-            f'📈 Eficiencia: {((total_importados + total_actualizados) / total_registros * 100):.1f}%'))
+        # ================= CSV ERRORES =================
 
-    def procesar_lote(self, movimientos):
-        """Procesa un lote de movimientos usando bulk_create con manejo de duplicados"""
-        creados = 0
-        actualizados = 0
+        if errores:
+            pd.DataFrame(errores).to_csv(
+                'errores_importacion_movimientos.csv',
+                index=False,
+                encoding='utf-8-sig'
+            )
 
-        try:
-            # Intentar crear en lote
-            MovimientoFicha.objects.bulk_create(movimientos, ignore_conflicts=False)
-            creados = len(movimientos)
-            self.stdout.write(self.style.SUCCESS(f'✅ Lote creado: {len(movimientos)} movimientos'))
+        # ================= RESUMEN =================
 
-        except Exception as e:
-            self.stdout.write(self.style.WARNING(f'⚠️ Error en bulk_create: {e}'))
-            self.stdout.write('🔍 Intentando crear una por una para identificar el problema...')
-
-            # Crear uno por uno para identificar errores específicos
-            for movimiento in movimientos:
-                try:
-                    obj, created = MovimientoFicha.objects.update_or_create(
-                        ficha=movimiento.ficha,
-                        fecha_envio=movimiento.fecha_envio,
-                        defaults={
-                            'fecha_recepcion': movimiento.fecha_recepcion,
-                            'observacion_envio': movimiento.observacion_envio,
-                            'observacion_recepcion': movimiento.observacion_recepcion,
-                            'observacion_traspaso': movimiento.observacion_traspaso,
-                            'estado_envio': movimiento.estado_envio,
-                            'estado_recepcion': movimiento.estado_recepcion,
-                            'estado_traspaso': movimiento.estado_traspaso,
-                            'servicio_clinico_recepcion': movimiento.servicio_clinico_recepcion,
-                            'usuario_envio_anterior': movimiento.usuario_envio_anterior,
-                            'usuario_recepcion_anterior': movimiento.usuario_recepcion_anterior,
-                            'profesional_recepcion': movimiento.profesional_recepcion,
-                            'establecimiento': movimiento.establecimiento,
-                            'rut_anterior': movimiento.rut_anterior,
-                            'rut_anterior_profesional': movimiento.rut_anterior_profesional,
-                        }
-                    )
-                    if created:
-                        creados += 1
-                    else:
-                        actualizados += 1
-                except Exception as e:
-                    self.stdout.write(self.style.ERROR(
-                        f'❌ Error creando movimiento para ficha #{movimiento.ficha.id} (sistema: {movimiento.ficha.numero_ficha_sistema}): {e}'
-                    ))
-
-        return creados, actualizados
-
-    # === Utilidades (mantener las mismas) ===
-
-    def safe_get(self, model, pk, nombre, index):
-        """Obtiene instancia por PK si existe."""
-        if not pk:
-            return None
-        obj = model.objects.filter(id=pk).first()
-        if not obj:
-            self.stdout.write(self.style.WARNING(f'⚠️ Fila {index + 2}: {nombre} ID {pk} no encontrado.'))
-        return obj
-
-    def safe_get_by_rut(self, model, rut, nombre, index):
-        """Obtiene instancia por campo RUT si aplica."""
-        if not rut or rut.strip() in ('', '0', 'SIN RUT', 'NULL'):
-            return None
-        obj = model.objects.filter(rut=rut.strip()).first()
-        if not obj:
-            self.stdout.write(self.style.WARNING(f'⚠️ Fila {index + 2}: {nombre} con RUT {rut} no encontrado. {model}'))
-        return obj
-
-    def parse_fecha(self, value):
-        """Convierte fechas del CSV a datetime aware (con zona horaria)."""
-        if pd.isna(value) or value == '' or str(value).upper() == 'NULL':
-            return timezone.now()
-        try:
-            if isinstance(value, pd.Timestamp):
-                dt = value.to_pydatetime()
-            else:
-                dt = pd.to_datetime(value)
-            if timezone.is_naive(dt):
-                dt = make_aware(dt, timezone.get_current_timezone())
-            return dt
-        except Exception:
-            return timezone.now()
-
-    def to_int_or_none(self, value):
-        try:
-            if pd.isna(value) or str(value).strip() in ('', 'NULL'):
-                return None
-            return int(value)
-        except Exception:
-            return None
-
-    def map_estado(self, estado):
-        """Mapea las letras o abreviaciones del CSV a tus choices con debug."""
-        estado_str = str(estado).upper().strip()
-
-        if estado_str in ['R', 'RECIBIDO']:
-            return 'RECIBIDO'
-        elif estado_str in ['E', 'ENVIADO']:
-            return 'ENVIADO'
-        elif estado_str in ['P', 'PENDIENTE']:
-            return 'EN ESPERA'
-        else:
-            return 'EN ESPERA'
+        self.stdout.write(self.style.SUCCESS('\n' + '=' * 60))
+        self.stdout.write(self.style.SUCCESS('📊 RESUMEN FINAL'))
+        self.stdout.write(self.style.SUCCESS(f'✅ Importados: {total_importados:,}'))
+        self.stdout.write(self.style.WARNING(f'⚠️ Omitidos: {total_omitidos:,}'))
+        self.stdout.write(self.style.WARNING(f'🔁 Duplicados: {total_duplicados:,}'))
+        self.stdout.write(self.style.SUCCESS('📁 CSV: errores_importacion_movimientos.csv'))
+        self.stdout.write(self.style.SUCCESS('=' * 60))

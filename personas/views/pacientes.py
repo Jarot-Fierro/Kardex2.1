@@ -125,17 +125,30 @@ def paciente_view(request, paciente_id=None):
 
                 with transaction.atomic():
 
-                    paciente = paciente_form.save(commit=False)
-                    es_creacion = paciente.pk is None or (accion == 'CREAR' and not paciente_instance)
+                    # 1. RESOLVER PACIENTE CORRECTO
+                    rut_post = paciente_form.cleaned_data.get('rut')
 
-                    paciente.usuario_modifica = request.user
-                    paciente.save()
+                    paciente_existente = Paciente.objects.filter(rut=rut_post).first()
 
+                    if paciente_existente:
+                        paciente = paciente_existente
+                        es_creacion = False
+                    else:
+                        paciente = paciente_form.save(commit=False)
+                        es_creacion = True
+
+                        paciente.usuario_modifica = request.user
+                        paciente.save()
+
+                    # CREAR / ACTUALIZAR FICHA
                     ficha = ficha_form.save(commit=False)
+
                     ficha.paciente = paciente
                     ficha.establecimiento = request.user.establecimiento
                     ficha.usuario = request.user
+
                     ficha.save()
+
 
             except IntegrityError:
                 ficha_form.add_error(

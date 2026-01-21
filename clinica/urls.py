@@ -1,6 +1,8 @@
 from django.urls import path
 
-from clinica.apis.buscar_paciente import buscar_paciente_ficha_api
+from clinica.apis.buscar_paciente import (
+    buscar_paciente_ficha_api, buscar_paciente_recepcion_api, buscar_paciente_traspaso_api
+)
 from clinica.apis.movimientos_ficha_paciente import get_movimientos_paciente_establecimiento
 from clinica.views.fichas import *
 from clinica.views.movimiento_ficha import *
@@ -27,6 +29,8 @@ urlpatterns = [
          name='api_movimientos_paciente_establecimiento'),
 
     path('api/ficha-paciente/buscar/', buscar_paciente_ficha_api, name='ficha-paciente-buscar'),
+    path('api/ficha-paciente/buscar-recepcion/', buscar_paciente_recepcion_api, name='ficha-paciente-buscar-recepcion'),
+    path('api/ficha-paciente/buscar-traspaso/', buscar_paciente_traspaso_api, name='ficha-paciente-buscar-traspaso'),
 
     path(
         "pdfs/stickers/ficha/<int:ficha_id>/", pdf_stickers, name="pdf_stickers_ficha"

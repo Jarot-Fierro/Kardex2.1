@@ -5,112 +5,164 @@
 
 {% block content %}
     <div class="container-fluid small-input">
-        <div class="row">
-            <div class="col-lg-4">
-                <div class="card card-primary">
+        <!-- Formulario de Registro (Arriba) -->
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="card card-primary card-outline">
                     <div class="card-header">
-                        <h3 class="card-title">Registro de Traspaso de Ficha</h3>
+                        <h3 class="card-title"><i class="fas fa-exchange-alt mr-1"></i> Registrar Traspaso de Ficha</h3>
                     </div>
                     <div class="card-body">
-                        <form id="form-traspaso" class="form" method="post" novalidate>
+                        <form id="form-traspaso" method="post" novalidate>
                             {% csrf_token %}
-                            {{ form.non_field_errors }}
-                            <input type="hidden" name="movimiento_id" id="id_movimiento_id">
+                            {{ form.movimiento_id }}
 
-                            <div class="form-group">
-                                <label>{{ form.rut.label }}</label>
-                                {{ form.rut }}
-                                {% for error in form.rut.errors %}
-                                    <span class="text-danger small d-block">{{ error }}</span>
-                                {% endfor %}
+                            <div class="row">
+                                <!-- RUT y Búsqueda -->
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="font-weight-bold text-primary">
+                                            <i class="fas fa-id-card mr-1"></i> {{ form.rut.label }}
+                                        </label>
+                                        {{ form.rut }}
+                                        <small class="form-text text-muted">Ingrese RUT y presione Tab o Enter.</small>
+                                    </div>
+                                </div>
+
+                                <!-- Nombre Paciente (Autocompletado) -->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>{{ form.nombre.label }}</label>
+                                        {{ form.nombre }}
+                                    </div>
+                                </div>
+
+                                <!-- N° Ficha (Autocompletado) -->
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>{{ form.ficha.label }}</label>
+                                        {{ form.ficha }}
+                                    </div>
+                                </div>
                             </div>
 
-                            <div class="form-group">
-                                <label>{{ form.ficha.label }}</label>
-                                {{ form.ficha }}
-                                {% for error in form.ficha.errors %}
-                                    <span class="text-danger small d-block">{{ error }}</span>
-                                {% endfor %}
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>{{ form.servicio_clinico_envio.label }}</label>
+                                        {{ form.servicio_clinico_envio }}
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>{{ form.servicio_clinico_recepcion.label }}</label>
+                                        {{ form.servicio_clinico_recepcion }}
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>{{ form.servicio_clinico_traspaso.label }}</label>
+                                        {{ form.servicio_clinico_traspaso }}
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>{{ form.profesional_traspaso.label }}</label>
+                                        {{ form.profesional_traspaso }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>{{ form.observacion_traspaso.label }}</label>
+                                        {{ form.observacion_traspaso }}
+                                    </div>
+                                </div>
                             </div>
 
-                            <div class="form-group">
-                                <label>{{ form.nombre.label }}</label>
-                                {{ form.nombre }}
+                            <div class="row mt-2">
+                                <div class="col-12 text-right">
+                                    <button type="button" id="btn-limpiar" class="btn btn-default mr-2">
+                                        <i class="fas fa-eraser"></i> Limpiar
+                                    </button>
+                                    <button type="submit" id="btn-registrar" class="btn btn-primary px-5" disabled>
+                                        <i class="fas fa-save mr-1"></i> Registrar Traspaso
+                                    </button>
+                                </div>
                             </div>
-
-                            <div class="form-group">
-                                <label>{{ form.profesional_traspaso.label }}</label>
-                                {{ form.profesional_traspaso }}
-                                {% for error in form.profesional_traspaso.errors %}
-                                    <span class="text-danger small d-block">{{ error }}</span>
-                                {% endfor %}
-                            </div>
-
-                            <div class="form-group">
-                                <label>{{ form.servicio_clinico_traspaso.label }}</label>
-                                {{ form.servicio_clinico_traspaso }}
-                                {% for error in form.servicio_clinico_traspaso.errors %}
-                                    <span class="text-danger small d-block">{{ error }}</span>
-                                {% endfor %}
-                            </div>
-
-                            <div class="form-group">
-                                <label>{{ form.observacion_traspaso.label }}</label>
-                                {{ form.observacion_traspaso }}
-                            </div>
-
-                            <button type="submit" id="btn-guardar" class="btn btn-primary btn-block">
-                                <i class="fas fa-save"></i> Registrar traspaso
-                            </button>
                         </form>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="col-lg-8">
+        <!-- Filtros (Al medio) -->
+        <div class="row mb-3">
+            <div class="col-12">
                 <div class="card card-outline card-secondary">
-                    <div class="card-header">
-                        <h3 class="card-title">Detalles del Movimiento Actual (En Tránsito)</h3>
+                    <div class="card-header p-2">
+                        <h3 class="card-title ml-2"><i class="fas fa-filter mr-1"></i> Filtros de Historial</h3>
                     </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>{{ form.servicio_clinico_envio.label }}</label>
-                                    {{ form.servicio_clinico_envio }}
+                    <div class="card-body p-2">
+                        <form id="form-filtros" method="get">
+                            <div class="row">
+                                <div class="form-group col-md-3 mb-0">
+                                    <label class="mb-1 small">{{ filter_form.hora_inicio.label }}</label>
+                                    {{ filter_form.hora_inicio }}
                                 </div>
-                                <div class="form-group">
-                                    <label>{{ form.fecha_envio.label }}</label>
-                                    {{ form.fecha_envio }}
+                                <div class="form-group col-md-3 mb-0">
+                                    <label class="mb-1 small">{{ filter_form.hora_termino.label }}</label>
+                                    {{ filter_form.hora_termino }}
                                 </div>
-                                <div class="form-group">
-                                    <label>{{ form.estado_envio.label }}</label>
-                                    {{ form.estado_envio }}
+                                <div class="form-group col-md-3 mb-0">
+                                    <label class="mb-1 small">{{ filter_form.servicio_clinico.label }}</label>
+                                    {{ filter_form.servicio_clinico }}
                                 </div>
-                                <div class="form-group">
-                                    <label>{{ form.observacion_envio.label }}</label>
-                                    {{ form.observacion_envio }}
+                                <div class="form-group col-md-2 mb-0">
+                                    <label class="mb-1 small">{{ filter_form.profesional.label }}</label>
+                                    {{ filter_form.profesional }}
                                 </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>{{ form.servicio_clinico_recepcion.label }}</label>
-                                    {{ form.servicio_clinico_recepcion }}
-                                </div>
-                                <div class="form-group">
-                                    <label>{{ form.fecha_recepcion.label }}</label>
-                                    {{ form.fecha_recepcion }}
-                                </div>
-                                <div class="form-group">
-                                    <label>{{ form.estado_recepcion.label }}</label>
-                                    {{ form.estado_recepcion }}
-                                </div>
-                                <div class="form-group">
-                                    <label>{{ form.observacion_recepcion.label }}</label>
-                                    {{ form.observacion_recepcion }}
+                                <div class="col-md-1 d-flex align-items-end">
+                                    <button class="btn btn-secondary btn-block btn-sm" type="submit">
+                                        Filtrar
+                                    </button>
                                 </div>
                             </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla (Abajo) -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex align-items-center p-2">
+                        <h3 class="card-title ml-2"><i class="fas fa-list mr-1"></i> Historial de Traspasos</h3>
+                        <div class="ml-auto">
+                            <button id="btn-refresh-table" class="btn btn-default btn-sm mr-2">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
                         </div>
+                    </div>
+                    <div class="card-body p-2">
+                        <table id="Table" class="table table-bordered table-striped table-sm mb-0">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Acciones</th>
+                                {% for col in columns %}
+                                    {% if col != 'ID' and col != 'actions' %}
+                                        <th>{{ col }}</th>
+                                    {% endif %}
+                                {% endfor %}
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -120,17 +172,208 @@
 
 {% block javascript %}
     <script>
-        $('.select2').select2({
-            theme: 'bootstrap4',
-            width: '100%'
+        $(document).ready(function () {
+            // Inicializar Select2
+            $('.select2').select2({
+                theme: 'bootstrap4',
+                width: '100%'
+            });
+
+            const $rut = $('#id_rut');
+            const $formTraspaso = $('#form-traspaso');
+            const $btnRegistrar = $('#btn-registrar');
+            const $btnLimpiar = $('#btn-limpiar');
+
+            // Persistencia en localStorage
+            const configKeys = [
+                'servicio_clinico_ficha', // id_traspaso
+                'profesional_movimiento',
+                'observacion_traspaso_ficha'
+            ];
+
+            function loadConfig() {
+                configKeys.forEach(id => {
+                    const saved = localStorage.getItem('traspaso_config_' + id);
+                    if (saved) {
+                        const $el = $('#' + id);
+                        $el.val(saved).trigger('change');
+                    }
+                });
+            }
+
+            function saveConfig() {
+                configKeys.forEach(id => {
+                    const val = $('#' + id).val();
+                    localStorage.setItem('traspaso_config_' + id, val);
+                });
+            }
+
+            loadConfig();
+
+            // Guardar config al cambiar campos
+            configKeys.forEach(id => {
+                $('#' + id).on('change', saveConfig);
+            });
+
+            // Foco automático en RUT al cargar
+            $rut.focus();
+
+            // Función para limpiar campos de registro
+            function limpiarRegistro() {
+                $('#id_movimiento_hidden').val('');
+                $('#id_rut').val('');
+                $('#nombre_mov').val('');
+                $('#id_ficha').val('');
+                $('#servicio_clinico_envio_ficha').val('');
+                $('#servicio_clinico_recepcion_ficha').val('');
+                $btnRegistrar.prop('disabled', true);
+                $rut.focus();
+            }
+
+            $btnLimpiar.on('click', limpiarRegistro);
+
+            // Función para formatear RUT
+            function formatRut(value) {
+                let rut = value.replace(/\./g, '').replace(/-/g, '').toUpperCase();
+                if (rut.length <= 1) return value;
+                let body = rut.slice(0, -1);
+                let dv = rut.slice(-1);
+                body = body.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                return body + '-' + dv;
+            }
+
+            // Búsqueda de paciente al salir del campo RUT (blur) o presionar Enter
+            function buscarPaciente() {
+                let val = $rut.val().trim();
+                if (!val) return;
+
+                if (!val.startsWith('PAC-')) {
+                    val = formatRut(val);
+                    $rut.val(val);
+                }
+
+                $.ajax({
+                    url: '{% url "ficha-paciente-buscar-traspaso" %}',
+                    data: {q: val},
+                    success: function (response) {
+                        if (response.results && response.results.length > 0) {
+                            const p = response.results[0];
+                            if (!p.apto_traspaso) {
+                                Swal.fire('Información', 'No hay movimientos pendientes de traspaso para este paciente.', 'info');
+                                limpiarRegistro();
+                            } else {
+                                $('#id_movimiento_hidden').val(p.movimiento_id);
+                                $rut.val(p.rut);
+                                $('#nombre_mov').val(p.nombre_completo);
+                                $('#id_ficha').val(p.numero_ficha_sistema);
+                                $('#servicio_clinico_envio_ficha').val(p.servicio_envio_nombre);
+                                $('#servicio_clinico_recepcion_ficha').val(p.servicio_recepcion_nombre);
+                                $btnRegistrar.prop('disabled', false);
+                            }
+                        } else {
+                            Swal.fire('No encontrado', 'No se encontró paciente con ese RUT o Ficha en su establecimiento.', 'error');
+                            limpiarRegistro();
+                        }
+                    },
+                    error: function () {
+                        Swal.fire('Error', 'Error al consultar la base de datos.', 'error');
+                        limpiarRegistro();
+                    }
+                });
+            }
+
+            $rut.on('keypress', function (e) {
+                if (e.which === 13) {
+                    e.preventDefault();
+                    buscarPaciente();
+                }
+            });
+
+            $rut.on('blur', function () {
+                buscarPaciente();
+            });
+
+            // Registro de traspaso vía AJAX
+            $formTraspaso.on('submit', function (e) {
+                e.preventDefault();
+
+                if (!$('#id_movimiento_hidden').val()) {
+                    Swal.fire('Error', 'Debe buscar un paciente con movimiento válido primero.', 'error');
+                    return;
+                }
+
+                $.ajax({
+                    url: window.location.href,
+                    method: 'POST',
+                    data: $(this).serialize(),
+                    headers: {'X-Requested-With': 'XMLHttpRequest'},
+                    success: function (response) {
+                        if (response.success) {
+                            Swal.fire({
+                                title: '¡Éxito!',
+                                text: response.message,
+                                icon: 'success',
+                                timer: 1500,
+                                showConfirmButton: false
+                            });
+                            limpiarRegistro();
+                            // Obtener instancia de DataTable inicializada en base.html
+                            const table = $('#Table').DataTable();
+                            table.ajax.reload(null, false);
+                            $rut.focus();
+                        } else {
+                            Swal.fire('Error', response.error || 'No se pudo registrar.', 'error');
+                        }
+                    },
+                    error: function (xhr) {
+                        const err = xhr.responseJSON ? xhr.responseJSON.error : 'Error en el servidor';
+                        Swal.fire('Error', err, 'error');
+                    }
+                });
+            });
+
+            // Configuración personalizada para DataTable (filtros y acciones)
+            // Esperamos a que DataTable esté inicializado (base.html lo hace en $(function(){...}))
+            $(function () {
+                const table = $('#Table').DataTable();
+
+                // Modificar la configuración de AJAX para incluir filtros
+                // Como ya está inicializado, interceptamos el evento preXhr o usamos ajax.data
+                table.on('preXhr.dt', function (e, settings, data) {
+                    const filterData = $('#form-filtros').serializeArray();
+                    filterData.forEach(item => {
+                        data[item.name] = item.value;
+                    });
+                });
+
+                // Eliminar el input de búsqueda de DataTable ya que usamos filtros personalizados
+                $('#Table_filter').remove();
+
+                // Personalizar renderizado de columnas si es necesario (Acciones y Estado)
+                // Nota: base.html ya define las columnas, pero podemos ajustar el comportamiento
+                // o confiar en lo que devuelve render_row en la vista si queremos simplificar.
+                // Sin embargo, para mantener los badges y botones:
+
+                // Refresh table button
+                $('#btn-refresh-table').on('click', function () {
+                    table.ajax.reload();
+                });
+
+                // Filtros de tabla
+                $('#form-filtros').on('submit', function (e) {
+                    e.preventDefault();
+                    table.ajax.reload();
+                });
+            });
+
+            // Acción de editar desde la tabla
+            $(document).on('click', '.btn-edit', function (e) {
+                e.preventDefault();
+                const rut = $(this).data('rut');
+                $rut.val(rut);
+                buscarPaciente();
+                $('html, body').animate({scrollTop: 0}, 'slow');
+            });
         });
     </script>
-    <script>
-        // Ajustes de UI para mantener consistencia con otros formularios
-        $('#servicio_clinico_ficha').prop('disabled', false);
-        $('#id_ficha').prop('disabled', false);
-        $('#nombre_mov').prop('readonly', true);
-        $('#id_rut').prop('disabled', false);
-    </script>
-    <script src="{% static 'js/apis/api_traspaso_ficha.js' %}"></script>
 {% endblock %}

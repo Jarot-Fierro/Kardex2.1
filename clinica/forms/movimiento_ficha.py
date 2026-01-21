@@ -106,6 +106,10 @@ class FormEntradaFicha(forms.ModelForm):
         return initial
 
     def clean_ficha(self):
+        # Si ya tenemos una instancia (estamos actualizando), la ficha ya está asociada.
+        if self.instance and self.instance.pk:
+            return self.instance.ficha
+
         raw = self.cleaned_data.get('ficha')
         user = getattr(self, 'user', None)
         if user is None and getattr(self, 'request', None) is not None:
@@ -123,8 +127,6 @@ class FormEntradaFicha(forms.ModelForm):
 
         # Filtrar por ficha y establecimiento del usuario
         qs = Ficha.objects.filter(numero_ficha_sistema=numero, establecimiento=user.establecimiento)
-        print(f"[FormEntradaFicha.clean_ficha] filtro -> numero={numero}, establecimiento={user.establecimiento}")
-        print(f"[FormEntradaFicha.clean_ficha] encontrados: {qs.count()}")
 
         if not qs.exists():
             raise forms.ValidationError("Ficha no encontrada en su establecimiento.")
@@ -305,14 +307,19 @@ class FormTraspasoFicha(forms.ModelForm):
         if self.user is None and self.request is not None:
             self.user = getattr(self.request, 'user', None)
 
+        # Si el usuario tiene un servicio asignado, usarlo como inicial para traspaso
+        if self.user and hasattr(self.user, 'servicio_clinico') and self.user.servicio_clinico:
+            self.fields['servicio_clinico_traspaso'].initial = self.user.servicio_clinico
+
     # Campos auxiliares de búsqueda/visualización
     rut = forms.CharField(
         label='RUT',
-        required=False,
+        required=True,
         widget=forms.TextInput(attrs={
             'id': 'id_rut',
             'class': 'form-control id_rut',
-            'placeholder': 'Ingrese RUT (sin puntos, con guión)'
+            'autocomplete': 'off',
+            'placeholder': '12.345.678-9'
         })
     )
 
@@ -369,37 +376,19 @@ class FormTraspasoFicha(forms.ModelForm):
         required=True
     )
 
-    # Estados como texto
-    estado_envio = forms.CharField(label='Estado Envío', required=False,
-                                   widget=forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}))
-    estado_recepcion = forms.CharField(label='Estado Recepción', required=False,
-                                       widget=forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}))
-    estado_traspaso = forms.CharField(label='Estado Traspaso', required=False,
-                                      widget=forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}))
+    # Observaciones
+    observacion_traspaso = forms.CharField(
+        label='Observación Traspaso',
+        required=False,
+        widget=forms.Textarea(attrs={
+            'id': 'observacion_traspaso_ficha',
+            'class': 'form-control',
+            'rows': 3,
+            'placeholder': 'Ingrese una observación de traspaso (opcional)'
+        })
+    )
 
-    # Observaciones como texto
-    observacion_envio = forms.CharField(label='Observación Envío', required=False,
-                                        widget=forms.Textarea(
-                                            attrs={'class': 'form-control', 'rows': 2, 'readonly': 'readonly'}))
-    observacion_recepcion = forms.CharField(label='Observación Recepción', required=False,
-                                            widget=forms.Textarea(
-                                                attrs={'class': 'form-control', 'rows': 2, 'readonly': 'readonly'}))
-    observacion_traspaso = forms.CharField(label='Observación Traspaso', required=False,
-                                           widget=forms.Textarea(
-                                               attrs={'id': 'observacion_traspaso_ficha', 'class': 'form-control',
-                                                      'rows': 2}))
-
-    # Fechas como texto/fecha
-    fecha_envio = forms.DateTimeField(label='Fecha Envío', required=False,
-                                      widget=forms.DateTimeInput(
-                                          attrs={'class': 'form-control', 'type': 'datetime-local',
-                                                 'readonly': 'readonly'}))
-    fecha_recepcion = forms.DateTimeField(label='Fecha Recepción', required=False,
-                                          widget=forms.DateTimeInput(
-                                              attrs={'class': 'form-control', 'type': 'datetime-local',
-                                                     'readonly': 'readonly'}))
-
-    # Profesional traspaso mostrado como texto para la API; el sistema puede usar select si fuese necesario
+    # Profesional traspaso
     profesional_traspaso = forms.ModelChoiceField(
         label='Profesional que traslada',
         empty_label="Seleccione un Profesional",
@@ -413,30 +402,34 @@ class FormTraspasoFicha(forms.ModelForm):
         required=True
     )
 
+    movimiento_id = forms.CharField(
+        widget=forms.HiddenInput(attrs={'id': 'id_movimiento_hidden'}),
+        required=False
+    )
+
     def clean_ficha(self):
-        ficha_value = self.cleaned_data.get('ficha')
-        # Obtener usuario (desde atributo seteado por la vista o desde request si existiera)
+        # Si ya tenemos una instancia (estamos actualizando), la ficha ya está asociada.
+        if self.instance and self.instance.pk:
+            return self.instance.ficha
+
+        raw = self.cleaned_data.get('ficha')
         user = getattr(self, 'user', None)
-        if user is None and hasattr(self, 'request'):
+        if user is None and getattr(self, 'request', None) is not None:
             user = getattr(self.request, 'user', None)
 
-        # Validar usuario y establecimiento
         if not user or not hasattr(user, 'establecimiento') or user.establecimiento is None:
             raise forms.ValidationError("No se pudo determinar el establecimiento del usuario.")
 
-        # Parsear número de ficha con validación
         try:
-            numero = int(str(ficha_value).strip())
+            numero = int(str(raw).strip())
         except (TypeError, ValueError):
-            raise forms.ValidationError("Ficha no válida o no encontrada.")
+            raise forms.ValidationError("El número de ficha debe ser numérico válido.")
 
-        # Filtrar por número y establecimiento del usuario logueado
         qs = Ficha.objects.filter(numero_ficha_sistema=numero, establecimiento=user.establecimiento)
         if not qs.exists():
-            raise forms.ValidationError("Ficha no válida o no encontrada.")
+            raise forms.ValidationError("Ficha no encontrada en su establecimiento.")
         if qs.count() > 1:
-            raise forms.ValidationError(
-                "La búsqueda de ficha es ambigua (existen varias con ese número en su establecimiento). Use el RUT para cargar o contacte al administrador.")
+            raise forms.ValidationError("Múltiples fichas encontradas. Contacte al administrador.")
         return qs.get()
 
     class Meta:
@@ -446,6 +439,7 @@ class FormTraspasoFicha(forms.ModelForm):
             'profesional_traspaso',
             'rut',
             'nombre',
+            'servicio_clinico_traspaso',
             'observacion_traspaso',
         ]
 

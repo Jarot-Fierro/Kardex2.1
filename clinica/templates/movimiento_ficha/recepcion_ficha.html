@@ -5,114 +5,141 @@
 
 {% block content %}
     <div class="container-fluid small-input">
-        <div class="row">
-            <div class="col-lg-4">
-                <div class="card card-primary">
+        <!-- Formulario de Registro (Arriba) -->
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="card card-primary card-outline">
                     <div class="card-header">
-                        <h3 class="card-title">Registrar Recepción de Ficha</h3>
+                        <h3 class="card-title"><i class="fas fa-file-import mr-1"></i> Registrar Recepción de Ficha</h3>
                     </div>
                     <div class="card-body">
-                        <form id="form-recepcion" class="form" method="post" novalidate>
+                        <form id="form-recepcion" method="post" novalidate>
                             {% csrf_token %}
-                            {{ form.non_field_errors }}
-                            <div class="form-group">
-                                <label>{{ form.rut.label }}</label>
-                                {{ form.rut }}
-                                {% for error in form.rut.errors %}
-                                    <span class="text-danger small d-block">{{ error }}</span>
-                                {% endfor %}
+                            <input type="hidden" name="movimiento_id" id="id_movimiento_hidden">
+
+                            <div class="row">
+                                <!-- RUT y Búsqueda -->
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="font-weight-bold text-primary">
+                                            <i class="fas fa-id-card mr-1"></i> {{ form.rut.label }}
+                                        </label>
+                                        {{ form.rut }}
+                                        <small class="form-text text-muted">Ingrese RUT y presione Tab o Enter.</small>
+                                    </div>
+                                </div>
+
+                                <!-- Nombre Paciente (Autocompletado) -->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>{{ form.nombre.label }}</label>
+                                        {{ form.nombre }}
+                                    </div>
+                                </div>
+
+                                <!-- N° Ficha (Autocompletado) -->
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>{{ form.ficha.label }}</label>
+                                        {{ form.ficha }}
+                                    </div>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label>{{ form.ficha.label }}</label>
-                                {{ form.ficha }}
-                                {% for error in form.ficha.errors %}
-                                    <span class="text-danger small d-block">{{ error }}</span>
-                                {% endfor %}
+
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>{{ form.servicio_clinico_envio.label }}</label>
+                                        {{ form.servicio_clinico_envio }}
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>{{ form.servicio_clinico_recepcion.label }}</label>
+                                        {{ form.servicio_clinico_recepcion }}
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>{{ form.profesional_recepcion.label }}</label>
+                                        {{ form.profesional_recepcion }}
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>{{ form.observacion_recepcion.label }}</label>
+                                        {{ form.observacion_recepcion }}
+                                    </div>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label>{{ form.nombre.label }}</label>
-                                {{ form.nombre }}
-                                {% for error in form.nombre.errors %}
-                                    <span class="text-danger small d-block">{{ error }}</span>
-                                {% endfor %}
+
+                            <div class="row mt-2">
+                                <div class="col-12 text-right">
+                                    <button type="button" id="btn-limpiar" class="btn btn-default mr-2">
+                                        <i class="fas fa-eraser"></i> Limpiar
+                                    </button>
+                                    <button type="submit" id="btn-registrar" class="btn btn-primary px-5" disabled>
+                                        <i class="fas fa-save mr-1"></i> Registrar Recepción
+                                    </button>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label>{{ form.servicio_clinico_envio.label }}</label>
-                                {{ form.servicio_clinico_envio }}
-                                {% for error in form.servicio_clinico_envio.errors %}
-                                    <span class="text-danger small d-block">{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                            <div class="form-group">
-                                <label>{{ form.servicio_clinico_recepcion.label }}</label>
-                                {{ form.servicio_clinico_recepcion }}
-                                {% for error in form.servicio_clinico_recepcion.errors %}
-                                    <span class="text-danger small d-block">{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                            <div class="form-group">
-                                <label>{{ form.profesional_recepcion.label }}</label>
-                                {{ form.profesional_recepcion }}
-                                {% for error in form.profesional_recepcion.errors %}
-                                    <span class="text-danger small d-block">{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                            <div class="form-group">
-                                <label>{{ form.observacion_recepcion.label }}</label>
-                                {{ form.observacion_recepcion }}
-                                {% for error in form.observacion_recepcion.errors %}
-                                    <span class="text-danger small d-block">{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                            <button type="submit" id="btn-guardar" class="btn btn-primary btn-block">
-                                <i class="fas fa-save"></i> Registrar recepción
-                            </button>
                         </form>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="col-lg-8">
-                <div class="card card-outline card-primary">
-                    <div class="card-header">
-                        <h3 class="card-title">Filtros de Historial</h3>
+        <!-- Filtros (Al medio) -->
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="card card-outline card-secondary">
+                    <div class="card-header p-2">
+                        <h3 class="card-title ml-2"><i class="fas fa-filter mr-1"></i> Filtros de Historial</h3>
                     </div>
-                    <div class="card-body">
-                        <form id="form-filtros" class="form" method="get">
-                            <div class="form-row">
-                                <div class="form-group col-md-3">
-                                    <label>{{ filter_form.hora_inicio.label }}</label>
+                    <div class="card-body p-2">
+                        <form id="form-filtros" method="get">
+                            <div class="row">
+                                <div class="form-group col-md-3 mb-0">
+                                    <label class="mb-1 small">{{ filter_form.hora_inicio.label }}</label>
                                     {{ filter_form.hora_inicio }}
                                 </div>
-                                <div class="form-group col-md-3">
-                                    <label for="id_hora_termino">{{ filter_form.hora_termino.label }}</label>
+                                <div class="form-group col-md-3 mb-0">
+                                    <label class="mb-1 small">{{ filter_form.hora_termino.label }}</label>
                                     {{ filter_form.hora_termino }}
                                 </div>
-                                <div class="form-group col-md-3">
-                                    <label for="id_servicio_clinico">{{ filter_form.servicio_clinico.label }}</label>
+                                <div class="form-group col-md-3 mb-0">
+                                    <label class="mb-1 small">{{ filter_form.servicio_clinico.label }}</label>
                                     {{ filter_form.servicio_clinico }}
                                 </div>
-                                <div class="form-group col-md-3">
-                                    <label for="id_profesional">{{ filter_form.profesional.label }}</label>
+                                <div class="form-group col-md-2 mb-0">
+                                    <label class="mb-1 small">{{ filter_form.profesional.label }}</label>
                                     {{ filter_form.profesional }}
                                 </div>
+                                <div class="col-md-1 d-flex align-items-end">
+                                    <button class="btn btn-secondary btn-block btn-sm" type="submit">
+                                        Filtrar
+                                    </button>
+                                </div>
                             </div>
-                            <button class="btn btn-secondary btn-sm" type="submit">
-                                <i class="fas fa-filter"></i> Aplicar filtros
-                            </button>
                         </form>
                     </div>
                 </div>
+            </div>
+        </div>
 
+        <!-- Tabla (Abajo) -->
+        <div class="row">
+            <div class="col-12">
                 <div class="card">
-                    <div class="card-header d-flex align-items-center">
-                        <h3 class="card-title mb-0">Movimientos de Recepción</h3>
-                        <a href=""
-                           class="btn btn-success btn-sm ml-auto">
-                            <i class="fas fa-file-csv"></i> Exportar CSV
-                        </a>
+                    <div class="card-header d-flex align-items-center p-2">
+                        <h3 class="card-title ml-2"><i class="fas fa-list mr-1"></i> Historial de Recepciones</h3>
+                        <div class="ml-auto">
+                            <button id="btn-refresh-table" class="btn btn-default btn-sm mr-2">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                        </div>
                     </div>
-                    <div class="card-body p-0">
+                    <div class="card-body p-2">
                         <table id="Table" class="table table-bordered table-striped table-sm mb-0">
                             <thead>
                             <tr>
@@ -137,21 +164,176 @@
 
 {% block javascript %}
     <script>
-        $('.select2').select2({
-            theme: 'bootstrap4',
-            width: '100%'
+        $(document).ready(function () {
+            // Inicializar Select2
+            $('.select2').select2({
+                theme: 'bootstrap4',
+                width: '100%'
+            });
+
+            const $rut = $('#id_rut');
+            const $formRecepcion = $('#form-recepcion');
+            const $btnRegistrar = $('#btn-registrar');
+            const $btnLimpiar = $('#btn-limpiar');
+
+            // Persistencia en localStorage
+            const configKeys = [
+                'profesional_movimiento',
+                'observacion_recepcion_ficha'
+            ];
+
+            function loadConfig() {
+                configKeys.forEach(id => {
+                    const saved = localStorage.getItem('recepcion_config_' + id);
+                    if (saved) {
+                        const $el = $('#' + id);
+                        $el.val(saved).trigger('change');
+                    }
+                });
+            }
+
+            function saveConfig() {
+                configKeys.forEach(id => {
+                    const val = $('#' + id).val();
+                    localStorage.setItem('recepcion_config_' + id, val);
+                });
+            }
+
+            loadConfig();
+
+            // Guardar config al cambiar campos
+            configKeys.forEach(id => {
+                $('#' + id).on('change', saveConfig);
+            });
+
+            // Foco automático en RUT al cargar
+            $rut.focus();
+
+            // Función para limpiar campos de registro
+            function limpiarRegistro() {
+                $('#id_movimiento_hidden').val('');
+                $('#id_rut').val('');
+                $('#nombre_mov').val('');
+                $('#id_ficha').val('');
+                $('#servicio_clinico_envio_ficha').val('');
+                $('#servicio_clinico_ficha').val('');
+                $btnRegistrar.prop('disabled', true);
+                $rut.focus();
+            }
+
+            $btnLimpiar.on('click', limpiarRegistro);
+
+            // Función para formatear RUT
+            function formatRut(value) {
+                let rut = value.replace(/\./g, '').replace(/-/g, '').toUpperCase();
+                if (rut.length <= 1) return value;
+                let body = rut.slice(0, -1);
+                let dv = rut.slice(-1);
+                body = body.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                return body + '-' + dv;
+            }
+
+            // Búsqueda de paciente al salir del campo RUT (blur) o presionar Enter
+            function buscarPaciente() {
+                let val = $rut.val().trim();
+                if (!val) return;
+
+                // Formatear antes de buscar si parece un RUT
+                if (!val.startsWith('PAC-')) {
+                    val = formatRut(val);
+                    $rut.val(val);
+                }
+
+                $.ajax({
+                    url: '{% url "ficha-paciente-buscar-recepcion" %}',
+                    data: {q: val},
+                    success: function (response) {
+                        if (response.results && response.results.length > 0) {
+                            const p = response.results[0];
+                            if (!p.en_espera) {
+                                Swal.fire('Advertencia', 'No se encontró un movimiento pendiente de recepción para esta ficha.', 'warning');
+                                limpiarRegistro();
+                            } else {
+                                $('#id_movimiento_hidden').val(p.movimiento_id);
+                                $rut.val(p.rut);
+                                $('#nombre_mov').val(p.nombre_completo);
+                                $('#id_ficha').val(p.numero_ficha_sistema);
+                                $('#servicio_clinico_envio_ficha').val(p.servicio_envio_nombre);
+                                $('#servicio_clinico_ficha').val(p.servicio_recepcion_nombre);
+                                $btnRegistrar.prop('disabled', false);
+                            }
+                        } else {
+                            Swal.fire('No encontrado', 'No se encontró paciente con ese RUT o Ficha en su establecimiento.', 'error');
+                            limpiarRegistro();
+                        }
+                    },
+                    error: function () {
+                        Swal.fire('Error', 'Error al consultar la base de datos.', 'error');
+                        limpiarRegistro();
+                    }
+                });
+            }
+
+            $rut.on('keypress', function (e) {
+                if (e.which === 13) {
+                    e.preventDefault();
+                    buscarPaciente();
+                }
+            });
+
+            $rut.on('blur', function () {
+                buscarPaciente();
+            });
+
+            // Registro de recepción vía AJAX
+            $formRecepcion.on('submit', function (e) {
+                e.preventDefault();
+
+                if (!$('#id_movimiento_hidden').val()) {
+                    Swal.fire('Error', 'Debe buscar un paciente con movimiento pendiente primero.', 'error');
+                    return;
+                }
+
+                $.ajax({
+                    url: window.location.href,
+                    method: 'POST',
+                    data: $(this).serialize(),
+                    headers: {'X-Requested-With': 'XMLHttpRequest'},
+                    success: function (response) {
+                        if (response.success) {
+                            Swal.fire({
+                                title: '¡Éxito!',
+                                text: response.message,
+                                icon: 'success',
+                                timer: 1500,
+                                showConfirmButton: false
+                            });
+                            limpiarRegistro();
+                            $('#Table').DataTable().ajax.reload(null, false);
+                            $rut.focus();
+                        } else {
+                            Swal.fire('Error', response.error || 'No se pudo registrar.', 'error');
+                        }
+                    },
+                    error: function (xhr) {
+                        const err = xhr.responseJSON ? xhr.responseJSON.error : 'Error en el servidor';
+                        Swal.fire('Error', err, 'error');
+                    }
+                });
+            });
+
+            // Refresh table button
+            $('#btn-refresh-table').on('click', function () {
+                $('#Table').DataTable().ajax.reload();
+            });
+
+            // Filtros de tabla
+            $('#form-filtros').on('submit', function (e) {
+                e.preventDefault();
+                const params = $(this).serialize();
+                const newUrl = window.location.pathname + '?' + params;
+                $('#Table').DataTable().ajax.url(newUrl + '&datatable=1').load();
+            });
         });
     </script>
-    <script>
-        // Marcar campos de envío como solo lectura en UI (rut y nombre ya tienen readonly en los widgets)
-        $('#servicio_clinico_ficha').prop('readonly', true);
-        $('#servicio_clinico_envio_ficha').prop('readonly', true);
-        // Importante: no deshabilitar #id_ficha para que el valor se envíe en el POST
-        $('#id_ficha').prop('disabled', false);
-        $('#nombre_mov').prop('readonly', true);
-        $('#id_rut').prop('disabled', false); // sólo para buscar y cargar
-    </script>
-    <script src="{% static 'js/apis/api_select2_rut.js' %}"></script>
-    <script src="{% static 'js/apis/api_select2_ficha.js' %}"></script>
-    <script src="{% static 'js/apis/api_recepcion_ficha.js' %}"></script>
 {% endblock %}
