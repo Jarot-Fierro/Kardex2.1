@@ -2,6 +2,7 @@ from django.urls import path
 
 from personas.apis.acciones_clinicas import actualizar_rut_paciente, toggle_pasivado_ficha, asignar_numero_ficha
 from personas.apis.ficha_paciente import get_paciente_ficha
+from personas.apis.pacientes import buscar_pacientes_api
 from personas.views.genero import *
 from personas.views.pacientes import *
 from personas.views.prevision import *
@@ -59,6 +60,7 @@ urlpatterns = [
     path("paciente/<int:paciente_id>/", paciente_view, name="paciente_view_param", ),
 
     # ACCIONES CLÍNICAS
+    path("api/pacientes/", buscar_pacientes_api, name="buscar_pacientes_api"),
     path("api/paciente/actualizar-rut/", actualizar_rut_paciente, name="api_actualizar_rut"),
     path("api/ficha/toggle-pasivado/", toggle_pasivado_ficha, name="api_toggle_pasivado"),
     path("api/ficha/asignar-numero/", asignar_numero_ficha, name="api_asignar_numero_ficha"),

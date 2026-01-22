@@ -165,15 +165,15 @@
                             <li>
                                 <a href="{% url 'entrada_tabla_ficha' %}" class="dropdown-item">Recepción fichas</a>
                             </li>
-
-                            <li class="dropdown-divider"></li>
-                            <li>
-                                <a href="{% url 'salida_tabla_ficha' %}" class="dropdown-item">Historial de Salidas</a>
-                            </li>
-                            <li class="dropdown-divider"></li>
                             <li>
                                 <a href="{% url 'traspaso_ficha' %}" class="dropdown-item">Traspaso de Fichas</a>
                             </li>
+
+                            <li class="dropdown-divider"></li>
+                            <li>
+                                <a href="{% url 'fichas_en_transito' %}" class="dropdown-item">Fichas en Transito</a>
+                            </li>
+
                         </ul>
                     </li>
                 {% endif %}

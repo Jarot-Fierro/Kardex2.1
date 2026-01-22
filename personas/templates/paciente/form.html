@@ -930,7 +930,17 @@
             if (!$el.length) return;
 
             if (value === null || value === undefined || value === '') {
-                $el.val(null).trigger('change');
+                // Si el valor es nulo, buscamos si hay una opción "NO INFORMADO"
+                const noInformadoVal = $el.find('option').filter(function () {
+                    const text = $(this).text().toUpperCase().trim();
+                    return text === 'NO INFORMADO' || text === 'SELECCIONA UN SECTOR' || text === 'SELECCIONA UN PACIENTE';
+                }).val();
+
+                if (noInformadoVal) {
+                    $el.val(String(noInformadoVal)).trigger('change.select2');
+                } else {
+                    $el.val(null).trigger('change.select2');
+                }
                 return;
             }
 
@@ -955,8 +965,8 @@
 
             // NACIMIENTO
             setValue('id_fecha_nacimiento', p.fecha_nacimiento);
-            setValue('id_sexo', p.sexo);
-            setValue('id_estado_civil', p.estado_civil);
+            setSelect2ById('id_sexo', p.sexo);
+            setSelect2ById('id_estado_civil', p.estado_civil);
 
             // ESTADO PACIENTE
             setValue('id_recien_nacido', p.recien_nacido);
@@ -1210,9 +1220,19 @@
                 $('#id_paciente_id').val('');
 
                 // select2
-                $('#paciente-form select')
-                    .val(null)
-                    .trigger('change');
+                $('#paciente-form select').each(function () {
+                    const $el = $(this);
+                    const noInformadoVal = $el.find('option').filter(function () {
+                        const text = $(this).text().toUpperCase().trim();
+                        return text === 'NO INFORMADO' || text === 'SELECCIONA UN SECTOR';
+                    }).val();
+
+                    if (noInformadoVal) {
+                        $el.val(String(noInformadoVal)).trigger('change');
+                    } else {
+                        $el.val(null).trigger('change');
+                    }
+                });
 
                 // restaurar rut
                 $('#id_rut').val(rutActual);
@@ -1858,6 +1878,23 @@
                     return false;
                 }
             });
+
+            // Establecer valores por defecto (NO INFORMADO) si el formulario está vacío
+            // Solo si no hay un paciente_id ya cargado (caso de creación)
+            const pacienteId = document.getElementById('id_paciente_id').value;
+            if (!pacienteId) {
+                $('#paciente-form select').each(function () {
+                    const $el = $(this);
+                    const noInformadoVal = $el.find('option').filter(function () {
+                        const text = $(this).text().toUpperCase().trim();
+                        return text === 'NO INFORMADO' || text === 'SELECCIONA UN SECTOR';
+                    }).val();
+
+                    if (noInformadoVal) {
+                        $el.val(String(noInformadoVal)).trigger('change.select2');
+                    }
+                });
+            }
 
         });
     </script>

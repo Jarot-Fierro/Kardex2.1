@@ -19,10 +19,10 @@ urlpatterns = [
     path('fichas/historial/', FichaHistoryListView.as_view(), name='ficha_history'),
 
     # Nuevas vistas de movimientos (Recepción y Salida)
-    path('salida-ficha-masiva/', SalidaFicha2View.as_view(), name='salida_ficha_masiva'),
-    path('salida-tabla-ficha/', SalidaTablaFichaView.as_view(), name='salida_tabla_ficha'),
+    path('salida-ficha-masiva/', SalidaTablaFichaView.as_view(), name='salida_ficha_masiva'),
     path('entrada-tabla-ficha/', RecepcionTablaFichaView.as_view(), name='entrada_tabla_ficha'),
-    path('traspaso-ficha/', TraspasoFichaView.as_view(), name='traspaso_ficha'),
+    path('traspaso-ficha/', TraspasoTablaFichaView.as_view(), name='traspaso_ficha'),
+    path('fichas-en-transito/', FichasEnTransito.as_view(), name='fichas_en_transito'),
 
     # Movimientos de Fichas del Paciente
     path('api/movimientos/paciente/<str:rut>/', get_movimientos_paciente_establecimiento,

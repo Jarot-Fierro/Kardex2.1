@@ -2,6 +2,7 @@ from django import forms
 
 from clinica.models import Ficha
 from establecimientos.models.sectores import Sector
+from personas.models.pacientes import Paciente
 
 
 class FichaForm(forms.ModelForm):
@@ -44,16 +45,17 @@ class FichaForm(forms.ModelForm):
         required=False,
         empty_label='Selecciona un Sector',
         widget=forms.Select(attrs={
-            'class': 'form-control form-control-sm',
+            'class': 'form-control form-control-sm select2',
         })
     )
 
     paciente = forms.ModelChoiceField(
-        queryset=None,  # 👈 IMPORTANTE
+        queryset=Paciente.objects.none(),
         required=False,
         empty_label='Selecciona un Paciente',
         widget=forms.Select(attrs={
             'class': 'form-control form-control-sm select2',
+            'id': 'id_paciente_select'
         })
     )
 
@@ -70,10 +72,9 @@ class FichaForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        from personas.models.pacientes import Paciente  # 👈 import diferido
-
-        self.fields['paciente'].queryset = Paciente.objects.filter(status=True)
+        # Si hay una instancia con paciente, permitimos que ese paciente esté en el queryset
+        if self.instance and self.instance.paciente_id:
+            self.fields['paciente'].queryset = Paciente.objects.filter(pk=self.instance.paciente_id)
 
 
 class FormFichaTarjeta(forms.ModelForm):

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Salida de Fichas{% endblock %}
+{% block title %}{{ title|default:"Fichas en Tránsito" }}{% endblock %}
 
 {% block content %}
     <div class="container-fluid small-input">
@@ -9,7 +9,7 @@
             <div class="col-12">
                 <div class="card card-primary">
                     <div class="card-header">
-                        <h3 class="card-title">Filtros</h3>
+                        <h3 class="card-title">Filtros - {{ title }}</h3>
                     </div>
                     <div class="card-body">
                         <form id="form-filtros" class="form" method="get">
@@ -44,8 +44,8 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header d-flex align-items-center">
-                        <h3 class="card-title mb-0">Movimientos de Salida</h3>
-                        <a href="{% url 'reports:export_movimiento_ficha_envio_csv' %}"
+                        <h3 class="card-title mb-0">{{ title }}</h3>
+                        <a href=""
                            class="btn btn-success btn-sm ml-auto">
                             <i class="fas fa-file-csv"></i> Exportar CSV
                         </a>
@@ -77,9 +77,22 @@
 
 {% block javascript %}
     <script>
-        $('.select2').select2({
-            theme: 'bootstrap4',
-            width: '100%'
+        $(document).ready(function () {
+            $('.select2').select2({
+                theme: 'bootstrap4',
+                width: '100%'
+            });
+
+            // Manejo de filtros
+            $('#form-filtros').on('submit', function (e) {
+                e.preventDefault();
+                const $table = $('#Table');
+                if ($.fn.DataTable.isDataTable($table)) {
+                    const params = $(this).serialize();
+                    const newUrl = window.location.pathname + '?' + params + '&datatable=1';
+                    $table.DataTable().ajax.url(newUrl).load();
+                }
+            });
         });
     </script>
 {% endblock %}

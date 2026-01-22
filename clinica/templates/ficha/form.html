@@ -66,41 +66,34 @@
 {% endblock %}
 
 {% block javascript %}
-    <script>
-        $('.select2').select2({
-            theme: 'bootstrap4',
-            width: '100%'
-        });
-    </script>
 
     <script>
-        $('#paciente-select').select2({
+        $('#id_paciente_select').select2({
             ajax: {
-                url: '/api/pacientes/',
+                url: '/personas/api/pacientes/',
                 dataType: 'json',
                 delay: 250,
                 data: function (params) {
                     return {
-                        search: params.term, // lo que el usuario escribe
+                        search: params.term,
                         page: params.page || 1
                     };
                 },
-                processResults: function (data) {
-                    // DRF devuelve por defecto un array, o un objeto con 'results'
-                    const results = data.results || data;
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
                     return {
-                        results: results.map(function (paciente) {
-                            return {
-                                id: paciente.id,
-                                text: (paciente.nombre || '') + (paciente.apellido_paterno ? ' ' + paciente.apellido_paterno : '') + (paciente.apellido_materno ? ' ' + paciente.apellido_materno : '') + (paciente.rut ? ' (' + paciente.rut + ')' : '')
-                            };
-                        })
+                        results: data.results,
+                        pagination: {
+                            more: data.pagination.more
+                        }
                     };
                 },
                 cache: true
             },
-            placeholder: 'Buscar paciente',
-            minimumInputLength: 1
+            placeholder: 'Buscar paciente (Nombre, RUT o Código)',
+            minimumInputLength: 1,
+            theme: 'bootstrap4',
+            width: '100%'
         });
 
     </script>

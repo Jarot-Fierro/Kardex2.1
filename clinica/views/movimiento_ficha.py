@@ -17,7 +17,7 @@ from core.mixin import DataTableMixin
 from personas.models.profesionales import Profesional
 
 
-class SalidaFicha2View(LoginRequiredMixin, DataTableMixin, TemplateView):
+class SalidaTablaFichaView(LoginRequiredMixin, DataTableMixin, TemplateView):
     """
     Vista para registro masivo de salidas de fichas con AJAX.
     Muestra el formulario de registro y el de filtro, además de la tabla.
@@ -200,7 +200,7 @@ class SalidaFicha2View(LoginRequiredMixin, DataTableMixin, TemplateView):
         return self.render_to_response(context)
 
 
-class SalidaTablaFichaView(LoginRequiredMixin, DataTableMixin, TemplateView):
+class FichasEnTransito(LoginRequiredMixin, DataTableMixin, TemplateView):
     template_name = 'movimiento_ficha/tabla_salida_ficha_update.html'
     model = MovimientoFicha
 
@@ -247,9 +247,9 @@ class SalidaTablaFichaView(LoginRequiredMixin, DataTableMixin, TemplateView):
             filter_form.fields['profesional'].queryset = Profesional.objects.filter(establecimiento=establecimiento)
 
         context.update({
-            'title': 'Salida de Fichas',
+            'title': 'Fichas en Tránsito',
             'filter_form': filter_form,
-            'list_url': reverse_lazy('salida_ficha'),
+            'list_url': reverse_lazy('fichas_en_transito'),
             'datatable_enabled': True,
             'datatable_order': [[0, 'desc']],
             'columns': self.datatable_columns,
@@ -260,6 +260,8 @@ class SalidaTablaFichaView(LoginRequiredMixin, DataTableMixin, TemplateView):
         establecimiento = getattr(self.request.user, 'establecimiento', None)
         qs = MovimientoFicha.objects.filter(
             estado_envio='ENVIADO',
+            estado_recepcion='EN ESPERA',
+            estado_traspaso='EN ESPERA',
             ficha__establecimiento=establecimiento
         ).select_related(
             'ficha__paciente',
@@ -471,7 +473,7 @@ class RecepcionTablaFichaView(LoginRequiredMixin, DataTableMixin, TemplateView):
         return self.render_to_response(context)
 
 
-class TraspasoFichaView(LoginRequiredMixin, DataTableMixin, TemplateView):
+class TraspasoTablaFichaView(LoginRequiredMixin, DataTableMixin, TemplateView):
     template_name = 'movimiento_ficha/traspaso_ficha.html'
     model = MovimientoFicha
 
