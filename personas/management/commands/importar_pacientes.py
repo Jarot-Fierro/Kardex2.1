@@ -12,7 +12,7 @@ from personas.models.usuario_anterior import UsuarioAnterior
 
 
 class Command(BaseCommand):
-    help = 'Importa pacientes desde CSV SOME (optimizado + comuna default 206).'
+    help = 'Importa pacientes desde CSV SOME (robusto y tolerante a datos sucios).'
 
     def add_arguments(self, parser):
         parser.add_argument('csv_path', type=str, help='Ruta del archivo CSV.')
@@ -30,14 +30,16 @@ class Command(BaseCommand):
 
     def limpiar_rut(self, valor):
         if pd.isna(valor) or valor is None:
-            return ''
-        return (
-            str(valor)
-            .replace('\xa0', '')
-            .replace('\u200b', '')
-            .replace(' ', '')
-            .strip()
-        )
+            return None
+
+        rut = str(valor).upper().strip()
+        rut = rut.replace('\xa0', '').replace('\u200b', '').replace(' ', '')
+        rut = re.sub(r'[^0-9K\-]', '', rut)
+
+        if '-' not in rut or len(rut) > 12:
+            return None
+
+        return rut
 
     def es_rut_recien_nacido(self, rut):
         if not rut:
@@ -69,6 +71,20 @@ class Command(BaseCommand):
         except Exception:
             return None
 
+    def limpiar_texto_limitado(self, valor, campo_modelo):
+        """
+        Limpia NaN, evita 'nan' string y corta según max_length del modelo
+        """
+        if pd.isna(valor) or valor is None:
+            return None
+
+        texto = str(valor).strip()
+        if not texto or texto.lower() == 'nan':
+            return None
+
+        max_length = Paciente._meta.get_field(campo_modelo).max_length
+        return texto[:max_length]
+
     # ================== MAIN ==================
 
     def handle(self, *args, **options):
@@ -98,25 +114,21 @@ class Command(BaseCommand):
         ruts_existentes = set(Paciente.objects.values_list('rut', flat=True))
         comunas = {c.id: c for c in Comuna.objects.all()}
         previsiones = {p.codigo: p for p in Prevision.objects.all()}
-        usuarios_anteriores = {u.rut: u for u in UsuarioAnterior.objects.all()}
 
-        # ---------- COMUNA DEFAULT ----------
+        usuarios_anteriores = {
+            self.limpiar_rut(u.rut): u
+            for u in UsuarioAnterior.objects.all()
+            if self.limpiar_rut(u.rut)
+        }
+
         COMUNA_DEFAULT_CODIGO = 206
         comuna_default = comunas.get(COMUNA_DEFAULT_CODIGO)
 
         if not comuna_default:
             self.stderr.write(
-                self.style.ERROR(
-                    f'❌ No existe la comuna default código {COMUNA_DEFAULT_CODIGO}'
-                )
+                self.style.ERROR(f'❌ No existe la comuna default código {COMUNA_DEFAULT_CODIGO}')
             )
             return
-
-        self.stdout.write(
-            self.style.SUCCESS(
-                f'🏷️ Comuna default aplicada: {comuna_default.nombre} ({COMUNA_DEFAULT_CODIGO})'
-            )
-        )
 
         # ================== CONTADORES ==================
 
@@ -135,8 +147,8 @@ class Command(BaseCommand):
                 for _, row in df.iterrows():
                     rut = self.limpiar_rut(row.get('rut'))
 
-                    # ---------- RUT ----------
                     if not rut:
+                        total_omitidos += 1
                         pbar.update(1)
                         continue
 
@@ -150,15 +162,11 @@ class Command(BaseCommand):
                         pbar.update(1)
                         continue
 
-                    # ---------- COMUNA ----------
                     comuna_codigo = self.limpiar_entero(row.get('comuna'))
-                    comuna = comunas.get(comuna_codigo)
-
-                    if not comuna:
-                        comuna = comuna_default
+                    comuna = comunas.get(comuna_codigo) or comuna_default
+                    if comuna.id == COMUNA_DEFAULT_CODIGO:
                         total_comuna_default += 1
 
-                    # ---------- FECHAS ----------
                     fecha_nacimiento = pd.to_datetime(
                         row.get('fecha_nacimiento'),
                         errors='coerce',
@@ -177,6 +185,10 @@ class Command(BaseCommand):
                         else None
                     )
 
+                    usuario_anterior = usuarios_anteriores.get(
+                        self.limpiar_rut(row.get('usuario_anterior'))
+                    )
+
                     paciente = Paciente(
                         rut=rut,
                         id_anterior=self.limpiar_entero(row.get('id_anterior')),
@@ -184,28 +196,30 @@ class Command(BaseCommand):
                         apellido_paterno=self.limpiar_texto(row.get('apellido_paterno')),
                         apellido_materno=self.limpiar_texto(row.get('apellido_materno')),
                         fecha_nacimiento=fecha_nacimiento,
-                        sexo=str(row.get('sexo', '')).strip().upper(),
-                        estado_civil=str(row.get('estado_civil', '')).strip().upper(),
-                        direccion=str(row.get('direccion', '')).strip().upper(),
+                        sexo=str(row.get('sexo', '')).strip().upper() or 'NO INFORMADO',
+                        estado_civil=str(row.get('estado_civil', '')).strip().upper() or 'NO INFORMADO',
+
+                        direccion=self.limpiar_texto_limitado(row.get('direccion'), 'direccion'),
                         numero_telefono1=self.limpiar_telefono(row.get('numero_telefono1')),
                         numero_telefono2=self.limpiar_telefono(row.get('numero_telefono2')),
                         comuna=comuna,
                         prevision=previsiones.get(self.limpiar_entero(row.get('prevision'))),
-                        nombre_social=self.limpiar_texto(row.get('nombre_social')) or None,
-                        nombres_padre=self.limpiar_texto(row.get('nombres_padre')) or None,
-                        nombres_madre=self.limpiar_texto(row.get('nombres_madre')) or None,
-                        nombre_pareja=self.limpiar_texto(row.get('nombre_pareja')) or None,
-                        rut_madre=self.limpiar_rut(row.get('rut_madre')) or None,
-                        ocupacion=self.limpiar_texto(row.get('ocupacion')) or None,
-                        representante_legal=self.limpiar_texto(row.get('representante_legal')) or None,
-                        pasaporte=str(row.get('pasaporte', '')).strip() or None,
+
+                        nombre_social=self.limpiar_texto_limitado(row.get('nombre_social'), 'nombre_social'),
+                        nombres_padre=self.limpiar_texto_limitado(row.get('nombres_padre'), 'nombres_padre'),
+                        nombres_madre=self.limpiar_texto_limitado(row.get('nombres_madre'), 'nombres_madre'),
+                        nombre_pareja=self.limpiar_texto_limitado(row.get('nombre_pareja'), 'nombre_pareja'),
+                        rut_madre=self.limpiar_rut(row.get('rut_madre')),
+                        ocupacion=self.limpiar_texto_limitado(row.get('ocupacion'), 'ocupacion'),
+                        representante_legal=self.limpiar_texto_limitado(row.get('representante_legal'),
+                                                                        'representante_legal'),
+                        pasaporte=self.limpiar_texto_limitado(row.get('pasaporte'), 'pasaporte'),
+
                         recien_nacido=self.limpiar_bool(row.get('recien_nacido')),
                         extranjero=self.limpiar_bool(row.get('extranjero')),
                         fallecido=self.limpiar_bool(row.get('fallecido')),
                         fecha_fallecimiento=fecha_fallecimiento,
-                        usuario_anterior=usuarios_anteriores.get(
-                            self.limpiar_rut(row.get('usuario_anterior'))
-                        ),
+                        usuario_anterior=usuario_anterior,
                     )
 
                     pacientes_buffer.append(paciente)
@@ -213,28 +227,20 @@ class Command(BaseCommand):
                     total_creados += 1
 
                     if len(pacientes_buffer) >= BATCH_SIZE:
-                        Paciente.objects.bulk_create(
-                            pacientes_buffer,
-                            ignore_conflicts=True,
-                            batch_size=BATCH_SIZE
-                        )
+                        Paciente.objects.bulk_create(pacientes_buffer, batch_size=BATCH_SIZE)
                         pacientes_buffer.clear()
 
                     pbar.update(1)
 
             if pacientes_buffer:
-                Paciente.objects.bulk_create(
-                    pacientes_buffer,
-                    ignore_conflicts=True,
-                    batch_size=BATCH_SIZE
-                )
+                Paciente.objects.bulk_create(pacientes_buffer, batch_size=BATCH_SIZE)
 
         # ================== RESUMEN ==================
 
         self.stdout.write(self.style.SUCCESS('\n' + '=' * 60))
         self.stdout.write(self.style.SUCCESS('📊 RESUMEN FINAL'))
         self.stdout.write(self.style.SUCCESS(f'✅ Creados: {total_creados:,}'))
-        self.stdout.write(self.style.WARNING(f'⏭️ Omitidos (ya existían): {total_omitidos:,}'))
+        self.stdout.write(self.style.WARNING(f'⏭️ Omitidos (inválidos / duplicados): {total_omitidos:,}'))
         self.stdout.write(self.style.WARNING(f'👶 RN omitidos: {total_rn_omitidos:,}'))
         self.stdout.write(self.style.WARNING(
             f'🏷️ Asignados a comuna 206 (NO INFORMADO): {total_comuna_default:,}'

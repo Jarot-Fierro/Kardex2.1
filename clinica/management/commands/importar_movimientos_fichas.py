@@ -11,6 +11,8 @@ from personas.models.profesionales import Profesional
 from personas.models.usuario_anterior import UsuarioAnterior
 
 
+# ================= UTILIDADES =================
+
 def normalize_rut(value):
     if value is None:
         return ''
@@ -20,8 +22,19 @@ def normalize_rut(value):
     return ''.join(ch for ch in s if ch.isalnum())
 
 
+def clean_text(value):
+    if value is None:
+        return ''
+    s = str(value).strip()
+    if s.upper() in ('NAN', 'NULL', 'NONE'):
+        return ''
+    return s
+
+
+# ================= COMMAND =================
+
 class Command(BaseCommand):
-    help = 'Importa movimientos de fichas desde CSV con auditoría de omitidos'
+    help = 'Importa movimientos de fichas desde CSV'
 
     def add_arguments(self, parser):
         parser.add_argument('csv_path', type=str)
@@ -70,10 +83,7 @@ class Command(BaseCommand):
         profesionales_dict = {normalize_rut(p.rut): p for p in Profesional.objects.all()}
 
         movimientos_existentes = set(
-            MovimientoFicha.objects.values_list(
-                'ficha_id',
-                'fecha_envio'
-            )
+            MovimientoFicha.objects.values_list('ficha_id', 'fecha_envio')
         )
 
         movimientos_a_crear = []
@@ -104,10 +114,7 @@ class Command(BaseCommand):
                     pbar.update(1)
                     continue
 
-                fecha_envio = None
-                if pd.notna(row['fecha_salida']):
-                    fecha_envio = make_aware(row['fecha_salida'])
-
+                fecha_envio = make_aware(row['fecha_salida']) if pd.notna(row['fecha_salida']) else None
                 clave = (ficha.id, fecha_envio)
 
                 # ---------- DUPLICADO ----------
@@ -128,33 +135,46 @@ class Command(BaseCommand):
                 # ---------- RELACIONES ----------
                 establecimiento = establecimientos_dict.get(est_id)
                 servicio = servicios_dict.get(row['servicio_clinico'])
-                usuario_envio = usuarios_ant_dict.get(row['usuario_entrega'])
-                usuario_recepcion = usuarios_ant_dict.get(row['usuario_entrada'])
+                usuario_envio_ant = usuarios_ant_dict.get(row['usuario_entrega'])
+                usuario_recep_ant = usuarios_ant_dict.get(row['usuario_entrada'])
                 profesional = profesionales_dict.get(row['profesional'])
 
-                # ---------- ESTADO ----------
-                estado = row['estado'].upper() if row['estado'] else 'EN ESPERA'
+                # ---------- ESTADO CSV ----------
+                estado_csv = (row.get('estado') or '').strip().upper()
 
-                # ---------- FECHAS ----------
-                fecha_recepcion = make_aware(row['fecha_entrada']) if pd.notna(row['fecha_entrada']) else None
+                recibido = estado_csv == 'R'
 
+                estado_recepcion = 'RECIBIDO' if recibido else 'EN ESPERA'
+                fecha_recepcion = make_aware(row['fecha_entrada']) if recibido and pd.notna(
+                    row['fecha_entrada']) else None
+
+                # ---------- MOVIMIENTO ----------
                 movimiento = MovimientoFicha(
                     ficha=ficha,
                     establecimiento=establecimiento,
+
                     fecha_envio=fecha_envio,
                     fecha_recepcion=fecha_recepcion,
-                    usuario_envio_anterior=usuario_envio,
-                    usuario_recepcion_anterior=usuario_recepcion,
-                    profesional_recepcion=profesional,
-                    servicio_clinico_recepcion=servicio,
-                    observacion_envio=row.get('observacion_salida', ''),
-                    observacion_recepcion=row.get('observacion_entrada', ''),
-                    observacion_traspaso=row.get('observacion_traspaso', ''),
+
                     estado_envio='ENVIADO',
-                    estado_recepcion=estado,
+                    estado_recepcion=estado_recepcion,
                     estado_traspaso='SIN TRASPASO',
-                    rut_anterior=row.get('rut_paciente', 'SIN RUT'),
-                    rut_anterior_profesional=row.get('profesional', 'SIN RUT')
+
+                    servicio_clinico_envio=servicio,
+                    servicio_clinico_recepcion=servicio if recibido else None,
+
+                    profesional_envio=profesional,
+                    profesional_recepcion=profesional if recibido else None,
+
+                    usuario_envio_anterior=usuario_envio_ant,
+                    usuario_recepcion_anterior=usuario_recep_ant,
+
+                    observacion_envio=clean_text(row.get('observacion_salida')),
+                    observacion_recepcion=clean_text(row.get('observacion_entrada')),
+                    observacion_traspaso=clean_text(row.get('observacion_traspaso')),
+
+                    rut_anterior=row.get('rut_paciente') or 'SIN RUT',
+                    rut_anterior_profesional=row.get('profesional') or 'SIN RUT'
                 )
 
                 movimientos_a_crear.append(movimiento)
