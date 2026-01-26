@@ -62,7 +62,7 @@ class Paciente(StandardModel):
 
     genero = models.ForeignKey('personas.Genero', on_delete=models.SET_NULL, null=True, blank=True,
                                verbose_name='Género',
-                               related_name='pacientes_genero', )
+                               related_name='pacientes_genero', default=1)
 
     usuario = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True, blank=True,
                                 verbose_name='Usuario', related_name='pacientes_usuario')
