@@ -76,6 +76,9 @@ class UserListView(DataTableMixin, TemplateView):
     def get_base_queryset(self):
         user = self.request.user
 
+        if user.is_superuser:
+            return User.objects.all()
+
         if user.establecimiento:
             return User.objects.filter(
                 establecimiento=user.establecimiento,

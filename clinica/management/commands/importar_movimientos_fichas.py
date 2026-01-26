@@ -46,11 +46,15 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS(f'📖 Leyendo CSV: {csv_path}'))
 
+        # 🔥 FIX IMPORTANTE PARA CSV SUCIO
         df = pd.read_csv(
             csv_path,
             sep=',',
             dtype=str,
-            na_values=['NULL', 'null', '']
+            engine='python',
+            quotechar='"',
+            on_bad_lines='skip',
+            keep_default_na=False
         )
 
         df.columns = df.columns.str.strip()
@@ -101,7 +105,6 @@ class Command(BaseCommand):
                 ficha_num = row['ficha']
                 est_id = row['establecimiento']
 
-                # ---------- VALIDAR FICHA ----------
                 ficha = fichas_dict.get((ficha_num, est_id))
                 if not ficha:
                     total_omitidos += 1
@@ -114,65 +117,44 @@ class Command(BaseCommand):
                     pbar.update(1)
                     continue
 
-                fecha_envio = make_aware(row['fecha_salida']) if pd.notna(row['fecha_salida']) else None
+                fecha_envio = make_aware(row['fecha_salida']) if row['fecha_salida'] else None
                 clave = (ficha.id, fecha_envio)
 
-                # ---------- DUPLICADO ----------
                 if clave in movimientos_existentes:
                     total_omitidos += 1
                     total_duplicados += 1
-                    errores.append({
-                        'fila_csv': idx + 2,
-                        'motivo': 'MOVIMIENTO_DUPLICADO',
-                        'ficha': ficha_num,
-                        'establecimiento': est_id
-                    })
                     pbar.update(1)
                     continue
 
                 movimientos_existentes.add(clave)
 
-                # ---------- RELACIONES ----------
                 establecimiento = establecimientos_dict.get(est_id)
                 servicio = servicios_dict.get(row['servicio_clinico'])
                 usuario_envio_ant = usuarios_ant_dict.get(row['usuario_entrega'])
                 usuario_recep_ant = usuarios_ant_dict.get(row['usuario_entrada'])
                 profesional = profesionales_dict.get(row['profesional'])
 
-                # ---------- ESTADO CSV ----------
-                estado_csv = (row.get('estado') or '').strip().upper()
-
+                estado_csv = row.get('estado', '').strip().upper()
                 recibido = estado_csv == 'R'
 
-                estado_recepcion = 'RECIBIDO' if recibido else 'EN ESPERA'
-                fecha_recepcion = make_aware(row['fecha_entrada']) if recibido and pd.notna(
-                    row['fecha_entrada']) else None
-
-                # ---------- MOVIMIENTO ----------
                 movimiento = MovimientoFicha(
                     ficha=ficha,
                     establecimiento=establecimiento,
-
                     fecha_envio=fecha_envio,
-                    fecha_recepcion=fecha_recepcion,
-
+                    fecha_recepcion=make_aware(row['fecha_entrada']) if recibido and pd.notna(
+                        row['fecha_entrada']) else None,
                     estado_envio='ENVIADO',
-                    estado_recepcion=estado_recepcion,
+                    estado_recepcion='RECIBIDO' if recibido else 'EN ESPERA',
                     estado_traspaso='SIN TRASPASO',
-
                     servicio_clinico_envio=servicio,
                     servicio_clinico_recepcion=servicio if recibido else None,
-
                     profesional_envio=profesional,
                     profesional_recepcion=profesional if recibido else None,
-
                     usuario_envio_anterior=usuario_envio_ant,
                     usuario_recepcion_anterior=usuario_recep_ant,
-
                     observacion_envio=clean_text(row.get('observacion_salida')),
                     observacion_recepcion=clean_text(row.get('observacion_entrada')),
                     observacion_traspaso=clean_text(row.get('observacion_traspaso')),
-
                     rut_anterior=row.get('rut_paciente') or 'SIN RUT',
                     rut_anterior_profesional=row.get('profesional') or 'SIN RUT'
                 )
@@ -192,8 +174,6 @@ class Command(BaseCommand):
                 MovimientoFicha.objects.bulk_create(movimientos_a_crear)
             total_importados += len(movimientos_a_crear)
 
-        # ================= CSV ERRORES =================
-
         if errores:
             pd.DataFrame(errores).to_csv(
                 'errores_importacion_movimientos.csv',
@@ -201,12 +181,9 @@ class Command(BaseCommand):
                 encoding='utf-8-sig'
             )
 
-        # ================= RESUMEN =================
-
         self.stdout.write(self.style.SUCCESS('\n' + '=' * 60))
         self.stdout.write(self.style.SUCCESS('📊 RESUMEN FINAL'))
         self.stdout.write(self.style.SUCCESS(f'✅ Importados: {total_importados:,}'))
         self.stdout.write(self.style.WARNING(f'⚠️ Omitidos: {total_omitidos:,}'))
         self.stdout.write(self.style.WARNING(f'🔁 Duplicados: {total_duplicados:,}'))
-        self.stdout.write(self.style.SUCCESS('📁 CSV: errores_importacion_movimientos.csv'))
         self.stdout.write(self.style.SUCCESS('=' * 60))
