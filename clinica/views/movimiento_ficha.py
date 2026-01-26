@@ -258,16 +258,16 @@ class FichasEnTransito(LoginRequiredMixin, DataTableMixin, TemplateView):
 
     def get_base_queryset(self):
         establecimiento = getattr(self.request.user, 'establecimiento', None)
-        qs = MovimientoFicha.objects.filter(
+        qs = (MovimientoFicha.objects.filter(
             estado_envio='ENVIADO',
+            estado_traspaso='SIN TRASPASO',
+            ficha__establecimiento=establecimiento,
             estado_recepcion='EN ESPERA',
-            estado_traspaso='EN ESPERA',
-            ficha__establecimiento=establecimiento
         ).select_related(
             'ficha__paciente',
             'servicio_clinico_envio',
             'usuario_envio'
-        )
+        ))
 
         # Filtros desde filter_form
         inicio = self.request.GET.get('hora_inicio')

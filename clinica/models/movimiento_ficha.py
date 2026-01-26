@@ -1,4 +1,3 @@
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 from simple_history.models import HistoricalRecords
@@ -101,10 +100,10 @@ class MovimientoFicha(StandardModel):
 
     def clean(self):
         # servicios distintos
-        if self.servicio_clinico_envio_id and self.servicio_clinico_recepcion_id and \
-                self.servicio_clinico_envio_id == self.servicio_clinico_recepcion_id:
-            raise ValidationError(
-                {'servicio_clinico_recepcion': 'El servicio de recepción no puede ser igual al de envío.'})
+        # if self.servicio_clinico_envio_id and self.servicio_clinico_recepcion_id and \
+        #         self.servicio_clinico_envio_id == self.servicio_clinico_recepcion_id:
+        #     raise ValidationError(
+        #         {'servicio_clinico_recepcion': 'El servicio de recepción no puede ser igual al de envío.'})
         # no editar si ya está recibido
         if self.pk and self.estado_recepcion == 'RECIBIDO':
             # Permitir idempotencia al marcar recibido: si lo único que cambia es establecer precisamente

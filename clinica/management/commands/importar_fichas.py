@@ -10,6 +10,8 @@ from personas.models.pacientes import Paciente
 from users.models import User
 
 
+# python manage.py importar_fichas "C:\Users\Informatica\Desktop\Importacion\ficha.csv"
+
 def normalize_rut(value):
     if value is None:
         return ''
