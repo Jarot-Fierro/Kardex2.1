@@ -89,7 +89,7 @@
             <div class="card">
                 <div class="card-header border-0 d-flex align-items-center">
                     <h3 class="card-title mb-0">Pacientes recientes con ingreso en este establecimiento</h3>
-                    <a href="" class="btn btn-warning btn-sm ml-auto">
+                    <a href="{% url 'paciente_history' %}" class="btn btn-warning btn-sm ml-auto">
                         Ver todos los cambios
                     </a>
                 </div>
@@ -123,21 +123,10 @@
                                         </td>
                                         <td>
                                             {% if p %}
-                                                {% if p.rut %}
-                                                    <a href="?rut={{ p.rut|urlencode }}"
-                                                       class="btn btn-sm btn-outline-primary">
-                                                        Ver ficha
-                                                    </a>
-                                                {% elif item.numero_ficha %}
-                                                    <a href="?ficha={{ item.numero_ficha }}"
-                                                       class="btn btn-sm btn-outline-primary">
-                                                        Ver ficha
-                                                    </a>
-                                                {% else %}
-                                                    <button class="btn btn-sm btn-outline-secondary" disabled>Ver
-                                                        ficha
-                                                    </button>
-                                                {% endif %}
+                                                <a href="{% url 'paciente_view_param' p.id %}"
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    Ver ficha
+                                                </a>
                                             {% else %}
                                                 <button class="btn btn-sm btn-outline-secondary" disabled>Ver ficha
                                                 </button>
