@@ -14,7 +14,7 @@
                     <a href="{% url 'servicio_clinico_history' %}" class="btn btn-warning me-2">
                         <i class="bi bi-file-earmark-excel"></i> Historial
                     </a>
-                    <a href="" class="btn btn-success me-2">
+                    <a href="{% url 'export_servicio_clinico' %}" class="btn btn-success me-2">
                         <i class="bi bi-file-earmark-excel"></i> Reporte
                     </a>
                     {% if perms.kardex.add_servicioclinico %}

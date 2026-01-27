@@ -2,6 +2,7 @@
 
 import csv
 import re
+from datetime import datetime
 
 import pandas as pd
 from django.core.management.base import BaseCommand
@@ -59,6 +60,22 @@ class Command(BaseCommand):
             return int(float(valor))
         except Exception:
             return None
+
+    def limpiar_fecha(self, valor):
+        if not valor or str(valor).strip() in ('01-01-1900', '1900-01-01'):
+            return None
+        try:
+            return datetime.strptime(str(valor), '%d-%m-%Y').date()
+        except Exception:
+            return None
+
+    def limpiar_sexo(self, valor):
+        v = str(valor).strip().upper()
+        return v if v in ('M', 'F') else 'NO INFORMADO'
+
+    def limpiar_estado_civil(self, valor):
+        v = str(valor).strip().upper()
+        return v if v in ('S', 'C', 'V', 'D') else 'NO INFORMADO'
 
     # ================== MAIN ==================
 
@@ -169,17 +186,34 @@ class Command(BaseCommand):
 
                     paciente = Paciente(
                         rut=rut,
-                        nombre=self.limpiar_texto(row.get('nom_nombre')),
-                        apellido_paterno=self.limpiar_texto(row.get('nom_apepat')),
-                        apellido_materno=self.limpiar_texto(row.get('nom_apemat')),
+
+                        id_anterior=self.limpiar_entero(row.get('id')),
+
+                        nombre=self.limpiar_texto(row.get('nom_nombre')) or 'NO INFORMADO',
+                        apellido_paterno=self.limpiar_texto(row.get('nom_apepat')) or 'NO INFORMADO',
+                        apellido_materno=self.limpiar_texto(row.get('nom_apemat')) or 'NO INFORMADO',
+
+                        rut_madre=self.limpiar_rut(row.get('rut_madre')),
+                        pasaporte=self.limpiar_texto(row.get('pasaporte')),
+                        nombre_social=self.limpiar_texto(row.get('nombre_social')),
+
                         fecha_nacimiento=fecha_nacimiento,
-                        sexo=str(row.get('ind_tisexo', '')).strip().upper(),
-                        direccion=str(row.get('nom_direcc', '')).strip().upper(),
+                        sexo=self.limpiar_sexo(row.get('ind_tisexo')),
+                        estado_civil=self.limpiar_estado_civil(row.get('ind_estciv')),
+
+                        direccion=self.limpiar_texto(row.get('nom_direcc')),
                         numero_telefono1=self.limpiar_telefono(row.get('num_telefo1')),
                         numero_telefono2=self.limpiar_telefono(row.get('num_telefo2')),
+
                         comuna=comuna,
                         prevision=previsiones.get(self.limpiar_entero(row.get('prevision'))),
+
                         recien_nacido=self.limpiar_bool(row.get('recien_nacido')),
+                        extranjero=self.limpiar_bool(row.get('extranjero')),
+                        fallecido=self.limpiar_bool(row.get('fallecido')),
+
+                        fecha_fallecimiento=self.limpiar_fecha(row.get('fecha_fallecido')),
+
                         usuario_anterior=usuarios_anteriores.get(
                             self.limpiar_rut(row.get('usuario'))
                         ),

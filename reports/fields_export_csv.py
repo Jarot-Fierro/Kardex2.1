@@ -67,8 +67,6 @@ fields_ficha_csv = [
 
     # === RELACIONES ===
     'usuario__username',
-    'profesional__nombres',  # si el modelo Profesional tiene un métdd o propiedad nombre_completo
-    'profesional__rut',  # si no, puedes usar rut / nombre / apellido según tu modelo
     'paciente__rut',
     'paciente__nombre',
     'paciente__apellido_paterno',
