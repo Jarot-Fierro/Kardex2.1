@@ -9,12 +9,9 @@ from personas.models.profesionales import Profesional
 class FormProfesional(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
-        self.request = kwargs.pop('request', None)  # recibir request desde la view
+        # Capturamos request para usar el establecimiento del usuario
+        self.request = kwargs.pop('request', None)
         super().__init__(*args, **kwargs)
-
-        # Si el usuario tiene establecimiento asignado, lo fijamos en el form
-        if self.request and hasattr(self.request.user, 'establecimiento'):
-            self.fields['establecimiento'].initial = self.request.user.establecimiento
 
     rut = forms.CharField(
         label='R.U.T.',
@@ -100,6 +97,7 @@ class FormProfesional(forms.ModelForm):
 
     def clean_nombres(self):
         nombres = self.cleaned_data.get('nombres', '').strip()
+        
         validate_spaces(nombres)
         return nombres
 

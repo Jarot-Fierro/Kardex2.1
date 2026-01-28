@@ -17,11 +17,9 @@
                     <a href="{% url 'export_sector' %}" class="btn btn-success me-2">
                         <i class="bi bi-file-earmark-excel"></i> Reporte
                     </a>
-                    {% if perms.kardex.add_sector %}
-                        <a href="{% url 'sector_create' %}" class="btn btn-primary">
-                            <i class="fas fa-plus"></i> Nuevo Sector
-                        </a>
-                    {% endif %}
+                    <a href="{% url 'sector_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Nuevo Sector
+                    </a>
                 </div>
             </div>
         </div>

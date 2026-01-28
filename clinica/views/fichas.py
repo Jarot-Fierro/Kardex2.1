@@ -4,8 +4,8 @@ from django.http.response import JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import CreateView, UpdateView, DetailView
 from django.views.generic import TemplateView
+from django.views.generic import UpdateView, DetailView
 
 from clinica.forms.ficha import FichaForm, FormFichaTarjeta
 from clinica.models import Ficha
@@ -96,8 +96,11 @@ class FichaDetailView(DetailView):
             return HttpResponse(html)
         return super().render_to_response(context, **response_kwargs)
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
 
-class FichaCreateView(CreateView):
     template_name = 'kardex/ficha/form.html'
     model = Ficha
     form_class = FichaForm
@@ -149,6 +152,11 @@ class FichaCreateView(CreateView):
 
 
 class FichaUpdateView(UpdateView):
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
     template_name = 'ficha/form.html'
     model = Ficha
     form_class = FichaForm

@@ -115,12 +115,22 @@ class ServicioClinicoUpdateView(IncludeUserFormUpdate, UpdateView):
     form_class = FormServicioClinico
     success_url = reverse_lazy('servicio_clinico_list')
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
+
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
+        if not self.request.user.establecimiento:
+            messages.error(self.request, "No tienes establecimiento asignado.")
+            return redirect('no_establecimiento')
+        form.instance.establecimiento = self.request.user.establecimiento
         messages.info(self.request, 'Servicio Clínico actualizado correctamente')
+
         return super().form_valid(form)
 
     def form_invalid(self, form):

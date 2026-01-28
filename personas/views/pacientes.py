@@ -97,7 +97,7 @@ def paciente_view(request, paciente_id=None):
         es_edicion = (accion == 'ACTUALIZAR') or (paciente_instance is not None)
 
         paciente_form = PacienteForm(request.POST, instance=paciente_instance)
-        ficha_form = FichaForm(request.POST, instance=ficha_instance)
+        ficha_form = FichaForm(request.POST, instance=ficha_instance, user=request.user)
 
         if paciente_form.is_valid() and ficha_form.is_valid():
 
@@ -205,7 +205,7 @@ def paciente_view(request, paciente_id=None):
                 ).first()
 
         paciente_form = PacienteForm(instance=paciente_instance)
-        ficha_form = FichaForm(instance=ficha_instance)
+        ficha_form = FichaForm(instance=ficha_instance, user=request.user)
 
     return render(request, 'paciente/form.html', {
         'paciente_form': paciente_form,

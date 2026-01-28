@@ -10,7 +10,7 @@ from clinica.views.pdf import pdf_stickers, pdf_index
 
 urlpatterns = [
     path('fichas/', FichaListView.as_view(), name='ficha_list'),
-    path('fichas/crear/', FichaCreateView.as_view(), name='ficha_create'),
+    # path('fichas/crear/', FichaCreateView.as_view(), name='ficha_create'),
     path('fichas/<int:pk>/editar/', FichaUpdateView.as_view(), name='ficha_update'),
     path('fichas/<int:pk>/detalle/', FichaDetailView.as_view(), name='ficha_detail'),
     path('fichas/<int:pk>/toggle-pasivar/', TogglePasivadoFichaView.as_view(), name='ficha_toggle_pasivar'),

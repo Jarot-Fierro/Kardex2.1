@@ -71,10 +71,16 @@ class FichaForm(forms.ModelForm):
         ]
 
     def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         # Si hay una instancia con paciente, permitimos que ese paciente esté en el queryset
         if self.instance and self.instance.paciente_id:
             self.fields['paciente'].queryset = Paciente.objects.filter(pk=self.instance.paciente_id)
+
+        # Filtrar sectores por establecimiento del usuario
+        est = getattr(self.user, 'establecimiento', None)
+        if est:
+            self.fields['sector'].queryset = Sector.objects.filter(establecimiento=est, status=True)
 
 
 class FormFichaTarjeta(forms.ModelForm):

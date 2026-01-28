@@ -17,11 +17,9 @@
                     <a href="{% url 'export_servicio_clinico' %}" class="btn btn-success me-2">
                         <i class="bi bi-file-earmark-excel"></i> Reporte
                     </a>
-                    {% if perms.kardex.add_servicioclinico %}
-                        <a href="{% url 'servicio_clinico_create' %}" class="btn btn-primary">
-                            <i class="fas fa-plus"></i> Nueva Servicio Clínico
-                        </a>
-                    {% endif %}
+                    <a href="{% url 'servicio_clinico_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Nueva Servicio Clínico
+                    </a>
                 </div>
             </div>
         </div>

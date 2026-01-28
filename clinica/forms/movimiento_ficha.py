@@ -98,6 +98,11 @@ class FormEntradaFicha(forms.ModelForm):
         if self.user is None and self.request is not None:
             self.user = getattr(self.request, 'user', None)
 
+        # Filtrar opciones por establecimiento del usuario
+        est = getattr(self.user, 'establecimiento', None)
+        if est:
+            self.fields['profesional_recepcion'].queryset = Profesional.objects.filter(establecimiento=est, status=True)
+
     def get_initial(self):
         initial = super().get_initial()
         user = getattr(self, 'user', None)
@@ -151,6 +156,15 @@ class FormSalidaFicha(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
+
+        # Filtrar opciones por establecimiento del usuario
+        est = getattr(self.user, 'establecimiento', None)
+        if est:
+            self.fields['servicio_clinico_envio'].queryset = ServicioClinico.objects.filter(establecimiento=est,
+                                                                                            status=True)
+            self.fields['servicio_clinico_recepcion'].queryset = ServicioClinico.objects.filter(establecimiento=est,
+                                                                                                status=True)
+            self.fields['profesional_envio'].queryset = Profesional.objects.filter(establecimiento=est, status=True)
 
         # Si el usuario tiene un servicio asignado, usarlo como inicial para envío
         if self.user and hasattr(self.user, 'servicio_clinico') and self.user.servicio_clinico:
@@ -307,6 +321,13 @@ class FormTraspasoFicha(forms.ModelForm):
         if self.user is None and self.request is not None:
             self.user = getattr(self.request, 'user', None)
 
+        # Filtrar opciones por establecimiento del usuario
+        est = getattr(self.user, 'establecimiento', None)
+        if est:
+            self.fields['servicio_clinico_traspaso'].queryset = ServicioClinico.objects.filter(establecimiento=est,
+                                                                                               status=True)
+            self.fields['profesional_traspaso'].queryset = Profesional.objects.filter(establecimiento=est, status=True)
+
         # Si el usuario tiene un servicio asignado, usarlo como inicial para traspaso
         if self.user and hasattr(self.user, 'servicio_clinico') and self.user.servicio_clinico:
             self.fields['servicio_clinico_traspaso'].initial = self.user.servicio_clinico
@@ -445,6 +466,17 @@ class FormTraspasoFicha(forms.ModelForm):
 
 
 class FiltroSalidaFichaForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        est = getattr(self.user, 'establecimiento', None)
+        if est:
+            if 'servicio_clinico' in self.fields:
+                self.fields['servicio_clinico'].queryset = ServicioClinico.objects.filter(establecimiento=est,
+                                                                                          status=True)
+            if 'profesional' in self.fields:
+                self.fields['profesional'].queryset = Profesional.objects.filter(establecimiento=est, status=True)
+
     hora_inicio = forms.DateTimeField(
         label="Hora inicio",
         widget=forms.DateTimeInput(attrs={
@@ -486,10 +518,10 @@ class MovimientoFichaForm(forms.ModelForm):
         if est is not None:
             for fname in ['servicio_clinico_envio', 'servicio_clinico_recepcion', 'servicio_clinico_traspaso']:
                 if fname in self.fields:
-                    self.fields[fname].queryset = ServicioClinico.objects.filter(establecimiento=est)
+                    self.fields[fname].queryset = ServicioClinico.objects.filter(establecimiento=est, status=True)
             for fname in ['profesional_envio', 'profesional_recepcion', 'profesional_traspaso']:
                 if fname in self.fields:
-                    self.fields[fname].queryset = Profesional.objects.filter(establecimiento=est)
+                    self.fields[fname].queryset = Profesional.objects.filter(establecimiento=est, status=True)
 
         # Ficha: por defecto vacío; si estamos editando, asegurar que la ficha actual esté disponible
         instance = kwargs.get('instance') or getattr(self, 'instance', None)

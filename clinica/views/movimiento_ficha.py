@@ -58,7 +58,7 @@ class SalidaTablaFichaView(LoginRequiredMixin, DataTableMixin, TemplateView):
         context.update({
             'title': 'Registro Masivo de Salida de Fichas',
             'form': FormSalidaFicha(user=self.request.user),
-            'filter_form': FiltroSalidaFichaForm(self.request.GET or None),
+            'filter_form': FiltroSalidaFichaForm(self.request.GET or None, user=self.request.user),
             'datatable_enabled': True,
             'datatable_order': [[0, 'desc']],
             'columns': self.datatable_columns,
@@ -242,7 +242,7 @@ class FichasEnTransito(LoginRequiredMixin, DataTableMixin, TemplateView):
         establecimiento = getattr(self.request.user, 'establecimiento', None)
 
         # Formulario de filtro
-        filter_form = FiltroSalidaFichaForm(self.request.GET or None)
+        filter_form = FiltroSalidaFichaForm(self.request.GET or None, user=self.request.user)
         if establecimiento and 'profesional' in filter_form.fields:
             filter_form.fields['profesional'].queryset = Profesional.objects.filter(establecimiento=establecimiento)
 
@@ -347,7 +347,7 @@ class RecepcionTablaFichaView(LoginRequiredMixin, DataTableMixin, TemplateView):
             context['form'] = FormEntradaFicha(user=self.request.user)
 
         # Formulario de filtro (mismo que en salida)
-        filter_form = FiltroSalidaFichaForm(self.request.GET or None)
+        filter_form = FiltroSalidaFichaForm(self.request.GET or None, user=self.request.user)
         if establecimiento and 'profesional' in filter_form.fields:
             filter_form.fields['profesional'].queryset = Profesional.objects.filter(establecimiento=establecimiento)
 
@@ -508,7 +508,7 @@ class TraspasoTablaFichaView(LoginRequiredMixin, DataTableMixin, TemplateView):
         if 'form' not in context:
             context['form'] = FormTraspasoFicha(user=self.request.user)
 
-        filter_form = FiltroSalidaFichaForm(self.request.GET or None)
+        filter_form = FiltroSalidaFichaForm(self.request.GET or None, user=self.request.user)
         if establecimiento and 'profesional' in filter_form.fields:
             filter_form.fields['profesional'].queryset = Profesional.objects.filter(establecimiento=establecimiento)
 
