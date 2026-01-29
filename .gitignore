@@ -27,7 +27,6 @@ dist/
 build/
 
 # Media / archivos subidos
-media/
 uploads/
 
 # Staticfiles colectivos (se generan)
