@@ -113,7 +113,7 @@ def paciente_view(request, paciente_id=None):
                         'modo': 'error_crear',
                         'accion': accion,
                         'paciente_id': paciente_id_post,
-                        'title': 'Consulta de pacientes'
+                        'title': f'Consulta de pacientes {request.user.establecimiento}'
                     })
             elif accion == 'ACTUALIZAR':
                 if not paciente_instance:
@@ -166,7 +166,7 @@ def paciente_view(request, paciente_id=None):
                     'modo': modo,
                     'accion': accion,
                     'paciente_id': paciente_id_post or (paciente_instance.pk if paciente_instance else None),
-                    'title': 'Consulta de pacientes'
+                    'title': f'Consulta de pacientes {request.user.establecimiento}'
                 })
 
             # ÉXITO
@@ -190,7 +190,7 @@ def paciente_view(request, paciente_id=None):
                 'modo': modo,
                 'accion': accion,
                 'paciente_id': paciente_id_post or (paciente_instance.pk if paciente_instance else None),
-                'title': 'Consulta de pacientes'
+                'title': f'Consulta de pacientes {request.user.establecimiento}'
             })
 
     if request.method == 'GET':
@@ -214,7 +214,7 @@ def paciente_view(request, paciente_id=None):
         'accion': request.POST.get('accion', 'ACTUALIZAR' if (paciente_id or paciente_instance) else 'CREAR'),
         'paciente_id': request.POST.get('paciente_id',
                                         paciente_id or (paciente_instance.pk if paciente_instance else None)),
-        'title': 'Consulta de pacientes'
+        'title': f'Consulta de pacientes {request.user.establecimiento}'
     })
 
 

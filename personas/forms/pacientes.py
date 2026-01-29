@@ -269,7 +269,8 @@ class PacienteForm(forms.ModelForm):
         label='Género',
         empty_label='Selecciona un Género',
         queryset=Genero.objects.filter(status=True),
-        widget=forms.Select(attrs={'class': 'form-control form-control-sm', 'id': 'id_genero', 'name': 'genero'}),
+        widget=forms.Select(
+            attrs={'class': 'form-control form-control-sm select2', 'id': 'id_genero', 'name': 'genero'}),
     )
 
     prevision = forms.ModelChoiceField(
@@ -283,7 +284,8 @@ class PacienteForm(forms.ModelForm):
         label='Comuna',
         empty_label='Selecciona una Comuna',
         queryset=Comuna.objects.filter(status=True),
-        widget=forms.Select(attrs={'class': 'form-control form-control-sm', 'id': 'id_comuna', 'name': 'comuna'}),
+        widget=forms.Select(
+            attrs={'class': 'form-control form-control-sm select2', 'id': 'id_comuna', 'name': 'comuna'}),
     )
 
     class Meta:
