@@ -27,13 +27,13 @@ class SalidaTablaFichaView(LoginRequiredMixin, DataTableMixin, TemplateView):
 
     datatable_columns = [
         'ID', 'RUT', 'Ficha', 'Nombre completo', 'Servicio Clínico Envío',
-        'Servicio Clínico Recibe', 'Usuario Envío', 'Fecha envío', 'Estado envio'
+        'Servicio Clínico Recibe', 'Usuario Envío', 'Fecha envío', 'Fecha recepción', 'Estado envio'
     ]
     datatable_order_fields = [
         'id', None, 'ficha__paciente__rut', 'ficha__numero_ficha_sistema',
         'ficha__paciente__apellido_paterno',
         'servicio_clinico_envio__nombre', 'servicio_clinico_recepcion__nombre',
-        'usuario_envio__username', 'fecha_envio', 'estado_envio'
+        'usuario_envio__username', 'fecha_envio', 'fecha_recepcion', 'estado_envio'
     ]
     datatable_search_fields = [
         'ficha__paciente__rut__icontains',
@@ -68,10 +68,6 @@ class SalidaTablaFichaView(LoginRequiredMixin, DataTableMixin, TemplateView):
         if establecimiento:
             if 'profesional' in context['filter_form'].fields:
                 context['filter_form'].fields['profesional'].queryset = Profesional.objects.filter(
-                    establecimiento=establecimiento)
-            if 'servicio_clinico' in context['filter_form'].fields:
-                from establecimientos.models.servicio_clinico import ServicioClinico
-                context['filter_form'].fields['servicio_clinico'].queryset = ServicioClinico.objects.filter(
                     establecimiento=establecimiento)
 
         return context
@@ -126,6 +122,7 @@ class SalidaTablaFichaView(LoginRequiredMixin, DataTableMixin, TemplateView):
             'Servicio Clínico Recibe': getattr(obj.servicio_clinico_recepcion, 'nombre', ''),
             'Usuario Envío': getattr(obj.usuario_envio, 'username', '') if obj.usuario_envio else '',
             'Fecha envío': obj.fecha_envio.strftime('%Y-%m-%d %H:%M') if obj.fecha_envio else '',
+            'Fecha recepción': obj.fecha_recepcion.strftime('%Y-%m-%d %H:%M') if obj.fecha_recepcion else 'PENDIENTE',
             'Estado envio': obj.estado_envio or '',
         }
 
@@ -316,11 +313,13 @@ class RecepcionTablaFichaView(LoginRequiredMixin, DataTableMixin, TemplateView):
     template_name = 'movimiento_ficha/recepcion_ficha.html'
     model = MovimientoFicha
 
-    datatable_columns = ['ID', 'RUT', 'Ficha', 'Nombre completo', 'Servicio Clínico', 'Profesional', 'Fecha de salida',
+    datatable_columns = ['ID', 'RUT', 'Ficha', 'Nombre completo', 'Servicio Clínico Envío', 'Profesional Envío',
+                         'Fecha envío', 'Fecha recepción',
                          'Estado']
     datatable_order_fields = ['id', None, 'ficha__paciente__rut', 'ficha__numero_ficha_sistema',
                               'ficha__paciente__apellido_paterno',
                               'servicio_clinico_envio__nombre', 'usuario_envio__username', 'fecha_envio',
+                              'fecha_recepcion',
                               'estado_recepcion']
     datatable_search_fields = [
         'ficha__paciente__rut__icontains',
@@ -407,9 +406,10 @@ class RecepcionTablaFichaView(LoginRequiredMixin, DataTableMixin, TemplateView):
             'RUT': getattr(pac, 'rut', '') if pac else '',
             'Ficha': getattr(obj.ficha, 'numero_ficha_sistema', '') if obj.ficha else '',
             'Nombre completo': nombre.strip(),
-            'Servicio Clínico': getattr(obj.servicio_clinico_envio, 'nombre', ''),
-            'Profesional': getattr(obj.usuario_envio, 'username', ''),
-            'Fecha de salida': obj.fecha_envio.strftime('%Y-%m-%d %H:%M') if obj.fecha_envio else '',
+            'Servicio Clínico Envío': getattr(obj.servicio_clinico_envio, 'nombre', ''),
+            'Profesional Envío': getattr(obj.usuario_envio, 'username', ''),
+            'Fecha envío': obj.fecha_envio.strftime('%Y-%m-%d %H:%M') if obj.fecha_envio else '',
+            'Fecha recepción': obj.fecha_recepcion.strftime('%Y-%m-%d %H:%M') if obj.fecha_recepcion else 'PENDIENTE',
             'Estado': obj.estado_recepcion,
         }
 
@@ -477,13 +477,13 @@ class TraspasoTablaFichaView(LoginRequiredMixin, DataTableMixin, TemplateView):
     template_name = 'movimiento_ficha/traspaso_ficha.html'
     model = MovimientoFicha
 
-    datatable_columns = ['ID', 'RUT', 'Ficha', 'Nombre completo', 'Servicio Clínico Envío',
+    datatable_columns = ['ID', 'actions', 'RUT', 'Ficha', 'Nombre completo', 'Servicio Clínico Envío',
                          'Servicio Clínico Recepción',
-                         'Servicio Clínico Traspaso', 'Fecha Traspaso', 'Estado']
+                         'Servicio Clínico Traspaso', 'Fecha Envío', 'Fecha Traspaso', 'Estado']
     datatable_order_fields = ['id', None, 'ficha__paciente__rut', 'ficha__numero_ficha_sistema',
                               'ficha__paciente__apellido_paterno',
                               'servicio_clinico_envio__nombre', 'servicio_clinico_recepcion__nombre',
-                              'servicio_clinico_traspaso__nombre', 'fecha_traspaso', 'estado_traspaso']
+                              'servicio_clinico_traspaso__nombre', 'fecha_envio', 'fecha_traspaso', 'estado_traspaso']
     datatable_search_fields = [
         'ficha__paciente__rut__icontains',
         'ficha__numero_ficha_sistema__icontains',
@@ -595,7 +595,8 @@ class TraspasoTablaFichaView(LoginRequiredMixin, DataTableMixin, TemplateView):
             'Servicio Clínico Envío': getattr(obj.servicio_clinico_envio, 'nombre', ''),
             'Servicio Clínico Recepción': getattr(obj.servicio_clinico_recepcion, 'nombre', ''),
             'Servicio Clínico Traspaso': getattr(obj.servicio_clinico_traspaso, 'nombre', ''),
-            'Fecha Traspaso': obj.fecha_traspaso.strftime('%Y-%m-%d %H:%M') if obj.fecha_traspaso else '',
+            'Fecha Envío': obj.fecha_envio.strftime('%Y-%m-%d %H:%M') if obj.fecha_envio else '',
+            'Fecha Traspaso': obj.fecha_traspaso.strftime('%Y-%m-%d %H:%M') if obj.fecha_traspaso else 'PENDIENTE',
             'Estado': estado_html,
         }
 

@@ -63,7 +63,7 @@ def buscar_paciente_ficha_api(request):
             'ficha_id': ficha.id,
             'rut': ficha.paciente.rut,  # Usar el RUT formateado del paciente
             'numero_ficha_sistema': ficha.numero_ficha_sistema,
-            'nombre_completo': f"{paciente.nombre} {paciente.apellido_paterno} {paciente.apellido_materno}".strip(),
+            'nombre_completo': paciente.nombre_completo,
             'en_transito': en_transito,
         })
 
@@ -124,7 +124,7 @@ def buscar_paciente_recepcion_api(request):
             'movimiento_id': ultimo_movimiento.id if ultimo_movimiento else None,
             'rut': ficha.paciente.rut,
             'numero_ficha_sistema': ficha.numero_ficha_sistema,
-            'nombre_completo': f"{paciente.nombre} {paciente.apellido_paterno} {paciente.apellido_materno}".strip(),
+            'nombre_completo': paciente.nombre_completo,
             'servicio_envio_id': ultimo_movimiento.servicio_clinico_envio_id if ultimo_movimiento else None,
             'servicio_envio_nombre': ultimo_movimiento.servicio_clinico_envio.nombre if ultimo_movimiento and ultimo_movimiento.servicio_clinico_envio else '',
             'servicio_recepcion_id': ultimo_movimiento.servicio_clinico_recepcion_id if ultimo_movimiento else None,
@@ -190,7 +190,7 @@ def buscar_paciente_traspaso_api(request):
             'movimiento_id': ultimo_movimiento.id if ultimo_movimiento else None,
             'rut': ficha.paciente.rut,
             'numero_ficha_sistema': ficha.numero_ficha_sistema,
-            'nombre_completo': f"{paciente.nombre} {paciente.apellido_paterno} {paciente.apellido_materno}".strip(),
+            'nombre_completo': paciente.nombre_completo,
             'servicio_envio_id': ultimo_movimiento.servicio_clinico_envio_id if ultimo_movimiento else None,
             'servicio_envio_nombre': ultimo_movimiento.servicio_clinico_envio.nombre if ultimo_movimiento and ultimo_movimiento.servicio_clinico_envio else '',
             'servicio_recepcion_id': ultimo_movimiento.servicio_clinico_recepcion_id if ultimo_movimiento else None,

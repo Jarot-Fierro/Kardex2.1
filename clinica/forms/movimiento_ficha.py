@@ -471,9 +471,6 @@ class FiltroSalidaFichaForm(forms.Form):
         super().__init__(*args, **kwargs)
         est = getattr(self.user, 'establecimiento', None)
         if est:
-            if 'servicio_clinico' in self.fields:
-                self.fields['servicio_clinico'].queryset = ServicioClinico.objects.filter(establecimiento=est,
-                                                                                          status=True)
             if 'profesional' in self.fields:
                 self.fields['profesional'].queryset = Profesional.objects.filter(establecimiento=est, status=True)
 

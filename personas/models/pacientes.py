@@ -72,8 +72,12 @@ class Paciente(StandardModel):
 
     history = HistoricalRecords()
 
+    @property
+    def nombre_completo(self):
+        return f"{self.nombre} {self.apellido_paterno} {self.apellido_materno}".strip()
+
     def __str__(self):
-        return f"{self.rut} - {self.nombre} {self.apellido_paterno} {self.apellido_materno}"
+        return f"{self.rut} - {self.nombre_completo}"
 
     class Meta:
         verbose_name = 'Paciente'

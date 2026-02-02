@@ -38,17 +38,11 @@ class Ficha(StandardModel):
         numero = f"{num:04d}" if num is not None else "----"
 
         if self.paciente:
-            nombre = self.paciente.nombre or ""
-            ap_paterno = self.paciente.apellido_paterno or ""
-            ap_materno = self.paciente.apellido_materno or ""
-            codigo = self.paciente.codigo or ""
-
-            nombre_completo = f"{nombre} {ap_paterno} {ap_materno}".strip()
-
-            if nombre_completo.strip():
+            nombre_completo = self.paciente.nombre_completo
+            if nombre_completo:
                 return f"Ficha #{numero} - {nombre_completo}"
             else:
-                return f"Ficha #{numero} - Código paciente: {codigo}"
+                return f"Ficha #{numero} - Código paciente: {self.paciente.codigo or '----'}"
         else:
             return f"Ficha #{numero} - Sin paciente"
 

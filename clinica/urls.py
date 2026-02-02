@@ -6,7 +6,7 @@ from clinica.apis.buscar_paciente import (
 from clinica.apis.movimientos_ficha_paciente import get_movimientos_paciente_establecimiento
 from clinica.views.fichas import *
 from clinica.views.movimiento_ficha import *
-from clinica.views.pdf import pdf_stickers, pdf_index
+from clinica.views.pdf import pdf_stickers, pdf_index, pdf_movimientos_fichas
 
 urlpatterns = [
     path('fichas/', FichaListView.as_view(), name='ficha_list'),
@@ -41,4 +41,5 @@ urlpatterns = [
 
     path("pdfs/ficha/<int:ficha_id>/", pdf_index, name="pdf_ficha"),
     path("pdfs/ficha/paciente/<int:paciente_id>/", pdf_index, name="pdf_ficha_paciente"),
+    path("pdfs/movimientos/", pdf_movimientos_fichas, name="pdf_movimientos_fichas"),
 ]

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ titulo_movimiento }}</title>
+
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 12px;
+            color: #000;
+            margin: 20mm; /* Márgenes para A4 */
+        }
+
+        @page {
+            size: A4;
+            margin: 20mm;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 16px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 12px;
+            font-weight: normal;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border: 1px solid #000;
+            padding: 6px;
+            vertical-align: middle;
+        }
+
+        th {
+            font-weight: bold;
+            text-align: left;
+        }
+
+        .encabezado-general {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        .fila-profesional {
+            background-color: #fafafa;
+            font-style: italic;
+        }
+
+        /* Botón */
+        .acciones {
+            text-align: right;
+            margin-bottom: 15px;
+        }
+
+        .btn-imprimir {
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            border: 1px solid #000;
+            background-color: #fff;
+            font-weight: bold;
+        }
+
+        /* OCULTAR SOLO AL IMPRIMIR */
+        @media print {
+            .acciones {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Botón de acción -->
+<div class="acciones">
+    <button class="btn-imprimir" onclick="window.print()">
+        Imprimir / Guardar
+    </button>
+</div>
+
+<h1>{{ titulo_movimiento }}</h1>
+<h2>{{ subtitulo_filtros }}</h2>
+
+{% for servicio in servicios %}
+    <table>
+        <thead>
+        <!-- Servicio Clínico -->
+        <tr>
+            <th colspan="5" class="encabezado-general">
+                Servicio Clínico: {{ servicio.nombre }}
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for profesional in servicio.profesionales %}
+            <!-- Profesional -->
+            <tr class="fila-profesional">
+                <td colspan="5">
+                    <strong>Profesional:</strong> {{ profesional.nombre }}
+                </td>
+            </tr>
+
+            <!-- Encabezados de tabla para este profesional -->
+            <tr>
+                <th style="width: 12%;">Ficha</th>
+                <th style="width: 18%;">RUT</th>
+                <th style="width: 30%;">Paciente</th>
+                <th style="width: 15%;">Fecha y Hora</th>
+                <th style="width: 25%;">{{ etiqueta_usuario }}</th>
+            </tr>
+
+            {% for mov in profesional.movimientos %}
+                <tr>
+                    <td>{{ mov.numero_ficha }}</td>
+                    <td>{{ mov.rut_paciente }}</td>
+                    <td>{{ mov.nombre_paciente }}</td>
+                    <td>{{ mov.hora_movimiento|date:"d/m/Y H:i" }}</td>
+                    <td>{{ mov.usuario_responsable }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align: center;">No hay movimientos registrados</td>
+                </tr>
+            {% endfor %}
+        {% endfor %}
+        </tbody>
+    </table>
+{% empty %}
+    <p style="text-align: center;">No se encontraron registros que coincidan con los criterios aplicados.</p>
+{% endfor %}
+
+</body>
+</html>
