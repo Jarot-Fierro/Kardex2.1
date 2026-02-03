@@ -72,6 +72,11 @@ class FormProfesional(forms.ModelForm):
         }),
         required=False
     )
+    status = forms.BooleanField(
+        label='¿Profesional activo?',
+        required=False,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input mx-5'})
+    )
 
     def clean_rut(self):
         rut = self.cleaned_data.get('rut')
@@ -97,7 +102,7 @@ class FormProfesional(forms.ModelForm):
 
     def clean_nombres(self):
         nombres = self.cleaned_data.get('nombres', '').strip()
-        
+
         validate_spaces(nombres)
         return nombres
 
@@ -136,4 +141,5 @@ class FormProfesional(forms.ModelForm):
             'telefono',
             'anexo',
             'profesion',
+            'status'
         ]

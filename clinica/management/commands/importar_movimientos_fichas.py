@@ -142,6 +142,50 @@ class Command(BaseCommand):
             self.style.SUCCESS(f'✅ Servicios clínicos cargados por código: {len(servicios_por_codigo):,}'))
         self.stdout.write(self.style.SUCCESS(f'📝 Códigos disponibles: {list(servicios_por_codigo.keys())[:10]}...'))
 
+        # Cargar servicios clínicos "ARCHIVO" por establecimiento
+        # Mapeo de establecimiento_id -> servicio_clinico "ARCHIVO"
+        servicios_archivo_por_establecimiento = {}
+        servicios_archivo = ServicioClinico.objects.filter(nombre='ARCHIVO')
+
+        for servicio_archivo in servicios_archivo:
+            # Obtener el establecimiento relacionado con este servicio ARCHIVO
+            # Asumiendo que hay una relación directa o indirecta
+            if hasattr(servicio_archivo, 'establecimiento') and servicio_archivo.establecimiento:
+                servicios_archivo_por_establecimiento[servicio_archivo.establecimiento.id] = servicio_archivo
+            # También buscar por nombre del establecimiento en el nombre del servicio
+            elif servicio_archivo.descripcion:
+                # Buscar establecimientos en la descripción
+                for establecimiento_id, establecimiento in establecimientos_dict.items():
+                    if establecimiento.nombre and establecimiento.nombre in servicio_archivo.descripcion:
+                        servicios_archivo_por_establecimiento[establecimiento_id] = servicio_archivo
+                        break
+
+        self.stdout.write(
+            self.style.SUCCESS(f'✅ Servicios ARCHIVO cargados: {len(servicios_archivo_por_establecimiento):,}'))
+
+        # Si no encontramos por la lógica anterior, usar el mapeo manual basado en tu información
+        if len(servicios_archivo_por_establecimiento) == 0:
+            # Mapeo manual de establecimiento_id -> servicio_clinico_id para ARCHIVO
+            mapeo_manual_archivo = {
+                233: 381,  # HOSPITAL DE ARAUCO -> ARCHIVO id 381
+                4: 380,  # HOSPITAL DE CONTULMO -> ARCHIVO id 380
+                # Agrega otros establecimientos según corresponda
+            }
+
+            # Buscar los servicios ARCHIVO por ID
+            for establecimiento_id, servicio_id in mapeo_manual_archivo.items():
+                try:
+                    servicio = ServicioClinico.objects.get(id=servicio_id, nombre='ARCHIVO')
+                    servicios_archivo_por_establecimiento[establecimiento_id] = servicio
+                except ServicioClinico.DoesNotExist:
+                    self.stdout.write(self.style.WARNING(
+                        f'⚠️ Servicio ARCHIVO con ID {servicio_id} no encontrado para establecimiento {establecimiento_id}'))
+
+        if servicios_archivo_por_establecimiento:
+            self.stdout.write(self.style.SUCCESS('📋 Servicios ARCHIVO por establecimiento:'))
+            for est_id, servicio in servicios_archivo_por_establecimiento.items():
+                self.stdout.write(self.style.SUCCESS(f'  Establecimiento {est_id}: Servicio ARCHIVO ID {servicio.id}'))
+
         # Cargar usuarios anteriores
         usuarios_ant_dict = {normalize_rut(u.rut): u for u in UsuarioAnterior.objects.all()}
         self.stdout.write(self.style.SUCCESS(f'✅ Usuarios anteriores cargados: {len(usuarios_ant_dict):,}'))
@@ -191,15 +235,30 @@ class Command(BaseCommand):
                         pbar.update(1)
                         continue
 
+                    # Convertir a enteros
+                    try:
+                        ficha_num_int = int(ficha_num)
+                        est_id_int = int(est_id)
+                    except (ValueError, TypeError):
+                        total_omitidos += 1
+                        errores.append({
+                            'fila_csv': idx + 2,
+                            'motivo': 'DATOS_NUMERICOS_INVALIDOS',
+                            'ficha': ficha_num,
+                            'establecimiento': est_id
+                        })
+                        pbar.update(1)
+                        continue
+
                     # Buscar ficha
-                    ficha = fichas_dict.get((int(ficha_num), int(est_id)))
+                    ficha = fichas_dict.get((ficha_num_int, est_id_int))
                     if not ficha:
                         total_omitidos += 1
                         errores.append({
                             'fila_csv': idx + 2,
                             'motivo': 'FICHA_NO_EXISTE',
-                            'ficha': ficha_num,
-                            'establecimiento': est_id
+                            'ficha': ficha_num_int,
+                            'establecimiento': est_id_int
                         })
                         pbar.update(1)
                         continue
@@ -239,11 +298,11 @@ class Command(BaseCommand):
                     # ================= OBTENER DATOS DE REFERENCIA =================
 
                     # Establecimiento
-                    establecimiento = establecimientos_dict.get(int(est_id))
+                    establecimiento = establecimientos_dict.get(est_id_int)
 
-                    # Servicio clínico - BUSCAR POR CÓDIGO
+                    # Servicio clínico del CSV (envío/recepción)
                     servicio_codigo = row.get('servicio_clinico')
-                    servicio = None
+                    servicio_csv = None
                     if not pd.isna(servicio_codigo):
                         try:
                             # Convertir a entero (manejar "2.0" como 2)
@@ -252,17 +311,29 @@ class Command(BaseCommand):
                             else:
                                 codigo_int = int(float(servicio_codigo))
 
-                            servicio = servicios_por_codigo.get(codigo_int)
-                            if not servicio:
+                            servicio_csv = servicios_por_codigo.get(codigo_int)
+                            if not servicio_csv:
                                 total_servicios_no_encontrados += 1
                                 self.stdout.write(self.style.WARNING(
                                     f'⚠️ Servicio con código {codigo_int} no encontrado (fila {idx + 2})'
                                 ))
                         except (ValueError, TypeError, AttributeError) as e:
-                            servicio = None
+                            servicio_csv = None
                             self.stdout.write(self.style.WARNING(
                                 f'⚠️ Error al procesar código de servicio: {servicio_codigo} (fila {idx + 2}): {str(e)}'
                             ))
+
+                    # Servicio clínico ARCHIVO según establecimiento
+                    servicio_archivo = servicios_archivo_por_establecimiento.get(est_id_int)
+                    if not servicio_archivo:
+                        self.stdout.write(self.style.WARNING(
+                            f'⚠️ No se encontró servicio ARCHIVO para establecimiento {est_id_int} (fila {idx + 2})'
+                        ))
+                        # Intentar encontrar cualquier servicio ARCHIVO como fallback
+                        servicios_archivo_fallback = ServicioClinico.objects.filter(nombre='ARCHIVO').first()
+                        if servicios_archivo_fallback:
+                            servicio_archivo = servicios_archivo_fallback
+                            servicios_archivo_por_establecimiento[est_id_int] = servicio_archivo
 
                     # Usuarios anteriores
                     usuario_entrega_ant = usuarios_ant_dict.get(normalize_rut(row.get('usuario_entrega', '')))
@@ -273,9 +344,9 @@ class Command(BaseCommand):
 
                     # ================= CONFIGURAR CAMPOS SEGÚN ESTADO =================
 
-                    # LÓGICA CORREGIDA:
-                    # - Si es E: solo datos de ENVÍO
-                    # - Si es R: datos de ENVÍO + RECEPCIÓN (copiando los mismos datos)
+                    # LÓGICA MODIFICADA:
+                    # - Servicio ARCHIVO siempre se asigna al establecimiento
+                    # - Servicio del CSV se usa para envío/recepción si está disponible
 
                     # Fecha de recepción (solo si está recibido)
                     fecha_recepcion = None
@@ -287,13 +358,19 @@ class Command(BaseCommand):
 
                     # Campos para ENVÍO (siempre se llenan si está enviado o recibido)
                     estado_envio_final = 'ENVIADO' if (es_enviado or es_recibido) else ''
-                    servicio_envio_final = servicio if (es_enviado or es_recibido) else None
+
+                    # Servicio para envío: primero intentar servicio del CSV, luego ARCHIVO
+                    servicio_envio_final = servicio_csv if servicio_csv else servicio_archivo
+
                     profesional_envio_final = profesional if (es_enviado or es_recibido) else None
                     usuario_envio_ant_final = usuario_entrega_ant if (es_enviado or es_recibido) else None
 
                     # Campos para RECEPCIÓN (solo si está recibido)
                     estado_recepcion_final = 'RECIBIDO' if es_recibido else 'EN ESPERA'
-                    servicio_recepcion_final = servicio if es_recibido else None
+
+                    # Servicio para recepción: mismo que para envío
+                    servicio_recepcion_final = servicio_csv if servicio_csv else servicio_archivo
+
                     profesional_recepcion_final = profesional if es_recibido else None
                     usuario_recepcion_ant_final = usuario_entrada_ant if es_recibido else None
 
