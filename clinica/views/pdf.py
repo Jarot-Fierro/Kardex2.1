@@ -100,7 +100,7 @@ def pdf_stickers(request, ficha_id=None, paciente_id=None):
     if not numero_rut:
         numero_rut = (
                 getattr(paciente, 'codigo', '') or str(getattr(ficha, 'numero_ficha_sistema', '') or '')).strip()
-    codigo_barras_base64 = generar_barcode_base64(numero_rut)
+    codigo_barras_base64 = generar_barcode_sticker_base64(numero_rut)
 
     context = {
         'paciente': paciente,
@@ -143,6 +143,30 @@ def generar_barcode_base64(codigo_paciente: str) -> str:
         "module_height": 10.0,
         "font_size": 10,
         "quiet_zone": 1,
+        "write_text": False,
+    })
+
+    base64_data = base64.b64encode(buffer.getvalue()).decode('utf-8')
+    return f"data:{mime_type};base64,{base64_data}"
+
+
+def generar_barcode_sticker_base64(codigo_paciente: str) -> str:
+    buffer = BytesIO()
+    try:
+        from barcode.writer import ImageWriter
+        writer = ImageWriter()
+        mime_type = "image/png"
+    except (ImportError, TypeError):
+        from barcode.writer import SVGWriter
+        writer = SVGWriter()
+        mime_type = "image/svg+xml"
+
+    codigo = barcode.get('code128', codigo_paciente, writer=writer)
+    codigo.write(buffer, options={
+        "module_width": 0.12,  # 🔹 barras más delgadas
+        "module_height": 1.5,  # 🔹 más bajo para ocupar menos espacio
+        "font_size": 0,  # 🔹 sin texto
+        "quiet_zone": 0.1,  # 🔹 margen mínimo lateral del código
         "write_text": False,
     })
 
