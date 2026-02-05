@@ -1899,6 +1899,87 @@
         });
     </script>
 
+    {# Script para generar RUT ficticio automático para recién nacidos en creación #}
+    <script>
+        $(document).ready(function () {
+            const $checkRecienNacido = $('#id_recien_nacido');
+            const $inputRut = $('#id_rut');
+            const $inputPacienteId = $('#id_paciente_id');
+
+            // Función para generar dígito verificador
+            function calcularDigitoVerificador(rutSinDV) {
+                let suma = 0;
+                let multiplicador = 2;
+
+                for (let i = rutSinDV.length - 1; i >= 0; i--) {
+                    suma += parseInt(rutSinDV.charAt(i)) * multiplicador;
+                    multiplicador = multiplicador === 7 ? 2 : multiplicador + 1;
+                }
+
+                const resto = suma % 11;
+                const dv = 11 - resto;
+
+                if (dv === 11) return '0';
+                if (dv === 10) return 'K';
+                return dv.toString();
+            }
+
+            // Función para generar RUT ficticio (comienza con 91 millones)
+            function generarRutFicticio() {
+                // Generar número aleatorio entre 91,000,000 y 99,999,999
+                const numeroBase = Math.floor(91000000 + Math.random() * (99999999 - 91000000 + 1));
+                const dv = calcularDigitoVerificador(numeroBase.toString());
+                return formatearRutString(numeroBase.toString() + dv);
+            }
+
+            // Función para formatear RUT (usando la función existente o creando una nueva)
+            function formatearRutString(rut) {
+                // Si ya existe la función global, usarla
+                if (typeof window.formatearRutString === 'function') {
+                    return window.formatearRutString(rut);
+                }
+
+                // Si no existe, crear formato básico
+                rut = rut.replace(/\./g, '').replace(/-/g, '').toUpperCase();
+                if (rut.length <= 1) return rut;
+
+                const cuerpo = rut.slice(0, -1);
+                const dv = rut.slice(-1);
+                return cuerpo.replace(/\B(?=(\d{3})+(?!\d))/g, '.') + '-' + dv;
+            }
+
+            // Evento cuando cambia el checkbox
+            $checkRecienNacido.on('change', function () {
+                // Solo si estamos en modo creación (sin paciente_id) y el checkbox está marcado
+                if ($checkRecienNacido.is(':checked') && !$inputPacienteId.val()) {
+                    // Solo generar RUT si el campo está vacío
+                    if (!$inputRut.val().trim()) {
+                        const rutFicticio = generarRutFicticio();
+                        $inputRut.val(rutFicticio);
+
+                        // Actualizar reglas del formulario si existe la función
+                        if (typeof window.actualizarReglasPaciente === 'function') {
+                            window.actualizarReglasPaciente();
+                        }
+                    }
+                }
+            });
+
+            // También ejecutar al cargar la página si ya está marcado el checkbox
+            // y estamos en modo creación
+            $(window).on('load', function () {
+                if ($checkRecienNacido.is(':checked') && !$inputPacienteId.val() && !$inputRut.val().trim()) {
+                    const rutFicticio = generarRutFicticio();
+                    $inputRut.val(rutFicticio);
+
+                    if (typeof window.actualizarReglasPaciente === 'function') {
+                        window.actualizarReglasPaciente();
+                    }
+                }
+            });
+        });
+    </script>
+
 
 
 {% endblock %}
