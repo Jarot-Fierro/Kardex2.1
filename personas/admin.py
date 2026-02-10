@@ -1,7 +1,7 @@
 from django.contrib import admin
 from import_export import resources, fields
 from import_export.admin import ImportExportModelAdmin
-from import_export.widgets import ForeignKeyWidget
+from import_export.widgets import ForeignKeyWidget, DateTimeWidget
 from simple_history.admin import SimpleHistoryAdmin
 
 from establecimientos.models.establecimiento import Establecimiento
@@ -19,8 +19,8 @@ class PrevisionResource(resources.ModelResource):
         import_id_fields = ['id']
         fields = ('id', 'nombre', 'codigo',)
         export_order = ('id', 'nombre', 'codigo',)
-        skip_unchanged = True
-        report_skipped = True
+        skip_unchanged = False
+        report_skipped = False
 
 
 @admin.register(Prevision)
@@ -121,7 +121,6 @@ class UsuarioAnteriorAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
 
 
 import re
-import datetime
 
 from django.contrib import admin
 from import_export import resources, fields
@@ -224,17 +223,23 @@ class CachedFKWidget(Widget):
             # Para usuario_anterior buscamos por RUT
             return self.cache.get(valor_str)
 
+    def before_import_row(self, row, **kwargs):
+
+        # Convertir fechas inválidas tipo 01-01-1900 0:00 a vacío
+        for campo in ['fecha_nacimiento', 'fecha_fallecimiento']:
+            valor = row.get(campo)
+            if valor and '1900' in str(valor):
+                row[campo] = None
+
 
 # ==============================
 # RESOURCE PACIENTE
 # ==============================
 class PacienteResource(resources.ModelResource):
-    # Campos que necesitan widgets personalizados
     comuna = fields.Field(column_name='comuna', attribute='comuna')
     prevision = fields.Field(column_name='prevision', attribute='prevision')
     usuario_anterior = fields.Field(column_name='usuario_anterior', attribute='usuario_anterior')
 
-    # Campos booleanos que necesitan limpieza especial
     recien_nacido = fields.Field(column_name='recien_nacido', attribute='recien_nacido')
     extranjero = fields.Field(column_name='extranjero', attribute='extranjero')
     fallecido = fields.Field(column_name='fallecido', attribute='fallecido')
@@ -242,10 +247,10 @@ class PacienteResource(resources.ModelResource):
     class Meta:
         model = Paciente
         import_id_fields = ('rut',)
-        skip_unchanged = True
-        report_skipped = True  # Cambiado a True para debug
+        skip_unchanged = False
+        report_skipped = False
         use_bulk = True
-        batch_size = 1000
+        batch_size = 20000
 
         fields = (
             'rut',
@@ -279,32 +284,32 @@ class PacienteResource(resources.ModelResource):
 
         export_order = fields
 
+    # ✅ NUEVO: limpiar headers para evitar error de rut
+    def before_import(self, dataset, **kwargs):
+        dataset.headers = [h.strip().lower() for h in dataset.headers]
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Precargar datos en caché
         self._comunas = {str(c.codigo): c for c in Comuna.objects.all()}
         self._previsiones = {str(p.codigo): p for p in Prevision.objects.all()}
         self._usuarios_anteriores = {str(u.rut).strip(): u for u in UsuarioAnterior.objects.all()}
 
-        # Asignar widgets con caché
         self.fields['comuna'].widget = CachedFKWidget(self._comunas, 'codigo')
         self.fields['prevision'].widget = CachedFKWidget(self._previsiones, 'codigo')
         self.fields['usuario_anterior'].widget = CachedFKWidget(self._usuarios_anteriores, 'rut')
+        self.fields['fecha_nacimiento'].widget = DateTimeWidget(format='%d-%m-%Y %H:%M')
+        self.fields['fecha_fallecimiento'].widget = DateTimeWidget(format='%d-%m-%Y %H:%M')
 
     def before_import_row(self, row, **kwargs):
-        """Limpieza previa de cada fila"""
 
-        # Limpiar RUT
         rut_raw = row.get('rut', '').strip()
         row['rut'] = limpiar_rut(rut_raw)
 
-        # Omitir recién nacidos
         if es_rut_recien_nacido(row['rut']):
             print(f"⚠️  Omitiendo RUT de recién nacido: {row['rut']}")
-            return False  # Esto hace que django-import-export omita la fila
+            return False
 
-        # Limpiar campos de texto
         for campo in [
             'nombre', 'apellido_paterno', 'apellido_materno', 'nombre_social',
             'direccion', 'ocupacion', 'alergico_a', 'nombres_padre',
@@ -313,75 +318,30 @@ class PacienteResource(resources.ModelResource):
         ]:
             row[campo] = limpiar_texto(row.get(campo, ''))
 
-        # Limpiar teléfonos
         row['numero_telefono1'] = limpiar_telefono(row.get('numero_telefono1'))
         row['numero_telefono2'] = limpiar_telefono(row.get('numero_telefono2'))
 
-        # Normalizar sexo
         sexo_raw = str(row.get('sexo', '')).strip().upper()
         row['sexo'] = MAP_SEXO.get(sexo_raw, 'FEMENINO' if sexo_raw == 'F' else 'MASCULINO')
 
-        # Normalizar estado civil
         estado_raw = str(row.get('estado_civil', '')).strip().upper()
         row['estado_civil'] = MAP_ESTADO_CIVIL.get(estado_raw, 'NO INFORMADO')
 
-        # Parsear fechas
-        row['fecha_nacimiento'] = self._parse_fecha(row.get('fecha_nacimiento'))
-        row['fecha_fallecimiento'] = self._parse_fecha(row.get('fecha_fallecimiento'))
+        row['fecha_nacimiento'] = row.get('fecha_nacimiento')
+        row['fecha_fallecimiento'] = row.get('fecha_fallecimiento')
 
-        # Manejar valores booleanos
         row['recien_nacido'] = self._parse_booleano(row.get('recien_nacido'))
         row['extranjero'] = self._parse_booleano(row.get('extranjero'))
         row['fallecido'] = self._parse_booleano(row.get('fallecido'))
 
-        # Limpiar ID anterior
         row['id_anterior'] = limpiar_entero(row.get('id_anterior'))
 
-        # Manejar valores vacíos en campos FK
-        row['comuna'] = self._parse_comuna(row.get('comuna'))
-        row['prevision'] = self._parse_prevision(row.get('prevision'))
-        row['usuario_anterior'] = self._parse_usuario_anterior(row.get('usuario_anterior'))
+        # ❌ ELIMINADO: no asignar FK manualmente
+        # Dejamos que CachedFKWidget haga el trabajo
 
         return True
 
-    def _parse_fecha(self, valor):
-        """Parsear diferentes formatos de fecha"""
-        if not valor:
-            return None
-
-        # Si ya es datetime.date
-        if isinstance(valor, datetime.date):
-            return valor
-
-        # Si es datetime.datetime
-        if isinstance(valor, datetime.datetime):
-            return valor.date()
-
-        valor_str = str(valor).strip()
-
-        # Manejar fechas inválidas como 01-01-1900
-        if valor_str in ['01-01-1900', '1900-01-01', '01/01/1900']:
-            return None
-
-        # Intentar diferentes formatos
-        formatos = [
-            "%Y-%m-%d",  # 2023-12-31
-            "%d-%m-%Y",  # 31-12-2023
-            "%d/%m/%Y",  # 31/12/2023
-            "%Y/%m/%d",  # 2023/12/31
-        ]
-
-        for fmt in formatos:
-            try:
-                return datetime.datetime.strptime(valor_str, fmt).date()
-            except ValueError:
-                continue
-
-        # Si no se pudo parsear, devolver None
-        return None
-
     def _parse_booleano(self, valor):
-        """Convertir diferentes representaciones a booleano"""
         if not valor:
             return False
 
@@ -392,70 +352,11 @@ class PacienteResource(resources.ModelResource):
         elif valor_str in ['0', 'false', 'f', 'no', 'n', 'falso']:
             return False
 
-        # Intentar convertir a int/float
         try:
             num_val = float(valor_str)
             return num_val != 0
         except (ValueError, TypeError):
             return False
-
-    def _parse_comuna(self, valor):
-        """Parsear código de comuna"""
-        if not valor:
-            return self._comunas.get('1')  # Valor por defecto
-
-        valor_str = str(valor).strip()
-
-        # Buscar por código exacto
-        comuna = self._comunas.get(valor_str)
-
-        if not comuna:
-            print(f"⚠️  Comuna no encontrada: {valor_str}. Usando valor por defecto.")
-            return self._comunas.get('1')
-
-        return comuna
-
-    def _parse_prevision(self, valor):
-        """Parsear código de previsión"""
-        if not valor:
-            return None
-
-        valor_str = str(valor).strip()
-
-        # Buscar por código exacto
-        prevision = self._previsiones.get(valor_str)
-
-        if not prevision:
-            print(f"⚠️  Previsión no encontrada: {valor_str}")
-            return None
-
-        return prevision
-
-    def _parse_usuario_anterior(self, valor):
-        """Parsear RUT de usuario anterior"""
-        if not valor:
-            return None
-
-        valor_str = limpiar_rut(valor)
-
-        # Buscar por RUT
-        usuario = self._usuarios_anteriores.get(valor_str)
-
-        if not usuario:
-            print(f"⚠️  Usuario anterior no encontrado: {valor_str}")
-            return None
-
-        return usuario
-
-    def skip_row(self, instance, original, row, import_validation_errors=None):
-        """
-        Lógica para saltar filas duplicadas
-        """
-        if Paciente.objects.filter(rut=instance.rut).exists():
-            print(f"⚠️  Paciente ya existe: {instance.rut}")
-            return True
-
-        return False
 
 
 # ==============================
