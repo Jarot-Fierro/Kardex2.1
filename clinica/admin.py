@@ -73,6 +73,7 @@ class FichaAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
         ("Auditoría", {
             "fields": (
                 "usuario",
+                "usuario_anterior",
                 "fecha_mov",
                 "fecha_creacion_anterior",
             )

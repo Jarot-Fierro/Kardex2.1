@@ -335,6 +335,7 @@ class Command(BaseCommand):
 
         creados = 0
         omitidos = 0
+        duplicados_insertados = 0
         duplicados = 0
         rn_creados = 0
         comuna_default_count = 0
@@ -368,10 +369,10 @@ class Command(BaseCommand):
                     # Verificar si ya existe en BD
                     if rut in ruts_existentes:
                         self.stdout.write(
-                            self.style.WARNING(f'Paciente con RUT {rut} ya existe en la base de datos. Omitiendo.'))
-                        omitidos += 1
-                        pbar.update(1)
-                        continue
+                            self.style.WARNING(
+                                f'Paciente con RUT {rut} ya existe en la base de datos. Se ingresará como duplicado.'))
+                        duplicados_insertados += 1
+                        # No omitimos, permitimos que siga y se cree
 
                     # BUSCAR COMUNA POR CÓDIGO
                     codigo_comuna = None
@@ -535,6 +536,7 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(f'Registros en Excel: {total_leidas:,}'))
         self.stdout.write(self.style.WARNING(f'RUTs duplicados en Excel: {duplicados_excel:,}'))
         self.stdout.write(self.style.SUCCESS(f'Procesados exitosamente: {creados:,}'))
+        self.stdout.write(self.style.WARNING(f'Duplicados insertados: {duplicados_insertados:,}'))
         self.stdout.write(self.style.WARNING(f'Omitidos (ya en BD): {omitidos:,}'))
         self.stdout.write(self.style.WARNING(f'Sin RUT: {sin_rut:,}'))
         self.stdout.write(self.style.WARNING(f'Errores de validación: {errores_validacion:,}'))

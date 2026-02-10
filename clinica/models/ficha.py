@@ -16,6 +16,12 @@ class Ficha(StandardModel):
     usuario = models.ForeignKey('users.User', on_delete=models.PROTECT, null=True, blank=True,
                                 verbose_name='Usuario', related_name='fichas_usuarios')
 
+    usuario_anterior = models.ForeignKey('personas.UsuarioAnterior', on_delete=models.PROTECT, null=True, blank=True,
+                                         verbose_name='Usuario Anterior', related_name='fichas_usuarios_anteriores')
+
+    rut_anterior = models.CharField(max_length=50, null=True, blank=True,
+                                    verbose_name='RUT Anterior del Usuario')
+
     fecha_creacion_anterior = models.DateTimeField(null=True, blank=True)
 
     paciente = models.ForeignKey('personas.Paciente', on_delete=models.PROTECT, null=True, blank=True,
@@ -68,9 +74,3 @@ class Ficha(StandardModel):
     class Meta:
         verbose_name = 'Ficha'
         verbose_name_plural = 'Fichas'
-        constraints = [
-            models.UniqueConstraint(
-                fields=['numero_ficha_sistema', 'establecimiento'],
-                name='unique_ficha_por_establecimiento'
-            )
-        ]

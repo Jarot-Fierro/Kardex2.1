@@ -54,8 +54,7 @@ LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/login/'
 
-SIMPLE_HISTORY_HISTORY_ID_USE_UUID = False
-SIMPLE_HISTORY_REVERT_DISABLED = False
+SIMPLE_HISTORY_HISTORY_ID_USE_UUID = True
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -92,7 +91,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
-SIMPLE_HISTORY_ENABLED = False
+SIMPLE_HISTORY_ENABLED = True
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
