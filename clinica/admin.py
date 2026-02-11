@@ -209,3 +209,52 @@ class MovimientoFichaAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+
+from django.contrib import admin
+from .models import MovimientoMonologoControlado
+
+
+@admin.register(MovimientoMonologoControlado)
+class MovimientoMonologoControladoAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'establecimiento',
+        'rut_paciente',
+        'numero_ficha',
+        'servicio_clinico_destino',
+        'estado',
+        'fecha_salida',
+        'fecha_entrada',
+    )
+
+    list_filter = (
+        'estado',
+        'establecimiento',
+    )
+
+    search_fields = (
+        'rut_paciente__rut',
+        'numero_ficha',
+    )
+
+    raw_id_fields = (
+        'rut_paciente',
+        'ficha',
+        'profesional',
+        'establecimiento',
+        'servicio_clinico_destino',
+    )
+
+    list_select_related = (
+        'establecimiento',
+        'rut_paciente',
+        'ficha',
+        'servicio_clinico_destino',
+        'profesional',
+    )
+
+    ordering = ('-fecha_salida',)
+
+    def has_delete_permission(self, request, obj=None):
+        return False

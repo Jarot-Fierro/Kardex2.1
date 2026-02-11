@@ -3,9 +3,11 @@ from django.urls import path
 from clinica.apis.buscar_paciente import (
     buscar_paciente_ficha_api, buscar_paciente_recepcion_api, buscar_paciente_traspaso_api
 )
+from clinica.apis.movimiento_ficha_monologo_controlado import RegistrarSalidaAPI, RegistrarRecepcionAPI
 from clinica.apis.movimientos_ficha_paciente import get_movimientos_paciente_establecimiento
 from clinica.views.fichas import *
 from clinica.views.movimiento_ficha import *
+from clinica.views.movimiento_ficha_monologo_controlado import SalidaFichaView, RecepcionFichaView, FichasEnTransitoView
 from clinica.views.pdf import pdf_stickers, pdf_index, pdf_movimientos_fichas
 
 urlpatterns = [
@@ -27,6 +29,15 @@ urlpatterns = [
     # Movimientos de Fichas del Paciente
     path('api/movimientos/paciente/<str:rut>/', get_movimientos_paciente_establecimiento,
          name='api_movimientos_paciente_establecimiento'),
+
+    # Movimiento Monologo Controlado
+    path('movimientos-monologo/salida/', SalidaFichaView.as_view(), name='movimiento_monologo_salida'),
+    path('movimientos-monologo/recepcion/', RecepcionFichaView.as_view(), name='movimiento_monologo_recepcion'),
+    path('fichas-en-transito/', FichasEnTransitoView.as_view(), name='fichas_en_transito_monologo'),
+    path('api/movimientos-fichas-monologo/salida/', RegistrarSalidaAPI.as_view(),
+         name='api_movimiento_monologo_salida'),
+    path('api/movimientos-fichas-monologo/recepcion/', RegistrarRecepcionAPI.as_view(),
+         name='api_movimiento_monologo_recepcion'),
 
     path('api/ficha-paciente/buscar/', buscar_paciente_ficha_api, name='ficha-paciente-buscar'),
     path('api/ficha-paciente/buscar-recepcion/', buscar_paciente_recepcion_api, name='ficha-paciente-buscar-recepcion'),

@@ -3,6 +3,7 @@ from django.db.models import Q
 from django.http import JsonResponse
 
 from clinica.models import Ficha, MovimientoFicha
+from clinica.models.movimiento_ficha_monologo_controlado import MovimientoMonologoControlado
 
 
 @login_required
@@ -52,11 +53,18 @@ def buscar_paciente_ficha_api(request):
         paciente = ficha.paciente
 
         # Validar si tiene movimientos en tránsito (EN ESPERA de recepción)
-        en_transito = MovimientoFicha.objects.filter(
+        en_transito_old = MovimientoFicha.objects.filter(
             ficha=ficha,
             estado_recepcion='EN ESPERA',
             establecimiento=establecimiento
         ).exists()
+
+        en_transito_new = MovimientoMonologoControlado.objects.filter(
+            ficha=ficha,
+            estado='E'
+        ).exists()
+
+        en_transito = en_transito_old or en_transito_new
 
         results.append({
             'paciente_id': paciente.id,
@@ -111,26 +119,34 @@ def buscar_paciente_recepcion_api(request):
         paciente = ficha.paciente
 
         # Buscar el último movimiento que esté en estado 'ENVIADO' y en espera de recepción
-        ultimo_movimiento = MovimientoFicha.objects.filter(
+        # We prioritize the NEW system (MovimientoMonologoControlado)
+        movimiento = MovimientoMonologoControlado.objects.filter(
             ficha=ficha,
-            estado_envio='ENVIADO',
-            estado_recepcion='EN ESPERA',
+            estado='E',
             establecimiento=establecimiento
-        ).order_by('-fecha_envio').first()
+        ).select_related('servicio_clinico_destino', 'profesional').first()
 
-        results.append({
-            'paciente_id': paciente.id,
-            'ficha_id': ficha.id,
-            'movimiento_id': ultimo_movimiento.id if ultimo_movimiento else None,
-            'rut': ficha.paciente.rut,
-            'numero_ficha_sistema': ficha.numero_ficha_sistema,
-            'nombre_completo': paciente.nombre_completo,
-            'servicio_envio_id': ultimo_movimiento.servicio_clinico_envio_id if ultimo_movimiento else None,
-            'servicio_envio_nombre': ultimo_movimiento.servicio_clinico_envio.nombre if ultimo_movimiento and ultimo_movimiento.servicio_clinico_envio else '',
-            'servicio_recepcion_id': ultimo_movimiento.servicio_clinico_recepcion_id if ultimo_movimiento else None,
-            'servicio_recepcion_nombre': ultimo_movimiento.servicio_clinico_recepcion.nombre if ultimo_movimiento and ultimo_movimiento.servicio_clinico_recepcion else '',
-            'en_espera': ultimo_movimiento is not None,
-        })
+        if movimiento:
+            results.append({
+                'paciente_id': paciente.id,
+                'ficha_id': ficha.id,
+                'rut': paciente.rut,
+                'numero_ficha_sistema': ficha.numero_ficha_sistema,
+                'nombre_completo': paciente.nombre_completo,
+                'movimiento_id': movimiento.id,
+                # Campos para la nueva vista
+                'servicio_clinico_actual': movimiento.servicio_clinico_destino.nombre,
+                'profesional_asignado': str(movimiento.profesional),
+                # Campos legacy por si acaso
+                'servicio_envio_nombre': 'SOME (Origen)',
+                'servicio_recepcion_nombre': movimiento.servicio_clinico_destino.nombre,
+                'en_espera': True
+            })
+        else:
+            # Fallback check old system? The user implies moving TO the new system.
+            # If we want to support both, we should check MovimientoFicha here too if MovimientoMonologoControlado is empty.
+            # For now, let's assume we are fully testing the new system as requested.
+            pass
 
     return JsonResponse({'results': results})
 

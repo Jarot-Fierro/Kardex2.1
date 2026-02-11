@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title|default:"Fichas en Tránsito" }}{% endblock %}
+
+{% block content %}
+    <div class="container-fluid small-input">
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Filtros - {{ title }}</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="form-filtros" class="form" method="get">
+                            <div class="form-row">
+                                <div class="form-group col-md-3">
+                                    <label>{{ filter_form.hora_inicio.label }}</label>
+                                    {{ filter_form.hora_inicio }}
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="id_hora_termino">{{ filter_form.hora_termino.label }}</label>
+                                    {{ filter_form.hora_termino }}
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="id_servicio_clinico">{{ filter_form.servicio_clinico.label }}</label>
+                                    {{ filter_form.servicio_clinico }}
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="id_profesional">{{ filter_form.profesional.label }}</label>
+                                    {{ filter_form.profesional }}
+                                </div>
+                            </div>
+                            <button class="btn btn-secondary" type="submit"><i class="fas fa-filter"></i> Aplicar
+                                filtros
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex align-items-center">
+                        <h3 class="card-title mb-0">{{ title }}</h3>
+                        {#                        <a href=""#}
+                        {#                           class="btn btn-success btn-sm ml-auto">#}
+                        {#                            <i class="fas fa-file-csv"></i> Exportar CSV#}
+                        {#                        </a>#}
+                    </div>
+                    <div class="card-body">
+                        <table id="Table" class="table table-bordered table-striped table-sm">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Acciones</th>
+                                {% for col in columns %}
+                                    {% if col != 'ID' %}
+                                        <th>{{ col }}</th>
+                                    {% endif %}
+                                {% endfor %}
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+{% block javascript %}
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2({
+                theme: 'bootstrap4',
+                width: '100%'
+            });
+
+            // Inicializar DataTable
+            $('#Table').DataTable({
+                responsive: true,
+                autoWidth: false,
+                destroy: true,
+                deferRender: true,
+                ajax: {
+                    url: window.location.href,
+                    type: 'GET',
+                    data: function (d) {
+                        d.datatable = 1;
+                    }
+                },
+                columns: [
+                    {data: 'id'},
+                    {
+                        data: null,
+                        defaultContent: '',
+                        orderable: false
+                    },
+                    {data: 'rut'},
+                    {data: 'ficha'},
+                    {data: 'paciente'},
+                    {data: 'servicio_clinico'},
+                    {data: 'profesional'},
+                    {data: 'fecha_salida'},
+                    {data: 'horas_transito'}
+                ],
+                order: [[7, 'desc']], // Ordenar por fecha salida
+                language: {
+                    "decimal": "",
+                    "emptyTable": "No hay información",
+                    "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
+                    "infoEmpty": "Mostrando 0 to 0 of 0 Entradas",
+                    "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+                    "infoPostFix": "",
+                    "thousands": ",",
+                    "lengthMenu": "Mostrar _MENU_ Entradas",
+                    "loadingRecords": "Cargando...",
+                    "processing": "Procesando...",
+                    "search": "Buscar:",
+                    "zeroRecords": "Sin resultados encontrados",
+                    "paginate": {
+                        "first": "Primero",
+                        "last": "Ultimo",
+                        "next": "Siguiente",
+                        "previous": "Anterior"
+                    }
+                }
+            });
+
+            // Manejo de filtros
+            $('#form-filtros').on('submit', function (e) {
+                e.preventDefault();
+                const $table = $('#Table');
+                if ($.fn.DataTable.isDataTable($table)) {
+                    const params = $(this).serialize();
+                    const newUrl = window.location.pathname + '?' + params;
+                    $table.DataTable().ajax.url(newUrl + '&datatable=1').load();
+                }
+            });
+        });
+    </script>
+{% endblock %}

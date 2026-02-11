@@ -16,12 +16,11 @@ class MovimientoMonologoControlado(StandardModel):
     fecha_traspaso = models.DateTimeField(null=True, blank=True)
     usuario_traspaso = models.CharField(max_length=50, null=True, blank=True)
 
-    profesional = models.CharField(max_length=50, null=True, blank=True)
-
     observacion_salida = models.TextField(null=True, blank=True)
     observacion_entrada = models.TextField(null=True, blank=True)
     observacion_traspaso = models.TextField(null=True, blank=True)
 
+    profesional = models.ForeignKey('personas.Profesional', on_delete=models.PROTECT)
     rut_paciente = models.ForeignKey('personas.Paciente', on_delete=models.PROTECT)
     establecimiento = models.ForeignKey('establecimientos.Establecimiento', on_delete=models.PROTECT)
     ficha = models.ForeignKey('clinica.Ficha', on_delete=models.PROTECT)
