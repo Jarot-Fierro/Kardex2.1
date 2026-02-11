@@ -15,12 +15,12 @@
                         <form id="form-filtros" class="form" method="get">
                             <div class="form-row">
                                 <div class="form-group col-md-3">
-                                    <label>{{ filter_form.hora_inicio.label }}</label>
-                                    {{ filter_form.hora_inicio }}
+                                    <label>{{ filter_form.fecha_inicio.label }}</label>
+                                    {{ filter_form.fecha_inicio }}
                                 </div>
                                 <div class="form-group col-md-3">
-                                    <label for="id_hora_termino">{{ filter_form.hora_termino.label }}</label>
-                                    {{ filter_form.hora_termino }}
+                                    <label>{{ filter_form.fecha_termino.label }}</label>
+                                    {{ filter_form.fecha_termino }}
                                 </div>
                                 <div class="form-group col-md-3">
                                     <label for="id_servicio_clinico">{{ filter_form.servicio_clinico.label }}</label>
@@ -45,10 +45,6 @@
                 <div class="card">
                     <div class="card-header d-flex align-items-center">
                         <h3 class="card-title mb-0">{{ title }}</h3>
-                        {#                        <a href=""#}
-                        {#                           class="btn btn-success btn-sm ml-auto">#}
-                        {#                            <i class="fas fa-file-csv"></i> Exportar CSV#}
-                        {#                        </a>#}
                     </div>
                     <div class="card-body">
                         <table id="Table" class="table table-bordered table-striped table-sm">
@@ -89,6 +85,8 @@
                 autoWidth: false,
                 destroy: true,
                 deferRender: true,
+                serverSide: true,
+                processing: true,
                 ajax: {
                     url: window.location.href,
                     type: 'GET',

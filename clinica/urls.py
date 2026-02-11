@@ -33,7 +33,7 @@ urlpatterns = [
     # Movimiento Monologo Controlado
     path('movimientos-monologo/salida/', SalidaFichaView.as_view(), name='movimiento_monologo_salida'),
     path('movimientos-monologo/recepcion/', RecepcionFichaView.as_view(), name='movimiento_monologo_recepcion'),
-    path('fichas-en-transito/', FichasEnTransitoView.as_view(), name='fichas_en_transito_monologo'),
+    path('fichas-en-transito-controlado/', FichasEnTransitoView.as_view(), name='fichas_en_transito_monologo'),
     path('api/movimientos-fichas-monologo/salida/', RegistrarSalidaAPI.as_view(),
          name='api_movimiento_monologo_salida'),
     path('api/movimientos-fichas-monologo/recepcion/', RegistrarRecepcionAPI.as_view(),

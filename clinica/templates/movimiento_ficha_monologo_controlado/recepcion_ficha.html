@@ -94,12 +94,12 @@
                         <form id="form-filtros" method="get">
                             <div class="row">
                                 <div class="form-group col-md-3 mb-0">
-                                    <label class="mb-1 small">{{ filter_form.hora_inicio.label }}</label>
-                                    {{ filter_form.hora_inicio }}
+                                    <label class="mb-1 small">{{ filter_form.fecha_inicio.label }}</label>
+                                    {{ filter_form.fecha_inicio }}
                                 </div>
                                 <div class="form-group col-md-3 mb-0">
-                                    <label class="mb-1 small">{{ filter_form.hora_termino.label }}</label>
-                                    {{ filter_form.hora_termino }}
+                                    <label class="mb-1 small">{{ filter_form.fecha_termino.label }}</label>
+                                    {{ filter_form.fecha_termino }}
                                 </div>
                                 <div class="form-group col-md-3 mb-0">
                                     <label class="mb-1 small">{{ filter_form.servicio_clinico.label }}</label>
@@ -168,6 +168,8 @@
                 autoWidth: false,
                 destroy: true,
                 deferRender: true,
+                serverSide: true,
+                processing: true,
                 ajax: {
                     url: window.location.href,
                     type: 'GET',

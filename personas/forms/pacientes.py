@@ -201,7 +201,7 @@ class PacienteForm(forms.ModelForm):
     rut_madre = forms.CharField(
         required=False,
         widget=forms.TextInput(
-            attrs={'class': 'form-control form-control-sm', 'id': 'id_rut_madre', 'name': 'rut_madre'})
+            attrs={'class': 'form-control form-control-sm id_rut', 'id': 'id_rut_madre', 'name': 'rut_madre'})
     )
 
     nombres_madre = forms.CharField(

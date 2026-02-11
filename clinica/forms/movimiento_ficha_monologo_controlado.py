@@ -68,13 +68,13 @@ class MovimientoRecepcionForm(forms.ModelForm):
 
 
 class FiltroMovimientoForm(forms.Form):
-    hora_inicio = forms.TimeField(
-        label='Hora Inicio', required=False,
-        widget=forms.TimeInput(attrs={'class': 'form-control', 'type': 'time'})
+    fecha_inicio = forms.DateTimeField(
+        label='Fecha Inicio', required=False,
+        widget=forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'})
     )
-    hora_termino = forms.TimeField(
-        label='Hora Término', required=False,
-        widget=forms.TimeInput(attrs={'class': 'form-control', 'type': 'time'})
+    fecha_termino = forms.DateTimeField(
+        label='Fecha Término', required=False,
+        widget=forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'})
     )
     servicio_clinico = forms.ModelChoiceField(
         queryset=ServicioClinico.objects.none(),
