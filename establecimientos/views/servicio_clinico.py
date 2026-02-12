@@ -32,7 +32,57 @@ class ServicioClinicoListView(DataTableMixin, TemplateView):
         establecimiento = getattr(user, 'establecimiento', None) if user else None
         qs = ServicioClinico.objects.all()
         if establecimiento:
-            return qs.filter(establecimiento=establecimiento)
+            return qs.filter(establecimiento=establecimiento, status=True)
+        # Si el usuario no tiene establecimiento, no mostrar registros
+        return qs.none()
+
+    def render_row(self, obj):
+        return {
+            'ID': obj.id,
+            'Nombre': (obj.nombre or '').upper(),
+            'Jefe Área': (obj.correo_jefe or ''),
+            'Teléfono': (obj.telefono or ''),
+            'Establecimiento': (obj.establecimiento.nombre or '').upper(),
+        }
+
+    def get(self, request, *args, **kwargs):
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest' and request.GET.get('datatable'):
+            return self.get_datatable_response(request)
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'title': 'Listado de Servicios Clínicos',
+            'list_url': reverse_lazy('servicio_clinico_list'),
+            'create_url': reverse_lazy('servicio_clinico_create'),
+            'datatable_enabled': True,
+            'datatable_order': [[0, 'asc']],
+            'datatable_page_length': 100,
+            'columns': self.datatable_columns,
+        })
+        return context
+
+
+class ServicioClinicoInactivoListView(DataTableMixin, TemplateView):
+    template_name = 'servicio_clinico/list.html'
+    model = ServicioClinico
+    datatable_columns = ['ID', 'Nombre', 'Jefe Área', 'Teléfono', 'Establecimiento']
+    datatable_order_fields = ['id', None, 'nombre', 'correo_jefe', 'telefono',
+                              'establecimiento__nombre']
+    datatable_search_fields = ['nombre__icontains', 'correo_jefe__icontains',
+                               'telefono__icontains', 'establecimiento__nombre__icontains']
+
+    url_detail = 'servicio_clinico_detail'
+    url_update = 'servicio_clinico_update'
+
+    def get_base_queryset(self):
+        """Filtra por el establecimiento del usuario logueado."""
+        user = getattr(self.request, 'user', None)
+        establecimiento = getattr(user, 'establecimiento', None) if user else None
+        qs = ServicioClinico.objects.all()
+        if establecimiento:
+            return qs.filter(establecimiento=establecimiento, status=False)
         # Si el usuario no tiene establecimiento, no mostrar registros
         return qs.none()
 

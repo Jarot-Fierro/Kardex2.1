@@ -44,7 +44,7 @@ class SalidaFichaView(LoginRequiredMixin, TemplateView):
         fecha_inicio = request.GET.get('fecha_inicio')
         fecha_termino = request.GET.get('fecha_termino')
         servicio_id = request.GET.get('servicio_clinico')
-        profesional_nombre = request.GET.get('profesional')
+        profesional_id = request.GET.get('profesional')
 
         if fecha_inicio:
             qs = qs.filter(fecha_salida__gte=fecha_inicio)
@@ -52,8 +52,8 @@ class SalidaFichaView(LoginRequiredMixin, TemplateView):
             qs = qs.filter(fecha_salida__lte=fecha_termino)
         if servicio_id:
             qs = qs.filter(servicio_clinico_destino_id=servicio_id)
-        if profesional_nombre:
-            qs = qs.filter(profesional__nombres__icontains=profesional_nombre)
+        if profesional_id:
+            qs = qs.filter(profesional_id=profesional_id, profesional__establecimiento=establecimiento, status=True)
 
         data = []
         for mov in qs:
@@ -104,7 +104,7 @@ class RecepcionFichaView(LoginRequiredMixin, TemplateView):
         fecha_inicio = request.GET.get('fecha_inicio')
         fecha_termino = request.GET.get('fecha_termino')
         servicio_id = request.GET.get('servicio_clinico')
-        profesional_nombre = request.GET.get('profesional')
+        profesional_id = request.GET.get('profesional')
 
         # Filtrar por fecha de ENTRADA (Recepción)
         if fecha_inicio:
@@ -113,8 +113,8 @@ class RecepcionFichaView(LoginRequiredMixin, TemplateView):
             qs = qs.filter(fecha_entrada__lte=fecha_termino)
         if servicio_id:
             qs = qs.filter(servicio_clinico_destino_id=servicio_id)
-        if profesional_nombre:
-            qs = qs.filter(profesional__nombres__icontains=profesional_nombre)
+        if profesional_id:
+            qs = qs.filter(profesional_id=profesional_id, profesional__establecimiento=establecimiento, status=True)
 
         # Total antes de búsqueda global
         records_total = qs.count()
@@ -229,7 +229,7 @@ class FichasEnTransitoView(LoginRequiredMixin, TemplateView):
         fecha_inicio = request.GET.get('fecha_inicio')
         fecha_termino = request.GET.get('fecha_termino')
         servicio_id = request.GET.get('servicio_clinico')
-        profesional_nombre = request.GET.get('profesional')
+        profesional_id = request.GET.get('profesional')
 
         if fecha_inicio:
             qs = qs.filter(fecha_salida__gte=fecha_inicio)
@@ -237,8 +237,8 @@ class FichasEnTransitoView(LoginRequiredMixin, TemplateView):
             qs = qs.filter(fecha_salida__lte=fecha_termino)
         if servicio_id:
             qs = qs.filter(servicio_clinico_destino_id=servicio_id)
-        if profesional_nombre:
-            qs = qs.filter(profesional__nombres__icontains=profesional_nombre)
+        if profesional_id:
+            qs = qs.filter(profesional_id=profesional_id, profesional__establecimiento=establecimiento, status=True)
 
         # Total antes de búsqueda
         records_total = qs.count()

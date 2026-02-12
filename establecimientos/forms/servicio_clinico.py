@@ -40,6 +40,11 @@ class FormServicioClinico(forms.ModelForm):
         }),
         required=False
     )
+    status = forms.BooleanField(
+        label='¿Servicio Clinico Activo?',
+        required=False,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input mx-5'})
+    )
 
     def clean_nombre(self):
         nombre = self.cleaned_data['nombre'].strip()
@@ -69,4 +74,4 @@ class FormServicioClinico(forms.ModelForm):
 
     class Meta:
         model = ServicioClinico
-        fields = ['nombre', 'correo_jefe', 'telefono']
+        fields = ['nombre', 'correo_jefe', 'telefono', 'status']

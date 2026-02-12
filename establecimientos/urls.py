@@ -16,6 +16,8 @@ urlpatterns = [
 
     # Vistas básicas para Servicios Clínicos
     path('servicios-clinicos/', ServicioClinicoListView.as_view(), name='servicio_clinico_list'),
+    path('servicios-clinicos-inactivos/', ServicioClinicoInactivoListView.as_view(),
+         name='servicio_clinico_list_inactivo'),
     path('servicios-clinicos/crear/', ServicioClinicoCreateView.as_view(), name='servicio_clinico_create'),
     path('servicios-clinicos/<int:pk>/editar/', ServicioClinicoUpdateView.as_view(), name='servicio_clinico_update'),
     path('servicios-clinicos/<int:pk>/detalle/', ServicioClinicoDetailView.as_view(), name='servicio_clinico_detail'),

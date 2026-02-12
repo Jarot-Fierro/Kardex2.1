@@ -23,11 +23,11 @@
                                     {{ filter_form.fecha_termino }}
                                 </div>
                                 <div class="form-group col-md-3">
-                                    <label for="id_servicio_clinico">{{ filter_form.servicio_clinico.label }}</label>
+                                    <label for="id_filter_servicio_clinico">{{ filter_form.servicio_clinico.label }}</label>
                                     {{ filter_form.servicio_clinico }}
                                 </div>
                                 <div class="form-group col-md-3">
-                                    <label for="id_profesional">{{ filter_form.profesional.label }}</label>
+                                    <label for="id_filter_profesional">{{ filter_form.profesional.label }}</label>
                                     {{ filter_form.profesional }}
                                 </div>
                             </div>
@@ -45,6 +45,11 @@
                 <div class="card">
                     <div class="card-header d-flex align-items-center">
                         <h3 class="card-title mb-0">{{ title }}</h3>
+                        <div class="ml-auto">
+                            <button id="btn-imprimir-transito" class="btn btn-info btn-sm">
+                                <i class="fas fa-print"></i> Imprimir Tránsito
+                            </button>
+                        </div>
                     </div>
                     <div class="card-body">
                         <table id="Table" class="table table-bordered table-striped table-sm">
@@ -141,6 +146,13 @@
                     const newUrl = window.location.pathname + '?' + params;
                     $table.DataTable().ajax.url(newUrl + '&datatable=1').load();
                 }
+            });
+
+            // Acción de imprimir tránsito
+            $('#btn-imprimir-transito').on('click', function () {
+                const params = $('#form-filtros').serialize();
+                const url = "{% url 'pdf_movimientos_fichas_monologo_controlado' %}?tipo=transito&" + params;
+                window.open(url, '_blank');
             });
         });
     </script>

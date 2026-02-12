@@ -1,7 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 
-from core.validations import validate_rut, format_rut, validate_spaces, validate_email
+from core.validations import validate_spaces, validate_email
 from personas.models.profesion import Profesion
 from personas.models.profesionales import Profesional
 
@@ -77,28 +77,6 @@ class FormProfesional(forms.ModelForm):
         required=False,
         widget=forms.CheckboxInput(attrs={'class': 'form-check-input mx-5'})
     )
-
-    def clean_rut(self):
-        rut = self.cleaned_data.get('rut')
-        if not rut:
-            return rut
-
-        rut = rut.strip()
-
-        # Validar que no contenga espacios
-        if " " in rut:
-            raise ValidationError("El RUT no debe contener espacios.")
-
-        rut_sin_formato = rut.replace(".", "").replace("-", "").upper()
-
-        if not validate_rut(rut_sin_formato):
-            raise ValidationError("El RUT ingresado no es válido.")
-
-        # Si ya existe otro profesional con el mismo RUT
-        if Profesional.objects.filter(rut=format_rut(rut_sin_formato)).exclude(pk=self.instance.pk).exists():
-            raise ValidationError("Ya existe un profesional con este RUT.")
-
-        return format_rut(rut_sin_formato)
 
     def clean_nombres(self):
         nombres = self.cleaned_data.get('nombres', '').strip()

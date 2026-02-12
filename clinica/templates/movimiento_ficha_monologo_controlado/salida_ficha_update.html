@@ -386,7 +386,7 @@
             // Acción de imprimir historial
             $('#btn-imprimir-historial').on('click', function () {
                 const params = $('#form-filtros').serialize();
-                const url = "{% url 'pdf_movimientos_fichas' %}?tipo=salida&" + params;
+                const url = "{% url 'pdf_movimientos_fichas_monologo_controlado' %}?tipo=salida&" + params;
                 window.open(url, '_blank');
             });
         });

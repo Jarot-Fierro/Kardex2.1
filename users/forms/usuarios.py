@@ -239,9 +239,6 @@ class FormUsuarioProfileUpdate(forms.ModelForm):
         self.request = request
         super().__init__(*args, **kwargs)
 
-        if initial_role:
-            self.fields['roles'].initial = initial_role
-
     username = forms.CharField(
         label='R.U.T',
         widget=forms.TextInput(attrs={
@@ -279,13 +276,6 @@ class FormUsuarioProfileUpdate(forms.ModelForm):
         required=False
     )
 
-    roles = forms.ModelChoiceField(
-        label='Rol',
-        empty_label='Seleccione un Rol',
-        queryset=Role.objects.all(),
-        widget=forms.Select(attrs={'class': 'form-control'}),
-    )
-
     def clean_username(self):
         username = self.cleaned_data['username']
 
@@ -312,7 +302,7 @@ class FormUsuarioProfileUpdate(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['username', 'first_name', 'last_name', 'email', 'roles']
+        fields = ['username', 'first_name', 'last_name', 'email']
 
 
 class UserResetPasswordForm(forms.Form):

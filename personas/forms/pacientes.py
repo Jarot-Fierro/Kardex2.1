@@ -243,13 +243,15 @@ class PacienteForm(forms.ModelForm):
     numero_telefono1 = forms.CharField(
         required=False,
         widget=forms.TextInput(
-            attrs={'class': 'form-control form-control-sm', 'id': 'id_numero_telefono1', 'name': 'numero_telefono1'})
+            attrs={'class': 'form-control form-control-sm telefono_personal', 'id': 'id_numero_telefono1',
+                   'name': 'numero_telefono1'})
     )
 
     numero_telefono2 = forms.CharField(
         required=False,
         widget=forms.TextInput(
-            attrs={'class': 'form-control form-control-sm', 'id': 'id_numero_telefono2', 'name': 'numero_telefono2'})
+            attrs={'class': 'form-control form-control-sm telefono_personal', 'id': 'id_numero_telefono2',
+                   'name': 'numero_telefono2'})
     )
 
     ocupacion = forms.CharField(

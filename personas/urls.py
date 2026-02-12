@@ -19,6 +19,7 @@ urlpatterns = [
 
     # Vistas básicas para Profesionales
     path('profesionales/', ProfesionalListView.as_view(), name='profesional_list'),
+    path('profesionales-inactivos/', ProfesionalListInactivosView.as_view(), name='profesional_list_inactivo'),
     path('profesionales/crear/', ProfesionalCreateView.as_view(), name='profesional_create'),
     path('profesionales/<int:pk>/editar/', ProfesionalUpdateView.as_view(), name='profesional_update'),
     path('profesionales/<int:pk>/detalle/', ProfesionalDetailView.as_view(), name='profesional_detail'),

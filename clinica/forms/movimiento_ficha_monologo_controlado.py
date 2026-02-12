@@ -79,11 +79,12 @@ class FiltroMovimientoForm(forms.Form):
     servicio_clinico = forms.ModelChoiceField(
         queryset=ServicioClinico.objects.none(),
         label='Servicio Clínico', required=False,
-        widget=forms.Select(attrs={'class': 'form-control select2'})
+        widget=forms.Select(attrs={'class': 'form-control select2', 'id': 'id_filter_servicio_clinico'})
     )
-    profesional = forms.CharField(
+    profesional = forms.ModelChoiceField(
+        queryset=Profesional.objects.none(),
         label='Profesional', required=False,
-        widget=forms.TextInput(attrs={'class': 'form-control'})
+        widget=forms.Select(attrs={'class': 'form-control select2', 'id': 'id_filter_profesional'})
     )
 
     def __init__(self, *args, **kwargs):
@@ -91,5 +92,7 @@ class FiltroMovimientoForm(forms.Form):
         super().__init__(*args, **kwargs)
         if establecimiento:
             self.fields['servicio_clinico'].queryset = ServicioClinico.objects.filter(establecimiento=establecimiento)
+            self.fields['profesional'].queryset = Profesional.objects.filter(establecimiento=establecimiento)
         else:
             self.fields['servicio_clinico'].queryset = ServicioClinico.objects.all()
+            self.fields['profesional'].queryset = Profesional.objects.all()

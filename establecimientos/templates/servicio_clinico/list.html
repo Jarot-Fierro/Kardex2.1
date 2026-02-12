@@ -11,6 +11,12 @@
                     <h5 class="mb-0">Listado de Servicios Clínicos</h5>
                 </div>
                 <div class="col-auto text-end">
+                    <a href="{% url 'servicio_clinico_list' %}" class="btn btn-info me-2">
+                        <i class="bi bi-file-earmark-excel"></i> Activos
+                    </a>
+                    <a href="{% url 'servicio_clinico_list_inactivo' %}" class="btn btn-danger me-2">
+                        <i class="bi bi-file-earmark-excel"></i> Inactivos
+                    </a>
                     <a href="{% url 'servicio_clinico_history' %}" class="btn btn-warning me-2">
                         <i class="bi bi-file-earmark-excel"></i> Historial
                     </a>
