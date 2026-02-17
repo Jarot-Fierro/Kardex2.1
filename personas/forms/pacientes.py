@@ -1,5 +1,8 @@
+import datetime
+
 from django import forms
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 from core.choices import ESTADO_CIVIL, SEXO_CHOICES
 from core.validations import validate_rut, format_rut
@@ -32,20 +35,24 @@ class PacienteForm(forms.ModelForm):
         except Exception:
             pass
 
-    fecha_nacimiento = forms.DateField(
+    fecha_nacimiento = forms.DateTimeField(
         required=True,
-        widget=forms.DateInput(attrs={
-            'type': 'date',
-            'class': 'form-control form-control-sm',
-            'id': 'id_fecha_nacimiento',
-            'name': 'fecha_nacimiento'
-        })
+        input_formats=['%Y-%m-%dT%H:%M'],
+        widget=forms.DateTimeInput(
+            format='%Y-%m-%dT%H:%M',
+            attrs={
+                'type': 'datetime-local',
+                'class': 'form-control form-control-sm',
+                'id': 'id_fecha_nacimiento',
+            }
+        )
     )
 
-    fecha_fallecimiento = forms.DateField(
+    fecha_fallecimiento = forms.DateTimeField(
         required=False,
-        widget=forms.DateInput(attrs={
-            'type': 'date',
+        input_formats=['%Y-%m-%dT%H:%M'],
+        widget=forms.DateTimeInput(attrs={
+            'type': 'datetime-local',
             'class': 'form-control form-control-sm bg-danger text-white border-dange',
             'id': 'id_fecha_fallecimiento',
             'name': 'fecha_fallecimiento'
@@ -373,6 +380,16 @@ class PacienteForm(forms.ModelForm):
     #     if rn and ext and fal:
     #         cleaned['ocupacion'] = None
     #         cleaned['nombre_pareja'] = None
+
+    def clean_fecha_fallecimiento(self):
+        fecha = self.cleaned_data.get('fecha_fallecimiento')
+        if fecha:
+            # Si es date, convertir a datetime timezone-aware
+            if isinstance(fecha, datetime.date) and not isinstance(fecha, datetime.datetime):
+                dt = datetime.datetime.combine(fecha, datetime.time.min)
+                return timezone.make_aware(dt)
+            return fecha
+        return fecha
 
     def _clean_fallecimiento(self, cleaned):
         esta_fallecido = cleaned.get("fallecido")

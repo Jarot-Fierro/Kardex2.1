@@ -93,6 +93,8 @@ def get_paciente_ficha(request, rut):
         "otras_fichas": []
     }
 
+    print(data)
+
     if ficha:
         data["ficha"] = {
             "numero_ficha_sistema": ficha.numero_ficha_sistema,

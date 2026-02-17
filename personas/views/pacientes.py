@@ -121,24 +121,31 @@ def paciente_view(request, paciente_id=None):
                                    'Error de consistencia: Se intentó actualizar un paciente que no existe o no fue cargado correctamente.')
                     return redirect('paciente_view')
 
+                # Validar que el RUT no pertenezca a otro paciente
+                if rut_post:
+                    existe_otro = Paciente.objects.filter(rut=rut_post).exclude(pk=paciente_instance.pk).exists()
+                    if existe_otro:
+                        paciente_form.add_error('rut', 'El RUT indicado ya pertenece a otro paciente.')
+                        return render(request, 'paciente/form.html', {
+                            'paciente_form': paciente_form,
+                            'ficha_form': ficha_form,
+                            'modo': 'error_actualizar',
+                            'accion': accion,
+                            'paciente_id': paciente_id_post,
+                            'title': f'Consulta de pacientes {request.user.establecimiento}'
+                        })
+
             try:
 
                 with transaction.atomic():
 
-                    # 1. RESOLVER PACIENTE CORRECTO
-                    rut_post = paciente_form.cleaned_data.get('rut')
+                    # 1. GUARDAR PACIENTE (CREAR O ACTUALIZAR)
+                    # Si existía paciente_instance, el form lo actualiza. Si no, crea uno nuevo.
+                    paciente = paciente_form.save(commit=False)
+                    es_creacion = (paciente_instance is None)
 
-                    paciente_existente = Paciente.objects.filter(rut=rut_post).first()
-
-                    if paciente_existente:
-                        paciente = paciente_existente
-                        es_creacion = False
-                    else:
-                        paciente = paciente_form.save(commit=False)
-                        es_creacion = True
-
-                        paciente.usuario_modifica = request.user
-                        paciente.save()
+                    paciente.usuario_modifica = request.user
+                    paciente.save()
 
                     # CREAR / ACTUALIZAR FICHA
                     ficha = ficha_form.save(commit=False)
@@ -655,3 +662,4 @@ class PacientePorFechaListView(PacienteListView):
             'date_range_form': form,
         })
         return context
+

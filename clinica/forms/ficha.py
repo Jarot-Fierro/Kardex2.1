@@ -1,4 +1,6 @@
+import datetime
 from django import forms
+from django.utils import timezone
 
 from clinica.models import Ficha
 from establecimientos.models.sectores import Sector
@@ -69,6 +71,16 @@ class FichaForm(forms.ModelForm):
             'paciente',
             'sector',
         ]
+
+    def clean_fecha_creacion_anterior(self):
+        fecha = self.cleaned_data.get('fecha_creacion_anterior')
+        if fecha:
+            # Si es date, convertir a datetime timezone-aware
+            if isinstance(fecha, datetime.date) and not isinstance(fecha, datetime.datetime):
+                dt = datetime.datetime.combine(fecha, datetime.time.min)
+                return timezone.make_aware(dt)
+            return fecha
+        return fecha
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)

@@ -118,10 +118,9 @@
                         </div>
                         <div class="row mt-1">
                             <div class="col text-end">
-                                <a href="{% url 'paciente_list' %}" class="btn btn-secondary btn-sm no-print"
-                                   id="btn-cancelar">
+                                <button type="button" class="btn btn-secondary btn-sm no-print" id="btn-cancelar">
                                     Cancelar
-                                </a>
+                                </button>
                                 <button type="submit" class="btn btn-primary btn-sm no-print">Guardar</button>
                                 {#                                <a id="btn-paciente-sin-rut"#}
                                 {#                                   href=""#}
@@ -656,10 +655,9 @@
                         <div class="col-12">
                             <div class="row mb-4 justify-content-end">
                                 <div class="col-auto">
-                                    <a href="{% url 'paciente_list' %}" class="btn btn-secondary btn-sm no-print"
-                                       id="btn-cancelar">
+                                    <button type="button" class="btn btn-secondary btn-sm no-print" id="btn-cancelar">
                                         Cancelar
-                                    </a>
+                                    </button>
                                     <button type="submit" class="btn btn-primary btn-sm no-print">
                                         Guardar
                                     </button>
@@ -879,10 +877,48 @@
             const $el = $('#' + id);
             if (!$el.length) return;
 
+            // Limpieza de valores string "None" o "null"
+            if (value === 'None' || value === 'null') value = '';
+
             if ($el.is(':checkbox')) {
-                $el.prop('checked', !!value);
+                // Checkbox: true, "true", 1, "on" -> checked
+                const checked = (value === true || value === 'true' || value === 1 || value === 'on');
+                $el.prop('checked', checked).trigger('change');
+            } else if ($el.attr('type') === 'datetime-local' && value) {
+                // datetime-local: YYYY-MM-DDTHH:MM (local time)
+                const d = new Date(value);
+                if (!isNaN(d.getTime())) {
+                    const year = d.getFullYear();
+                    const month = String(d.getMonth() + 1).padStart(2, '0');
+                    const day = String(d.getDate()).padStart(2, '0');
+                    const hours = String(d.getHours()).padStart(2, '0');
+                    const minutes = String(d.getMinutes()).padStart(2, '0');
+                    const valStr = `${year}-${month}-${day}T${hours}:${minutes}`;
+                    $el.val(valStr).trigger('change');
+                } else {
+                    // Fallback
+                    let valStr = String(value);
+                    if (valStr.includes('+')) valStr = valStr.split('+')[0];
+                    if (valStr.endsWith('Z')) valStr = valStr.slice(0, -1);
+                    $el.val(valStr).trigger('change');
+                }
+            } else if ($el.attr('type') === 'date' && value) {
+                // date: YYYY-MM-DD (local time)
+                const d = new Date(value);
+                if (!isNaN(d.getTime())) {
+                    const year = d.getFullYear();
+                    const month = String(d.getMonth() + 1).padStart(2, '0');
+                    const day = String(d.getDate()).padStart(2, '0');
+                    const valStr = `${year}-${month}-${day}`;
+                    $el.val(valStr).trigger('change');
+                } else {
+                    let valStr = String(value);
+                    if (valStr.includes('T')) valStr = valStr.split('T')[0];
+                    $el.val(valStr).trigger('change');
+                }
             } else {
-                $el.val(value ?? '');
+                // Otros inputs
+                $el.val(value ?? '').trigger('change');
             }
         }
 
@@ -977,6 +1013,9 @@
             setValue('id_fallecido', p.fallecido);
             setValue('id_fecha_fallecimiento', p.fecha_fallecimiento);
 
+            // OTROS
+            setValue('id_alergico_a', p.alergico_a);
+
             // FAMILIA
             setValue('id_rut_madre', p.rut_madre);
             setValue('id_nombres_madre', p.nombres_madre);
@@ -996,6 +1035,7 @@
             setValue('id_ocupacion', p.ocupacion);
             setValue('id_numero_telefono1', p.numero_telefono1);
             setValue('id_numero_telefono2', p.numero_telefono2);
+            setValue('id_sin_telefono', p.sin_telefono);
 
             setText('id_usuario_anterior', p.usuario_anterior);
         }

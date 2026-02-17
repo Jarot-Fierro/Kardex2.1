@@ -189,7 +189,15 @@
                     {data: 'profesional'},
                     {data: 'observacion'},
                     {data: 'estado'},
-                    {data: 'fecha'}
+                    {
+                        data: 'fecha',
+                        render: function (data, type, row) {
+                            if (type === 'sort' || type === 'type') {
+                                return row.fecha_iso;
+                            }
+                            return data;
+                        }
+                    }
                 ],
                 order: [[9, 'desc']],
                 language: {

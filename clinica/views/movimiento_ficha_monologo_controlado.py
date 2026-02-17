@@ -38,7 +38,7 @@ class SalidaFichaView(LoginRequiredMixin, TemplateView):
         qs = MovimientoMonologoControlado.objects.filter(
             establecimiento=establecimiento,
             estado='E'
-        ).select_related('rut_paciente', 'ficha', 'servicio_clinico_destino', 'profesional')
+        ).select_related('rut_paciente', 'ficha', 'servicio_clinico_destino', 'profesional').exclude(profesional_id=71).order_by('-fecha_salida')
 
         # Filtros
         fecha_inicio = request.GET.get('fecha_inicio')
@@ -57,6 +57,7 @@ class SalidaFichaView(LoginRequiredMixin, TemplateView):
 
         data = []
         for mov in qs:
+            fecha_local = timezone.localtime(mov.fecha_salida)
             data.append({
                 'id': mov.id,
                 'rut': mov.rut,
@@ -66,7 +67,8 @@ class SalidaFichaView(LoginRequiredMixin, TemplateView):
                 'profesional': str(mov.profesional) if mov.profesional else '-',
                 'observacion': mov.observacion_salida or '',
                 'estado': mov.get_estado_display(),
-                'fecha': timezone.localtime(mov.fecha_salida).strftime('%d/%m/%Y %H:%M')
+                'fecha': fecha_local.strftime('%d/%m/%Y %H:%M'),
+                'fecha_iso': fecha_local.isoformat(),
             })
 
         return JsonResponse({'data': data})
