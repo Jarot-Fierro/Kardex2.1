@@ -103,7 +103,7 @@ def paciente_view(request, paciente_id=None):
 
             # Verificación de consistencia Accion vs Instancia
             rut_post = paciente_form.cleaned_data.get('rut')
-            if accion == 'CREAR':
+            if accion == 'CREAR' and rut_post:
                 if Paciente.objects.filter(rut=rut_post).exists():
                     paciente_form.add_error('rut',
                                             'Ya existe un paciente con este RUT. Por favor, consúltelo antes de intentar crear uno nuevo.')
@@ -157,12 +157,20 @@ def paciente_view(request, paciente_id=None):
                     ficha.save()
 
 
-            except IntegrityError:
-                ficha_form.add_error(
-                    'numero_ficha_sistema',
-                    'Ya existe una ficha con este número para este establecimiento.'
-                )
-                messages.error(request, 'El número de ficha que intentas agregar ya fue asignado a otro paciente.')
+            except IntegrityError as e:
+                error_str = str(e).lower()
+                if 'unique_paciente_por_establecimiento' in error_str or 'paciente_id' in error_str:
+                    ficha_form.add_error(
+                        'paciente',
+                        'El paciente ya tiene una ficha asignada en este establecimiento.'
+                    )
+                    messages.error(request, 'Este paciente ya cuenta con una ficha en el establecimiento actual.')
+                else:
+                    ficha_form.add_error(
+                        'numero_ficha_sistema',
+                        'La ficha se está intentando duplicar. Bórrela para generar una automática o coloque una válida (que no esté ocupada).'
+                    )
+                    messages.error(request, 'El número de ficha que intentas agregar ya fue asignado a otro paciente.')
 
                 # Si ya existía el paciente (paciente_instance no es None) o si accion es ACTUALIZAR, es una actualización fallida
                 modo = "error_actualizar" if es_edicion else "error_crear"

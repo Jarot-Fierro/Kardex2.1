@@ -6,6 +6,7 @@ from django.utils import timezone
 
 from core.choices import ESTADO_CIVIL, SEXO_CHOICES
 from core.validations import validate_rut, format_rut
+from core.utils.rut_ficticio import generar_rut_ficticio_unico
 from geografia.models.comuna import Comuna
 from personas.models.genero import Genero
 from personas.models.pacientes import Paciente
@@ -484,7 +485,19 @@ class PacienteForm(forms.ModelForm):
     def clean(self):
         cleaned = super().clean()
 
-        # self._clean_files_custom(cleaned)
+        recien_nacido = cleaned.get('recien_nacido')
+        rut = cleaned.get('rut')
+
+        # Si es Recién Nacido y el RUT está vacío, generamos uno ficticio
+        if recien_nacido and not rut:
+            nuevo_rut = generar_rut_ficticio_unico(Paciente)
+            if nuevo_rut:
+                cleaned['rut'] = nuevo_rut
+                # Actualizar el valor en el formulario para que se muestre o use posteriormente
+                self.cleaned_data['rut'] = nuevo_rut
+            else:
+                self.add_error('rut', "No se pudo generar un RUT ficticio único. Intente de nuevo.")
+
         self._clean_extranjero(cleaned)
         self._clean_telefonos(cleaned)
         self._clean_recien_nacido(cleaned)

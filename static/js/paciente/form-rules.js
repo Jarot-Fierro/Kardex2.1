@@ -72,7 +72,6 @@
         if (rn && !ext && fal) {
             disable([el.nip, el.pasaporte, el.ocupacion, el.nombre_pareja]);
             el.fecha_fallecimiento.required = true;
-            el.rut.disabled = true;
         }
 
         // EXTRANJERO
@@ -88,12 +87,12 @@
 
         // RN + EXTRANJERO
         if (rn && ext && !fal) {
-            disable([el.rut, el.ocupacion, el.nombre_pareja, el.fecha_fallecimiento]);
+            disable([el.ocupacion, el.nombre_pareja, el.fecha_fallecimiento]);
         }
 
         // RN + EXTRANJERO + FALLECIDO
         if (rn && ext && fal) {
-            disable([el.rut, el.ocupacion, el.nombre_pareja]);
+            disable([el.ocupacion, el.nombre_pareja]);
             el.fecha_fallecimiento.required = true;
         }
 

@@ -94,6 +94,57 @@ class FichaForm(forms.ModelForm):
         if est:
             self.fields['sector'].queryset = Sector.objects.filter(establecimiento=est, status=True)
 
+    def clean_paciente(self):
+        paciente = self.cleaned_data.get('paciente')
+        if not paciente:
+            return paciente
+
+        est = getattr(self.user, 'establecimiento', None)
+        if not est:
+            return paciente
+
+        qs = Ficha.objects.filter(
+            paciente=paciente,
+            establecimiento=est
+        )
+
+        if self.instance and self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+
+        if qs.exists():
+            raise forms.ValidationError(
+                "El paciente ya tiene una ficha asignada en este establecimiento."
+            )
+
+        return paciente
+
+    def clean_numero_ficha_sistema(self):
+        numero = self.cleaned_data.get('numero_ficha_sistema')
+
+        if not numero:
+            return numero
+
+        # Obtener establecimiento desde el usuario
+        est = getattr(self.user, 'establecimiento', None)
+        if not est:
+            return numero
+
+        qs = Ficha.objects.filter(
+            numero_ficha_sistema=numero,
+            establecimiento=est
+        )
+
+        # Si estamos editando, excluir la misma instancia
+        if self.instance and self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+
+        if qs.exists():
+            raise forms.ValidationError(
+                "La ficha se está intentando duplicar. Bórrela para generar una automática o coloque una válida (que no esté ocupada)."
+            )
+
+        return numero
+
 
 class FormFichaTarjeta(forms.ModelForm):
     """
@@ -149,3 +200,31 @@ class FormFichaTarjeta(forms.ModelForm):
             self.fields['nombre_display'].initial = nombre
         # Si ya tiene número de ficha, mantenerlo en el input
         # (Django ya setea initial para campos del modelo con instance)
+
+    def clean_numero_ficha_sistema(self):
+        numero = self.cleaned_data.get('numero_ficha_sistema')
+
+        if not numero:
+            return numero
+
+        # Obtener establecimiento desde la instancia
+        est = getattr(self.instance, 'establecimiento', None)
+        if not est:
+            return numero
+
+        qs = Ficha.objects.filter(
+            numero_ficha_sistema=numero,
+            establecimiento=est
+        )
+
+        # Excluir la propia ficha en actualización
+        if self.instance and self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+
+        if qs.exists():
+            raise forms.ValidationError(
+                "La ficha se está intentando duplicar. Bórrela para generar una automática o coloque una válida (que no esté ocupada)."
+            )
+
+        return numero
+

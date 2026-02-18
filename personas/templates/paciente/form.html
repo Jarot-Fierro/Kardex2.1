@@ -24,9 +24,9 @@
                                         {{ paciente_form.rut.errors }}
                                     </div>
                                 {% endif %}
-                                {% if paciente_form.numero_ficha_sistema.errors %}
+                                {% if ficha_form.numero_ficha_sistema.errors %}
                                     <div class="invalid-feedback d-block p-0 m-0">
-                                        {{ paciente_form.numero_ficha_sistema.errors }}
+                                        {{ ficha_form.numero_ficha_sistema.errors }}
                                     </div>
                                 {% endif %}
                             </div>
@@ -994,6 +994,7 @@
 
             setValue('id_paciente_id', p.id);
             // IDENTIFICACIÓN
+            setValue('id_rut', p.rut);
             setValue('id_nombre', p.nombre);
             setValue('id_apellido_paterno', p.apellido_paterno);
             setValue('id_apellido_materno', p.apellido_materno);
@@ -1444,12 +1445,6 @@
 
             const el = {
                 rut: document.getElementById('id_rut'),
-                nombres: document.getElementById('id_nombre'),
-                apellido_paterno: document.getElementById('id_apellido_paterno'),
-                apellido_materno: document.getElementById('id_apellido_materno'),
-                nombres_padre: document.getElementById('id_nombres_padre'),
-                nombres_madre: document.getElementById('id_nombres_madre'),
-                direccion: document.getElementById('id_direccion'),
                 nip: document.getElementById('id_nip'),
                 pasaporte: document.getElementById('id_pasaporte'),
                 rut_resp: document.getElementById('id_rut_responsable_temporal'),
@@ -1457,7 +1452,6 @@
                 fecha_fallecimiento: document.getElementById('id_fecha_fallecimiento'),
                 ocupacion: document.getElementById('id_ocupacion'),
                 nombre_pareja: document.getElementById('id_nombre_pareja'),
-
                 telefono1: document.getElementById('id_numero_telefono1'),
                 telefono2: document.getElementById('id_numero_telefono2'),
 
@@ -1496,58 +1490,54 @@
                     el.telefono1, el.telefono2
                 ]);
 
-                //  Estándar
+                // ESTÁNDAR
                 if (!rn && !ext && !fal) {
                     disable([el.nip, el.pasaporte, el.rut_resp, el.fecha_fallecimiento]);
                     el.usar_rut_madre.checked = false;
                     el.rut.required = true;
-                    el.apellido_paterno.required = true;
-                    el.apellido_materno.required = true;
-                    el.direccion.required = true;
                 }
 
-                // Fallecido
+                // FALLECIDO
                 if (!rn && !ext && fal) {
                     disable([el.nip, el.pasaporte, el.rut_resp]);
                     el.fecha_fallecimiento.required = true;
                     el.rut.required = true;
                 }
 
-                //  Recién nacido
+                // RN
                 if (rn && !ext && !fal) {
                     disable([el.nip, el.pasaporte, el.ocupacion, el.nombre_pareja, el.fecha_fallecimiento]);
                 }
 
-                //  RN + Fallecido
+                // RN + FALLECIDO
                 if (rn && !ext && fal) {
                     disable([el.nip, el.pasaporte, el.ocupacion, el.nombre_pareja]);
                     el.fecha_fallecimiento.required = true;
-                    el.rut.disabled = true;
                 }
 
-                //  Extranjero
+                // EXTRANJERO
                 if (!rn && ext && !fal) {
                     disable([el.rut_resp, el.fecha_fallecimiento]);
                 }
 
-                //  Extranjero + Fallecido
+                // EXTRANJERO + FALLECIDO
                 if (!rn && ext && fal) {
                     disable([el.rut_resp]);
                     el.fecha_fallecimiento.required = true;
                 }
 
-                //  RN + Extranjero
+                // RN + EXTRANJERO
                 if (rn && ext && !fal) {
                     disable([el.ocupacion, el.nombre_pareja, el.fecha_fallecimiento]);
                 }
 
-                //  RN + Extranjero + Fallecido
+                // RN + EXTRANJERO + FALLECIDO
                 if (rn && ext && fal) {
                     disable([el.ocupacion, el.nombre_pareja]);
                     el.fecha_fallecimiento.required = true;
                 }
 
-                /* TELÉFONOS */
+                // TELÉFONOS
                 if (sn) {
                     disable([el.telefono1, el.telefono2]);
                 } else {
@@ -1556,15 +1546,9 @@
                 }
             }
 
-            document.addEventListener('change', function (e) {
+            document.addEventListener('change', e => {
                 if (!e.target) return;
-
-                if ([
-                    'id_recien_nacido',
-                    'id_extranjero',
-                    'id_fallecido',
-                    'id_sin_telefono'
-                ].includes(e.target.id)) {
+                if (['id_recien_nacido', 'id_extranjero', 'id_fallecido', 'id_sin_telefono'].includes(e.target.id)) {
                     applyRules();
                 }
             });
@@ -1966,10 +1950,10 @@
                 return dv.toString();
             }
 
-            // Función para generar RUT ficticio (comienza con 91 millones)
+            // Función para generar RUT ficticio (comienza con 90 millones)
             function generarRutFicticio() {
-                // Generar número aleatorio entre 91,000,000 y 99,999,999
-                const numeroBase = Math.floor(91000000 + Math.random() * (99999999 - 91000000 + 1));
+                // Generar número aleatorio entre 90,000,000 y 99,999,999
+                const numeroBase = Math.floor(90000000 + Math.random() * (99999999 - 90000000 + 1));
                 const dv = calcularDigitoVerificador(numeroBase.toString());
                 return formatearRutString(numeroBase.toString() + dv);
             }
@@ -1992,25 +1976,21 @@
 
             // Evento cuando cambia el checkbox
             $checkRecienNacido.on('change', function () {
-                // Solo si estamos en modo creación (sin paciente_id) y el checkbox está marcado
-                if ($checkRecienNacido.is(':checked') && !$inputPacienteId.val()) {
-                    // Solo generar RUT si el campo está vacío
-                    if (!$inputRut.val().trim()) {
-                        const rutFicticio = generarRutFicticio();
-                        $inputRut.val(rutFicticio);
+                // Solo si el checkbox está marcado y el campo RUT está vacío
+                if ($checkRecienNacido.is(':checked') && !$inputRut.val().trim()) {
+                    const rutFicticio = generarRutFicticio();
+                    $inputRut.val(rutFicticio);
 
-                        // Actualizar reglas del formulario si existe la función
-                        if (typeof window.actualizarReglasPaciente === 'function') {
-                            window.actualizarReglasPaciente();
-                        }
+                    // Actualizar reglas del formulario si existe la función
+                    if (typeof window.actualizarReglasPaciente === 'function') {
+                        window.actualizarReglasPaciente();
                     }
                 }
             });
 
-            // También ejecutar al cargar la página si ya está marcado el checkbox
-            // y estamos en modo creación
+            // También ejecutar al cargar la página si ya está marcado el checkbox y el RUT está vacío
             $(window).on('load', function () {
-                if ($checkRecienNacido.is(':checked') && !$inputPacienteId.val() && !$inputRut.val().trim()) {
+                if ($checkRecienNacido.is(':checked') && !$inputRut.val().trim()) {
                     const rutFicticio = generarRutFicticio();
                     $inputRut.val(rutFicticio);
 

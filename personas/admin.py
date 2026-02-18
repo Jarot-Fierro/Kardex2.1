@@ -129,8 +129,8 @@ from import_export.widgets import Widget
 from simple_history.admin import SimpleHistoryAdmin
 
 from personas.models.pacientes import Paciente
-from personas.models.prevision import Prevision
 from personas.models.usuario_anterior import UsuarioAnterior
+from core.utils.rut_ficticio import es_rut_recien_nacido
 from geografia.models.comuna import Comuna
 
 
@@ -144,13 +144,6 @@ def limpiar_rut(valor):
     valor = valor.replace('\xa0', '').replace('\u200b', '').replace(' ', '')
     valor = re.sub(r'[^0-9kK\.-]', '', valor)
     return valor.upper()
-
-
-def es_rut_recien_nacido(rut):
-    if not rut:
-        return False
-    rut_num = re.sub(r'[^\d]', '', rut.split('-')[0] if '-' in rut else rut)
-    return rut_num.isdigit() and int(rut_num) >= 90000000
 
 
 def limpiar_texto(texto):

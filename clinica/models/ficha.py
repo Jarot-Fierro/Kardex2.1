@@ -53,24 +53,39 @@ class Ficha(StandardModel):
             return f"Ficha #{numero} - Sin paciente"
 
     def save(self, *args, **kwargs):
-        creando = self.pk is None
-        super().save(*args, **kwargs)  # Guardamos primero para tener el PK
-
-        if creando and not self.numero_ficha_sistema and self.establecimiento:
-            # Obtener el máximo actual
+        # Determinamos si necesitamos asignar un número de ficha automáticamente
+        # 1. Si no tiene número de ficha sistema
+        # 2. Y tiene un establecimiento asignado
+        if not self.numero_ficha_sistema and self.establecimiento:
+            # Obtener el máximo actual en ese establecimiento
             max_ficha = Ficha.objects.filter(establecimiento=self.establecimiento) \
-                .exclude(pk=self.pk) \
                 .aggregate(models.Max('numero_ficha_sistema'))['numero_ficha_sistema__max']
 
             if max_ficha is not None:
                 self.numero_ficha_sistema = max_ficha + 1
             else:
-                # Fallback: usar el ID como número de ficha si no hay registros
-                self.numero_ficha_sistema = self.pk
+                # Fallback: si no hay registros previos con número, intentamos usar el PK si existe
+                # o dejamos que el save posterior asigne un número basado en el PK si sigue vacío
+                if self.pk:
+                    self.numero_ficha_sistema = self.pk
+                else:
+                    # Si estamos creando, guardaremos primero para obtener el PK
+                    pass
 
-            # Guardamos solo el campo actualizado para evitar loops
+        super().save(*args, **kwargs)
+
+        # Si después de guardar sigue sin número (caso de creación inicial sin registros previos)
+        if not self.numero_ficha_sistema and self.pk:
+            self.numero_ficha_sistema = self.pk
             super().save(update_fields=['numero_ficha_sistema'])
 
     class Meta:
         verbose_name = 'Ficha'
         verbose_name_plural = 'Fichas'
+
+        constraints = [
+            models.UniqueConstraint(
+                fields=['numero_ficha_sistema', 'establecimiento'],
+                name='unique_ficha_por_establecimiento'
+            )
+        ]

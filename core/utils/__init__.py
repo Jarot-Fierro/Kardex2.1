@@ -1,3 +1,6 @@
+from .rut_ficticio import es_rut_recien_nacido, generar_rut_ficticio_unico, calcular_dv_rut
+
+
 class IncludeUserFormCreate:
     def form_valid(self, form):
         form.instance.created_by = self.request.user
