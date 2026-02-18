@@ -301,7 +301,7 @@
                 }
 
                 $.ajax({
-                    url: '{% url "ficha-paciente-buscar" %}',
+                    url: '{% url "ficha-paciente-buscar-monologo" %}',
                     data: {q: val},
                     success: function (response) {
                         if (response.results && response.results.length > 0) {

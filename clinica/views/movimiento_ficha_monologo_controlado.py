@@ -1,4 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Case, When, IntegerField, Value
 from django.db.models import Q
 from django.http import JsonResponse
 from django.utils import timezone
@@ -37,8 +38,10 @@ class SalidaFichaView(LoginRequiredMixin, TemplateView):
         # Pero el Prompt dice "La ficha debe pertenecer al establecimiento del usuario logueado"
         qs = MovimientoMonologoControlado.objects.filter(
             establecimiento=establecimiento,
-            estado='E'
-        ).select_related('rut_paciente', 'ficha', 'servicio_clinico_destino', 'profesional').exclude(profesional_id=71).order_by('-fecha_salida')
+            estado='E',
+            ficha__isnull=False,
+            ficha__paciente__isnull=False
+        ).select_related('rut_paciente', 'ficha', 'servicio_clinico_destino', 'profesional').order_by('-fecha_salida')
 
         # Filtros
         fecha_inicio = request.GET.get('fecha_inicio')
@@ -60,8 +63,8 @@ class SalidaFichaView(LoginRequiredMixin, TemplateView):
             fecha_local = timezone.localtime(mov.fecha_salida)
             data.append({
                 'id': mov.id,
-                'rut': mov.rut,
-                'paciente': mov.rut_paciente.nombre_completo if mov.rut_paciente else '-',
+                'rut': mov.ficha.paciente.rut,
+                'paciente': mov.ficha.paciente.nombre_completo,
                 'ficha': mov.numero_ficha,
                 'servicio_recepcion': mov.servicio_clinico_destino.nombre if mov.servicio_clinico_destino else '-',
                 'profesional': str(mov.profesional) if mov.profesional else '-',
@@ -99,8 +102,19 @@ class RecepcionFichaView(LoginRequiredMixin, TemplateView):
         # Recepción: Movimientos ya recibidos (estado R) en este establecimiento
         qs = MovimientoMonologoControlado.objects.filter(
             establecimiento=establecimiento,
-            estado='R'
-        ).select_related('rut_paciente', 'ficha', 'servicio_clinico_destino', 'profesional')
+            estado__in=['E', 'R']
+        ).select_related(
+            'rut_paciente',
+            'ficha',
+            'servicio_clinico_destino',
+            'profesional'
+        ).annotate(
+            estado_orden=Case(
+                When(estado='E', then=Value(0)),
+                When(estado='R', then=Value(1)),
+                output_field=IntegerField()
+            )
+        ).order_by('estado_orden', '-fecha_salida')
 
         # Filtros Base (GET)
         fecha_inicio = request.GET.get('fecha_inicio')
@@ -178,7 +192,7 @@ class RecepcionFichaView(LoginRequiredMixin, TemplateView):
                 'profesional': str(mov.profesional) if mov.profesional else '-',
                 'observacion': mov.observacion_entrada or '',  # Observación de recepción
                 'estado': mov.get_estado_display(),
-                'fecha': timezone.localtime(mov.fecha_entrada).strftime('%d/%m/%Y %H:%M') if mov.fecha_entrada else '-'
+                'fecha': timezone.localtime(mov.fecha_salida).strftime('%d/%m/%Y %H:%M') if mov.fecha_salida else '-'
             })
 
         return JsonResponse({

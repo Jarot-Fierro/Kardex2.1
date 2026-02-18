@@ -1,7 +1,8 @@
 from django.urls import path
 
 from clinica.apis.buscar_paciente import (
-    buscar_paciente_ficha_api, buscar_paciente_recepcion_api, buscar_paciente_traspaso_api
+    buscar_paciente_ficha_api, buscar_paciente_recepcion_api, buscar_paciente_traspaso_api,
+    buscar_paciente_ficha_api_monologo, buscar_paciente_recepcion_api_monologo
 )
 from clinica.apis.movimiento_ficha_monologo_controlado import RegistrarSalidaAPI, RegistrarRecepcionAPI
 from clinica.apis.movimientos_ficha_paciente import get_movimientos_paciente_establecimiento
@@ -41,7 +42,13 @@ urlpatterns = [
          name='api_movimiento_monologo_recepcion'),
 
     path('api/ficha-paciente/buscar/', buscar_paciente_ficha_api, name='ficha-paciente-buscar'),
+    path('api/ficha-paciente/buscar/monologo/', buscar_paciente_ficha_api_monologo,
+         name='ficha-paciente-buscar-monologo'),
+
     path('api/ficha-paciente/buscar-recepcion/', buscar_paciente_recepcion_api, name='ficha-paciente-buscar-recepcion'),
+    path('api/ficha-paciente/buscar-recepcion/monologo/', buscar_paciente_recepcion_api_monologo,
+         name='ficha-paciente-buscar-recepcion-monologo'),
+
     path('api/ficha-paciente/buscar-traspaso/', buscar_paciente_traspaso_api, name='ficha-paciente-buscar-traspaso'),
 
     path(

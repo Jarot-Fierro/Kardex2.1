@@ -193,7 +193,7 @@
                     {data: 'estado'},
                     {data: 'fecha'}
                 ],
-                order: [[9, 'desc']],
+                order: [],
                 language: {
                     "decimal": "",
                     "emptyTable": "No hay información",
@@ -296,7 +296,7 @@
                 }
 
                 $.ajax({
-                    url: '{% url "ficha-paciente-buscar-recepcion" %}',
+                    url: '{% url "ficha-paciente-buscar-recepcion-monologo" %}',
                     data: {q: val},
                     success: function (response) {
                         if (response.results && response.results.length > 0) {
