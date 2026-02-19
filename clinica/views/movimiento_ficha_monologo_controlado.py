@@ -2,13 +2,17 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Case, When, IntegerField, Value
 from django.db.models import Q
 from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import TemplateView
 
 from clinica.apis.movimiento_ficha_monologo_controlado import RegistrarSalidaAPI, RegistrarRecepcionAPI
 from clinica.forms.movimiento_ficha_monologo_controlado import MovimientoSalidaForm, MovimientoRecepcionForm, \
     FiltroMovimientoForm
+from clinica.models import Ficha
 from clinica.models.movimiento_ficha_monologo_controlado import MovimientoMonologoControlado
+from personas.models.pacientes import Paciente
 
 
 class SalidaFichaView(LoginRequiredMixin, TemplateView):
@@ -61,15 +65,25 @@ class SalidaFichaView(LoginRequiredMixin, TemplateView):
         data = []
         for mov in qs:
             fecha_local = timezone.localtime(mov.fecha_salida)
+            edit_url = reverse('movimiento_monologo_salida_update', kwargs={'pk': mov.id})
+            estado_badge = ''
+            if mov.estado == 'E':
+                estado_badge = f'<span class="badge badge-primary">{mov.get_estado_display()}</span>'
+            elif mov.estado == 'R':
+                estado_badge = f'<span class="badge badge-success">{mov.get_estado_display()}</span>'
+            else:
+                estado_badge = f'<span class="badge badge-secondary">{mov.get_estado_display()}</span>'
+
             data.append({
                 'id': mov.id,
+                'acciones': f'<a href="{edit_url}" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></a>',
                 'rut': mov.ficha.paciente.rut,
                 'paciente': mov.ficha.paciente.nombre_completo,
                 'ficha': mov.numero_ficha,
                 'servicio_recepcion': mov.servicio_clinico_destino.nombre if mov.servicio_clinico_destino else '-',
                 'profesional': str(mov.profesional) if mov.profesional else '-',
                 'observacion': mov.observacion_salida or '',
-                'estado': mov.get_estado_display(),
+                'estado': estado_badge,
                 'fecha': fecha_local.strftime('%d/%m/%Y %H:%M'),
                 'fecha_iso': fecha_local.isoformat(),
             })
@@ -81,6 +95,50 @@ class SalidaFichaView(LoginRequiredMixin, TemplateView):
         return view(request, *args, **kwargs)
 
 
+class SalidaFichaUpdateView(SalidaFichaView):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        movimiento = get_object_or_404(MovimientoMonologoControlado, pk=self.kwargs.get('pk'))
+        context['movimiento'] = movimiento
+        context['form'] = MovimientoSalidaForm(
+            instance=movimiento,
+            establecimiento=self.request.user.establecimiento,
+            initial={
+                'rut': movimiento.ficha.paciente.rut,
+                'nombre': movimiento.ficha.paciente.nombre_completo,
+                'ficha': movimiento.ficha.numero_ficha_sistema,
+                'ficha_id_hidden': movimiento.ficha_id
+            }
+        )
+        context['is_update'] = True
+        return context
+
+    def post(self, request, *args, **kwargs):
+        movimiento = get_object_or_404(MovimientoMonologoControlado, pk=self.kwargs.get('pk'))
+        # Actualizamos campos del movimiento
+        rut_paciente = request.POST.get('rut')
+        paciente = Paciente.objects.filter(rut=rut_paciente).first()
+
+        ficha_id = Ficha.objects.filter(paciente=paciente, establecimiento=request.user.establecimiento).first()
+
+        servicio_id = request.POST.get('servicio_clinico_destino')
+        profesional_id = request.POST.get('profesional')
+        observacion = request.POST.get('observacion_salida')
+
+        if not servicio_id or not profesional_id:
+            return JsonResponse({'success': False, 'error': 'Servicio y Profesional son obligatorios.'})
+
+        try:
+            movimiento.servicio_clinico_destino_id = servicio_id
+            movimiento.profesional_id = profesional_id
+            movimiento.observacion_salida = observacion
+            movimiento.ficha = ficha_id
+            movimiento.save()
+            return JsonResponse({'success': True, 'message': 'Movimiento actualizado correctamente.'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+
 class RecepcionFichaView(LoginRequiredMixin, TemplateView):
     template_name = 'movimiento_ficha_monologo_controlado/recepcion_ficha.html'
 
@@ -89,7 +147,7 @@ class RecepcionFichaView(LoginRequiredMixin, TemplateView):
         context['form'] = MovimientoRecepcionForm()
         context['filter_form'] = FiltroMovimientoForm(establecimiento=self.request.user.establecimiento)
         context['columns'] = ['RUT', 'Paciente', 'Ficha', 'Servicio Recepción', 'Profesional',
-                              'Observación', 'Estado', 'Fecha']
+                              'Observación', 'Estado', 'Envío', 'Recepción']
         return context
 
     def get(self, request, *args, **kwargs):
@@ -155,7 +213,7 @@ class RecepcionFichaView(LoginRequiredMixin, TemplateView):
         order_dir = request.GET.get('order[0][dir]', 'desc')
         prefix = '-' if order_dir == 'desc' else ''
 
-        # Mapeo de columnas: 0:id, 1:acc, 2:rut, 3:paciente, 4:ficha, 5:servicio, 6:profesional, 7:obs, 8:estado, 9:fecha
+        # Mapeo de columnas: 0:id, 1:acc, 2:rut, 3:paciente, 4:ficha, 5:servicio, 6:profesional, 7:obs, 8:estado, 9:fecha_salida, 10:fecha_entrada
         columns_map = {
             0: 'id',
             2: 'rut',
@@ -165,7 +223,8 @@ class RecepcionFichaView(LoginRequiredMixin, TemplateView):
             6: 'profesional__nombres',
             7: 'observacion_entrada',
             8: 'estado',
-            9: 'fecha_entrada'
+            9: 'fecha_salida',
+            10: 'fecha_entrada'
         }
 
         col_name = columns_map.get(order_column_index)
@@ -183,6 +242,14 @@ class RecepcionFichaView(LoginRequiredMixin, TemplateView):
 
         data = []
         for mov in qs_slice:
+            estado_badge = ''
+            if mov.estado == 'E':
+                estado_badge = f'<span class="badge badge-primary">{mov.get_estado_display()}</span>'
+            elif mov.estado == 'R':
+                estado_badge = f'<span class="badge badge-success">{mov.get_estado_display()}</span>'
+            else:
+                estado_badge = f'<span class="badge badge-secondary">{mov.get_estado_display()}</span>'
+
             data.append({
                 'id': mov.id,
                 'rut': mov.rut,
@@ -191,8 +258,11 @@ class RecepcionFichaView(LoginRequiredMixin, TemplateView):
                 'servicio_recepcion': mov.servicio_clinico_destino.nombre if mov.servicio_clinico_destino else '-',
                 'profesional': str(mov.profesional) if mov.profesional else '-',
                 'observacion': mov.observacion_entrada or '',  # Observación de recepción
-                'estado': mov.get_estado_display(),
-                'fecha': timezone.localtime(mov.fecha_salida).strftime('%d/%m/%Y %H:%M') if mov.fecha_salida else '-'
+                'estado': estado_badge,
+                'fecha_salida': timezone.localtime(mov.fecha_salida).strftime(
+                    '%d/%m/%Y %H:%M') if mov.fecha_salida else '-',
+                'fecha_entrada': timezone.localtime(mov.fecha_entrada).strftime(
+                    '%d/%m/%Y %H:%M') if mov.fecha_entrada else '-'
             })
 
         return JsonResponse({

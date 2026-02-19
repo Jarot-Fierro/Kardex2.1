@@ -17,6 +17,7 @@ class RegistrarSalidaAPI(APIView):
         servicio_clinico_destino_id = request.data.get('servicio_clinico_destino')
         profesional_id = request.data.get('profesional')
         observacion_salida = request.data.get('observacion_salida')
+        fecha_salida = request.data.get('fecha_salida')
 
         # Validaciones básicas
         if not rut or not servicio_clinico_destino_id or not profesional_id:
@@ -70,7 +71,7 @@ class RegistrarSalidaAPI(APIView):
                     servicio_clinico_destino=servicio_destino,
                     profesional=profesional,
                     observacion_salida=observacion_salida,
-                    fecha_salida=timezone.now(),
+                    fecha_salida=fecha_salida if fecha_salida else timezone.now(),
                     usuario_entrega=request.user.username,
                     estado='E'
                 )
@@ -88,6 +89,7 @@ class RegistrarRecepcionAPI(APIView):
     def post(self, request):
         movimiento_id = request.data.get('movimiento_id')
         observacion_entrada = request.data.get('observacion_recepcion')
+        fecha_entrada = request.data.get('fecha_entrada')
 
         if not movimiento_id:
             return Response({'error': 'ID de movimiento no proporcionado.'}, status=status.HTTP_400_BAD_REQUEST)
@@ -113,6 +115,7 @@ class RegistrarRecepcionAPI(APIView):
                 movimiento.fecha_entrada = timezone.now()
                 movimiento.usuario_entrada = request.user.username
                 movimiento.observacion_entrada = observacion_entrada
+                movimiento.fecha_entrada = fecha_entrada if fecha_entrada else timezone.now()
                 movimiento.estado = 'R'
                 movimiento.save()
 

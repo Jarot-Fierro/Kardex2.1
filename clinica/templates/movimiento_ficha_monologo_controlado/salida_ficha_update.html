@@ -10,7 +10,10 @@
             <div class="col-12">
                 <div class="card card-primary card-outline">
                     <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-plus mr-1"></i> Registrar Salida de Ficha</h3>
+                        <h3 class="card-title">
+                            <i class="fas {% if is_update %}fa-edit{% else %}fa-plus{% endif %} mr-1"></i>
+                            {% if is_update %}Actualizar{% else %}Registrar{% endif %} Salida de Ficha
+                        </h3>
                     </div>
                     <div class="card-body">
                         <form id="form-salida" method="post" novalidate>
@@ -47,19 +50,25 @@
                             </div>
 
                             <div class="row">
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="form-group">
                                         <label>{{ form.servicio_clinico_destino.label }}</label>
                                         {{ form.servicio_clinico_destino }}
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="form-group">
                                         <label>{{ form.profesional.label }}</label>
                                         {{ form.profesional }}
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>{{ form.fecha_salida.label }}</label>
+                                        {{ form.fecha_salida }}
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
                                     <div class="form-group">
                                         <label>{{ form.observacion_salida.label }}</label>
                                         {{ form.observacion_salida }}
@@ -69,11 +78,19 @@
 
                             <div class="row mt-2">
                                 <div class="col-12 text-right">
-                                    <button type="button" id="btn-limpiar" class="btn btn-default mr-2">
-                                        <i class="fas fa-eraser"></i> Limpiar
-                                    </button>
-                                    <button type="submit" id="btn-registrar" class="btn btn-primary px-5" disabled>
-                                        <i class="fas fa-save mr-1"></i> Registrar Salida
+                                    {% if is_update %}
+                                        <a href="{% url 'movimiento_monologo_salida' %}" class="btn btn-default mr-2">
+                                            <i class="fas fa-times"></i> Cancelar
+                                        </a>
+                                    {% else %}
+                                        <button type="button" id="btn-limpiar" class="btn btn-default mr-2">
+                                            <i class="fas fa-eraser"></i> Limpiar
+                                        </button>
+                                    {% endif %}
+                                    <button type="submit" id="btn-registrar" class="btn btn-primary px-5"
+                                            {% if not is_update %}disabled{% endif %}>
+                                        <i class="fas fa-save mr-1"></i> {% if is_update %}Actualizar{% else %}
+                                        Registrar{% endif %} Salida
                                     </button>
                                 </div>
                             </div>
@@ -178,9 +195,9 @@
                 columns: [
                     {data: 'id'},
                     {
-                        data: null,
-                        defaultContent: '',
-                        orderable: false
+                        data: 'acciones',
+                        orderable: false,
+                        searchable: false
                     },
                     {data: 'rut'},
                     {data: 'paciente'},
@@ -188,7 +205,12 @@
                     {data: 'servicio_recepcion'},
                     {data: 'profesional'},
                     {data: 'observacion'},
-                    {data: 'estado'},
+                    {
+                        data: 'estado',
+                        render: function (data, type, row) {
+                            return data;
+                        }
+                    },
                     {
                         data: 'fecha',
                         render: function (data, type, row) {
@@ -234,11 +256,15 @@
             const $btnLimpiar = $('#btn-limpiar');
 
             // Persistencia en localStorage
-            const configKeys = [
-                'id_servicio_clinico_destino',
-                'id_profesional',
-                'id_observacion_salida'
-            ];
+            {% if not is_update %}
+                const configKeys = [
+                    'id_servicio_clinico_destino',
+                    'id_profesional',
+                    'id_observacion_salida'
+                ];
+            {% else %}
+                const configKeys = [];
+            {% endif %}
 
             function loadConfig() {
                 configKeys.forEach(id => {
@@ -265,7 +291,9 @@
             });
 
             // Foco automático en RUT al cargar
-            $rut.focus();
+            {% if not is_update %}
+                $rut.focus();
+            {% endif %}
 
             // Función para limpiar campos de registro
             function limpiarRegistro() {
@@ -363,9 +391,15 @@
                                 timer: 1500,
                                 showConfirmButton: false
                             });
-                            limpiarRegistro();
-                            $('#Table').DataTable().ajax.reload(null, false);
-                            $rut.focus();
+                            {% if is_update %}
+                                setTimeout(function () {
+                                    window.location.href = "{% url 'movimiento_monologo_salida' %}";
+                                }, 1500);
+                            {% else %}
+                                limpiarRegistro();
+                                $('#Table').DataTable().ajax.reload(null, false);
+                                $rut.focus();
+                            {% endif %}
                         } else {
                             Swal.fire('Error', response.error || 'No se pudo registrar.', 'error');
                         }

@@ -8,7 +8,8 @@ from clinica.apis.movimiento_ficha_monologo_controlado import RegistrarSalidaAPI
 from clinica.apis.movimientos_ficha_paciente import get_movimientos_paciente_establecimiento
 from clinica.views.fichas import *
 from clinica.views.movimiento_ficha import *
-from clinica.views.movimiento_ficha_monologo_controlado import SalidaFichaView, RecepcionFichaView, FichasEnTransitoView
+from clinica.views.movimiento_ficha_monologo_controlado import SalidaFichaView, SalidaFichaUpdateView, \
+    RecepcionFichaView, FichasEnTransitoView
 from clinica.views.pdf import pdf_stickers, pdf_index, pdf_movimientos_fichas, \
     pdf_movimientos_fichas_monologo_controlado
 
@@ -34,6 +35,8 @@ urlpatterns = [
 
     # Movimiento Monologo Controlado
     path('movimientos-monologo/salida/', SalidaFichaView.as_view(), name='movimiento_monologo_salida'),
+    path('movimientos-monologo/salida/<int:pk>/editar/', SalidaFichaUpdateView.as_view(),
+         name='movimiento_monologo_salida_update'),
     path('movimientos-monologo/recepcion/', RecepcionFichaView.as_view(), name='movimiento_monologo_recepcion'),
     path('fichas-en-transito-controlado/', FichasEnTransitoView.as_view(), name='fichas_en_transito_monologo'),
     path('api/movimientos-fichas-monologo/salida/', RegistrarSalidaAPI.as_view(),

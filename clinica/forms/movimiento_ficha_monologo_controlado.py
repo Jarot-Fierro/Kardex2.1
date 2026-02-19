@@ -18,6 +18,8 @@ class MovimientoSalidaForm(forms.ModelForm):
         label='Servicio Clínico Destino',
         widget=forms.Select(attrs={'class': 'form-control select2', 'id': 'id_servicio_clinico_destino'})
     )
+    fecha_salida = forms.DateTimeField(label='Fecha Salida', widget=forms.DateTimeInput(
+        attrs={'class': 'form-control', 'type': 'datetime-local', 'id': 'id_fecha_salida'}))
     profesional = forms.ModelChoiceField(
         queryset=Profesional.objects.none(),
         label='Profesional Destino',
@@ -28,7 +30,7 @@ class MovimientoSalidaForm(forms.ModelForm):
 
     class Meta:
         model = MovimientoMonologoControlado
-        fields = ['rut', 'servicio_clinico_destino', 'profesional', 'observacion_salida']
+        fields = ['rut', 'servicio_clinico_destino', 'profesional', 'observacion_salida', 'fecha_salida']
 
     def __init__(self, *args, **kwargs):
         establecimiento = kwargs.pop('establecimiento', None)
@@ -49,6 +51,8 @@ class MovimientoRecepcionForm(forms.ModelForm):
         attrs={'class': 'form-control', 'readonly': True, 'id': 'nombre_mov'}))
     ficha = forms.CharField(label='N° Ficha', required=False,
                             widget=forms.TextInput(attrs={'class': 'form-control', 'readonly': True, 'id': 'id_ficha'}))
+    fecha_entrada = forms.DateTimeField(label='Fecha Entrada', widget=forms.DateTimeInput(
+        attrs={'class': 'form-control', 'type': 'datetime-local', 'id': 'id_fecha_entrada'}))
 
     # Campos informativos de donde viene (Servicio) y quien lo tiene (Profesional)
     servicio_clinico = forms.CharField(label='Servicio Clínico (Ubicación Actual)', required=False,
@@ -64,7 +68,7 @@ class MovimientoRecepcionForm(forms.ModelForm):
 
     class Meta:
         model = MovimientoMonologoControlado
-        fields = ['rut', 'observacion_recepcion']
+        fields = ['rut', 'observacion_recepcion', 'fecha_entrada']
 
 
 class FiltroMovimientoForm(forms.Form):

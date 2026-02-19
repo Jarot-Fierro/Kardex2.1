@@ -47,19 +47,25 @@
                             </div>
 
                             <div class="row">
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="form-group">
                                         <label>{{ form.servicio_clinico.label }}</label>
                                         {{ form.servicio_clinico }}
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="form-group">
                                         <label>{{ form.profesional.label }}</label>
                                         {{ form.profesional }}
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>{{ form.fecha_entrada.label }}</label>
+                                        {{ form.fecha_entrada }}
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
                                     <div class="form-group">
                                         <label>{{ form.observacion_recepcion.label }}</label>
                                         {{ form.observacion_recepcion }}
@@ -190,8 +196,14 @@
                     {data: 'servicio_recepcion'},
                     {data: 'profesional'},
                     {data: 'observacion'},
-                    {data: 'estado'},
-                    {data: 'fecha'}
+                    {
+                        data: 'estado',
+                        render: function (data, type, row) {
+                            return data;
+                        }
+                    },
+                    {data: 'fecha_salida'},
+                    {data: 'fecha_entrada'}
                 ],
                 order: [],
                 language: {
