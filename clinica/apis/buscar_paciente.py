@@ -343,3 +343,75 @@ def buscar_paciente_traspaso_api(request):
         })
 
     return JsonResponse({'results': results})
+
+
+@login_required
+def buscar_paciente_ficha_api_monologo_traspaso(request):
+    """
+    API para buscar un paciente y su movimiento monólogo controlado más reciente
+    en el establecimiento del usuario, sin importar el estado.
+    """
+    query = request.GET.get('q', '').strip()
+    if not query:
+        return JsonResponse({'results': []})
+
+    query_upper = query.upper()
+    query_clean = query.replace('.', '').replace('-', '').strip()
+
+    establecimiento = getattr(request.user, 'establecimiento', None)
+    if not establecimiento:
+        return JsonResponse({'error': 'Usuario no tiene establecimiento asociado'}, status=403)
+
+    filtros = Q(paciente__rut=query_upper) | Q(paciente__rut=query_clean) | Q(paciente__rut=query_upper.lower()) | Q(
+        paciente__rut=query_clean.lower())
+
+    if query_clean.isdigit() or (query_upper.startswith('PAC-') and query_upper[4:].isdigit()):
+        try:
+            val = query_upper
+            if val.startswith('PAC-'):
+                val = int(val[4:])
+            else:
+                val = int(query_clean)
+            filtros |= Q(numero_ficha_sistema=val)
+        except:
+            pass
+
+    fichas = Ficha.objects.filter(
+        filtros,
+        establecimiento=establecimiento
+    ).select_related('paciente').distinct()
+
+    results = []
+    for ficha in fichas:
+        paciente = ficha.paciente
+
+        # Buscar el movimiento monólogo más reciente para esta ficha y este establecimiento
+        ultimo_movimiento = MovimientoMonologoControlado.objects.filter(
+            ficha=ficha,
+            establecimiento=establecimiento,
+            estado='E'
+        ).order_by('-fecha_salida').first()
+
+        data = {
+            'paciente_id': paciente.id,
+            'ficha_id': ficha.id,
+            'rut': ficha.paciente.rut,
+            'numero_ficha_sistema': ficha.numero_ficha_sistema,
+            'nombre_completo': paciente.nombre_completo,
+        }
+
+        if ultimo_movimiento:
+            data.update({
+                'movimiento_id': ultimo_movimiento.id,
+                'servicio_clinico_destino': ultimo_movimiento.servicio_clinico_destino_id,
+                'profesional': ultimo_movimiento.profesional_id,
+                'fecha_salida': ultimo_movimiento.fecha_salida.strftime(
+                    '%Y-%m-%dT%H:%M') if ultimo_movimiento.fecha_salida else '',
+                'fecha_entrada': ultimo_movimiento.fecha_entrada.strftime(
+                    '%Y-%m-%dT%H:%M') if ultimo_movimiento.fecha_entrada else '',
+                'observacion_traspaso': ultimo_movimiento.observacion_traspaso or '',
+            })
+
+        results.append(data)
+
+    return JsonResponse({'results': results})

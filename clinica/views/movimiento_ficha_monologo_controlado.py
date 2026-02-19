@@ -8,8 +8,9 @@ from django.utils import timezone
 from django.views.generic import TemplateView
 
 from clinica.apis.movimiento_ficha_monologo_controlado import RegistrarSalidaAPI, RegistrarRecepcionAPI
-from clinica.forms.movimiento_ficha_monologo_controlado import MovimientoSalidaForm, MovimientoRecepcionForm, \
-    FiltroMovimientoForm
+from clinica.forms.movimiento_ficha_monologo_controlado import (
+    MovimientoSalidaForm, MovimientoRecepcionForm, FiltroMovimientoForm, MovimientoTraspasoForm
+)
 from clinica.models import Ficha
 from clinica.models.movimiento_ficha_monologo_controlado import MovimientoMonologoControlado
 from personas.models.pacientes import Paciente
@@ -93,6 +94,160 @@ class SalidaFichaView(LoginRequiredMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         view = RegistrarSalidaAPI.as_view()
         return view(request, *args, **kwargs)
+
+
+class TraspasoFichaView(LoginRequiredMixin, TemplateView):
+    template_name = 'movimiento_ficha_monologo_controlado/traspaso_ficha.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = MovimientoTraspasoForm(establecimiento=self.request.user.establecimiento)
+        context['filter_form'] = FiltroMovimientoForm(establecimiento=self.request.user.establecimiento)
+        context['columns'] = ['RUT', 'Paciente', 'Ficha', 'Servicio Destino', 'Profesional',
+                              'Observación Traspaso', 'Estado', 'Fecha Salida', 'Fecha Entrada']
+        context['datatable_enabled'] = True
+        return context
+
+    def get(self, request, *args, **kwargs):
+        if request.GET.get('datatable'):
+            return self.get_datatable_data(request)
+        return super().get(request, *args, **kwargs)
+
+    def get_datatable_data(self, request):
+        establecimiento = request.user.establecimiento
+        qs = MovimientoMonologoControlado.objects.filter(
+            establecimiento=establecimiento,
+            estado='E',
+        ).select_related('rut_paciente', 'ficha', 'servicio_clinico_destino', 'profesional')
+
+        # Filtros
+        fecha_inicio = request.GET.get('fecha_inicio')
+        fecha_termino = request.GET.get('fecha_termino')
+        servicio_id = request.GET.get('servicio_clinico')
+        profesional_id = request.GET.get('profesional')
+
+        if fecha_inicio:
+            qs = qs.filter(fecha_salida__gte=fecha_inicio)
+        if fecha_termino:
+            qs = qs.filter(fecha_salida__lte=fecha_termino)
+        if servicio_id:
+            qs = qs.filter(servicio_clinico_destino_id=servicio_id)
+        if profesional_id:
+            qs = qs.filter(profesional_id=profesional_id)
+
+        # Total antes de búsqueda global
+        records_total = qs.count()
+        records_filtered = records_total
+
+        # Búsqueda Global (DataTables)
+        search_value = request.GET.get('search[value]', '').strip()
+        if search_value:
+            qs = qs.filter(
+                Q(rut__icontains=search_value) |
+                Q(numero_ficha__icontains=search_value) |
+                Q(rut_paciente__nombres__icontains=search_value) |
+                Q(rut_paciente__apellidos__icontains=search_value) |
+                Q(servicio_clinico_destino__nombre__icontains=search_value) |
+                Q(profesional__nombres__icontains=search_value) |
+                Q(observacion_traspaso__icontains=search_value)
+            )
+            records_filtered = qs.count()
+
+        # Ordenamiento
+        order_column_index = int(request.GET.get('order[0][column]', 0))
+        order_dir = request.GET.get('order[0][dir]', 'desc')
+        prefix = '-' if order_dir == 'desc' else ''
+
+        # Mapeo de columnas según el orden en context['columns'] + ID + Acciones
+        # 0: ID, 1: acciones, 2: RUT, 3: Paciente, 4: Ficha, 5: Servicio Destino, 6: Profesional, 7: Obs, 8: Estado, 9: Fecha Salida, 10: Fecha Entrada
+        columns_map = {
+            0: 'id',
+            2: 'rut',
+            3: 'rut_paciente__nombres',
+            4: 'numero_ficha',
+            5: 'servicio_clinico_destino__nombre',
+            6: 'profesional__nombres',
+            7: 'observacion_traspaso',
+            8: 'estado',
+            9: 'fecha_salida',
+            10: 'fecha_entrada'
+        }
+
+        col_name = columns_map.get(order_column_index)
+        if col_name:
+            qs = qs.order_by(f'{prefix}{col_name}')
+        else:
+            qs = qs.order_by('-fecha_salida')
+
+        # Paginación
+        start = int(request.GET.get('start', 0))
+        length = int(request.GET.get('length', 10))
+        qs_slice = qs[start:start + length]
+
+        data = []
+        for mov in qs_slice:
+            fecha_salida_local = timezone.localtime(mov.fecha_salida) if mov.fecha_salida else None
+            fecha_entrada_local = timezone.localtime(mov.fecha_entrada) if mov.fecha_entrada else None
+
+            estado_badge = ''
+            if mov.estado == 'E':
+                estado_badge = f'<span class="badge badge-primary">{mov.get_estado_display()}</span>'
+            elif mov.estado == 'R':
+                estado_badge = f'<span class="badge badge-success">{mov.get_estado_display()}</span>'
+            else:
+                estado_badge = f'<span class="badge badge-secondary">{mov.get_estado_display()}</span>'
+
+            # El base.html espera campos que coincidan con los nombres en 'columns' (slugified o similar?)
+            # Según base.html: {data: 'ID'}, {data: 'actions'}, {data: '{{ col }}'}
+            # 'columns' = ['RUT', 'Paciente', 'Ficha', 'Servicio Destino', 'Profesional', 'Observación Traspaso', 'Estado', 'Fecha Salida', 'Fecha Entrada']
+            data.append({
+                'ID': mov.id,
+                'actions': f'<button type="button" class="btn btn-warning btn-sm btn-edit" data-rut="{mov.ficha.paciente.rut if mov.ficha and mov.ficha.paciente else mov.rut}"><i class="fas fa-edit"></i></button>',
+                'RUT': mov.ficha.paciente.rut if mov.ficha and mov.ficha.paciente else mov.rut,
+                'Paciente': mov.ficha.paciente.nombre_completo if mov.ficha and mov.ficha.paciente else (
+                    mov.rut_paciente.nombre_completo if mov.rut_paciente else '-'),
+                'Ficha': mov.numero_ficha,
+                'Servicio Destino': mov.servicio_clinico_destino.nombre if mov.servicio_clinico_destino else '-',
+                'Profesional': str(mov.profesional) if mov.profesional else '-',
+                'Observación Traspaso': mov.observacion_traspaso or '',
+                'Estado': estado_badge,
+                'Fecha Salida': fecha_salida_local.strftime('%d/%m/%Y %H:%M') if fecha_salida_local else '-',
+                'Fecha Entrada': fecha_entrada_local.strftime('%d/%m/%Y %H:%M') if fecha_entrada_local else '-',
+            })
+
+        return JsonResponse({
+            'draw': int(request.GET.get('draw', 1)),
+            'recordsTotal': records_total,
+            'recordsFiltered': records_filtered,
+            'data': data
+        })
+
+    def post(self, request, *args, **kwargs):
+        movimiento_id = request.POST.get('movimiento_id_hidden')
+        if not movimiento_id:
+            # Si no hay ID, tal vez sea por el nombre del campo en el form
+            movimiento_id = request.POST.get('id_movimiento_hidden')
+
+        if not movimiento_id:
+            return JsonResponse({'success': False, 'error': 'No se especificó un movimiento para actualizar.'},
+                                status=400)
+
+        movimiento = get_object_or_404(MovimientoMonologoControlado, pk=movimiento_id,
+                                       establecimiento=request.user.establecimiento)
+
+        form = MovimientoTraspasoForm(request.POST, instance=movimiento, establecimiento=request.user.establecimiento)
+        if form.is_valid():
+            mov = form.save(commit=False)
+            # Aseguramos que se guarde la observación de traspaso específicamente
+            mov.observacion_traspaso = form.cleaned_data.get('observacion_traspaso')
+            # Si se proporcionó fecha de entrada, el estado debería ser Recibido
+            if mov.fecha_entrada:
+                mov.estado = 'R'
+            mov.save()
+            return JsonResponse({'success': True, 'message': 'Traspaso actualizado correctamente.'})
+        else:
+            errors = form.errors.as_text()
+            return JsonResponse({'success': False, 'error': f'Error en el formulario: {errors}'}, status=400)
 
 
 class SalidaFichaUpdateView(SalidaFichaView):

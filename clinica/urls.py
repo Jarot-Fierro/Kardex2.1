@@ -2,14 +2,16 @@ from django.urls import path
 
 from clinica.apis.buscar_paciente import (
     buscar_paciente_ficha_api, buscar_paciente_recepcion_api, buscar_paciente_traspaso_api,
-    buscar_paciente_ficha_api_monologo, buscar_paciente_recepcion_api_monologo
+    buscar_paciente_ficha_api_monologo, buscar_paciente_recepcion_api_monologo,
+    buscar_paciente_ficha_api_monologo_traspaso
 )
 from clinica.apis.movimiento_ficha_monologo_controlado import RegistrarSalidaAPI, RegistrarRecepcionAPI
 from clinica.apis.movimientos_ficha_paciente import get_movimientos_paciente_establecimiento
 from clinica.views.fichas import *
 from clinica.views.movimiento_ficha import *
-from clinica.views.movimiento_ficha_monologo_controlado import SalidaFichaView, SalidaFichaUpdateView, \
-    RecepcionFichaView, FichasEnTransitoView
+from clinica.views.movimiento_ficha_monologo_controlado import (
+    SalidaFichaView, SalidaFichaUpdateView, RecepcionFichaView, FichasEnTransitoView, TraspasoFichaView
+)
 from clinica.views.pdf import pdf_stickers, pdf_index, pdf_movimientos_fichas, \
     pdf_movimientos_fichas_monologo_controlado
 
@@ -37,6 +39,7 @@ urlpatterns = [
     path('movimientos-monologo/salida/', SalidaFichaView.as_view(), name='movimiento_monologo_salida'),
     path('movimientos-monologo/salida/<int:pk>/editar/', SalidaFichaUpdateView.as_view(),
          name='movimiento_monologo_salida_update'),
+    path('movimientos-monologo/traspaso/', TraspasoFichaView.as_view(), name='movimiento_monologo_traspaso'),
     path('movimientos-monologo/recepcion/', RecepcionFichaView.as_view(), name='movimiento_monologo_recepcion'),
     path('fichas-en-transito-controlado/', FichasEnTransitoView.as_view(), name='fichas_en_transito_monologo'),
     path('api/movimientos-fichas-monologo/salida/', RegistrarSalidaAPI.as_view(),
@@ -51,6 +54,9 @@ urlpatterns = [
     path('api/ficha-paciente/buscar-recepcion/', buscar_paciente_recepcion_api, name='ficha-paciente-buscar-recepcion'),
     path('api/ficha-paciente/buscar-recepcion/monologo/', buscar_paciente_recepcion_api_monologo,
          name='ficha-paciente-buscar-recepcion-monologo'),
+
+    path('api/ficha-paciente/buscar/monologo-traspaso/', buscar_paciente_ficha_api_monologo_traspaso,
+         name='ficha-paciente-buscar-monologo-traspaso'),
 
     path('api/ficha-paciente/buscar-traspaso/', buscar_paciente_traspaso_api, name='ficha-paciente-buscar-traspaso'),
 

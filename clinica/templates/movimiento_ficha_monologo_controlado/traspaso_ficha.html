@@ -15,7 +15,8 @@
                     <div class="card-body">
                         <form id="form-traspaso" method="post" novalidate>
                             {% csrf_token %}
-                            {{ form.movimiento_id }}
+                            <input type="hidden" name="movimiento_id_hidden" id="id_movimiento_hidden">
+                            {{ form.ficha_id_hidden }}
 
                             <div class="row">
                                 <!-- RUT y Búsqueda -->
@@ -49,26 +50,26 @@
                             <div class="row">
                                 <div class="col-md-3">
                                     <div class="form-group">
-                                        <label>{{ form.servicio_clinico_envio.label }}</label>
-                                        {{ form.servicio_clinico_envio }}
+                                        <label>{{ form.servicio_clinico_destino.label }}</label>
+                                        {{ form.servicio_clinico_destino }}
                                     </div>
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
-                                        <label>{{ form.servicio_clinico_recepcion.label }}</label>
-                                        {{ form.servicio_clinico_recepcion }}
+                                        <label>{{ form.profesional.label }}</label>
+                                        {{ form.profesional }}
                                     </div>
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
-                                        <label>{{ form.servicio_clinico_traspaso.label }}</label>
-                                        {{ form.servicio_clinico_traspaso }}
+                                        <label>{{ form.fecha_salida.label }}</label>
+                                        {{ form.fecha_salida }}
                                     </div>
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
-                                        <label>{{ form.profesional_traspaso.label }}</label>
-                                        {{ form.profesional_traspaso }}
+                                        <label>{{ form.fecha_entrada.label }}</label>
+                                        {{ form.fecha_entrada }}
                                     </div>
                                 </div>
                             </div>
@@ -155,7 +156,7 @@
                             <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Acciones</th>
+                                <th>acciones</th>
                                 {% for col in columns %}
                                     {% if col != 'ID' and col != 'actions' %}
                                         <th>{{ col }}</th>
@@ -225,10 +226,14 @@
             function limpiarRegistro() {
                 $('#id_movimiento_hidden').val('');
                 $('#id_rut').val('');
-                $('#nombre_mov').val('');
-                $('#id_ficha').val('');
-                $('#servicio_clinico_envio_ficha').val('');
-                $('#servicio_clinico_recepcion_ficha').val('');
+                $('#nombre_paciente').val('');
+                $('#numero_ficha').val('');
+                $('#id_ficha_hidden').val('');
+                $('#id_servicio_clinico_destino').val('').trigger('change');
+                $('#id_profesional').val('').trigger('change');
+                $('#id_fecha_salida').val('');
+                $('#id_fecha_entrada').val('');
+                $('#id_observacion_traspaso').val('');
                 $btnRegistrar.prop('disabled', true);
                 $rut.focus();
             }
@@ -256,21 +261,36 @@
                 }
 
                 $.ajax({
-                    url: '{% url "ficha-paciente-buscar-traspaso" %}',
+                    url: '{% url "ficha-paciente-buscar-monologo-traspaso" %}',
                     data: {q: val},
                     success: function (response) {
                         if (response.results && response.results.length > 0) {
                             const p = response.results[0];
-                            if (!p.apto_traspaso) {
-                                Swal.fire('Información', 'No hay movimientos pendientes de traspaso para este paciente.', 'info');
-                                limpiarRegistro();
+                            if (!p.movimiento_id) {
+                                Swal.fire('Información', 'No se encontró un movimiento previo para este paciente.', 'info');
+                                // Rellenamos lo básico por si acaso
+                                $('#id_rut').val(p.rut);
+                                $('#nombre_paciente').val(p.nombre_completo);
+                                $('#numero_ficha').val(p.numero_ficha_sistema);
+                                $('#id_ficha_hidden').val(p.ficha_id);
+                                $btnRegistrar.prop('disabled', true);
                             } else {
                                 $('#id_movimiento_hidden').val(p.movimiento_id);
                                 $rut.val(p.rut);
-                                $('#nombre_mov').val(p.nombre_completo);
-                                $('#id_ficha').val(p.numero_ficha_sistema);
-                                $('#servicio_clinico_envio_ficha').val(p.servicio_envio_nombre);
-                                $('#servicio_clinico_recepcion_ficha').val(p.servicio_recepcion_nombre);
+                                $('#nombre_paciente').val(p.nombre_completo);
+                                $('#numero_ficha').val(p.numero_ficha_sistema);
+                                $('#id_ficha_hidden').val(p.ficha_id);
+
+                                if (p.servicio_clinico_destino) {
+                                    $('#id_servicio_clinico_destino').val(p.servicio_clinico_destino).trigger('change');
+                                }
+                                if (p.profesional) {
+                                    $('#id_profesional').val(p.profesional).trigger('change');
+                                }
+                                $('#id_fecha_salida').val(p.fecha_salida);
+                                $('#id_fecha_entrada').val(p.fecha_entrada);
+                                $('#id_observacion_traspaso').val(p.observacion_traspaso);
+
                                 $btnRegistrar.prop('disabled', false);
                             }
                         } else {
@@ -306,7 +326,7 @@
                 }
 
                 $.ajax({
-                    url: window.location.href,
+                    url: '{% url "movimiento_monologo_traspaso" %}',
                     method: 'POST',
                     data: $(this).serialize(),
                     headers: {'X-Requested-With': 'XMLHttpRequest'},
@@ -336,12 +356,12 @@
             });
 
             // Configuración personalizada para DataTable (filtros y acciones)
-            // Esperamos a que DataTable esté inicializado (base.html lo hace en $(function(){...}))
+            // El DataTable ya se inicializa en base.html si datatable_enabled es True.
+            // Aquí solo manejamos los filtros y el botón de refresh.
             $(function () {
                 const table = $('#Table').DataTable();
 
-                // Modificar la configuración de AJAX para incluir filtros
-                // Como ya está inicializado, interceptamos el evento preXhr o usamos ajax.data
+                // Interceptar la petición para añadir filtros adicionales
                 table.on('preXhr.dt', function (e, settings, data) {
                     const filterData = $('#form-filtros').serializeArray();
                     filterData.forEach(item => {
@@ -349,13 +369,8 @@
                     });
                 });
 
-                // Eliminar el input de búsqueda de DataTable ya que usamos filtros personalizados
-                $('#Table_filter').remove();
-
-                // Personalizar renderizado de columnas si es necesario (Acciones y Estado)
-                // Nota: base.html ya define las columnas, pero podemos ajustar el comportamiento
-                // o confiar en lo que devuelve render_row en la vista si queremos simplificar.
-                // Sin embargo, para mantener los badges y botones:
+                // Eliminar el input de búsqueda de DataTable ya que usamos filtros personalizados si es necesario
+                // $('#Table_filter').remove();
 
                 // Refresh table button
                 $('#btn-refresh-table').on('click', function () {
