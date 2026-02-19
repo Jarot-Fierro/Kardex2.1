@@ -104,7 +104,7 @@ class TraspasoFichaView(LoginRequiredMixin, TemplateView):
         context['form'] = MovimientoTraspasoForm(establecimiento=self.request.user.establecimiento)
         context['filter_form'] = FiltroMovimientoForm(establecimiento=self.request.user.establecimiento)
         context['columns'] = ['RUT', 'Paciente', 'Ficha', 'Servicio Destino', 'Profesional',
-                              'Observación Traspaso', 'Estado', 'Fecha Salida', 'Fecha Entrada']
+                              'Observación Traspaso', 'Estado', 'Fecha Salida']
         context['datatable_enabled'] = True
         return context
 
@@ -159,7 +159,7 @@ class TraspasoFichaView(LoginRequiredMixin, TemplateView):
         prefix = '-' if order_dir == 'desc' else ''
 
         # Mapeo de columnas según el orden en context['columns'] + ID + Acciones
-        # 0: ID, 1: acciones, 2: RUT, 3: Paciente, 4: Ficha, 5: Servicio Destino, 6: Profesional, 7: Obs, 8: Estado, 9: Fecha Salida, 10: Fecha Entrada
+        # 0: ID, 1: acciones, 2: RUT, 3: Paciente, 4: Ficha, 5: Servicio Destino, 6: Profesional, 7: Obs, 8: Estado, 9: Fecha Salida,
         columns_map = {
             0: 'id',
             2: 'rut',
@@ -170,7 +170,6 @@ class TraspasoFichaView(LoginRequiredMixin, TemplateView):
             7: 'observacion_traspaso',
             8: 'estado',
             9: 'fecha_salida',
-            10: 'fecha_entrada'
         }
 
         col_name = columns_map.get(order_column_index)
@@ -212,7 +211,6 @@ class TraspasoFichaView(LoginRequiredMixin, TemplateView):
                 'Observación Traspaso': mov.observacion_traspaso or '',
                 'Estado': estado_badge,
                 'Fecha Salida': fecha_salida_local.strftime('%d/%m/%Y %H:%M') if fecha_salida_local else '-',
-                'Fecha Entrada': fecha_entrada_local.strftime('%d/%m/%Y %H:%M') if fecha_entrada_local else '-',
             })
 
         return JsonResponse({

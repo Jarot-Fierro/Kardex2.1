@@ -156,9 +156,18 @@
                         <ul aria-labelledby="dropdownSubMenu3" class="dropdown-menu border-0 shadow">
 
                             <!-- ===== BLOQUE 1: BIDIRECCIONAL ===== -->
-                            <li class="dropdown-header text-primary font-weight-bold">
-                                🔁 Movimientos Bidireccionales
+                            <li class="dropdown-header text-primary font-weight-bold d-flex justify-content-between align-items-center">
+                                <span>🔄 Enviar y Recibir entre Servicios</span>
+
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-primary ml-2"
+                                        data-toggle="modal"
+                                        data-target="#modalServicios"
+                                        style="padding:2px 6px;">
+                                    ?
+                                </button>
                             </li>
+
 
                             <li>
                                 <a href="{% url 'salida_ficha_masiva' %}" class="dropdown-item">
@@ -181,8 +190,16 @@
                             <li class="dropdown-divider"></li>
 
                             <!-- ===== BLOQUE 2: MONÓLOGO ===== -->
-                            <li class="dropdown-header text-success font-weight-bold px-3 text-left">
-                                📁 Monólogo Controlado
+                            <li class="dropdown-header text-success font-weight-bold d-flex justify-content-between align-items-center">
+                                <span>📁 Enviar y Recibir Normal</span>
+
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-success ml-2"
+                                        data-toggle="modal"
+                                        data-target="#modalSome"
+                                        style="padding:2px 6px;">
+                                    ?
+                                </button>
                             </li>
 
 
@@ -285,4 +302,81 @@
         </ul>
     </div>
 </nav>
+
+<div class="modal fade" id="modalServicios" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">🔄 Movimiento entre Servicios</h5>
+                <button type="button" class="close text-white" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <p>
+                    Este tipo de movimiento requiere que el servicio que recibe la ficha
+                    confirme la recepción en el sistema.
+                </p>
+
+                <ul>
+                    <li>SOME envía a Urgencia → Urgencia debe confirmar.</li>
+                    <li>Urgencia devuelve a SOME → SOME debe confirmar.</li>
+                </ul>
+
+                <p class="text-muted small">
+                    Cada servicio es responsable de registrar cuando recibe la ficha.
+                </p>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    Cerrar
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalSome" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">📦 Movimiento Controlado desde Origen</h5>
+                <button type="button" class="close text-white" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <p>
+                    La ficha puede circular por distintos servicios,
+                    pero solo el servicio clinico de origen confirma la recepción final.
+                </p>
+
+                <ul>
+                    <li>SOME/Fichero/Archivo envía a Urgencia.</li>
+                    <li>Puede pasar por otros servicios.</li>
+                    <li>Cuando regresa a SOME/Fichero/Archivo, allí se confirma la recepción.</li>
+                </ul>
+
+                <p class="text-muted small">
+                    Otros servicios no necesitan registrar recepción.
+                </p>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    Cerrar
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
 <!-- /.navbar -->

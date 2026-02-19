@@ -109,10 +109,12 @@ class DataTableMixin:
             order_col = 0
         order_dir = request.GET.get('order[0][dir]', 'asc')
 
+        pk_field = self.model._meta.pk.name if self.model else 'id'
+
         order_field = (
             self.datatable_order_fields[order_col]
             if 0 <= order_col < len(self.datatable_order_fields)
-            else 'id'
+            else pk_field
         )
         if order_field:
             if order_dir == 'desc':

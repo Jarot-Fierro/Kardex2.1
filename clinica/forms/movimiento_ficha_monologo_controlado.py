@@ -87,9 +87,6 @@ class MovimientoTraspasoForm(forms.ModelForm):
     fecha_salida = forms.DateTimeField(label='Fecha Salida', widget=forms.DateTimeInput(
         attrs={'class': 'form-control', 'type': 'datetime-local', 'id': 'id_fecha_salida'}))
 
-    fecha_entrada = forms.DateTimeField(label='Fecha Entrada', widget=forms.DateTimeInput(
-        attrs={'class': 'form-control', 'type': 'datetime-local', 'id': 'id_fecha_entrada'}), required=False)
-
     profesional = forms.ModelChoiceField(
         queryset=Profesional.objects.none(),
         label='Profesional Destino',

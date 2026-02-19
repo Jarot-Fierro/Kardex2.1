@@ -66,12 +66,6 @@
                                         {{ form.fecha_salida }}
                                     </div>
                                 </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label>{{ form.fecha_entrada.label }}</label>
-                                        {{ form.fecha_entrada }}
-                                    </div>
-                                </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-12">
@@ -109,12 +103,12 @@
                         <form id="form-filtros" method="get">
                             <div class="row">
                                 <div class="form-group col-md-3 mb-0">
-                                    <label class="mb-1 small">{{ filter_form.hora_inicio.label }}</label>
-                                    {{ filter_form.hora_inicio }}
+                                    <label class="mb-1 small">{{ filter_form.fecha_inicio.label }}</label>
+                                    {{ filter_form.fecha_inicio }}
                                 </div>
                                 <div class="form-group col-md-3 mb-0">
-                                    <label class="mb-1 small">{{ filter_form.hora_termino.label }}</label>
-                                    {{ filter_form.hora_termino }}
+                                    <label class="mb-1 small">{{ filter_form.fecha_termino.label }}</label>
+                                    {{ filter_form.fecha_termino }}
                                 </div>
                                 <div class="form-group col-md-3 mb-0">
                                     <label class="mb-1 small">{{ filter_form.servicio_clinico.label }}</label>
@@ -232,7 +226,6 @@
                 $('#id_servicio_clinico_destino').val('').trigger('change');
                 $('#id_profesional').val('').trigger('change');
                 $('#id_fecha_salida').val('');
-                $('#id_fecha_entrada').val('');
                 $('#id_observacion_traspaso').val('');
                 $btnRegistrar.prop('disabled', true);
                 $rut.focus();
@@ -288,7 +281,6 @@
                                     $('#id_profesional').val(p.profesional).trigger('change');
                                 }
                                 $('#id_fecha_salida').val(p.fecha_salida);
-                                $('#id_fecha_entrada').val(p.fecha_entrada);
                                 $('#id_observacion_traspaso').val(p.observacion_traspaso);
 
                                 $btnRegistrar.prop('disabled', false);

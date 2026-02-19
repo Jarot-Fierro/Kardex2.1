@@ -10,6 +10,7 @@ from django.shortcuts import redirect, get_object_or_404
 from django.shortcuts import render
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy
+from django.utils import timezone
 from django.views import View
 from django.views.generic import CreateView, DetailView
 from django.views.generic import TemplateView
@@ -57,10 +58,10 @@ class UserListView(DataTableMixin, TemplateView):
     template_name = 'usuarios/list.html'
     model = User
 
-    datatable_columns = ['ID', 'Usuario', 'Nombre', 'Correo', 'Establecimiento', 'Último inicio']
+    datatable_columns = ['ID', 'Usuario', 'Nombre', 'Correo', 'Establecimiento', 'Ultimo inicio']
 
     datatable_order_fields = [
-        'user_id', 'username', 'first_name', 'email',
+        'user_id', None, 'username', 'first_name', 'email',
         'establecimiento__nombre', 'last_login'
     ]
 
@@ -82,7 +83,6 @@ class UserListView(DataTableMixin, TemplateView):
         if user.establecimiento:
             return User.objects.filter(
                 establecimiento=user.establecimiento,
-                is_active=True
             ).select_related('establecimiento')
 
         return User.objects.none()
@@ -90,13 +90,18 @@ class UserListView(DataTableMixin, TemplateView):
     def render_row(self, obj):
         nombre = f"{obj.first_name or ''} {obj.last_name or ''}".strip()
 
+        last_login_str = 'Nunca'
+        if obj.last_login:
+            last_login_local = timezone.localtime(obj.last_login)
+            last_login_str = last_login_local.strftime('%d-%m-%Y %H:%M')
+
         return {
             'ID': obj.user_id,  # << tu PK real
             'Usuario': obj.username,
             'Nombre': nombre if nombre else '—',
             'Correo': obj.email or '—',
             'Establecimiento': obj.establecimiento.nombre if obj.establecimiento else '—',
-            'Último inicio': obj.last_login.strftime('%d-%m-%Y %H:%M') if obj.last_login else 'Nunca',
+            'Ultimo inicio': last_login_str,
         }
 
     def get(self, request, *args, **kwargs):
