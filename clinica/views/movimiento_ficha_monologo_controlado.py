@@ -13,6 +13,7 @@ from clinica.forms.movimiento_ficha_monologo_controlado import (
 )
 from clinica.models import Ficha
 from clinica.models.movimiento_ficha_monologo_controlado import MovimientoMonologoControlado
+from core.utils.search_utils import get_rut_q_filter, get_name_q_filter
 from personas.models.pacientes import Paciente
 
 
@@ -45,7 +46,8 @@ class SalidaFichaView(LoginRequiredMixin, TemplateView):
             establecimiento=establecimiento,
             estado='E',
             ficha__isnull=False,
-            ficha__paciente__isnull=False
+            ficha__paciente__isnull=False,
+            status=True
         ).select_related('rut_paciente', 'ficha', 'servicio_clinico_destino', 'profesional').order_by('-fecha_salida')
 
         # Filtros
@@ -62,6 +64,19 @@ class SalidaFichaView(LoginRequiredMixin, TemplateView):
             qs = qs.filter(servicio_clinico_destino_id=servicio_id)
         if profesional_id:
             qs = qs.filter(profesional_id=profesional_id, profesional__establecimiento=establecimiento, status=True)
+
+        # Búsqueda Global (DataTables)
+        search_value = request.GET.get('search[value]', '').strip()
+        if search_value:
+            q = get_rut_q_filter(search_value, 'rut')
+            q |= get_rut_q_filter(search_value, 'rut_paciente__rut')
+            q |= get_name_q_filter(search_value, 'rut_paciente__')
+            q |= Q(numero_ficha__icontains=search_value)
+            q |= Q(servicio_clinico_destino__nombre__icontains=search_value)
+            q |= Q(profesional__nombres__icontains=search_value)
+            q |= Q(observacion_salida__icontains=search_value)
+            q |= Q(fecha_salida__icontains=search_value)
+            qs = qs.filter(q)
 
         data = []
         for mov in qs:
@@ -118,6 +133,7 @@ class TraspasoFichaView(LoginRequiredMixin, TemplateView):
         qs = MovimientoMonologoControlado.objects.filter(
             establecimiento=establecimiento,
             estado='E',
+            status=True
         ).select_related('rut_paciente', 'ficha', 'servicio_clinico_destino', 'profesional')
 
         # Filtros
@@ -142,15 +158,15 @@ class TraspasoFichaView(LoginRequiredMixin, TemplateView):
         # Búsqueda Global (DataTables)
         search_value = request.GET.get('search[value]', '').strip()
         if search_value:
-            qs = qs.filter(
-                Q(rut__icontains=search_value) |
-                Q(numero_ficha__icontains=search_value) |
-                Q(rut_paciente__nombres__icontains=search_value) |
-                Q(rut_paciente__apellidos__icontains=search_value) |
-                Q(servicio_clinico_destino__nombre__icontains=search_value) |
-                Q(profesional__nombres__icontains=search_value) |
-                Q(observacion_traspaso__icontains=search_value)
-            )
+            q = get_rut_q_filter(search_value, 'rut')
+            q |= get_rut_q_filter(search_value, 'rut_paciente__rut')
+            q |= get_name_q_filter(search_value, 'rut_paciente__')
+            q |= Q(numero_ficha__icontains=search_value)
+            q |= Q(servicio_clinico_destino__nombre__icontains=search_value)
+            q |= Q(profesional__nombres__icontains=search_value)
+            q |= Q(observacion_salida__icontains=search_value)
+            q |= Q(fecha_salida__icontains=search_value)
+            qs = qs.filter(q)
             records_filtered = qs.count()
 
         # Ordenamiento
@@ -350,15 +366,16 @@ class RecepcionFichaView(LoginRequiredMixin, TemplateView):
         # Búsqueda Global (DataTables)
         search_value = request.GET.get('search[value]', '').strip()
         if search_value:
-            qs = qs.filter(
-                Q(rut__icontains=search_value) |
-                Q(numero_ficha__icontains=search_value) |
-                Q(rut_paciente__nombres__icontains=search_value) |
-                Q(rut_paciente__apellidos__icontains=search_value) |
-                Q(servicio_clinico_destino__nombre__icontains=search_value) |
-                Q(profesional__nombres__icontains=search_value) |
-                Q(observacion_entrada__icontains=search_value)
-            )
+            q = get_rut_q_filter(search_value, 'rut')
+            q |= get_rut_q_filter(search_value, 'rut_paciente__rut')
+            q |= get_name_q_filter(search_value, 'rut_paciente__')
+            q |= Q(numero_ficha__icontains=search_value)
+            q |= Q(servicio_clinico_destino__nombre__icontains=search_value)
+            q |= Q(profesional__nombres__icontains=search_value)
+            q |= Q(observacion_entrada__icontains=search_value)
+            q |= Q(fecha_salida__icontains=search_value)
+            q |= Q(fecha_entrada__icontains=search_value)
+            qs = qs.filter(q)
             records_filtered = qs.count()
 
         # Ordenamiento
@@ -440,7 +457,8 @@ class FichasEnTransitoView(LoginRequiredMixin, TemplateView):
         # Contar total en tránsito (Estado E)
         total = MovimientoMonologoControlado.objects.filter(
             establecimiento=establecimiento,
-            estado='E'
+            estado='E',
+            status=True
         ).count()
 
         context['title'] = f'Fichas en Tránsito (Total: {total})'
@@ -461,7 +479,8 @@ class FichasEnTransitoView(LoginRequiredMixin, TemplateView):
         # Movimientos en tránsito (E)
         qs = MovimientoMonologoControlado.objects.filter(
             establecimiento=establecimiento,
-            estado='E'
+            estado='E',
+            status=True
         ).select_related('rut_paciente', 'ficha', 'servicio_clinico_destino', 'profesional')
 
         # Filtros Base
@@ -486,14 +505,14 @@ class FichasEnTransitoView(LoginRequiredMixin, TemplateView):
         # Búsqueda Global (DataTables)
         search_value = request.GET.get('search[value]', '').strip()
         if search_value:
-            qs = qs.filter(
-                Q(rut__icontains=search_value) |
-                Q(numero_ficha__icontains=search_value) |
-                Q(rut_paciente__nombres__icontains=search_value) |
-                Q(rut_paciente__apellidos__icontains=search_value) |
-                Q(servicio_clinico_destino__nombre__icontains=search_value) |
-                Q(profesional__nombres__icontains=search_value)
-            )
+            q = get_rut_q_filter(search_value, 'rut')
+            q |= get_rut_q_filter(search_value, 'rut_paciente__rut')
+            q |= get_name_q_filter(search_value, 'rut_paciente__')
+            q |= Q(numero_ficha__icontains=search_value)
+            q |= Q(servicio_clinico_destino__nombre__icontains=search_value)
+            q |= Q(profesional__nombres__icontains=search_value)
+            q |= Q(fecha_salida__icontains=search_value)
+            qs = qs.filter(q)
             records_filtered = qs.count()
 
         # Ordenamiento

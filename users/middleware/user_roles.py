@@ -26,6 +26,7 @@ class UserRolesMiddleware(MiddlewareMixin):
                 "fichas": 0,
                 "genero": 0,
                 "movimiento_ficha": 0,
+                "movimiento_ficha_controlado": 0,
                 "paciente": 0,
                 "pais": 0,
                 "prevision": 0,

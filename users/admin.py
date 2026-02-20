@@ -139,6 +139,6 @@ class RoleAdmin(admin.ModelAdmin):
         }),
 
         ("Sección Clínica", {
-            "fields": ("paciente", "fichas", "movimiento_ficha"),
+            "fields": ("paciente", "fichas", "movimiento_ficha", "movimiento_ficha_controlado"),
         }),
     )

@@ -21,3 +21,4 @@ class Prevision(StandardModel):
     class Meta:
         verbose_name = 'Prevision'
         verbose_name_plural = 'Previsiones'
+        ordering = ['nombre']

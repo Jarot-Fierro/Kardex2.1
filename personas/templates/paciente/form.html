@@ -818,11 +818,11 @@
                             <thead class="bg-light">
                             <tr>
                                 <th>Fecha Envío</th>
-                                <th>Origen</th>
-                                <th>Fecha Recep.</th>
                                 <th>Destino</th>
+                                <th>Fecha Recepción</th>
+                                <th>Profesional</th>
                                 <th>Usuario Envío</th>
-                                <th>Usuario Recep.</th>
+                                <th>Usuario Recepción</th>
                                 <th>Estado</th>
                             </tr>
                             </thead>
@@ -851,6 +851,7 @@
             });
         });
     </script>
+    {#    Limpiar Formulario #}
     <script>
         {#    Botones #}
         $('#btn-confirmar-limpiar-formulario').on('click', function () {
@@ -1135,6 +1136,14 @@
             // Último movimiento (más reciente)
             const movimiento = data.ficha.movimientos[0];
 
+            // Si el último movimiento es R (Recibido), significa que está en SOME
+            if (movimiento.estado === 'R') {
+                setText('id_servicio_clinico', 'SIN INFORMACIÓN');
+                setText('id_profesional_cargo', 'SIN INFORMACIÓN');
+                setText('id_fecha_envio', '—');
+                return;
+            }
+
             // Servicio clínico actual (destino)
             setText(
                 'id_servicio_clinico',
@@ -1156,7 +1165,7 @@
 
 
     </script>
-    {#  Mostrar la Fecha en caso de que el paciente se ecneutre fallecido #}
+    {#  Mostrar la Fecha en caso de que el paciente se encuentre fallecido #}
     <script>
         $(document).ready(function () {
 
@@ -1227,7 +1236,7 @@
 
     </script>
 
-    {#    ESTA ES LA CONSULTA HACIA LA API FICHA-PACIENTE#}
+    {#    ESTA ES LA CONSULTA HACIA LA API FICHA-PACIENTE #}
     <script>
         $(document).ready(function () {
 
@@ -1398,7 +1407,7 @@
         });
     </script>
 
-    {#  Solo carga la tabla en caso de que Django devuelva el fromulario con los datos pero sin la ubicación del registro #}
+    {#  Solo carga la tabla en caso de que Django devuelva el formulario con los datos pero sin la ubicación del registro #}
     <script>
         $(document).ready(function () {
             // Carga solo los datos de Tabla y ubicacion en caso de que Django devuelva el formulario con errores
@@ -1842,6 +1851,21 @@
                     url: `/clinica/api/movimientos/paciente/${rut}/`,
                     type: 'GET',
                     success: function (response) {
+                        // ACTUALIZAR INFORMACIÓN DE INGRESO Y UBICACIÓN
+                        if (response.ficha) {
+                            const f = response.ficha;
+                            setText('id_usuario_anterior', f.ingresado_por || '—');
+                            setText('id_fecha_creacion', f.fecha_ingreso ? formatearFechaHora(f.fecha_ingreso) : '—');
+
+                            if (f.ubicacion_actual) {
+                                const u = f.ubicacion_actual;
+                                setText('id_servicio_clinico', u.servicio_clinico || 'SIN INFORMACIÓN');
+                                setText('id_profesional_cargo', u.profesional_cargo || 'SIN INFORMACIÓN');
+                                setText('id_fecha_envio', u.fecha_hora_envio ? formatearFechaHora(u.fecha_hora_envio) : '—');
+                            }
+                        }
+
+                        // CARGAR MOVIMIENTOS EN EL MODAL
                         $tabla.empty();
                         if (response.movimientos && response.movimientos.length > 0) {
                             response.movimientos.forEach(m => {
@@ -1849,22 +1873,20 @@
                                 const fechaRecep = m.fecha_recepcion ? new Date(m.fecha_recepcion).toLocaleString() : '---';
 
                                 let badgeClass = 'badge-secondary';
-                                let estado = 'Pendiente';
+                                let estado = m.estado || 'Pendiente';
 
-                                if (m.estado_recepcion === 'RECIBIDO') {
+                                if (m.estado_code === 'R') {
                                     badgeClass = 'badge-success';
-                                    estado = 'Recibido';
-                                } else if (m.estado_envio === 'ENVIADO') {
+                                } else if (m.estado_code === 'E') {
                                     badgeClass = 'badge-primary';
-                                    estado = 'Enviado';
                                 }
 
                                 $tabla.append(`
                                     <tr>
                                         <td>${fechaEnvio}</td>
-                                        <td>${m.servicio_envio || '---'}</td>
+                                        <td>${m.destino || '---'}</td>
                                         <td>${fechaRecep}</td>
-                                        <td>${m.servicio_recepcion || '---'}</td>
+                                        <td>${m.profesional || '---'}</td>
                                         <td>${m.usuario_envio || '---'}</td>
                                         <td>${m.usuario_recepcion || '---'}</td>
                                         <td class="text-center"><span class="badge ${badgeClass}">${estado}</span></td>
@@ -1886,6 +1908,7 @@
             window.deshabilitarBotoneraClinica();
         });
     </script>
+    {#    Establece valores por defecto NO INFORMADO #}
     <script>
         document.addEventListener('DOMContentLoaded', function () {
 

@@ -149,89 +149,96 @@
                     </li>
                 {% endif %}
 
-                {% if user_permissions.movimiento_ficha > 0 %}
+                {% if user_permissions.movimiento_ficha > 0 or user_permissions.movimiento_ficha_controlado > 0 %}
                     <li class="nav-item dropdown">
-                        <a id="dropdownSubMenu3" href="#" data-toggle="dropdown" aria-haspopup="true"
-                           aria-expanded="false" class="nav-link dropdown-toggle">Movimiento Ficha</a>
-                        <ul aria-labelledby="dropdownSubMenu3" class="dropdown-menu border-0 shadow">
+                    <a id="dropdownSubMenu3" href="#" data-toggle="dropdown" aria-haspopup="true"
+                       aria-expanded="false" class="nav-link dropdown-toggle">Movimiento Ficha</a>
+                    <ul aria-labelledby="dropdownSubMenu3" class="dropdown-menu border-0 shadow">
 
-                            <!-- ===== BLOQUE 1: BIDIRECCIONAL ===== -->
-                            <li class="dropdown-header text-primary font-weight-bold d-flex justify-content-between align-items-center">
-                                <span>🔄 Enviar y Recibir entre Servicios</span>
+                    {% if user_permissions.movimiento_ficha > 0 %}
 
-                                <button type="button"
-                                        class="btn btn-sm btn-outline-primary ml-2"
-                                        data-toggle="modal"
-                                        data-target="#modalServicios"
-                                        style="padding:2px 6px;">
-                                    ?
-                                </button>
-                            </li>
+                        <!-- ===== BLOQUE 1: BIDIRECCIONAL ===== -->
+                        <li class="dropdown-header text-primary font-weight-bold d-flex justify-content-between align-items-center">
+                            <span>🔄 Enviar y Recibir entre Servicios</span>
 
-
-                            <li>
-                                <a href="{% url 'salida_ficha_masiva' %}" class="dropdown-item">
-                                    Envío fichas
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="{% url 'entrada_tabla_ficha' %}" class="dropdown-item">
-                                    Recepción fichas
-                                </a>
-                            </li>
-                            <li class="dropdown-divider"></li>
-                            <li>
-                                <a href="{% url 'fichas_en_transito' %}" class="dropdown-item">
-                                    Fichas en Tránsito
-                                </a>
-                            </li>
-
-                            <li class="dropdown-divider"></li>
-
-                            <!-- ===== BLOQUE 2: MONÓLOGO ===== -->
-                            <li class="dropdown-header text-success font-weight-bold d-flex justify-content-between align-items-center">
-                                <span>📁 Enviar y Recibir Normal</span>
-
-                                <button type="button"
-                                        class="btn btn-sm btn-outline-success ml-2"
-                                        data-toggle="modal"
-                                        data-target="#modalSome"
-                                        style="padding:2px 6px;">
-                                    ?
-                                </button>
-                            </li>
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-primary ml-2"
+                                    data-toggle="modal"
+                                    data-target="#modalServicios"
+                                    style="padding:2px 6px;">
+                                ?
+                            </button>
+                        </li>
 
 
-                            <li>
-                                <a href="{% url 'movimiento_monologo_salida' %}" class="dropdown-item">
-                                    Salida Rápida
-                                </a>
-                            </li>
+                        <li>
+                            <a href="{% url 'salida_ficha_masiva' %}" class="dropdown-item">
+                                Envío fichas
+                            </a>
+                        </li>
 
-                            <li>
-                                <a href="{% url 'movimiento_monologo_recepcion' %}" class="dropdown-item">
-                                    Entrada Rápida
-                                </a>
-                            </li>
-                            <li class="dropdown-divider"></li>
-                            <li>
-                                <a href="{% url 'movimiento_monologo_traspaso' %}" class="dropdown-item">
-                                    Traspaso Rápido
-                                </a>
-                            </li>
-                            <li class="dropdown-divider"></li>
+                        <li>
+                            <a href="{% url 'entrada_tabla_ficha' %}" class="dropdown-item">
+                                Recepción fichas
+                            </a>
+                        </li>
+                        <li class="dropdown-divider"></li>
+                        <li>
+                            <a href="{% url 'fichas_en_transito' %}" class="dropdown-item">
+                                Fichas en Tránsito
+                            </a>
+                        </li>
 
-                            <li>
-                                <a href="{% url 'fichas_en_transito_monologo' %}" class="dropdown-item">
-                                    Fichas en Transito
-                                </a>
-                            </li>
+                        <li class="dropdown-divider"></li>
 
-                        </ul>
+                    {% endif %}
 
-                    </li>
+                    {% if user_permissions.movimiento_ficha_controlado > 0 %}
+
+                        <!-- ===== BLOQUE 2: MONÓLOGO ===== -->
+                        <li class="dropdown-header text-success font-weight-bold d-flex justify-content-between align-items-center">
+                            <span>📁 Enviar y Recibir Normal</span>
+
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-success ml-2"
+                                    data-toggle="modal"
+                                    data-target="#modalSome"
+                                    style="padding:2px 6px;">
+                                ?
+                            </button>
+                        </li>
+
+
+                        <li>
+                            <a href="{% url 'movimiento_monologo_salida' %}" class="dropdown-item">
+                                Salida Rápida
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{% url 'movimiento_monologo_recepcion' %}" class="dropdown-item">
+                                Entrada Rápida
+                            </a>
+                        </li>
+                        <li class="dropdown-divider"></li>
+                        <li>
+                            <a href="{% url 'movimiento_monologo_traspaso' %}" class="dropdown-item">
+                                Traspaso Rápido
+                            </a>
+                        </li>
+                        <li class="dropdown-divider"></li>
+
+                        <li>
+                            <a href="{% url 'fichas_en_transito_monologo' %}" class="dropdown-item">
+                                Fichas en Transito
+                            </a>
+                        </li>
+                    {% endif %}
                 {% endif %}
+
+                </ul>
+
+                </li>
             </ul>
         </div>
 

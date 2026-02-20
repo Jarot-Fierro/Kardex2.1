@@ -33,3 +33,4 @@ class ServicioClinico(StandardModel):
     class Meta:
         verbose_name = 'Servicio Clínico'
         verbose_name_plural = 'Servicios Clínicos'
+        ordering = ['nombre']

@@ -2,6 +2,8 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.urls import reverse_lazy
 
+from core.utils.search_utils import get_rut_q_filter, get_name_q_filter
+
 
 class DataTableMixin:
     datatable_columns = []  # e.g. ['ID', 'Nombre', 'Codigo']
@@ -86,7 +88,28 @@ class DataTableMixin:
         if search_value and self.datatable_search_fields:
             q = Q()
             for field in self.datatable_search_fields:
-                q |= Q(**{field: search_value})
+                if 'rut' in field.lower() and '__icontains' in field:
+                    rut_field = field.replace('__icontains', '')
+                    q |= get_rut_q_filter(search_value, rut_field)
+                elif any(
+                        name_part in field.lower() for name_part in ['nombre', 'apellido_paterno', 'apellido_materno']):
+                    # Evitar duplicados si ya procesamos el nombre completo
+                    prefix = field.split('nombre')[0] if 'nombre' in field else (
+                        field.split('apellido_paterno')[0] if 'apellido_paterno' in field else
+                        field.split('apellido_materno')[0]
+                    )
+                    # Solo procesamos una vez por prefijo (ej: ficha__paciente__)
+                    if not hasattr(self, '_processed_prefixes'):
+                        self._processed_prefixes = set()
+                    if prefix not in self._processed_prefixes:
+                        q |= get_name_q_filter(search_value, prefix)
+                        self._processed_prefixes.add(prefix)
+                else:
+                    q |= Q(**{field: search_value})
+
+            if hasattr(self, '_processed_prefixes'):
+                del self._processed_prefixes
+
             qs = qs.filter(q)
         return qs
 

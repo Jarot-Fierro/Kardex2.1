@@ -123,7 +123,8 @@ def buscar_paciente_ficha_api_monologo(request):
 
         en_transito_new = MovimientoMonologoControlado.objects.filter(
             ficha=ficha,
-            estado='E'
+            estado='E',
+            status=True
         ).exists()
 
         en_transito = en_transito_new
@@ -250,7 +251,8 @@ def buscar_paciente_recepcion_api_monologo(request):
         movimiento = MovimientoMonologoControlado.objects.filter(
             ficha=ficha,
             estado='E',
-            establecimiento=establecimiento
+            establecimiento=establecimiento,
+            status=True
         ).select_related('servicio_clinico_destino', 'profesional').first()
 
         if movimiento:
@@ -389,7 +391,8 @@ def buscar_paciente_ficha_api_monologo_traspaso(request):
         ultimo_movimiento = MovimientoMonologoControlado.objects.filter(
             ficha=ficha,
             establecimiento=establecimiento,
-            estado='E'
+            estado='E',
+            status=True
         ).order_by('-fecha_salida').first()
 
         data = {

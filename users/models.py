@@ -56,6 +56,7 @@ class Role(models.Model):
     fichas = models.IntegerField(choices=PERMISSION_CHOICES, default=0)
     genero = models.IntegerField(choices=PERMISSION_CHOICES, default=0)
     movimiento_ficha = models.IntegerField(choices=PERMISSION_CHOICES, default=0)
+    movimiento_ficha_controlado = models.IntegerField(choices=PERMISSION_CHOICES, default=0)
     paciente = models.IntegerField(choices=PERMISSION_CHOICES, default=0)
     pais = models.IntegerField(choices=PERMISSION_CHOICES, default=0)
     prevision = models.IntegerField(choices=PERMISSION_CHOICES, default=0)

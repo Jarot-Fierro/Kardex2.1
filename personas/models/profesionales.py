@@ -36,3 +36,4 @@ class Profesional(StandardModel):
     class Meta:
         verbose_name = 'Profesional'
         verbose_name_plural = 'Profesionales'
+        ordering = ['nombres']

@@ -44,7 +44,7 @@ class RegistrarSalidaAPI(APIView):
                                     status=status.HTTP_404_NOT_FOUND)
 
                 # 2. Validar que no exista movimiento en estado 'E'
-                if MovimientoMonologoControlado.objects.filter(ficha=ficha, estado='E').exists():
+                if MovimientoMonologoControlado.objects.filter(ficha=ficha, estado='E', status=True).exists():
                     return Response({'error': 'Ya existe un movimiento en tránsito para esta ficha.'},
                                     status=status.HTTP_400_BAD_REQUEST)
 

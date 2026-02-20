@@ -42,6 +42,8 @@ class SalidaTablaFichaView(LoginRequiredMixin, DataTableMixin, TemplateView):
         'servicio_clinico_envio__nombre__icontains',
         'servicio_clinico_recepcion__nombre__icontains',
         'usuario_envio__username__icontains',
+        'observacion_envio__icontains',
+        'fecha_envio__icontains',
     ]
 
     def get(self, request, *args, **kwargs):
@@ -111,6 +113,12 @@ class SalidaTablaFichaView(LoginRequiredMixin, DataTableMixin, TemplateView):
     def render_row(self, obj):
         pac = obj.ficha.paciente if obj.ficha else None
         nombre = f"{getattr(pac, 'nombre', '')} {getattr(pac, 'apellido_paterno', '')} {getattr(pac, 'apellido_materno', '')}" if pac else ''
+
+        # Generar HTML para Estado (Badge)
+        estado = obj.estado_envio or ''
+        badge_class = 'badge-primary' if estado == 'ENVIADO' else 'badge-secondary'
+        estado_html = f'<span class="badge {badge_class}">{estado}</span>'
+
         return {
             'ID': obj.id,
             'RUT': getattr(pac, 'rut', '') if pac else '',
@@ -121,7 +129,7 @@ class SalidaTablaFichaView(LoginRequiredMixin, DataTableMixin, TemplateView):
             'Usuario Envío': getattr(obj.usuario_envio, 'username', '') if obj.usuario_envio else '',
             'Fecha envío': obj.fecha_envio.strftime('%Y-%m-%d %H:%M') if obj.fecha_envio else '',
             'Fecha recepción': obj.fecha_recepcion.strftime('%Y-%m-%d %H:%M') if obj.fecha_recepcion else 'PENDIENTE',
-            'Estado envio': obj.estado_envio or '',
+            'Estado envio': estado_html,
         }
 
     def post(self, request, *args, **kwargs):
@@ -217,7 +225,9 @@ class FichasEnTransito(LoginRequiredMixin, DataTableMixin, TemplateView):
         'ficha__paciente__apellido_materno__icontains',
         'servicio_clinico_envio__nombre__icontains',
         'usuario_envio__username__icontains',
-        'observacion_envio__icontains',
+        'observacion_recepcion__icontains',
+        'fecha_envio__icontains',
+        'fecha_recepcion__icontains',
     ]
 
     def get_form_kwargs(self):
@@ -294,6 +304,12 @@ class FichasEnTransito(LoginRequiredMixin, DataTableMixin, TemplateView):
     def render_row(self, obj):
         pac = obj.ficha.paciente if obj.ficha else None
         nombre = f"{getattr(pac, 'nombre', '')} {getattr(pac, 'apellido_paterno', '')} {getattr(pac, 'apellido_materno', '')}" if pac else ''
+
+        # Generar HTML para Estado (Badge)
+        estado = obj.estado_envio or ''
+        badge_class = 'badge-primary' if estado == 'ENVIADO' else 'badge-secondary'
+        estado_html = f'<span class="badge {badge_class}">{estado}</span>'
+
         return {
             'ID': obj.id,
             'RUT': getattr(pac, 'rut', '') if pac else '',
@@ -303,7 +319,7 @@ class FichasEnTransito(LoginRequiredMixin, DataTableMixin, TemplateView):
             'Usuario Envío': getattr(obj.usuario_envio, 'username', '') if obj.usuario_envio else '',
             'Observación envío': obj.observacion_envio or '',
             'Fecha envío': obj.fecha_envio.strftime('%Y-%m-%d %H:%M') if obj.fecha_envio else '',
-            'Estado envio': obj.estado_envio or '',
+            'Estado envio': estado_html,
         }
 
 
@@ -327,6 +343,8 @@ class RecepcionTablaFichaView(LoginRequiredMixin, DataTableMixin, TemplateView):
         'ficha__paciente__apellido_materno__icontains',
         'servicio_clinico_envio__nombre__icontains',
         'usuario_envio__username__icontains',
+        'observacion_envio__icontains',
+        'fecha_envio__icontains',
     ]
 
     def get(self, request, *args, **kwargs):
@@ -399,6 +417,18 @@ class RecepcionTablaFichaView(LoginRequiredMixin, DataTableMixin, TemplateView):
     def render_row(self, obj):
         pac = obj.ficha.paciente if obj.ficha else None
         nombre = f"{getattr(pac, 'nombre', '')} {getattr(pac, 'apellido_paterno', '')} {getattr(pac, 'apellido_materno', '')}" if pac else ''
+
+        # Generar HTML para Estado (Badge)
+        estado = obj.estado_recepcion or ''
+        if estado == 'RECIBIDO':
+            badge_class = 'badge-success'
+        elif estado == 'EN ESPERA':
+            # Según requerimiento, 'Enviado' azul. 'EN ESPERA' de recepción significa que fue ENVIADO.
+            badge_class = 'badge-primary'
+        else:
+            badge_class = 'badge-secondary'
+        estado_html = f'<span class="badge {badge_class}">{estado}</span>'
+
         return {
             'ID': obj.id,
             'RUT': getattr(pac, 'rut', '') if pac else '',
@@ -408,7 +438,7 @@ class RecepcionTablaFichaView(LoginRequiredMixin, DataTableMixin, TemplateView):
             'Profesional Envío': getattr(obj.usuario_envio, 'username', ''),
             'Fecha envío': obj.fecha_envio.strftime('%Y-%m-%d %H:%M') if obj.fecha_envio else '',
             'Fecha recepción': obj.fecha_recepcion.strftime('%Y-%m-%d %H:%M') if obj.fecha_recepcion else 'PENDIENTE',
-            'Estado': obj.estado_recepcion,
+            'Estado': estado_html,
         }
 
     def post(self, request, *args, **kwargs):
@@ -491,6 +521,10 @@ class TraspasoTablaFichaView(LoginRequiredMixin, DataTableMixin, TemplateView):
         'servicio_clinico_envio__nombre__icontains',
         'servicio_clinico_recepcion__nombre__icontains',
         'servicio_clinico_traspaso__nombre__icontains',
+        'usuario_traspaso__username__icontains',
+        'observacion_traspaso__icontains',
+        'fecha_envio__icontains',
+        'fecha_traspaso__icontains',
     ]
 
     def get(self, request, *args, **kwargs):
@@ -581,7 +615,12 @@ class TraspasoTablaFichaView(LoginRequiredMixin, DataTableMixin, TemplateView):
 
         # Generar HTML para Estado (Badge)
         estado = obj.estado_traspaso
-        badge_class = 'badge-success' if estado == 'TRASPASADO' else 'badge-secondary'
+        if estado == 'TRASPASADO':
+            badge_class = 'badge-warning'  # Requerido amarillo para traspasado
+        elif estado == 'ENVIADO':
+            badge_class = 'badge-primary'
+        else:
+            badge_class = 'badge-secondary'
         estado_html = f'<span class="badge {badge_class}">{estado}</span>'
 
         return {

@@ -22,3 +22,4 @@ class Comuna(StandardModel):
     class Meta:
         verbose_name = 'Comuna'
         verbose_name_plural = 'Comunas'
+        ordering = ['nombre']

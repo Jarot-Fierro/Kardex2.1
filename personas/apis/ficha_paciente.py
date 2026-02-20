@@ -1,7 +1,7 @@
 from django.db.models import Prefetch
 from django.http import JsonResponse
 
-from clinica.models import Ficha, MovimientoFicha
+from clinica.models import Ficha, MovimientoMonologoControlado
 from personas.models.pacientes import Paciente
 
 
@@ -26,7 +26,7 @@ def get_paciente_ficha(request, rut):
         .prefetch_related(
             Prefetch(
                 "movimientoficha_set",
-                queryset=MovimientoFicha.objects.order_by("-fecha_envio"),
+                queryset=MovimientoMonologoControlado.objects.filter(status=True).order_by("-fecha_salida"),
                 to_attr="movimientos"
             )
         )
@@ -93,8 +93,6 @@ def get_paciente_ficha(request, rut):
         "otras_fichas": []
     }
 
-    print(data)
-
     if ficha:
         data["ficha"] = {
             "numero_ficha_sistema": ficha.numero_ficha_sistema,
@@ -110,16 +108,19 @@ def get_paciente_ficha(request, rut):
             "sector": ficha.sector.color.nombre if ficha.sector and ficha.sector.color else "",
             "movimientos": [
                 {
-                    "fecha_envio": m.fecha_envio.isoformat() if m.fecha_envio else None,
-                    "origen": m.servicio_clinico_envio.nombre if m.servicio_clinico_envio else None,
-                    "destino": m.servicio_clinico_recepcion.nombre if m.servicio_clinico_recepcion else None,
-                    "profesional_id": m.profesional_recepcion_id,
-                    "profesional_nombre": (m.profesional_recepcion.nombres if m.profesional_recepcion else None
+                    "fecha_envio": m.fecha_salida.isoformat() if m.fecha_salida else None,
+                    "origen": m.servicio_clinico_destino.nombre if m.servicio_clinico_destino else None,
+                    "destino": m.servicio_clinico_destino.nombre if m.servicio_clinico_destino else None,
+                    "estado": m.estado,
+                    "profesional_id": m.profesional.id if m.profesional else None,
+                    "profesional_nombre": (m.profesional.nombres if m.profesional else (m.profesional_anterior or None)
                                            ),
                 }
                 for m in getattr(ficha, "movimientos", [])
             ],
         }
+
+        print(data)
 
         data["otras_fichas"] = [
             {

@@ -94,7 +94,7 @@ function cargaTabla(data) {
 function cargaUbicacionFicha(data) {
     const mov = data.ficha?.movimientos?.[0];
 
-    if (!mov) {
+    if (!mov || mov.estado === 'R') {
         setText('id_servicio_clinico', 'SIN INFORMACIÓN');
         setText('id_profesional_cargo', 'SIN INFORMACIÓN');
         setText('id_fecha_envio', '—');

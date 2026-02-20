@@ -363,7 +363,8 @@ def pdf_movimientos_fichas_monologo_controlado(request):
         # Para entrada, deben tener fecha de recepción
         queryset = MovimientoMonologoControlado.objects.filter(
             establecimiento=establecimiento,
-            fecha_entrada__isnull=False
+            fecha_entrada__isnull=False,
+            status=True
         )
     elif tipo == 'transito':
         titulo = "Entrega Fichas Monólogo – En Tránsito"
@@ -375,7 +376,8 @@ def pdf_movimientos_fichas_monologo_controlado(request):
         # Tránsito: estado E (Enviado, no recibido)
         queryset = MovimientoMonologoControlado.objects.filter(
             establecimiento=establecimiento,
-            estado='E'
+            estado='E',
+            status=True
         )
     else:
         # Salida / Envío (Historial)
@@ -387,7 +389,8 @@ def pdf_movimientos_fichas_monologo_controlado(request):
         etiqueta_usuario = "Entregado por"
         queryset = MovimientoMonologoControlado.objects.filter(
             establecimiento=establecimiento,
-            fecha_salida__isnull=False
+            fecha_salida__isnull=False,
+            status=True
         )
 
     queryset = queryset.select_related(
