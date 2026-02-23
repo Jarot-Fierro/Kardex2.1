@@ -77,15 +77,19 @@ class UserListView(DataTableMixin, TemplateView):
     def get_base_queryset(self):
         user = self.request.user
 
-        if user.is_superuser:
-            return User.objects.all()
+        qs = User.objects.select_related('establecimiento')
 
-        if user.establecimiento:
-            return User.objects.filter(
-                establecimiento=user.establecimiento,
-            ).select_related('establecimiento')
+        # Si NO es superuser, filtramos por establecimiento
+        if not user.is_superuser:
+            if user.establecimiento:
+                qs = qs.filter(establecimiento=user.establecimiento)
+            else:
+                return User.objects.none()
 
-        return User.objects.none()
+        # Opcional: si quieres excluir superusuarios del listado
+        qs = qs.exclude(is_superuser=True)
+
+        return qs.order_by('first_name')
 
     def render_row(self, obj):
         nombre = f"{obj.first_name or ''} {obj.last_name or ''}".strip()
@@ -116,7 +120,7 @@ class UserListView(DataTableMixin, TemplateView):
             'list_url': reverse_lazy('usuarios_list'),
             'create_url': reverse_lazy('usuarios_create'),
             'datatable_enabled': True,
-            'datatable_order': [[0, 'desc']],
+            'datatable_order': [[3, 'asc']],
             'datatable_page_length': 50,
             'columns': self.datatable_columns,
         })

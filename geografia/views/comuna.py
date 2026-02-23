@@ -35,6 +35,11 @@ class ComunaListView(DataTableMixin, TemplateView):
             return self.get_datatable_response(request)
         return super().get(request, *args, **kwargs)
 
+    def get_base_queryset(self):
+        """Filtra por el establecimiento del usuario logueado."""
+        qs = Comuna.objects.filter(status=True).order_by('nombre')
+        return qs
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
@@ -42,7 +47,7 @@ class ComunaListView(DataTableMixin, TemplateView):
             'list_url': reverse_lazy('list_comunas'),
             'create_url': reverse_lazy('create_comunas'),
             'datatable_enabled': True,
-            'datatable_order': [[0, 'asc']],
+            'datatable_order': [[1, 'asc']],
             'datatable_page_length': 100,
             'columns': self.datatable_columns,
         })

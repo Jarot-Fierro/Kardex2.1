@@ -35,6 +35,7 @@ class MovimientoMonologoControlado(StandardModel):
     ESTADO_CHOICES = [
         ('E', 'Enviado'),
         ('R', 'Recibido'),
+        ('S', 'Sin Paciente')
     ]
 
     estado = models.CharField(max_length=1, choices=ESTADO_CHOICES)

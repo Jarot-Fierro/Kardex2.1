@@ -329,7 +329,7 @@ class RecepcionFichaView(LoginRequiredMixin, TemplateView):
         # Recepción: Movimientos ya recibidos (estado R) en este establecimiento
         qs = MovimientoMonologoControlado.objects.filter(
             establecimiento=establecimiento,
-            estado__in=['E', 'R']
+            estado__in=['E', 'R'], status=True
         ).select_related(
             'rut_paciente',
             'ficha',

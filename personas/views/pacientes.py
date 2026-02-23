@@ -91,7 +91,7 @@ def paciente_view(request, paciente_id=None):
             if paciente_instance:
                 ficha_instance = Ficha.objects.filter(
                     paciente=paciente_instance,
-                    establecimiento=request.user.establecimiento
+                    establecimiento=request.user.establecimiento, status=True
                 ).first()
 
         es_edicion = (accion == 'ACTUALIZAR') or (paciente_instance is not None)
@@ -104,7 +104,7 @@ def paciente_view(request, paciente_id=None):
             # Verificación de consistencia Accion vs Instancia
             rut_post = paciente_form.cleaned_data.get('rut')
             if accion == 'CREAR' and rut_post:
-                if Paciente.objects.filter(rut=rut_post).exists():
+                if Paciente.objects.filter(rut=rut_post, status=True).exists():
                     paciente_form.add_error('rut',
                                             'Ya existe un paciente con este RUT. Por favor, consúltelo antes de intentar crear uno nuevo.')
                     return render(request, 'paciente/form.html', {
@@ -123,7 +123,8 @@ def paciente_view(request, paciente_id=None):
 
                 # Validar que el RUT no pertenezca a otro paciente
                 if rut_post:
-                    existe_otro = Paciente.objects.filter(rut=rut_post).exclude(pk=paciente_instance.pk).exists()
+                    existe_otro = Paciente.objects.filter(rut=rut_post, status=True).exclude(
+                        pk=paciente_instance.pk).exists()
                     if existe_otro:
                         paciente_form.add_error('rut', 'El RUT indicado ya pertenece a otro paciente.')
                         return render(request, 'paciente/form.html', {
@@ -211,12 +212,12 @@ def paciente_view(request, paciente_id=None):
     if request.method == 'GET':
         # GET
         if paciente_id:
-            paciente_instance = Paciente.objects.filter(pk=paciente_id).first()
+            paciente_instance = Paciente.objects.filter(pk=paciente_id, status=True).first()
 
             if paciente_instance:
                 ficha_instance = Ficha.objects.filter(
                     paciente=paciente_instance,
-                    establecimiento=request.user.establecimiento
+                    establecimiento=request.user.establecimiento, status=True
                 ).first()
 
         paciente_form = PacienteForm(instance=paciente_instance)
@@ -263,11 +264,12 @@ class PacienteListView(DataTableMixin, TemplateView):
 
     def get_base_queryset(self):
         # Vista libre: no limitar por establecimiento, mostrar todos los pacientes
-        return Paciente.objects.filter(status=True)
+        return Paciente.objects.filter(status=True).order_by('nombre')
 
     def render_row(self, obj):
         nombre_completo = f"{(obj.nombre or '').upper()} {(obj.apellido_paterno or '').upper()} {(obj.apellido_materno or '').upper()}".strip()
-        ficha = Ficha.objects.filter(paciente=obj, establecimiento=self.request.user.establecimiento).first()
+        ficha = Ficha.objects.filter(paciente=obj, establecimiento=self.request.user.establecimiento,
+                                     status=True).first()
 
         return {
             'ID': obj.id,
@@ -292,7 +294,7 @@ class PacienteListView(DataTableMixin, TemplateView):
             'list_url': reverse_lazy('paciente_list'),
             'create_url': reverse_lazy('paciente_query'),
             'datatable_enabled': True,
-            'datatable_order': [[0, 'desc']],
+            'datatable_order': [[3, 'asc']],
             'datatable_page_length': 100,
             'columns': self.datatable_columns,
             'export_csv_url': reverse_lazy('export_paciente_csv'),
@@ -304,7 +306,6 @@ class PacienteDetailView(DetailView):
     model = Paciente
     template_name = 'paciente/detail.html'
     permission_required = 'view_paciente'
-    raise_exception = True
 
     def render_to_response(self, context, **response_kwargs):
         if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -317,7 +318,7 @@ class PacienteDetailView(DetailView):
 class PacienteRecienNacidoListView(PacienteListView):
     datatable_columns = [
         'ID',
-        'Código',
+        'RUT',
         'N° Ficha',
         'Nombre',
         'Apellidos',
@@ -331,7 +332,7 @@ class PacienteRecienNacidoListView(PacienteListView):
     datatable_order_fields = [
         'id',
         None,
-        'codigo',
+        'rut',
         None,
         'nombre',
         None,
@@ -343,7 +344,6 @@ class PacienteRecienNacidoListView(PacienteListView):
     ]
 
     datatable_search_fields = [
-        'codigo__icontains',
         'rut__icontains',
         'nombre__icontains',
         'apellido_paterno__icontains',
@@ -354,19 +354,19 @@ class PacienteRecienNacidoListView(PacienteListView):
     ]
 
     def get_base_queryset(self):
-        return Paciente.objects.filter(recien_nacido=True)
+        return Paciente.objects.filter(recien_nacido=True, status=True).order_by('apellido_paterno')
 
     def render_row(self, obj):
         apellidos = f"{obj.apellido_paterno or ''} {obj.apellido_materno or ''}".strip()
 
         ficha = Ficha.objects.filter(
             paciente=obj,
-            establecimiento=self.request.user.establecimiento
+            establecimiento=self.request.user.establecimiento, status=True
         ).first()
 
         return {
             'ID': obj.id,
-            'Código': (obj.codigo or '').upper(),
+            'RUT': (obj.rut or '').upper(),
             'N° Ficha': (
                 str(ficha.numero_ficha_sistema)
                 if ficha and ficha.numero_ficha_sistema
@@ -438,7 +438,8 @@ class PacienteExtranjeroListView(PacienteListView):
     ]
 
     def render_row(self, obj):
-        ficha = Ficha.objects.filter(paciente=obj, establecimiento=self.request.user.establecimiento).first()
+        ficha = Ficha.objects.filter(paciente=obj, establecimiento=self.request.user.establecimiento,
+                                     status=True).first()
         return {
             'ID': obj.id,
             'N° Ficha': (str(ficha.numero_ficha_sistema) if ficha and ficha.numero_ficha_sistema else 'SIN FICHA'),
@@ -448,14 +449,14 @@ class PacienteExtranjeroListView(PacienteListView):
             'NIP': (obj.nip or '').upper(),
             'Pasaporte': (obj.pasaporte or '').upper(),
             'Sexo': (obj.sexo or '').upper(),
-            'Estado Civil': (obj.estado_civil or '').upper(),
+            'Estado Civil': (obj.get_estado_civil_display() or '').upper(),
             'Comuna': (getattr(obj.comuna, 'nombre', '') or '').upper(),
             'Previsión': (getattr(obj.prevision, 'nombre', '') or '').upper(),
             'Observación': (ficha.observacion.lower() if ficha and ficha.observacion else 'SIN OBSERVACIÓN'),
         }
 
     def get_base_queryset(self):
-        return Paciente.objects.filter(extranjero=True)
+        return Paciente.objects.filter(extranjero=True, status=True).order_by('nombre')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -463,6 +464,10 @@ class PacienteExtranjeroListView(PacienteListView):
             'title': 'Pacientes Extranjeros',
             'list_url': reverse_lazy('paciente_extranjero_list'),
             'export_csv_url': reverse_lazy('reports:export_paciente_extranjero_csv'),
+            'datatable_enabled': True,
+            'datatable_order': [[4, 'asc']],
+            'datatable_page_length': 100,
+            'columns': self.datatable_columns,
         })
         return context
 
@@ -495,7 +500,8 @@ class PacienteRutMadreListView(PacienteListView):
     ]
 
     def render_row(self, obj):
-        ficha = Ficha.objects.filter(paciente=obj, establecimiento=self.request.user.establecimiento).first()
+        ficha = Ficha.objects.filter(paciente=obj, establecimiento=self.request.user.establecimiento,
+                                     status=True).first()
         return {
             'ID': obj.id,
             'N° Ficha': (str(ficha.numero_ficha_sistema) if ficha and ficha.numero_ficha_sistema else 'SIN FICHA'),
@@ -503,9 +509,13 @@ class PacienteRutMadreListView(PacienteListView):
             'Nombre': (obj.nombre or '').upper(),
             'Sexo': (obj.sexo or '').upper(),
             'Rut Responsable': (
-                obj.rut_responsable_temporal.upper()
-                if obj.rut_responsable_temporal and obj.rut_responsable_temporal.lower() != 'nan'
-                else 'SIN RUT'
+                obj.rut_madre.upper()
+                if obj.rut_madre and obj.rut_madre.lower() != 'nan'
+                else (
+                    obj.rut_responsable_temporal.upper()
+                    if obj.rut_responsable_temporal and obj.rut_responsable_temporal.lower() != 'nan'
+                    else ''
+                )
             ),
             'Comuna': (getattr(obj.comuna, 'nombre', '') or '').upper(),
             'Previsión': (getattr(obj.prevision, 'nombre', '') or '').upper(),
@@ -513,7 +523,7 @@ class PacienteRutMadreListView(PacienteListView):
         }
 
     def get_base_queryset(self):
-        return Paciente.objects.filter(usar_rut_madre_como_responsable=True)
+        return Paciente.objects.filter(usar_rut_madre_como_responsable=True, status=True)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -551,11 +561,12 @@ class PacienteFallecidoListView(PacienteListView):
     ]
 
     def get_base_queryset(self):
-        return Paciente.objects.filter(fallecido=True)
+        return Paciente.objects.filter(fallecido=True, status=True)
 
     def render_row(self, obj):
         apellidos = f"{obj.apellido_paterno or ''} {obj.apellido_materno or ''}".strip()
-        ficha = Ficha.objects.filter(paciente=obj, establecimiento=self.request.user.establecimiento).first()
+        ficha = Ficha.objects.filter(paciente=obj, establecimiento=self.request.user.establecimiento,
+                                     status=True).first()
 
         return {
             'ID': obj.id,
@@ -565,7 +576,7 @@ class PacienteFallecidoListView(PacienteListView):
             'Apellidos': apellidos.upper(),
             'Fecha Fallecimiento': obj.fecha_fallecimiento.strftime('%d/%m/%Y') if obj.fecha_fallecimiento else '---',
             'Sexo': (obj.sexo or '').upper(),
-            'Estado Civil': (obj.estado_civil or '').upper(),
+            'Estado Civil': (obj.get_estado_civil_display() or '').upper(),
             'Comuna': (getattr(obj.comuna, 'nombre', '') or '').upper(),
             'Observación': (ficha.observacion.lower() if ficha and ficha.observacion else 'SIN OBSERVACIÓN'),
         }
@@ -584,7 +595,8 @@ class PacientePuebloIndigenaListView(PacienteListView):
     datatable_columns = ['ID', 'N° Ficha', 'RUT', 'Nombre', 'Sexo', 'Estado Civil', 'Comuna', 'Observación']
 
     def render_row(self, obj):
-        ficha = Ficha.objects.filter(paciente=obj, establecimiento=self.request.user.establecimiento).first()
+        ficha = Ficha.objects.filter(paciente=obj, establecimiento=self.request.user.establecimiento,
+                                     status=True).first()
         nombre_completo = f"{(obj.nombre or '').upper()} {(obj.apellido_paterno or '').upper()} {(obj.apellido_materno or '').upper()}".strip()
 
         return {
@@ -593,13 +605,13 @@ class PacientePuebloIndigenaListView(PacienteListView):
             'RUT': obj.rut or 'Sin RUT',
             'Nombre': nombre_completo or 'Sin Nombre',
             'Sexo': obj.sexo or '',
-            'Estado Civil': obj.estado_civil or '',
+            'Estado Civil': obj.get_estado_civil_display() or '',
             'Comuna': (getattr(obj.comuna, 'nombre', '') or '').upper(),
             'Observación': (ficha.observacion.lower() if ficha and ficha.observacion else 'SIN OBSERVACIÓN'),
         }
 
     def get_base_queryset(self):
-        return Paciente.objects.filter(pueblo_indigena=True)
+        return Paciente.objects.filter(pueblo_indigena=True, status=True)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -648,7 +660,7 @@ class PacienteFechaFormView(FormView):
 class PacientePorFechaListView(PacienteListView):
 
     def get_base_queryset(self):
-        qs = Paciente.objects.all()
+        qs = Paciente.objects.filter(status=True)
         fecha_inicio = self.request.GET.get('fecha_inicio')
         fecha_fin = self.request.GET.get('fecha_fin')
         if fecha_inicio and fecha_fin:
@@ -670,4 +682,3 @@ class PacientePorFechaListView(PacienteListView):
             'date_range_form': form,
         })
         return context
-

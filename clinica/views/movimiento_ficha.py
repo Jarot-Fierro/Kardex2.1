@@ -11,11 +11,11 @@ from clinica.forms.movimiento_ficha import (
     FormSalidaFicha, FiltroSalidaFichaForm, FormEntradaFicha, FormTraspasoFicha
 )
 from clinica.models import MovimientoFicha
-from core.mixin import DataTableMixin
+from core.mixin import DataTableMixinMov
 from personas.models.profesionales import Profesional
 
 
-class SalidaTablaFichaView(LoginRequiredMixin, DataTableMixin, TemplateView):
+class SalidaTablaFichaView(LoginRequiredMixin, DataTableMixinMov, TemplateView):
     """
     Vista para registro masivo de salidas de fichas con AJAX.
     Muestra el formulario de registro y el de filtro, además de la tabla.
@@ -203,7 +203,7 @@ class SalidaTablaFichaView(LoginRequiredMixin, DataTableMixin, TemplateView):
         return self.render_to_response(context)
 
 
-class FichasEnTransito(LoginRequiredMixin, DataTableMixin, TemplateView):
+class FichasEnTransito(LoginRequiredMixin, DataTableMixinMov, TemplateView):
     template_name = 'movimiento_ficha/tabla_salida_ficha_update.html'
     model = MovimientoFicha
 
@@ -323,7 +323,7 @@ class FichasEnTransito(LoginRequiredMixin, DataTableMixin, TemplateView):
         }
 
 
-class RecepcionTablaFichaView(LoginRequiredMixin, DataTableMixin, TemplateView):
+class RecepcionTablaFichaView(LoginRequiredMixin, DataTableMixinMov, TemplateView):
     template_name = 'movimiento_ficha/recepcion_ficha.html'
     model = MovimientoFicha
 
@@ -501,7 +501,7 @@ class RecepcionTablaFichaView(LoginRequiredMixin, DataTableMixin, TemplateView):
         return self.render_to_response(context)
 
 
-class TraspasoTablaFichaView(LoginRequiredMixin, DataTableMixin, TemplateView):
+class TraspasoTablaFichaView(LoginRequiredMixin, DataTableMixinMov, TemplateView):
     template_name = 'movimiento_ficha/traspaso_ficha.html'
     model = MovimientoFicha
 

@@ -1,5 +1,4 @@
 from django.contrib import messages
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView, DetailView
@@ -11,7 +10,7 @@ from core.utils import IncludeUserFormCreate, IncludeUserFormUpdate
 from personas.forms.genero import FormGenero
 from personas.models.genero import Genero
 
-MODULE_NAME = 'Generoes'
+MODULE_NAME = 'Generos'
 
 
 class GeneroListView(DataTableMixin, TemplateView):
@@ -42,14 +41,14 @@ class GeneroListView(DataTableMixin, TemplateView):
             'list_url': reverse_lazy('genero_list'),
             'create_url': reverse_lazy('genero_create'),
             'datatable_enabled': True,
-            'datatable_order': [[0, 'asc']],
+            'datatable_order': [[1, 'asc']],
             'datatable_page_length': 100,
             'columns': self.datatable_columns,
         })
         return context
 
 
-class GeneroDetailView(PermissionRequiredMixin, DetailView):
+class GeneroDetailView(DetailView):
     model = Genero
     template_name = 'genero/detail.html'
 

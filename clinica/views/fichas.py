@@ -81,13 +81,14 @@ class FichaListView(DataTableMixin, TemplateView):
         user = getattr(self.request, 'user', None)
         establecimiento = getattr(user, 'establecimiento', None) if user else None
         if establecimiento:
-            qs = qs.filter(establecimiento=establecimiento)
+            qs = qs.filter(establecimiento=establecimiento, status=True)
         return qs
 
 
 class FichaDetailView(DetailView):
     model = Ficha
     template_name = 'ficha/detail.html'
+    permission_required = 'view_paciente'
 
     def render_to_response(self, context, **response_kwargs):
         if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -95,60 +96,6 @@ class FichaDetailView(DetailView):
             html = render_to_string(self.template_name, context=context, request=self.request)
             return HttpResponse(html)
         return super().render_to_response(context, **response_kwargs)
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['user'] = self.request.user
-        return kwargs
-
-    template_name = 'kardex/ficha/form.html'
-    model = Ficha
-    form_class = FichaForm
-    success_url = reverse_lazy('kardex:ficha_list')
-
-    def post(self, request, *args, **kwargs):
-        self.object = None
-        ficha_id = (request.POST.get('ficha_id') or '').strip()
-        instance = None
-        if ficha_id:
-            try:
-                instance = Ficha.objects.get(pk=ficha_id)
-                self.object = instance
-            except Ficha.DoesNotExist:
-                from django.contrib import messages
-                messages.error(request, 'La ficha seleccionada no existe.')
-                return self.render_to_response(self.get_context_data(form=self.get_form(), open_modal=True))
-
-        form = self.get_form()
-        if instance is not None:
-            form.instance = instance  # Edición
-        # Si instance es None, form.save() creará una nueva ficha
-
-        if form.is_valid():
-            saved_obj = form.save()
-            self.object = saved_obj
-            from django.contrib import messages
-            from django.shortcuts import redirect
-            if instance:
-                messages.success(request, 'Ficha actualizada correctamente')
-            else:
-                messages.success(request, 'Ficha creada correctamente')
-            return redirect(self.success_url)
-
-        from django.contrib import messages
-        messages.error(request, 'Hay errores en el formulario')
-        self.object = instance
-        return self.render_to_response(self.get_context_data(form=form, open_modal=True))
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = 'Crear / Editar Ficha'
-        context['list_url'] = self.success_url
-        context['action'] = 'edit' if getattr(self, 'object', None) else 'create'
-        context['module_name'] = MODULE_NAME
-        if getattr(self, 'object', None) is not None:
-            context['ficha'] = self.object
-        return context
 
 
 class FichaUpdateView(UpdateView):
@@ -368,7 +315,7 @@ class PacientePasivadosListView(FichaListView):
     export_report_url_name = 'export_ficha_pasivada'
 
     def get_base_queryset(self):
-        return Ficha.objects.filter(pasivado=True)
+        return Ficha.objects.filter(pasivado=True, status=True)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

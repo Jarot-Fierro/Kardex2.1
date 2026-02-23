@@ -204,7 +204,6 @@ class MovimientoFichaAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     )
 
 
-
 from django.contrib import admin
 from .models import MovimientoMonologoControlado
 
@@ -214,6 +213,7 @@ class MovimientoMonologoControladoAdmin(admin.ModelAdmin):
     list_display = (
         'id',
         'establecimiento',
+        'rut',
         'rut_paciente',
         'numero_ficha',
         'servicio_clinico_destino',
@@ -225,11 +225,15 @@ class MovimientoMonologoControladoAdmin(admin.ModelAdmin):
     list_filter = (
         'estado',
         'establecimiento',
+        'status',
     )
 
     search_fields = (
-        'rut_paciente__rut',
         'numero_ficha',
+        'ficha__paciente__rut',
+        'servicio_clinico_destino__nombre',
+        'ficha__numero_ficha_sistema',
+        'ficha__numero_ficha_tarjeta',
     )
 
     raw_id_fields = (

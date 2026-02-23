@@ -57,7 +57,7 @@ class ServicioClinicoListView(DataTableMixin, TemplateView):
             'list_url': reverse_lazy('servicio_clinico_list'),
             'create_url': reverse_lazy('servicio_clinico_create'),
             'datatable_enabled': True,
-            'datatable_order': [[0, 'asc']],
+            'datatable_order': [[1, 'asc']],
             'datatable_page_length': 100,
             'columns': self.datatable_columns,
         })

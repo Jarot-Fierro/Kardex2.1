@@ -5,8 +5,8 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 
 from core.choices import ESTADO_CIVIL, SEXO_CHOICES
-from core.validations import validate_rut, format_rut
 from core.utils.rut_ficticio import generar_rut_ficticio_unico
+from core.validations import validate_rut, format_rut
 from geografia.models.comuna import Comuna
 from personas.models.genero import Genero
 from personas.models.pacientes import Paciente
@@ -238,8 +238,9 @@ class PacienteForm(forms.ModelForm):
 
     rut_responsable_temporal = forms.CharField(
         required=False,
-        widget=forms.TextInput(attrs={'class': 'form-control form-control-sm', 'id': 'id_rut_responsable_temporal',
-                                      'name': 'rut_responsable_temporal'})
+        widget=forms.TextInput(
+            attrs={'class': 'form-control form-control-sm id_rut', 'id': 'id_rut_responsable_temporal',
+                   'name': 'rut_responsable_temporal'})
     )
 
     direccion = forms.CharField(

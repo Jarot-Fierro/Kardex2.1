@@ -62,7 +62,7 @@ class ProfesionalListView(DataTableMixin, TemplateView):
             'list_url': reverse_lazy('profesional_list'),
             'create_url': reverse_lazy('profesional_create'),
             'datatable_enabled': True,
-            'datatable_order': [[0, 'asc']],
+            'datatable_order': [[1, 'asc']],
             'datatable_page_length': 100,
             'columns': self.datatable_columns,
         })
