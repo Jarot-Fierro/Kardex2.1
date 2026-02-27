@@ -238,6 +238,8 @@
             const $formRecepcion = $('#form-recepcion');
             const $btnRegistrar = $('#btn-registrar');
             const $btnLimpiar = $('#btn-limpiar');
+            let isSubmitting = false;
+            let isSearching = false;
 
             // Persistencia en localStorage
             const configKeys = [
@@ -297,9 +299,13 @@
             }
 
             // Búsqueda de paciente al salir del campo RUT (blur) o presionar Enter
-            function buscarPaciente() {
+            function buscarPaciente(autoSubmit = true) {
+                if (isSearching || isSubmitting) return;
+
                 let val = $rut.val().trim();
                 if (!val) return;
+
+                isSearching = true;
 
                 // Formatear antes de buscar si parece un RUT
                 if (!val.startsWith('PAC-')) {
@@ -311,6 +317,7 @@
                     url: '{% url "ficha-paciente-buscar-recepcion-monologo" %}',
                     data: {q: val},
                     success: function (response) {
+                        isSearching = false;
                         if (response.results && response.results.length > 0) {
                             const p = response.results[0];
                             if (!p.en_espera) {
@@ -324,13 +331,35 @@
                                 $('#servicio_clinico_actual').val(p.servicio_clinico_actual);
                                 $('#profesional_asignado').val(p.profesional_asignado);
                                 $btnRegistrar.prop('disabled', false);
+
+                                // Solo intentar envío automático si autoSubmit es true
+                                if (autoSubmit) {
+                                    // Validar y Enviar Automáticamente tras cargar datos de la API
+                                    const nombre = $('#nombre_mov').val();
+                                    const ficha = $('#id_ficha').val();
+
+                                    if (nombre && ficha) {
+                                        if (!isSubmitting) {
+                                            $formRecepcion.submit();
+                                        }
+                                    } else {
+                                        Swal.fire({
+                                            title: 'Información Faltante',
+                                            text: 'Los campos de nombre y n ficha deben estar cargados para el envío automático.',
+                                            icon: 'warning',
+                                            confirmButtonText: 'Entendido'
+                                        });
+                                    }
+                                }
                             }
                         } else {
+                            isSearching = false;
                             Swal.fire('No encontrado', 'No se encontró el paciente con ese RUT o su Ficha no ha sido enviada.', 'error');
                             limpiarRegistro();
                         }
                     },
                     error: function () {
+                        isSearching = false;
                         Swal.fire('Error', 'Error al consultar la base de datos.', 'error');
                         limpiarRegistro();
                     }
@@ -340,22 +369,28 @@
             $rut.on('keypress', function (e) {
                 if (e.which === 13) {
                     e.preventDefault();
-                    buscarPaciente();
+                    buscarPaciente(true); // Con pistola/Enter se intenta auto-envío
                 }
             });
 
             $rut.on('blur', function () {
-                buscarPaciente();
+                // Al perder foco, buscamos pero SIN envío automático (flujo manual)
+                buscarPaciente(false);
             });
 
             // Registro de recepción vía AJAX
             $formRecepcion.on('submit', function (e) {
                 e.preventDefault();
 
+                if (isSubmitting) return;
+
                 if (!$('#id_movimiento_hidden').val()) {
                     Swal.fire('Error', 'Debe buscar un paciente con movimiento pendiente primero.', 'error');
                     return;
                 }
+
+                isSubmitting = true;
+                $btnRegistrar.prop('disabled', true);
 
                 $.ajax({
                     url: window.location.href,
@@ -368,17 +403,21 @@
                                 title: '¡Éxito!',
                                 text: response.message,
                                 icon: 'success',
-                                timer: 1500,
+                                timer: 1000,
                                 showConfirmButton: false
                             });
-                            limpiarRegistro();
-                            $('#Table').DataTable().ajax.reload(null, false);
-                            $rut.focus();
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 1000);
                         } else {
+                            isSubmitting = false;
+                            $btnRegistrar.prop('disabled', false);
                             Swal.fire('Error', response.error || 'No se pudo registrar.', 'error');
                         }
                     },
                     error: function (xhr) {
+                        isSubmitting = false;
+                        $btnRegistrar.prop('disabled', false);
                         const err = xhr.responseJSON ? xhr.responseJSON.error : 'Error en el servidor';
                         Swal.fire('Error', err, 'error');
                     }

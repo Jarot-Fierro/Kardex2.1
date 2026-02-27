@@ -238,6 +238,9 @@ class TraspasoFichaView(LoginRequiredMixin, TemplateView):
 
     def post(self, request, *args, **kwargs):
         movimiento_id = request.POST.get('movimiento_id_hidden')
+        instance_movimiento = MovimientoMonologoControlado.objects.filter(id=movimiento_id).first()
+        print(instance_movimiento.fecha_salida)
+
         if not movimiento_id:
             # Si no hay ID, tal vez sea por el nombre del campo en el form
             movimiento_id = request.POST.get('id_movimiento_hidden')
@@ -251,12 +254,21 @@ class TraspasoFichaView(LoginRequiredMixin, TemplateView):
 
         form = MovimientoTraspasoForm(request.POST, instance=movimiento, establecimiento=request.user.establecimiento)
         if form.is_valid():
+            # Guardamos el valor original de fecha_salida antes de que el form lo cambie si viene vacío
+
             mov = form.save(commit=False)
+
             # Aseguramos que se guarde la observación de traspaso específicamente
             mov.observacion_traspaso = form.cleaned_data.get('observacion_traspaso')
-            # Si se proporcionó fecha de entrada, el estado debería ser Recibido
-            if mov.fecha_entrada:
-                mov.estado = 'R'
+
+            # Si el usuario ingresó una fecha, se actualiza. Si no, se mantiene la original.
+            fecha_salida_form = form.cleaned_data.get('fecha_salida')
+
+            if fecha_salida_form:
+                mov.fecha_salida = fecha_salida_form
+
+            # El traspaso marca el movimiento como Enviado (E) para que pueda ser recibido nuevamente
+            mov.estado = 'E'
             mov.save()
             return JsonResponse({'success': True, 'message': 'Traspaso actualizado correctamente.'})
         else:
@@ -284,28 +296,42 @@ class SalidaFichaUpdateView(SalidaFichaView):
 
     def post(self, request, *args, **kwargs):
         movimiento = get_object_or_404(MovimientoMonologoControlado, pk=self.kwargs.get('pk'))
-        # Actualizamos campos del movimiento
-        rut_paciente = request.POST.get('rut')
-        paciente = Paciente.objects.filter(rut=rut_paciente).first()
+        form = MovimientoSalidaForm(request.POST, instance=movimiento, establecimiento=request.user.establecimiento)
 
-        ficha_id = Ficha.objects.filter(paciente=paciente, establecimiento=request.user.establecimiento).first()
+        if form.is_valid():
+            try:
+                # El formulario ya maneja los campos y el instance
+                # Pero la vista anterior hacia búsqueda manual de ficha por RUT
+                rut_paciente = form.cleaned_data.get('rut')
+                paciente = Paciente.objects.filter(rut=rut_paciente).first()
+                if not paciente:
+                    return JsonResponse({'success': False, 'error': 'Paciente no encontrado.'})
 
-        servicio_id = request.POST.get('servicio_clinico_destino')
-        profesional_id = request.POST.get('profesional')
-        observacion = request.POST.get('observacion_salida')
+                ficha = Ficha.objects.filter(paciente=paciente, establecimiento=request.user.establecimiento).first()
+                if not ficha:
+                    return JsonResponse({'success': False, 'error': 'Ficha no encontrada para este paciente.'})
 
-        if not servicio_id or not profesional_id:
-            return JsonResponse({'success': False, 'error': 'Servicio y Profesional son obligatorios.'})
+                # Guardamos el valor original de fecha_salida antes de que el form lo cambie si viene vacío
+                fecha_salida_original = movimiento.fecha_salida
 
-        try:
-            movimiento.servicio_clinico_destino_id = servicio_id
-            movimiento.profesional_id = profesional_id
-            movimiento.observacion_salida = observacion
-            movimiento.ficha = ficha_id
-            movimiento.save()
-            return JsonResponse({'success': True, 'message': 'Movimiento actualizado correctamente.'})
-        except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)})
+                mov = form.save(commit=False)
+
+                # Si el usuario ingresó una fecha, se actualiza. Si no, se mantiene la original.
+                fecha_salida_form = form.cleaned_data.get('fecha_salida')
+
+                if fecha_salida_form:
+                    mov.fecha_salida = fecha_salida_form
+                else:
+                    mov.fecha_salida = fecha_salida_original
+
+                mov.ficha = ficha
+                mov.save()
+                return JsonResponse({'success': True, 'message': 'Movimiento actualizado correctamente.'})
+            except Exception as e:
+                return JsonResponse({'success': False, 'error': str(e)})
+        else:
+            errors = form.errors.as_text()
+            return JsonResponse({'success': False, 'error': f'Error en el formulario: {errors}'})
 
 
 class RecepcionFichaView(LoginRequiredMixin, TemplateView):

@@ -18,7 +18,7 @@ class MovimientoSalidaForm(forms.ModelForm):
         label='Servicio Clínico Destino',
         widget=forms.Select(attrs={'class': 'form-control select2', 'id': 'id_servicio_clinico_destino'})
     )
-    fecha_salida = forms.DateTimeField(label='Fecha Salida', widget=forms.DateTimeInput(
+    fecha_salida = forms.DateTimeField(label='Fecha Salida', required=False, widget=forms.DateTimeInput(
         attrs={'class': 'form-control', 'type': 'datetime-local', 'id': 'id_fecha_salida'}))
     profesional = forms.ModelChoiceField(
         queryset=Profesional.objects.none(),
@@ -84,7 +84,7 @@ class MovimientoTraspasoForm(forms.ModelForm):
         label='Servicio Clínico Destino',
         widget=forms.Select(attrs={'class': 'form-control select2', 'id': 'id_servicio_clinico_destino'})
     )
-    fecha_salida = forms.DateTimeField(label='Fecha Salida', widget=forms.DateTimeInput(
+    fecha_salida = forms.DateTimeField(label='Fecha Salida', required=False, widget=forms.DateTimeInput(
         attrs={'class': 'form-control', 'type': 'datetime-local', 'id': 'id_fecha_salida'}))
 
     profesional = forms.ModelChoiceField(

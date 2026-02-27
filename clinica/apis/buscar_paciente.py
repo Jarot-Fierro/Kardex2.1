@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.http import JsonResponse
+from django.utils import timezone
 
 from clinica.models import Ficha, MovimientoFicha
 from clinica.models.movimiento_ficha_monologo_controlado import MovimientoMonologoControlado
@@ -408,7 +409,7 @@ def buscar_paciente_ficha_api_monologo_traspaso(request):
                 'movimiento_id': ultimo_movimiento.id,
                 'servicio_clinico_destino': ultimo_movimiento.servicio_clinico_destino_id,
                 'profesional': ultimo_movimiento.profesional_id,
-                'fecha_salida': ultimo_movimiento.fecha_salida.strftime(
+                'fecha_salida': timezone.localtime(ultimo_movimiento.fecha_salida).strftime(
                     '%Y-%m-%dT%H:%M') if ultimo_movimiento.fecha_salida else '',
                 'fecha_entrada': ultimo_movimiento.fecha_entrada.strftime(
                     '%Y-%m-%dT%H:%M') if ultimo_movimiento.fecha_entrada else '',

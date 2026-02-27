@@ -181,12 +181,14 @@
             const $formTraspaso = $('#form-traspaso');
             const $btnRegistrar = $('#btn-registrar');
             const $btnLimpiar = $('#btn-limpiar');
+            let isSubmitting = false;
+            let isSearching = false;
 
             // Persistencia en localStorage
             const configKeys = [
-                'servicio_clinico_ficha', // id_traspaso
-                'profesional_movimiento',
-                'observacion_traspaso_ficha'
+                'id_servicio_clinico_destino',
+                'id_profesional',
+                'id_observacion_traspaso'
             ];
 
             function loadConfig() {
@@ -244,9 +246,13 @@
             }
 
             // Búsqueda de paciente al salir del campo RUT (blur) o presionar Enter
-            function buscarPaciente() {
+            function buscarPaciente(autoSubmit = true) {
+                if (isSearching || isSubmitting) return;
+
                 let val = $rut.val().trim();
                 if (!val) return;
+
+                isSearching = true;
 
                 if (!val.startsWith('PAC-')) {
                     val = formatRut(val);
@@ -257,6 +263,7 @@
                     url: '{% url "ficha-paciente-buscar-monologo-traspaso" %}',
                     data: {q: val},
                     success: function (response) {
+                        isSearching = false;
                         if (response.results && response.results.length > 0) {
                             const p = response.results[0];
                             if (!p.movimiento_id) {
@@ -274,23 +281,53 @@
                                 $('#numero_ficha').val(p.numero_ficha_sistema);
                                 $('#id_ficha_hidden').val(p.ficha_id);
 
+                                /* Comentamos la asignación automática de servicio y profesional desde la API
+                                   para permitir que se usen los valores seleccionados manualmente o cargados de la config
                                 if (p.servicio_clinico_destino) {
                                     $('#id_servicio_clinico_destino').val(p.servicio_clinico_destino).trigger('change');
                                 }
                                 if (p.profesional) {
                                     $('#id_profesional').val(p.profesional).trigger('change');
                                 }
-                                $('#id_fecha_salida').val(p.fecha_salida);
+                                */
                                 $('#id_observacion_traspaso').val(p.observacion_traspaso);
 
                                 $btnRegistrar.prop('disabled', false);
+
+                                // Solo intentar envío automático si autoSubmit es true
+                                if (autoSubmit) {
+                                    // Pequeño delay para asegurar que los triggers de Select2 se procesen
+                                    setTimeout(function () {
+                                        // Validar y Enviar Automáticamente tras cargar datos de la API
+                                        const servicio = $('#id_servicio_clinico_destino').val();
+                                        const profesional = $('#id_profesional').val();
+                                        const nombre = $('#nombre_paciente').val();
+                                        const ficha = $('#numero_ficha').val();
+
+                                        if (nombre && ficha && servicio && profesional) {
+                                            if (!isSubmitting) {
+                                                console.log("Auto-submitting form...");
+                                                $formTraspaso.submit();
+                                            }
+                                        } else {
+                                            Swal.fire({
+                                                title: 'Información Faltante',
+                                                text: 'Los campos de nombre, n ficha, servicio clínico y profesional deben estar seleccionados para el envío automático.',
+                                                icon: 'warning',
+                                                confirmButtonText: 'Entendido'
+                                            });
+                                        }
+                                    }, 100);
+                                }
                             }
                         } else {
+                            isSearching = false;
                             Swal.fire('No encontrado', 'No se encontró paciente con ese RUT o Ficha en su establecimiento.', 'error');
                             limpiarRegistro();
                         }
                     },
                     error: function () {
+                        isSearching = false;
                         Swal.fire('Error', 'Error al consultar la base de datos.', 'error');
                         limpiarRegistro();
                     }
@@ -300,22 +337,38 @@
             $rut.on('keypress', function (e) {
                 if (e.which === 13) {
                     e.preventDefault();
-                    buscarPaciente();
+                    buscarPaciente(true); // Con pistola/Enter se intenta auto-envío
                 }
             });
 
             $rut.on('blur', function () {
-                buscarPaciente();
+                // Al perder foco, buscamos pero SIN envío automático (flujo manual)
+                buscarPaciente(false);
             });
 
             // Registro de traspaso vía AJAX
             $formTraspaso.on('submit', function (e) {
                 e.preventDefault();
 
+                if (isSubmitting) return;
+
                 if (!$('#id_movimiento_hidden').val()) {
                     Swal.fire('Error', 'Debe buscar un paciente con movimiento válido primero.', 'error');
                     return;
                 }
+
+                const nombre = $('#nombre_paciente').val();
+                const ficha = $('#numero_ficha').val();
+                const servicio = $('#id_servicio_clinico_destino').val();
+                const profesional = $('#id_profesional').val();
+
+                if (!(nombre && ficha && servicio && profesional)) {
+                    Swal.fire('Campos requeridos', 'Los campos de nombre, N° ficha, servicio clínico y profesional deben estar seleccionados.', 'warning');
+                    return;
+                }
+
+                isSubmitting = true;
+                $btnRegistrar.prop('disabled', true);
 
                 $.ajax({
                     url: '{% url "movimiento_monologo_traspaso" %}',
@@ -328,19 +381,40 @@
                                 title: '¡Éxito!',
                                 text: response.message,
                                 icon: 'success',
-                                timer: 1500,
+                                timer: 1000,
                                 showConfirmButton: false
                             });
-                            limpiarRegistro();
-                            // Obtener instancia de DataTable inicializada en base.html
-                            const table = $('#Table').DataTable();
-                            table.ajax.reload(null, false);
-                            $rut.focus();
+                            // En lugar de recargar toda la página, limpiamos los campos del paciente
+                            // pero mantenemos la configuración de servicio y profesional si el usuario lo desea.
+                            setTimeout(function () {
+                                // Reiniciar flag de envío
+                                isSubmitting = false;
+                                // Limpiar solo los datos del paciente buscado
+                                $('#id_movimiento_hidden').val('');
+                                $('#id_rut').val('');
+                                $('#nombre_paciente').val('');
+                                $('#numero_ficha').val('');
+                                $('#id_ficha_hidden').val('');
+                                // Mantenemos servicio_clinico_destino y profesional si están en localStorage (config)
+                                // Si no se usan config, el usuario puede querer que se mantengan para el siguiente escaneo.
+
+                                // Recargar la tabla si existe
+                                if ($.fn.DataTable.isDataTable('#Table')) {
+                                    $('#Table').DataTable().ajax.reload();
+                                }
+
+                                $btnRegistrar.prop('disabled', true);
+                                $rut.focus();
+                            }, 1000);
                         } else {
+                            isSubmitting = false;
+                            $btnRegistrar.prop('disabled', false);
                             Swal.fire('Error', response.error || 'No se pudo registrar.', 'error');
                         }
                     },
                     error: function (xhr) {
+                        isSubmitting = false;
+                        $btnRegistrar.prop('disabled', false);
                         const err = xhr.responseJSON ? xhr.responseJSON.error : 'Error en el servidor';
                         Swal.fire('Error', err, 'error');
                     }

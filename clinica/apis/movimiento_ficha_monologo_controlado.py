@@ -71,11 +71,12 @@ class RegistrarSalidaAPI(APIView):
                     servicio_clinico_destino=servicio_destino,
                     profesional=profesional,
                     observacion_salida=observacion_salida,
-                    fecha_salida=fecha_salida if fecha_salida else timezone.now(),
+                    fecha_salida=fecha_salida if fecha_salida else timezone.localtime(),
                     usuario_entrega=request.user.username,
                     estado='E'
                 )
                 movimiento.save()
+                print(movimiento.fecha_salida)
 
                 return Response(
                     {'success': True, 'message': 'Salida registrada correctamente.', 'movimiento_id': movimiento.id},
@@ -112,10 +113,9 @@ class RegistrarRecepcionAPI(APIView):
                                     status=status.HTTP_403_FORBIDDEN)
 
                 # Actualizar
-                movimiento.fecha_entrada = timezone.now()
                 movimiento.usuario_entrada = request.user.username
                 movimiento.observacion_entrada = observacion_entrada
-                movimiento.fecha_entrada = fecha_entrada if fecha_entrada else timezone.now()
+                movimiento.fecha_entrada = fecha_entrada if fecha_entrada else timezone.localtime()
                 movimiento.estado = 'R'
                 movimiento.save()
 

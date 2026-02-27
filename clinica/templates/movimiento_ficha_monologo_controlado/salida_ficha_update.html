@@ -254,6 +254,8 @@
             const $formSalida = $('#form-salida');
             const $btnRegistrar = $('#btn-registrar');
             const $btnLimpiar = $('#btn-limpiar');
+            let isSubmitting = false;
+            let isSearching = false;
 
             // Persistencia en localStorage
             {% if not is_update %}
@@ -318,9 +320,13 @@
             }
 
             // Búsqueda de paciente al salir del campo RUT (blur) o presionar Enter
-            function buscarPaciente() {
+            function buscarPaciente(autoSubmit = true) {
+                if (isSearching || isSubmitting) return;
+
                 let val = $rut.val().trim();
                 if (!val) return;
+
+                isSearching = true;
 
                 // Formatear antes de buscar si parece un RUT
                 if (!val.startsWith('PAC-')) {
@@ -332,6 +338,7 @@
                     url: '{% url "ficha-paciente-buscar-monologo" %}',
                     data: {q: val},
                     success: function (response) {
+                        isSearching = false;
                         if (response.results && response.results.length > 0) {
                             const p = response.results[0];
                             if (p.en_transito) {
@@ -343,13 +350,37 @@
                                 $('#nombre_paciente').val(p.nombre_completo);
                                 $('#numero_ficha').val(p.numero_ficha_sistema);
                                 $btnRegistrar.prop('disabled', false);
+
+                                // Solo intentar envío automático si autoSubmit es true
+                                if (autoSubmit) {
+                                    // Validar y Enviar Automáticamente tras cargar datos de la API
+                                    const servicio = $('#id_servicio_clinico_destino').val();
+                                    const profesional = $('#id_profesional').val();
+                                    const nombre = $('#nombre_paciente').val();
+                                    const ficha = $('#numero_ficha').val();
+
+                                    if (nombre && ficha && servicio && profesional) {
+                                        if (!isSubmitting) {
+                                            $formSalida.submit();
+                                        }
+                                    } else {
+                                        Swal.fire({
+                                            title: 'Información Faltante',
+                                            text: 'Los campos de nombre, n ficha, servicio clínico y profesional deben estar seleccionados para el envío automático.',
+                                            icon: 'warning',
+                                            confirmButtonText: 'Entendido'
+                                        });
+                                    }
+                                }
                             }
                         } else {
+                            isSearching = false;
                             Swal.fire('No encontrado', 'No se encontró paciente con ese RUT o Ficha en su establecimiento.', 'error');
                             limpiarRegistro();
                         }
                     },
                     error: function () {
+                        isSearching = false;
                         Swal.fire('Error', 'Error al consultar la base de datos.', 'error');
                         limpiarRegistro();
                     }
@@ -359,23 +390,39 @@
             $rut.on('keypress', function (e) {
                 if (e.which === 13) {
                     e.preventDefault();
-                    buscarPaciente();
+                    buscarPaciente(true); // Con pistola/Enter se intenta auto-envío
                 }
             });
 
             $rut.on('blur', function () {
-                buscarPaciente();
+                // Al perder foco, buscamos pero SIN envío automático (flujo manual)
+                buscarPaciente(false);
             });
 
             // Registro de salida vía AJAX
             $formSalida.on('submit', function (e) {
                 e.preventDefault();
 
+                if (isSubmitting) return;
+
                 // Validar que tengamos los datos necesarios
                 if (!$('#id_ficha_hidden').val()) {
                     Swal.fire('Error', 'Debe buscar un paciente válido primero.', 'error');
                     return;
                 }
+
+                const nombre = $('#nombre_paciente').val();
+                const ficha = $('#numero_ficha').val();
+                const servicio = $('#id_servicio_clinico_destino').val();
+                const profesional = $('#id_profesional').val();
+
+                if (!(nombre && ficha && servicio && profesional)) {
+                    Swal.fire('Campos requeridos', 'Los campos de nombre, N° ficha, servicio clínico y profesional deben estar seleccionados.', 'warning');
+                    return;
+                }
+
+                isSubmitting = true;
+                $btnRegistrar.prop('disabled', true);
 
                 $.ajax({
                     url: window.location.href,
@@ -388,23 +435,27 @@
                                 title: '¡Éxito!',
                                 text: response.message,
                                 icon: 'success',
-                                timer: 1500,
+                                timer: 1000,
                                 showConfirmButton: false
                             });
                             {% if is_update %}
                                 setTimeout(function () {
                                     window.location.href = "{% url 'movimiento_monologo_salida' %}";
-                                }, 1500);
+                                }, 1000);
                             {% else %}
-                                limpiarRegistro();
-                                $('#Table').DataTable().ajax.reload(null, false);
-                                $rut.focus();
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 1000);
                             {% endif %}
                         } else {
+                            isSubmitting = false;
+                            $btnRegistrar.prop('disabled', false);
                             Swal.fire('Error', response.error || 'No se pudo registrar.', 'error');
                         }
                     },
                     error: function (xhr) {
+                        isSubmitting = false;
+                        $btnRegistrar.prop('disabled', false);
                         const err = xhr.responseJSON ? xhr.responseJSON.error : 'Error en el servidor';
                         Swal.fire('Error', err, 'error');
                     }

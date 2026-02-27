@@ -57,6 +57,7 @@ class FichaAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
                 "numero_ficha_tarjeta",
                 "numero_ficha_respaldo",
                 "pasivado",
+                "status",
             )
         }),
         ("Paciente", {
