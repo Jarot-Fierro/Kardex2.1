@@ -41,6 +41,7 @@ urlpatterns = [
 
     # Vistas básicas para Pacientes
     path('pacientes/', PacienteListView.as_view(), name='paciente_list'),
+    path('pacientes-duplicados/', PacienteDuplicadoListView.as_view(), name='paciente_list_duplicados'),
     path('pacientes/recien-nacidos/', PacienteRecienNacidoListView.as_view(), name='paciente_recien_nacido_list'),
     path('pacientes/extranjeros/', PacienteExtranjeroListView.as_view(), name='paciente_extranjero_list'),
     path('pacientes/rut-madre-reponsable/', PacienteRutMadreListView.as_view(), name='paciente_rut_madre_list'),

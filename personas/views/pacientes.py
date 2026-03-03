@@ -2,6 +2,7 @@ from datetime import datetime
 
 from django.contrib import messages
 from django.db import transaction, IntegrityError
+from django.db.models import Count, Subquery
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
@@ -145,11 +146,21 @@ def paciente_view(request, paciente_id=None):
                     paciente = paciente_form.save(commit=False)
                     es_creacion = (paciente_instance is None)
 
-                    paciente.usuario_modifica = request.user
+                    # Auditoría (usuario logueado)
+                    if es_creacion:
+                        paciente.created_by = request.user
+                    paciente.updated_by = request.user
+
                     paciente.save()
 
                     # CREAR / ACTUALIZAR FICHA
+                    # Si ya existía una ficha_instance cargada, el form la actualiza.
                     ficha = ficha_form.save(commit=False)
+                    es_creacion_ficha = (ficha.pk is None)
+
+                    if es_creacion_ficha:
+                        ficha.created_by = request.user
+                    ficha.updated_by = request.user
 
                     ficha.paciente = paciente
                     ficha.establecimiento = request.user.establecimiento
@@ -680,5 +691,36 @@ class PacientePorFechaListView(PacienteListView):
             'title': 'Pacientes por Rango de Fecha',
             'list_url': reverse_lazy('paciente_por_fecha_list'),
             'date_range_form': form,
+        })
+        return context
+
+
+class PacienteDuplicadoListView(PacienteListView):
+    template_name = 'paciente/list_duplicados.html'
+
+    def get_base_queryset(self):
+        ruts_duplicados = (
+            Paciente.objects
+            .filter(status=True)
+            .values('rut')
+            .annotate(total=Count('id'))
+            .filter(total__gt=1)
+            .values('rut')
+        )
+
+        return (
+            Paciente.objects
+            .filter(
+                status=True,
+                rut__in=Subquery(ruts_duplicados)
+            )
+            .order_by('rut', 'id')
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'title': 'Pacientes con RUT Duplicado',
+            'list_url': reverse_lazy('paciente_list_duplicados'),
         })
         return context

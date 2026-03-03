@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.db.models import Count
 from django.http import HttpResponse
 from django.http.response import JsonResponse
 from django.shortcuts import redirect
@@ -322,6 +323,45 @@ class PacientePasivadosListView(FichaListView):
         context.update({
             'title': 'Fichas Pasivadas',
             'list_url': reverse_lazy('ficha_pasivados_list'),
+        })
+        return context
+
+
+class FichaDuplicadaListView(FichaListView):
+    def get_base_queryset(self):
+        fichas_duplicadas_ids = (
+            Ficha.objects
+            .filter(status=True)
+            .values('numero_ficha_sistema', 'establecimiento')
+            .annotate(total=Count('id'))
+            .filter(total__gt=1)
+            .values('numero_ficha_sistema', 'establecimiento')
+        )
+
+        from django.db.models import Q
+        query = Q()
+        for item in fichas_duplicadas_ids:
+            query |= Q(
+                numero_ficha_sistema=item['numero_ficha_sistema'],
+                establecimiento=item['establecimiento']
+            )
+
+        if not query:
+            return Ficha.objects.none()
+
+        return (
+            Ficha.objects
+            .filter(status=True)
+            .filter(query)
+            .select_related('paciente', 'establecimiento')
+            .order_by('establecimiento', 'numero_ficha_sistema', 'id')
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'title': 'Fichas con Número Duplicado por Establecimiento',
+            'list_url': reverse_lazy('ficha_list_duplicados'),
         })
         return context
 
