@@ -63,6 +63,56 @@ def pdf_index(request, ficha_id=None, paciente_id=None):
     return render(request, 'pdfs/formato_caratula.html', context)
 
 
+def pdf_index_rn(request, ficha_id=None, paciente_id=None):
+    ficha = None
+
+    if ficha_id is not None:
+        ficha = get_object_or_404(Ficha, id=ficha_id)
+        paciente = ficha.paciente
+    elif paciente_id is not None:
+        paciente = get_object_or_404(Paciente, id=paciente_id)
+        # Obtener la ficha asociada al establecimiento del usuario logueado
+        establecimiento = getattr(request.user, 'establecimiento', None)
+        if establecimiento is None:
+            raise Http404("El usuario no tiene un establecimiento asociado")
+        ficha = Ficha.objects.filter(
+            paciente=paciente,
+            establecimiento=establecimiento
+        ).first()
+        if ficha is None:
+            raise Http404("El paciente no tiene una ficha asociada para el establecimiento del usuario")
+    else:
+        # Si no se proporciona ningún ID, retornar 404
+        raise Http404("Se requiere ficha")
+
+    # Compatibilidad con plantillas antiguas: proporcionar atributos esperados
+    if not hasattr(ficha, 'numero_ficha'):
+        ficha.numero_ficha = ficha.numero_ficha_sistema
+    if not hasattr(ficha, 'ingreso_paciente'):
+        ficha.ingreso_paciente = SimpleNamespace(
+            establecimiento=ficha.establecimiento,
+            paciente=ficha.paciente,
+        )
+
+    # Generar código de barras basado en el número de RUT del paciente
+    rut_paciente = getattr(paciente, 'rut', '') or ''
+    numero_rut = obtener_numero_rut(rut_paciente)
+    # Fallbacks por si no hay RUT válido
+    if not numero_rut:
+        # Usar el código interno de paciente si existe, de lo contrario el número de ficha del sistema
+        numero_rut = (
+                getattr(paciente, 'codigo', '') or str(getattr(ficha, 'numero_ficha_sistema', '') or '')).strip()
+    codigo_barras_base64 = generar_barcode_base64(numero_rut)
+
+    context = {
+        'paciente': paciente,
+        'ficha': ficha,
+        'codigo_barras_base64': codigo_barras_base64
+    }
+
+    return render(request, 'pdfs/formato_caratula_rn.html', context)
+
+
 def pdf_stickers(request, ficha_id=None, paciente_id=None):
     ficha = None
 
@@ -343,10 +393,11 @@ def pdf_movimientos_fichas(request):
 
 def pdf_movimientos_fichas_monologo_controlado(request):
     tipo = request.GET.get('tipo', 'salida')
-    hora_inicio = request.GET.get('hora_inicio')
-    hora_termino = request.GET.get('hora_termino')
+    hora_inicio = request.GET.get('fecha_inicio')
+    hora_termino = request.GET.get('fecha_termino')
     servicio_id = request.GET.get('servicio_clinico')
     profesional_id = request.GET.get('profesional')
+    print(hora_inicio, hora_termino, servicio_id, profesional_id)
 
     establecimiento = getattr(request.user, 'establecimiento', None)
     if not establecimiento:
@@ -361,7 +412,7 @@ def pdf_movimientos_fichas_monologo_controlado(request):
         usuario_field_str = 'usuario_entrada'
         etiqueta_usuario = "Recepcionado por"
         # Para entrada, deben tener fecha de recepción
-        queryset = MovimientoMonologoControlado.objects.filter(
+        base_queryset = MovimientoMonologoControlado.objects.filter(
             establecimiento=establecimiento,
             fecha_entrada__isnull=False,
             status=True
@@ -374,7 +425,7 @@ def pdf_movimientos_fichas_monologo_controlado(request):
         usuario_field_str = 'usuario_entrega'
         etiqueta_usuario = "Enviado por"
         # Tránsito: estado E (Enviado, no recibido)
-        queryset = MovimientoMonologoControlado.objects.filter(
+        base_queryset = MovimientoMonologoControlado.objects.filter(
             establecimiento=establecimiento,
             estado='E',
             status=True
@@ -387,122 +438,143 @@ def pdf_movimientos_fichas_monologo_controlado(request):
         profesional_field = 'profesional'
         usuario_field_str = 'usuario_entrega'
         etiqueta_usuario = "Entregado por"
-        queryset = MovimientoMonologoControlado.objects.filter(
+        base_queryset = MovimientoMonologoControlado.objects.filter(
             establecimiento=establecimiento,
             fecha_salida__isnull=False,
             status=True
         )
 
-    queryset = queryset.select_related(
-        'rut_paciente',
-        servicio_field,
-        profesional_field
-    )
-
     filtros_aplicados = any([hora_inicio, hora_termino, servicio_id, profesional_id])
 
-    # Aplicar filtros si existen
-    if hora_inicio:
-        queryset = queryset.filter(**{f"{fecha_field}__gte": hora_inicio})
-    if hora_termino:
-        queryset = queryset.filter(**{f"{fecha_field}__lte": hora_termino})
-    if servicio_id:
-        queryset = queryset.filter(**{f"{servicio_field}_id": servicio_id})
-    if profesional_id:
-        queryset = queryset.filter(**{f"{profesional_field}_id": profesional_id})
+    # 1. SI HAY FILTROS: Imprimir exactamente lo que se muestra
+    if filtros_aplicados:
+        queryset = base_queryset.select_related(
+            'rut_paciente',
+            servicio_field,
+            profesional_field
+        )
 
-    # Ordenar por fecha descendente
-    queryset = queryset.order_by(f'-{fecha_field}')
+        if hora_inicio:
+            queryset = queryset.filter(**{f"{fecha_field}__gte": hora_inicio})
+        if hora_termino:
+            queryset = queryset.filter(**{f"{fecha_field}__lte": hora_termino})
+        if servicio_id:
+            queryset = queryset.filter(**{f"{servicio_field}_id": servicio_id})
+        if profesional_id:
+            queryset = queryset.filter(**{f"{profesional_field}_id": profesional_id})
 
-    # Aplicar límites por defecto si no hay filtros
-    if not filtros_aplicados:
-        primer_mov = queryset.first()
-        if primer_mov:
-            ultima_fecha = getattr(primer_mov, fecha_field)
-            if ultima_fecha:
-                limite_temporal = ultima_fecha - timedelta(weeks=2)
-                queryset = queryset.filter(**{f"{fecha_field}__gte": limite_temporal})
+        # Ordenar por fecha descendente
+        queryset = queryset.order_by(f'-{fecha_field}')
 
-    # Límites solicitados
-    limit_servicios = 3
-    limit_profesionales = 2
-    limit_fichas = 10
+        # Agrupación de datos según lo filtrado (sin límites especiales)
+        datos_agrupados = []
+        servicios_map = {}
 
-    # Agrupación de datos
-    datos_agrupados = []
-    count_servicios = 0
-    servicios_map = {}
+        for m in queryset:
+            s_obj = getattr(m, servicio_field)
+            if not s_obj: continue
+            s_id = s_obj.id
 
-    for m in queryset:
-        s_obj = getattr(m, servicio_field)
-        if not s_obj: continue
+            if s_id not in servicios_map:
+                servicios_map[s_id] = {
+                    'obj': s_obj,
+                    'profesionales_map': {},
+                    'order': len(servicios_map)
+                }
 
-        s_id = s_obj.id
-        if s_id not in servicios_map:
-            if limit_servicios and count_servicios >= limit_servicios:
-                continue
-            servicios_map[s_id] = {
-                'obj': s_obj,
-                'profesionales_map': {},
-                'profesionales_count': 0,
-                'order': count_servicios
-            }
-            count_servicios += 1
+            s_data = servicios_map[s_id]
+            p_obj = getattr(m, profesional_field)
+            if not p_obj: continue
+            p_id = p_obj.id
 
-        s_data = servicios_map[s_id]
-        p_obj = getattr(m, profesional_field)
-        if not p_obj: continue
+            if p_id not in s_data['profesionales_map']:
+                s_data['profesionales_map'][p_id] = {
+                    'obj': p_obj,
+                    'movimientos': [],
+                    'order': len(s_data['profesionales_map'])
+                }
 
-        p_id = p_obj.id
-        if p_id not in s_data['profesionales_map']:
-            if limit_profesionales and s_data['profesionales_count'] >= limit_profesionales:
-                continue
-            s_data['profesionales_map'][p_id] = {
-                'obj': p_obj,
-                'movimientos': [],
-                'order': s_data['profesionales_count']
-            }
-            s_data['profesionales_count'] += 1
+            p_data = s_data['profesionales_map'][p_id]
+            usuario_responsable = getattr(m, usuario_field_str, 'N/A')
 
-        p_data = s_data['profesionales_map'][p_id]
-        if limit_fichas and len(p_data['movimientos']) >= limit_fichas:
-            continue
-
-        usuario_responsable = getattr(m, usuario_field_str, 'N/A')
-
-        p_data['movimientos'].append({
-            'numero_ficha': m.numero_ficha,
-            'rut_paciente': m.rut,  # Usamos el RUT directo del movimiento si queremos, o del paciente
-            'nombre_paciente': m.rut_paciente.nombre_completo if m.rut_paciente else 'N/A',
-            'hora_movimiento': getattr(m, fecha_field),
-            'usuario_responsable': usuario_responsable or 'N/A',
-        })
-
-    # Convertir mapas a listas ordenadas
-    servicios_sorted = sorted(servicios_map.values(), key=lambda x: x['order'])
-    for s in servicios_sorted:
-        profs_sorted = sorted(s['profesionales_map'].values(), key=lambda x: x['order'])
-        profesionales_list = []
-        for p in profs_sorted:
-            profesionales_list.append({
-                'nombre': str(p['obj']),
-                'movimientos': p['movimientos']
+            p_data['movimientos'].append({
+                'numero_ficha': m.numero_ficha,
+                'rut_paciente': m.rut,
+                'nombre_paciente': m.rut_paciente.nombre_completo if m.rut_paciente else 'N/A',
+                'hora_movimiento': getattr(m, fecha_field),
+                'usuario_responsable': m.usuario_entrega_id or 'N/A',
             })
 
-        datos_agrupados.append({
-            'nombre': s['obj'].nombre,
-            'profesionales': profesionales_list
-        })
+        # Convertir mapas a listas ordenadas
+        servicios_sorted = sorted(servicios_map.values(), key=lambda x: x['order'])
+        for s in servicios_sorted:
+            profs_sorted = sorted(s['profesionales_map'].values(), key=lambda x: x['order'])
+            profesionales_list = []
+            for p in profs_sorted:
+                profesionales_list.append({
+                    'nombre': str(p['obj']),
+                    'movimientos': p['movimientos']
+                })
+            datos_agrupados.append({
+                'nombre': s['obj'].nombre,
+                'profesionales': profesionales_list
+            })
 
-    subtitulo = "Historial completo"
-    if hora_inicio and hora_termino:
-        subtitulo = f"Desde {hora_inicio} hasta {hora_termino}"
-    elif hora_inicio:
-        subtitulo = f"Desde {hora_inicio}"
-    elif hora_termino:
-        subtitulo = f"Hasta {hora_termino}"
-    elif not filtros_aplicados:
-        subtitulo = "Últimos movimientos registrados"
+        subtitulo = "Resultados filtrados"
+        if hora_inicio and hora_termino:
+            subtitulo = f"Desde {hora_inicio} hasta {hora_termino}"
+        elif hora_inicio:
+            subtitulo = f"Desde {hora_inicio}"
+        elif hora_termino:
+            subtitulo = f"Hasta {hora_termino}"
+
+    # 2. SI NO HAY FILTROS: Aplicar lógica de últimos servicios, profesionales y fichas
+    else:
+        # Obtener los últimos 3 servicios clínicos que tienen movimientos
+        servicios_ids = base_queryset.values_list(f'{servicio_field}_id', flat=True).distinct().order_by(
+            f'-{fecha_field}')[:3]
+
+        datos_agrupados = []
+        for s_id in servicios_ids:
+            # Obtenemos el objeto ServicioClinico
+            from establecimientos.models import ServicioClinico
+            s_obj = ServicioClinico.objects.filter(id=s_id).first()
+
+            # Obtener los últimos 2 profesionales de este servicio
+            profesionales_ids = base_queryset.filter(**{f"{servicio_field}_id": s_id}).values_list(
+                f'{profesional_field}_id', flat=True).distinct().order_by(f'-{fecha_field}')[:2]
+
+            profesionales_list = []
+            for p_id in profesionales_ids:
+                p_movs = base_queryset.filter(
+                    **{f"{servicio_field}_id": s_id, f"{profesional_field}_id": p_id}
+                ).select_related('rut_paciente', profesional_field).order_by(f'-{fecha_field}')[:10]
+
+                if p_movs.exists():
+                    p_obj = getattr(p_movs[0], profesional_field)
+                    movimientos_list = []
+                    for m in p_movs:
+                        usuario_responsable = getattr(m, usuario_field_str, 'N/A')
+                        movimientos_list.append({
+                            'numero_ficha': m.numero_ficha,
+                            'rut_paciente': m.rut,
+                            'nombre_paciente': m.rut_paciente.nombre_completo if m.rut_paciente else 'N/A',
+                            'hora_movimiento': getattr(m, fecha_field),
+                            'usuario_responsable': usuario_responsable or 'N/A',
+                        })
+                    profesionales_list.append({
+                        'nombre': str(p_obj) if p_obj else 'N/A',
+                        'movimientos': movimientos_list
+                    })
+
+            if profesionales_list:
+                s_name = getattr(s_obj, 'nombre', 'N/A')
+                datos_agrupados.append({
+                    'nombre': s_name,
+                    'profesionales': profesionales_list
+                })
+
+        subtitulo = "Últimos movimientos registrados (Resumen)"
 
     context = {
         'titulo_movimiento': titulo,

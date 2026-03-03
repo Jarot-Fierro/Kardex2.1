@@ -86,8 +86,8 @@ class Command(BaseCommand):
             # Intentar parsear como fecha de Excel (número de serie)
             fecha_num = float(valor_str)
             fecha = pd.Timestamp('1899-12-30') + pd.Timedelta(days=fecha_num)
-            if fecha == pd.Timestamp('1900-01-01'):
-                return None
+            # if fecha == pd.Timestamp('1900-01-01'):
+            #     return None
             return fecha.to_pydatetime()
         except (ValueError, TypeError):
             pass
@@ -105,8 +105,8 @@ class Command(BaseCommand):
             try:
                 # Parsear como datetime
                 fecha_dt = datetime.strptime(valor_str, formato)
-                if fecha_dt.year == 1900 and fecha_dt.month == 1 and fecha_dt.day == 1:
-                    return None
+                # if fecha_dt.year == 1900 and fecha_dt.month == 1 and fecha_dt.day == 1:
+                #     return None
                 return fecha_dt
             except Exception:
                 continue

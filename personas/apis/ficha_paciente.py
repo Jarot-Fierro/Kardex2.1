@@ -12,6 +12,7 @@ def get_paciente_ficha(request, rut):
         .select_related("comuna", "prevision", "usuario", "usuario_anterior")
         .first()
     )
+    print(paciente)
 
     if not paciente:
         return JsonResponse({"error": "Paciente no encontrado"}, status=404)
@@ -22,7 +23,7 @@ def get_paciente_ficha(request, rut):
             paciente=paciente,
             establecimiento=request.user.establecimiento
         )
-        .select_related("sector", "establecimiento", "usuario")
+        .select_related("sector", "establecimiento", "usuario", "usuario_anterior", "created_by")
         .prefetch_related(
             Prefetch(
                 "movimientoficha_set",
@@ -32,6 +33,7 @@ def get_paciente_ficha(request, rut):
         )
         .first()
     )
+    print(ficha)
 
     # if not ficha:
     #     return JsonResponse(
@@ -86,7 +88,7 @@ def get_paciente_ficha(request, rut):
             "prevision_nombre": paciente.prevision.nombre if paciente.prevision else "",
             "genero_nombre": paciente.genero.nombre if paciente.genero else "",
 
-            "usuario_creador": paciente.usuario.username if paciente.usuario else None,
+            # "usuario_creador": paciente.usuario.username if paciente.usuario else None,
             "usuario_anterior": paciente.usuario_anterior.nombre if paciente.usuario_anterior else None,
         },
         "ficha": None,
@@ -99,13 +101,39 @@ def get_paciente_ficha(request, rut):
             "numero_ficha_tarjeta": ficha.numero_ficha_tarjeta,
             "pasivado": ficha.pasivado,
             "observacion": ficha.observacion,
-            "fecha_creacion": ficha.created_at.isoformat() if ficha.created_at else None,
+            # "fecha_creacion": ficha.created_at.isoformat() if ficha.created_at else None,
             "fecha_modificacion": ficha.updated_at.isoformat() if ficha.updated_at else None,
             "fecha_creacion_anterior": ficha.fecha_creacion_anterior.isoformat() if ficha.fecha_creacion_anterior else None,
+            "fecha_creacion": (
+                (
+                    ficha.fecha_creacion_anterior.isoformat()
+                    if ficha.fecha_creacion_anterior
+                    else (
+                        ficha.created_at.isoformat()
+                        if ficha.created_at
+                        else None
+                    )
+                )
+            ),
             "usuario": ficha.usuario.username if ficha.usuario else None,
             "establecimiento": ficha.establecimiento.nombre if ficha.establecimiento else None,
             "sector_id": ficha.sector_id,
             "sector": ficha.sector.color.nombre if ficha.sector and ficha.sector.color else "",
+            "usuario_creador": (
+                (
+                    ficha.usuario_anterior.nombre
+                    if ficha.usuario_anterior
+                    else (
+                        f"{ficha.created_by.first_name or ''} {ficha.created_by.last_name or ''}"
+                        if ficha.created_by
+                        else ""
+                    )
+                )
+            ).strip(),
+            "ingresado_por": ficha.usuario_anterior.nombre if ficha.usuario_anterior else (
+                ficha.created_by.username if ficha.created_by else None),
+            "fecha_ingreso": (ficha.fecha_creacion_anterior.isoformat() if ficha.fecha_creacion_anterior else (
+                ficha.created_at.isoformat() if ficha.created_at else None)),
             "movimientos": [
                 {
                     "fecha_envio": m.fecha_salida.isoformat() if m.fecha_salida else None,
@@ -119,8 +147,6 @@ def get_paciente_ficha(request, rut):
                 for m in getattr(ficha, "movimientos", [])
             ],
         }
-
-        print(data)
 
         data["otras_fichas"] = [
             {

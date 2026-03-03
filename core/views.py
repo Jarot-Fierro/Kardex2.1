@@ -161,6 +161,11 @@ def dashboard_view(request):
 
 
 @login_required
+def maintenance_view(request):
+    return render(request, 'core/maintenance.html')
+
+
+@login_required
 def no_establecimiento(request):
     return render(request, 'core/no_establecimiento.html')
 

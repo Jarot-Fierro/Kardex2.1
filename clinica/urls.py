@@ -3,7 +3,7 @@ from django.urls import path
 from clinica.apis.buscar_paciente import (
     buscar_paciente_ficha_api, buscar_paciente_recepcion_api, buscar_paciente_traspaso_api,
     buscar_paciente_ficha_api_monologo, buscar_paciente_recepcion_api_monologo,
-    buscar_paciente_ficha_api_monologo_traspaso
+    buscar_paciente_ficha_api_monologo_traspaso, buscar_paciente_general_api
 )
 from clinica.apis.movimiento_ficha_monologo_controlado import RegistrarSalidaAPI, RegistrarRecepcionAPI
 from clinica.apis.movimientos_ficha_paciente import get_movimientos_paciente_establecimiento
@@ -13,7 +13,7 @@ from clinica.views.movimiento_ficha_monologo_controlado import (
     SalidaFichaView, SalidaFichaUpdateView, RecepcionFichaView, FichasEnTransitoView, TraspasoFichaView
 )
 from clinica.views.pdf import pdf_stickers, pdf_index, pdf_movimientos_fichas, \
-    pdf_movimientos_fichas_monologo_controlado
+    pdf_movimientos_fichas_monologo_controlado, pdf_index_rn
 
 urlpatterns = [
     path('fichas/', FichaListView.as_view(), name='ficha_list'),
@@ -59,6 +59,7 @@ urlpatterns = [
          name='ficha-paciente-buscar-monologo-traspaso'),
 
     path('api/ficha-paciente/buscar-traspaso/', buscar_paciente_traspaso_api, name='ficha-paciente-buscar-traspaso'),
+    path('api/paciente/buscar-general/', buscar_paciente_general_api, name='api-paciente-buscar-general'),
 
     path(
         "pdfs/stickers/ficha/<int:ficha_id>/", pdf_stickers, name="pdf_stickers_ficha"
@@ -69,6 +70,8 @@ urlpatterns = [
 
     path("pdfs/ficha/<int:ficha_id>/", pdf_index, name="pdf_ficha"),
     path("pdfs/ficha/paciente/<int:paciente_id>/", pdf_index, name="pdf_ficha_paciente"),
+    path("pdfs/ficha/paciente-rn/<int:paciente_id>/", pdf_index_rn, name="pdf_ficha_paciente_rn"),
+
     path("pdfs/movimientos/", pdf_movimientos_fichas, name="pdf_movimientos_fichas"),
     path("pdfs/movimientos-monologo/", pdf_movimientos_fichas_monologo_controlado,
          name="pdf_movimientos_fichas_monologo_controlado"),

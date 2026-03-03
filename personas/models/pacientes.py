@@ -29,7 +29,7 @@ class Paciente(StandardModel):
     nombre_social = models.CharField(max_length=100, null=True, blank=True, verbose_name='Nombre Social')
 
     # DATOS DE NACIMIENTO
-    fecha_nacimiento = models.DateTimeField(null=True, blank=True, verbose_name='Fecha de Nacimiento')
+    fecha_nacimiento = models.DateField(null=True, blank=True, verbose_name='Fecha de Nacimiento')
     sexo = models.CharField(max_length=50, choices=SEXO_CHOICES, null=False,
                             verbose_name='Sexo', default='NO INFORMADO')
     estado_civil = models.CharField(max_length=20, choices=ESTADO_CIVIL, null=False, verbose_name='Estado Civil',
@@ -52,7 +52,7 @@ class Paciente(StandardModel):
     recien_nacido = models.BooleanField(default=False, verbose_name='Recién Nacido')
     extranjero = models.BooleanField(default=False, verbose_name='Extranjero')
     fallecido = models.BooleanField(default=False, verbose_name='Fallecido')
-    fecha_fallecimiento = models.DateTimeField(null=True, blank=True, verbose_name='Fecha de Fallecimiento')
+    fecha_fallecimiento = models.DateField(null=True, blank=True, verbose_name='Fecha de Fallecimiento')
     alergico_a = models.CharField(null=True, blank=True, max_length=200, verbose_name='Alergico a')
 
     comuna = models.ForeignKey('geografia.Comuna', on_delete=models.PROTECT, null=False,

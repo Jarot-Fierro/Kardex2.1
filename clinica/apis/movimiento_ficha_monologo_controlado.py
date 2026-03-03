@@ -124,3 +124,56 @@ class RegistrarRecepcionAPI(APIView):
 
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class RegistrarTraspasoAPI(APIView):
+    def post(self, request):
+        movimiento_id = request.data.get('movimiento_id_hidden') or request.data.get('movimiento_id')
+        servicio_clinico_destino_id = request.data.get('servicio_clinico_destino')
+        profesional_id = request.data.get('profesional')
+        observacion_traspaso = request.data.get('observacion_traspaso')
+        fecha_salida = request.data.get('fecha_salida')
+
+        # Validaciones básicas
+        if not movimiento_id or not servicio_clinico_destino_id or not profesional_id:
+            return Response({'error': 'Movimiento, Servicio Clínico Destino y Profesional son obligatorios.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            with transaction.atomic():
+                # 1. Obtener el Movimiento
+                try:
+                    movimiento = MovimientoMonologoControlado.objects.get(pk=movimiento_id)
+                except MovimientoMonologoControlado.DoesNotExist:
+                    return Response({'error': 'Movimiento no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+
+                # 2. Validar servicio clinico
+                try:
+                    servicio_destino = ServicioClinico.objects.get(pk=servicio_clinico_destino_id)
+                except ServicioClinico.DoesNotExist:
+                    return Response({'error': 'Servicio clínico destino no válido.'},
+                                    status=status.HTTP_400_BAD_REQUEST)
+
+                # 3. Validar profesional
+                try:
+                    profesional = Profesional.objects.get(pk=profesional_id)
+                except Profesional.DoesNotExist:
+                    return Response({'error': 'Profesional no válido.'}, status=status.HTTP_400_BAD_REQUEST)
+
+                # 4. Actualizar Movimiento
+                movimiento.servicio_clinico_destino = servicio_destino
+                movimiento.profesional = profesional
+                movimiento.observacion_traspaso = observacion_traspaso
+
+                # Si el usuario ingresó una fecha, se actualiza. Si no, se mantiene la original.
+                if fecha_salida:
+                    movimiento.fecha_salida = fecha_salida
+
+                movimiento.save()
+
+                return Response(
+                    {'success': True, 'message': 'Traspaso actualizado correctamente.', 'movimiento_id': movimiento.id},
+                    status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

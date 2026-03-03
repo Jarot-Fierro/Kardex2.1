@@ -7,7 +7,8 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import TemplateView
 
-from clinica.apis.movimiento_ficha_monologo_controlado import RegistrarSalidaAPI, RegistrarRecepcionAPI
+from clinica.apis.movimiento_ficha_monologo_controlado import RegistrarSalidaAPI, RegistrarRecepcionAPI, \
+    RegistrarTraspasoAPI
 from clinica.forms.movimiento_ficha_monologo_controlado import (
     MovimientoSalidaForm, MovimientoRecepcionForm, FiltroMovimientoForm, MovimientoTraspasoForm
 )
@@ -217,7 +218,7 @@ class TraspasoFichaView(LoginRequiredMixin, TemplateView):
             # 'columns' = ['RUT', 'Paciente', 'Ficha', 'Servicio Destino', 'Profesional', 'Observación Traspaso', 'Estado', 'Fecha Salida', 'Fecha Entrada']
             data.append({
                 'ID': mov.id,
-                'actions': f'<button type="button" class="btn btn-warning btn-sm btn-edit" data-rut="{mov.ficha.paciente.rut if mov.ficha and mov.ficha.paciente else mov.rut}"><i class="fas fa-edit"></i></button>',
+                'actions': f'',
                 'RUT': mov.ficha.paciente.rut if mov.ficha and mov.ficha.paciente else mov.rut,
                 'Paciente': mov.ficha.paciente.nombre_completo if mov.ficha and mov.ficha.paciente else (
                     mov.rut_paciente.nombre_completo if mov.rut_paciente else '-'),
@@ -237,43 +238,8 @@ class TraspasoFichaView(LoginRequiredMixin, TemplateView):
         })
 
     def post(self, request, *args, **kwargs):
-        movimiento_id = request.POST.get('movimiento_id_hidden')
-        instance_movimiento = MovimientoMonologoControlado.objects.filter(id=movimiento_id).first()
-        print(instance_movimiento.fecha_salida)
-
-        if not movimiento_id:
-            # Si no hay ID, tal vez sea por el nombre del campo en el form
-            movimiento_id = request.POST.get('id_movimiento_hidden')
-
-        if not movimiento_id:
-            return JsonResponse({'success': False, 'error': 'No se especificó un movimiento para actualizar.'},
-                                status=400)
-
-        movimiento = get_object_or_404(MovimientoMonologoControlado, pk=movimiento_id,
-                                       establecimiento=request.user.establecimiento)
-
-        form = MovimientoTraspasoForm(request.POST, instance=movimiento, establecimiento=request.user.establecimiento)
-        if form.is_valid():
-            # Guardamos el valor original de fecha_salida antes de que el form lo cambie si viene vacío
-
-            mov = form.save(commit=False)
-
-            # Aseguramos que se guarde la observación de traspaso específicamente
-            mov.observacion_traspaso = form.cleaned_data.get('observacion_traspaso')
-
-            # Si el usuario ingresó una fecha, se actualiza. Si no, se mantiene la original.
-            fecha_salida_form = form.cleaned_data.get('fecha_salida')
-
-            if fecha_salida_form:
-                mov.fecha_salida = fecha_salida_form
-
-            # El traspaso marca el movimiento como Enviado (E) para que pueda ser recibido nuevamente
-            mov.estado = 'E'
-            mov.save()
-            return JsonResponse({'success': True, 'message': 'Traspaso actualizado correctamente.'})
-        else:
-            errors = form.errors.as_text()
-            return JsonResponse({'success': False, 'error': f'Error en el formulario: {errors}'}, status=400)
+        view = RegistrarTraspasoAPI.as_view()
+        return view(request, *args, **kwargs)
 
 
 class SalidaFichaUpdateView(SalidaFichaView):

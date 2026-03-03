@@ -46,4 +46,4 @@ class MovimientoMonologoControlado(StandardModel):
     class Meta:
         verbose_name = 'Movimiento Monologo Controlado'
         verbose_name_plural = 'Movimientos Monologo Controlados'
-        ordering = ['-fecha_salida']
+        ordering = ['-id']

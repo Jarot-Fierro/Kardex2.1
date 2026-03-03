@@ -419,3 +419,58 @@ def buscar_paciente_ficha_api_monologo_traspaso(request):
         results.append(data)
 
     return JsonResponse({'results': results})
+
+
+@login_required
+def buscar_paciente_general_api(request):
+    """
+    API general para buscar pacientes por RUT o número de ficha y devolver sus datos básicos.
+    """
+    query = request.GET.get('q', '').strip()
+    if not query:
+        return JsonResponse({'results': []})
+
+    query_upper = query.upper()
+    query_clean = query.replace('.', '').replace('-', '').strip()
+
+    establecimiento = getattr(request.user, 'establecimiento', None)
+    if not establecimiento:
+        return JsonResponse({'error': 'Usuario no tiene establecimiento asociado'}, status=403)
+
+    filtros = Q(paciente__rut__icontains=query_clean) | Q(paciente__nombre__icontains=query_upper) | \
+              Q(paciente__apellido_paterno__icontains=query_upper) | Q(
+        paciente__apellido_materno__icontains=query_upper)
+
+    if query_clean.isdigit():
+        try:
+            val = int(query_clean)
+            filtros |= Q(numero_ficha_sistema=val)
+        except:
+            pass
+
+    fichas = Ficha.objects.filter(
+        filtros,
+        establecimiento=establecimiento
+    ).select_related('paciente', 'paciente__comuna', 'paciente__prevision').distinct()[:20]
+
+    results = []
+    for ficha in fichas:
+        p = ficha.paciente
+        results.append({
+            'id': p.id,
+            'text': f"Ficha {ficha.numero_ficha_sistema} - {p.nombre_completo} ({p.rut})",
+            'paciente_id': p.id,
+            'ficha_id': ficha.id,
+            'rut': p.rut,
+            'numero_ficha_sistema': ficha.numero_ficha_sistema,
+            'nombre_completo': p.nombre_completo,
+            'fecha_nacimiento': p.fecha_nacimiento.strftime('%d/%m/%Y') if p.fecha_nacimiento else 'N/A',
+            'sexo': p.sexo,
+            'direccion': p.direccion or 'No informada',
+            'comuna': p.comuna.nombre if p.comuna else 'N/A',
+            'prevision': p.prevision.nombre if p.prevision else 'N/A',
+            'telefono': p.numero_telefono1 or p.numero_telefono2 or 'N/A',
+            'pasivado': ficha.pasivado,
+        })
+
+    return JsonResponse({'results': results})

@@ -62,6 +62,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'core.middleware.maintenance.MaintenanceModeMiddleware',
     'users.middleware.login_required.LoginRequiredMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -97,6 +98,9 @@ SIMPLE_HISTORY_ENABLED = True
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 DATABASES = MYSQL
+
+# MANTENIMIENTO
+MAINTENANCE_MODE = False
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators

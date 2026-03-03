@@ -36,24 +36,24 @@ class PacienteForm(forms.ModelForm):
         except Exception:
             pass
 
-    fecha_nacimiento = forms.DateTimeField(
+    fecha_nacimiento = forms.DateField(
         required=True,
-        input_formats=['%Y-%m-%dT%H:%M'],
-        widget=forms.DateTimeInput(
-            format='%Y-%m-%dT%H:%M',
+        input_formats=['%Y-%m-%d'],
+        widget=forms.DateInput(
+            format='%Y-%m-%d',
             attrs={
-                'type': 'datetime-local',
+                'type': 'date',
                 'class': 'form-control form-control-sm',
                 'id': 'id_fecha_nacimiento',
             }
         )
     )
 
-    fecha_fallecimiento = forms.DateTimeField(
+    fecha_fallecimiento = forms.DateField(
         required=False,
-        input_formats=['%Y-%m-%dT%H:%M'],
-        widget=forms.DateTimeInput(attrs={
-            'type': 'datetime-local',
+        input_formats=['%Y-%m-%d'],
+        widget=forms.DateInput(attrs={
+            'type': 'date',
             'class': 'form-control form-control-sm bg-danger text-white border-dange',
             'id': 'id_fecha_fallecimiento',
             'name': 'fecha_fallecimiento'
@@ -396,7 +396,6 @@ class PacienteForm(forms.ModelForm):
     def _clean_fallecimiento(self, cleaned):
         esta_fallecido = cleaned.get("fallecido")
         fecha_fallecimiento = cleaned.get("fecha_fallecimiento")
-        print(esta_fallecido)
 
         if esta_fallecido and not fecha_fallecimiento:
             self.add_error(
@@ -452,23 +451,23 @@ class PacienteForm(forms.ModelForm):
                     'Debe indicar el apellido paterno.'
                 )
 
-    def _clean_telefonos(self, cleaned):
-        sin_telefono = cleaned.get("sin_telefono")
-
-        telefono1 = cleaned.get("numero_telefono1")
-
-        # Caso inválido: no tiene teléfono y no marcó "sin teléfono"
-        if not sin_telefono and not telefono1:
-            self.add_error(
-                'numero_telefono1',
-                'Debe ingresar un teléfono o indicar que no cuenta con uno.'
-            )
-
-        # Caso válido: marcó sin teléfono
-        if sin_telefono:
-            cleaned['sin_telefono'] = True
-            cleaned['numero_telefono1'] = None
-            cleaned['numero_telefono2'] = None
+    # def _clean_telefonos(self, cleaned):
+    #     sin_telefono = cleaned.get("sin_telefono")
+    #
+    #     telefono1 = cleaned.get("numero_telefono1")
+    #
+    #     # Caso inválido: no tiene teléfono y no marcó "sin teléfono"
+    #     if not sin_telefono and not telefono1:
+    #         self.add_error(
+    #             'numero_telefono1',
+    #             'Debe ingresar un teléfono o indicar que no cuenta con uno.'
+    #         )
+    #
+    #     # Caso válido: marcó sin teléfono
+    #     if sin_telefono:
+    #         cleaned['sin_telefono'] = True
+    #         cleaned['numero_telefono1'] = None
+    #         cleaned['numero_telefono2'] = None
 
     def clean_rut(self):
         rut = self.cleaned_data.get('rut')
@@ -500,7 +499,7 @@ class PacienteForm(forms.ModelForm):
                 self.add_error('rut', "No se pudo generar un RUT ficticio único. Intente de nuevo.")
 
         self._clean_extranjero(cleaned)
-        self._clean_telefonos(cleaned)
+        # self._clean_telefonos(cleaned)
         self._clean_recien_nacido(cleaned)
         self._clean_fallecimiento(cleaned)
 

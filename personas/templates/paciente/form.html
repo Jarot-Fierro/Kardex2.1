@@ -107,6 +107,13 @@
                                         Carátula
                                     </a>
 
+                                    <a id="btn-caratula-rn"
+                                       href="#"
+                                       class="btn btn-sm btn-outline-secondary flex-fill mx-1 btn-botonera-clinica"
+                                       style="pointer-events: none; opacity: 0.6;">
+                                        C. Sin RUT
+                                    </a>
+
                                     <a id="btn-stickers"
                                        href="#"
                                        class="btn btn-sm btn-outline-secondary flex-fill mx-1 btn-botonera-clinica"
@@ -114,6 +121,7 @@
                                         Stickers
                                     </a>
                                 </div>
+
                             </div>
                         </div>
                         <div class="row mt-1">
@@ -122,12 +130,16 @@
                                     Cancelar
                                 </button>
                                 <button type="submit" class="btn btn-primary btn-sm no-print">Guardar</button>
-                                {#                                <a id="btn-paciente-sin-rut"#}
-                                {#                                   href=""#}
-                                {#                                   class="btn btn-sm btn-outline-danger flex-fill mx-1">#}
-                                {#                                    Crear Paciente sin RUT#}
-                                {#                                </a>#}
+
+                                <button type="button"
+                                        id="btn-buscar-ficha-modal"
+                                        class="btn btn-sm btn-dark flex-fill mx-1"
+                                        data-toggle="modal"
+                                        data-target="#modalBuscarFicha">
+                                    Buscar Ficha
+                                </button>
                             </div>
+
                         </div>
                     </div>
                 </div>
@@ -556,12 +568,12 @@
 
                                     <div class="col-md-4">
                                         <small class="text-muted">Servicio clínico</small><br>
-                                        <strong class="text-primary" id="id_servicio_clinico">—</strong>
+                                        <strong class="text-primary" id="id_servicio_clinico">SIN INFORMACIÓN</strong>
                                     </div>
 
                                     <div class="col-md-4">
                                         <small class="text-muted">Profesional a cargo</small><br>
-                                        <strong class="text-primary" id="id_profesional_cargo">—</strong>
+                                        <strong class="text-primary" id="id_profesional_cargo">SIN INFORMACIÓN</strong>
                                     </div>
 
                                     <div class="col-md-4">
@@ -1039,7 +1051,7 @@
             setValue('id_numero_telefono2', p.numero_telefono2);
             setValue('id_sin_telefono', p.sin_telefono);
 
-            setText('id_usuario_anterior', p.usuario_anterior);
+
         }
 
         function cargarFicha(data) {
@@ -1050,12 +1062,13 @@
             setValue('id_ficha', f.numero_ficha_sistema);
             setValue('id_observacion', f.observacion);
             setSelect2ById('id_sector', f.sector_id);
+            setText('id_usuario_anterior', f.usuario_creador || '—');
 
             const fechaMostrar = f.fecha_creacion_anterior || f.fecha_creacion;
 
             setText(
                 'id_fecha_creacion',
-                formatearFechaHora(fechaMostrar)
+                fechaMostrar ? formatearFechaHora(fechaMostrar) : '—'
             );
         }
 
@@ -1138,8 +1151,8 @@
 
             // Si el último movimiento es R (Recibido), significa que está en SOME
             if (movimiento.estado === 'R') {
-                setText('id_servicio_clinico', 'SIN INFORMACIÓN');
-                setText('id_profesional_cargo', 'SIN INFORMACIÓN');
+                setText('id_servicio_clinico', 'REGISTRO RECIBIDO (S.O.M.E)');
+                setText('id_profesional_cargo', '—');
                 setText('id_fecha_envio', '—');
                 return;
             }
@@ -1292,8 +1305,8 @@
                 // textos informativos
                 setText('id_usuario_anterior', '—');
                 setText('id_fecha_creacion', '—');
-                setText('id_servicio_clinico', '—');
-                setText('id_profesional_cargo', '—');
+                setText('id_servicio_clinico', 'SIN INFORMACIÓN');
+                setText('id_profesional_cargo', 'SIN INFORMACIÓN');
                 setText('id_fecha_envio', '—');
 
                 // tabla
@@ -1592,6 +1605,7 @@
             const btnTarjetaFisica = $('#btn-tarjeta-fisica');
             const btnNumeroFicha = $('#btn-numero-ficha');
             const btnCaratula = $('#btn-caratula');
+            const btnCaratulaRn = $('#btn-caratula-rn');
             const btnStickers = $('#btn-stickers');
             const btnVerMovimientos = $('#ver_movimientos');
 
@@ -1606,7 +1620,7 @@
                     pacienteActual = data.paciente;
                     fichaActual = data.ficha;
 
-                    const botones = [btnActualizarRut, btnPasivar, btnTarjetaFisica, btnNumeroFicha, btnCaratula, btnStickers, btnVerMovimientos];
+                    const botones = [btnActualizarRut, btnPasivar, btnTarjetaFisica, btnNumeroFicha, btnCaratula, btnCaratulaRn, btnStickers, btnVerMovimientos];
                     botones.forEach($btn => {
                         $btn.removeClass('disabled')
                             .prop('disabled', false)
@@ -1627,8 +1641,10 @@
 
                     // Configurar Links dinámicos
                     btnCaratula.attr('href', `/clinica/pdfs/ficha/paciente/${pacienteActual.id}/`);
+                    btnCaratulaRn.attr('href', `/clinica/pdfs/ficha/paciente-rn/${pacienteActual.id}/`);
                     btnStickers.attr('href', `/clinica/pdfs/stickers/paciente/${pacienteActual.id}/`);
                     btnCaratula.attr('target', '_blank');
+                    btnCaratulaRn.attr('target', '_blank');
                     btnStickers.attr('target', '_blank');
 
                 }
@@ -1813,7 +1829,7 @@
             // Función para deshabilitar botonera (cuando se limpia el formulario)
             window.deshabilitarBotoneraClinica = function () {
                 console.log('Deshabilitando botonera clínica');
-                const botones = [btnActualizarRut, btnPasivar, btnTarjetaFisica, btnNumeroFicha, btnCaratula, btnStickers, btnVerMovimientos];
+                const botones = [btnActualizarRut, btnPasivar, btnTarjetaFisica, btnNumeroFicha, btnCaratula, btnCaratulaRn, btnStickers, btnVerMovimientos];
                 botones.forEach($btn => {
                     $btn.addClass('disabled')
                         .prop('disabled', true)
@@ -1831,6 +1847,7 @@
 
                 // Limpiar links
                 btnCaratula.attr('href', '#');
+                btnCaratulaRn.attr('href', '#');
                 btnStickers.attr('href', '#');
 
                 pacienteActual = null;
@@ -2025,6 +2042,146 @@
         });
     </script>
 
+    <!-- Modal para Buscar Ficha -->
+    <div class="modal fade" id="modalBuscarFicha" tabindex="-1" role="dialog" aria-labelledby="modalBuscarFichaLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title" id="modalBuscarFichaLabel">Buscador de Pacientes por Ficha</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="select-buscar-paciente-general">Buscar por Ficha o Nombre:</label>
+                        <select id="select-buscar-paciente-general" class="form-control" style="width: 100%;">
+                            <option value="">Escriba para buscar...</option>
+                        </select>
+                    </div>
+
+                    <div id="detalle-paciente-busqueda" class="mt-4 d-none">
+                        <div class="card card-outline card-primary">
+                            <div class="card-header">
+                                <h3 class="card-title">Información del Paciente</h3>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p><strong>Nombre:</strong> <span id="busqueda-nombre"></span></p>
+                                        <p><strong>RUT:</strong> <span id="busqueda-rut"></span></p>
+                                        <p><strong>Ficha:</strong> <span id="busqueda-ficha"></span></p>
+                                        <p><strong>Fecha Nacimiento:</strong> <span id="busqueda-fecha-nac"></span></p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong>Sexo:</strong> <span id="busqueda-sexo"></span></p>
+                                        <p><strong>Previsión:</strong> <span id="busqueda-prevision"></span></p>
+                                        <p><strong>Comuna:</strong> <span id="busqueda-comuna"></span></p>
+                                        <p><strong>Dirección:</strong> <span id="busqueda-direccion"></span></p>
+                                    </div>
+                                </div>
+                                <div class="alert alert-warning d-none" id="busqueda-alerta-pasivado">
+                                    <i class="fas fa-exclamation-triangle"></i> Este paciente se encuentra <strong>PASIVADO</strong>.
+                                </div>
+                            </div>
+                            <div class="card-footer text-right">
+                                <a href="#" id="btn-ir-a-paciente" class="btn btn-primary">
+                                    <i class="fas fa-external-link-alt"></i> Ver Ficha Completa
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Script para el buscador general de fichas #}
+    <script>
+        $(document).ready(function () {
+            const $select = $('#select-buscar-paciente-general');
+            const $detalle = $('#detalle-paciente-busqueda');
+            const $btnIrAPaciente = $('#btn-ir-a-paciente');
+
+            $select.select2({
+                theme: 'bootstrap4',
+                placeholder: 'Ingrese N° Ficha, RUT o Nombre...',
+                minimumInputLength: 2,
+                dropdownParent: $('#modalBuscarFicha'),
+                language: {
+                    inputTooShort: function () {
+                        return "Por favor ingrese 2 o más caracteres";
+                    },
+                    searching: function () {
+                        return "Buscando...";
+                    },
+                    noResults: function () {
+                        return "No se encontraron resultados";
+                    }
+                },
+                ajax: {
+                    url: "{% url 'api-paciente-buscar-general' %}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            q: params.term
+                        };
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: data.results
+                        };
+                    },
+                    cache: true
+                }
+            });
+
+            $select.on('select2:select', function (e) {
+                const data = e.params.data;
+
+                // Llenar campos
+                $('#busqueda-nombre').text(data.nombre_completo);
+                $('#busqueda-rut').text(data.rut);
+                $('#busqueda-ficha').text(data.numero_ficha_sistema);
+                $('#busqueda-fecha-nac').text(data.fecha_nacimiento);
+                $('#busqueda-sexo').text(data.sexo);
+                $('#busqueda-prevision').text(data.prevision);
+                $('#busqueda-comuna').text(data.comuna);
+                $('#busqueda-direccion').text(data.direccion);
+
+                // Mostrar/Ocultar alerta de pasivado
+                if (data.pasivado) {
+                    $('#busqueda-alerta-pasivado').removeClass('d-none');
+                } else {
+                    $('#busqueda-alerta-pasivado').addClass('d-none');
+                }
+
+                // Configurar botón de ir a paciente
+                // Usamos una URL base y reemplazamos el ID
+                const baseUrl = "{% url 'paciente_view_param' 0 %}".replace('0', data.paciente_id);
+                $btnIrAPaciente.attr('href', baseUrl);
+
+                // Mostrar detalle
+                $detalle.removeClass('d-none');
+            });
+
+            // Limpiar al cerrar el modal
+            $('#modalBuscarFicha').on('hidden.bs.modal', function () {
+                $select.val(null).trigger('change');
+                $detalle.addClass('d-none');
+            });
+        });
+    </script>
 
 
 {% endblock %}

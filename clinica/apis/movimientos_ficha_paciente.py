@@ -27,7 +27,12 @@ def get_movimientos_paciente_establecimiento(request, rut):
         )
 
     # 3️⃣ Buscar Ficha para este establecimiento
-    ficha = Ficha.objects.filter(paciente=paciente, establecimiento=establecimiento).first()
+    ficha = (
+        Ficha.objects
+        .filter(paciente=paciente, establecimiento=establecimiento)
+        .select_related("usuario_anterior", "created_by")
+        .first()
+    )
     if not ficha:
         return JsonResponse(
             {"error": "Ficha no encontrada para este paciente en este establecimiento"},
@@ -39,7 +44,7 @@ def get_movimientos_paciente_establecimiento(request, rut):
     # prioridad usuario_anterior, si no existe se muestra created_by
     ingresado_por = ""
     if ficha.usuario_anterior:
-        ingresado_por = f"{ficha.usuario_anterior.nombre} (Migrado)"
+        ingresado_por = ficha.usuario_anterior.nombre
     elif ficha.created_by:
         ingresado_por = ficha.created_by.username
 

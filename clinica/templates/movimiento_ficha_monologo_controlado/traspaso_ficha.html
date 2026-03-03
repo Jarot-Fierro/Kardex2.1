@@ -137,9 +137,9 @@
                     <div class="card-header d-flex align-items-center p-2">
                         <h3 class="card-title ml-2"><i class="fas fa-list mr-1"></i> Historial de Traspasos</h3>
                         <div class="ml-auto">
-                            <button id="btn-imprimir-historial" class="btn btn-info btn-sm mr-2">
-                                <i class="fas fa-print"></i> Imprimir Historial
-                            </button>
+                            {#                            <button id="btn-imprimir-historial" class="btn btn-info btn-sm mr-2">#}
+                            {#                                <i class="fas fa-print"></i> Imprimir Historial#}
+                            {#                            </button>#}
                             <button id="btn-refresh-table" class="btn btn-default btn-sm mr-2">
                                 <i class="fas fa-sync-alt"></i>
                             </button>
@@ -188,7 +188,8 @@
             const configKeys = [
                 'id_servicio_clinico_destino',
                 'id_profesional',
-                'id_observacion_traspaso'
+                'id_observacion_traspaso',
+                'id_fecha_salida'
             ];
 
             function loadConfig() {
@@ -398,6 +399,14 @@
                                 // Mantenemos servicio_clinico_destino y profesional si están en localStorage (config)
                                 // Si no se usan config, el usuario puede querer que se mantengan para el siguiente escaneo.
 
+                                // Limpiar observación y fecha salida si NO están en configKeys o si queremos resetearlas
+                                if (!configKeys.includes('id_observacion_traspaso')) {
+                                    $('#id_observacion_traspaso').val('');
+                                }
+                                if (!configKeys.includes('id_fecha_salida')) {
+                                    $('#id_fecha_salida').val('');
+                                }
+
                                 // Recargar la tabla si existe
                                 if ($.fn.DataTable.isDataTable('#Table')) {
                                     $('#Table').DataTable().ajax.reload();
@@ -453,7 +462,7 @@
             // Acción de imprimir historial
             $('#btn-imprimir-historial').on('click', function () {
                 const params = $('#form-filtros').serialize();
-                const url = "{% url 'pdf_movimientos_fichas' %}?tipo=traspaso&" + params;
+                const url = "{% url 'pdf_movimientos_fichas_monologo_controlado' %}?tipo=salida&" + params;
                 window.open(url, '_blank');
             });
 
