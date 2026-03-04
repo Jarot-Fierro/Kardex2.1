@@ -93,7 +93,9 @@ class SalidaFichaView(LoginRequiredMixin, TemplateView):
 
             data.append({
                 'id': mov.id,
-                'acciones': f'<a href="{edit_url}" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></a>',
+                'acciones': f'<a href="{edit_url}" class="btn btn-warning btn-sm p-1 " title="Editar"><i class="fas fa-edit"></i></a> '
+                            f'<button type="button" class="btn btn-danger btn-sm p-1 btn-delete-movimiento" data-id="{mov.id}" title="Eliminar">'
+                            f'<i class="fas fa-trash"></i></button>',
                 'rut': mov.ficha.paciente.rut,
                 'paciente': mov.ficha.paciente.nombre_completo,
                 'ficha': mov.numero_ficha,
@@ -218,7 +220,8 @@ class TraspasoFichaView(LoginRequiredMixin, TemplateView):
             # 'columns' = ['RUT', 'Paciente', 'Ficha', 'Servicio Destino', 'Profesional', 'Observación Traspaso', 'Estado', 'Fecha Salida', 'Fecha Entrada']
             data.append({
                 'ID': mov.id,
-                'actions': f'',
+                'actions': f'<button type="button" class="btn btn-danger btn-sm p-1 btn-delete-movimiento" data-id="{mov.id}" title="Eliminar">'
+                           f'<i class="fas fa-trash"></i></button>',
                 'RUT': mov.ficha.paciente.rut if mov.ficha and mov.ficha.paciente else mov.rut,
                 'Paciente': mov.ficha.paciente.nombre_completo if mov.ficha and mov.ficha.paciente else (
                     mov.rut_paciente.nombre_completo if mov.rut_paciente else '-'),
@@ -414,6 +417,8 @@ class RecepcionFichaView(LoginRequiredMixin, TemplateView):
 
             data.append({
                 'id': mov.id,
+                'acciones': f'<button type="button" class="btn btn-danger btn-sm p-1 btn-delete-movimiento" data-id="{mov.id}" title="Eliminar">'
+                            f'<i class="fas fa-trash"></i></button>',
                 'rut': mov.rut,
                 'paciente': mov.rut_paciente.nombre_completo if mov.rut_paciente else '-',
                 'ficha': mov.numero_ficha,
@@ -560,6 +565,8 @@ class FichasEnTransitoView(LoginRequiredMixin, TemplateView):
 
             data.append({
                 'id': mov.id,
+                'acciones': f'<button type="button" class="btn btn-danger btn-sm p-1 btn-delete-movimiento" data-id="{mov.id}" title="Eliminar">'
+                            f'<i class="fas fa-trash"></i></button>',
                 'rut': mov.rut,
                 'ficha': mov.numero_ficha,
                 'paciente': mov.rut_paciente.nombre_completo if mov.rut_paciente else '-',

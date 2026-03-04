@@ -143,7 +143,7 @@ class RegistrarTraspasoAPI(APIView):
             with transaction.atomic():
                 # 1. Obtener el Movimiento
                 try:
-                    movimiento = MovimientoMonologoControlado.objects.get(pk=movimiento_id)
+                    movimiento = MovimientoMonologoControlado.objects.get(pk=movimiento_id, status=True)
                 except MovimientoMonologoControlado.DoesNotExist:
                     return Response({'error': 'Movimiento no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -175,5 +175,24 @@ class RegistrarTraspasoAPI(APIView):
                     {'success': True, 'message': 'Traspaso actualizado correctamente.', 'movimiento_id': movimiento.id},
                     status=status.HTTP_200_OK)
 
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class EliminarMovimientoAPI(APIView):
+    def post(self, request):
+        movimiento_id = request.data.get('movimiento_id')
+
+        if not movimiento_id:
+            return Response({'error': 'ID de movimiento no proporcionado.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            movimiento = MovimientoMonologoControlado.objects.get(pk=movimiento_id)
+            movimiento.status = False
+            movimiento.save()
+            return Response({'success': True, 'message': 'Registro eliminado correctamente.'},
+                            status=status.HTTP_200_OK)
+        except MovimientoMonologoControlado.DoesNotExist:
+            return Response({'error': 'Movimiento no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -916,18 +916,23 @@
                     $el.val(valStr).trigger('change');
                 }
             } else if ($el.attr('type') === 'date' && value) {
-                // date: YYYY-MM-DD (local time)
-                const d = new Date(value);
-                if (!isNaN(d.getTime())) {
-                    const year = d.getFullYear();
-                    const month = String(d.getMonth() + 1).padStart(2, '0');
-                    const day = String(d.getDate()).padStart(2, '0');
-                    const valStr = `${year}-${month}-${day}`;
-                    $el.val(valStr).trigger('change');
+                // date: YYYY-MM-DD
+                // Si el valor ya tiene el formato YYYY-MM-DD, lo asignamos directamente para evitar problemas de zona horaria
+                if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+                    $el.val(value).trigger('change');
                 } else {
-                    let valStr = String(value);
-                    if (valStr.includes('T')) valStr = valStr.split('T')[0];
-                    $el.val(valStr).trigger('change');
+                    const d = new Date(value);
+                    if (!isNaN(d.getTime())) {
+                        const year = d.getFullYear();
+                        const month = String(d.getMonth() + 1).padStart(2, '0');
+                        const day = String(d.getDate()).padStart(2, '0');
+                        const valStr = `${year}-${month}-${day}`;
+                        $el.val(valStr).trigger('change');
+                    } else {
+                        let valStr = String(value);
+                        if (valStr.includes('T')) valStr = valStr.split('T')[0];
+                        $el.val(valStr).trigger('change');
+                    }
                 }
             } else {
                 // Otros inputs
@@ -961,6 +966,12 @@
 
         function formatearFechaHora(fechaIso) {
             if (!fechaIso) return '—';
+
+            // Si es solo fecha YYYY-MM-DD
+            if (/^\d{4}-\d{2}-\d{2}$/.test(fechaIso)) {
+                const parts = fechaIso.split('-');
+                return `${parts[2]}-${parts[1]}-${parts[0]}`;
+            }
 
             const fecha = new Date(fechaIso);
 
@@ -2153,7 +2164,7 @@
                 $('#busqueda-nombre').text(data.nombre_completo);
                 $('#busqueda-rut').text(data.rut);
                 $('#busqueda-ficha').text(data.numero_ficha_sistema);
-                $('#busqueda-fecha-nac').text(data.fecha_nacimiento);
+                $('#busqueda-fecha-nac').text(formatearFechaHora(data.fecha_nacimiento));
                 $('#busqueda-sexo').text(data.sexo);
                 $('#busqueda-prevision').text(data.prevision);
                 $('#busqueda-comuna').text(data.comuna);

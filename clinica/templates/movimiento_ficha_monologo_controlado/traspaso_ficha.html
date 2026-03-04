@@ -471,6 +471,44 @@
                 buscarPaciente();
                 $('html, body').animate({scrollTop: 0}, 'slow');
             });
+
+            // Acción de eliminar movimiento
+            $(document).on('click', '.btn-delete-movimiento', function () {
+                const id = $(this).data('id');
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    text: "Esta acción dejará el registro como inactivo.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "{% url 'api_movimiento_monologo_eliminar' %}",
+                            type: 'POST',
+                            data: {
+                                movimiento_id: id,
+                                csrfmiddlewaretoken: '{{ csrf_token }}'
+                            },
+                            success: function (response) {
+                                if (response.success) {
+                                    Swal.fire('Eliminado', response.message, 'success');
+                                    $('#Table').DataTable().ajax.reload();
+                                } else {
+                                    Swal.fire('Error', response.error || 'No se pudo eliminar el registro.', 'error');
+                                }
+                            },
+                            error: function (xhr) {
+                                const err = xhr.responseJSON ? xhr.responseJSON.error : 'Error en el servidor';
+                                Swal.fire('Error', err, 'error');
+                            }
+                        });
+                    }
+                });
+            });
         });
     </script>
 {% endblock %}

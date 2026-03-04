@@ -15,6 +15,7 @@ class FichaAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
         "establecimiento",
         "sector",
         "pasivado",
+        "status_icon",
         "created_at",
     )
 
@@ -93,6 +94,12 @@ class FichaAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
             )
         }),
     )
+
+    def status_icon(self, obj):
+        return obj.status
+
+    status_icon.boolean = True
+    status_icon.short_description = "Estado"
 
 
 @admin.register(MovimientoFicha)
@@ -215,6 +222,7 @@ from .models import MovimientoMonologoControlado
 class MovimientoMonologoControladoAdmin(admin.ModelAdmin):
     list_display = (
         'id',
+        'status_icon',
         'establecimiento',
         'rut',
         'rut_paciente',
@@ -255,4 +263,10 @@ class MovimientoMonologoControladoAdmin(admin.ModelAdmin):
         'profesional',
     )
 
-    ordering = ('-fecha_salida',)
+    ordering = ('-id',)
+
+    def status_icon(self, obj):
+        return obj.status
+
+    status_icon.boolean = True
+    status_icon.short_description = "Estado"

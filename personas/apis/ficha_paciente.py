@@ -12,7 +12,6 @@ def get_paciente_ficha(request, rut):
         .select_related("comuna", "prevision", "usuario", "usuario_anterior")
         .first()
     )
-    print(paciente)
 
     if not paciente:
         return JsonResponse({"error": "Paciente no encontrado"}, status=404)
@@ -33,7 +32,6 @@ def get_paciente_ficha(request, rut):
         )
         .first()
     )
-    print(ficha)
 
     # if not ficha:
     #     return JsonResponse(

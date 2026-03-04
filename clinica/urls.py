@@ -5,7 +5,8 @@ from clinica.apis.buscar_paciente import (
     buscar_paciente_ficha_api_monologo, buscar_paciente_recepcion_api_monologo,
     buscar_paciente_ficha_api_monologo_traspaso, buscar_paciente_general_api
 )
-from clinica.apis.movimiento_ficha_monologo_controlado import RegistrarSalidaAPI, RegistrarRecepcionAPI
+from clinica.apis.movimiento_ficha_monologo_controlado import RegistrarSalidaAPI, RegistrarRecepcionAPI, \
+    EliminarMovimientoAPI
 from clinica.apis.movimientos_ficha_paciente import get_movimientos_paciente_establecimiento
 from clinica.views.fichas import *
 from clinica.views.movimiento_ficha import *
@@ -13,7 +14,7 @@ from clinica.views.movimiento_ficha_monologo_controlado import (
     SalidaFichaView, SalidaFichaUpdateView, RecepcionFichaView, FichasEnTransitoView, TraspasoFichaView
 )
 from clinica.views.pdf import pdf_stickers, pdf_index, pdf_movimientos_fichas, \
-    pdf_movimientos_fichas_monologo_controlado, pdf_index_rn
+    pdf_movimientos_fichas_monologo_controlado, pdf_index_rn, pdf_stickers_ejemplos
 
 urlpatterns = [
     path('fichas/', FichaListView.as_view(), name='ficha_list'),
@@ -47,6 +48,8 @@ urlpatterns = [
          name='api_movimiento_monologo_salida'),
     path('api/movimientos-fichas-monologo/recepcion/', RegistrarRecepcionAPI.as_view(),
          name='api_movimiento_monologo_recepcion'),
+    path('api/movimientos-fichas-monologo/eliminar/', EliminarMovimientoAPI.as_view(),
+         name='api_movimiento_monologo_eliminar'),
 
     path('api/ficha-paciente/buscar/', buscar_paciente_ficha_api, name='ficha-paciente-buscar'),
     path('api/ficha-paciente/buscar/monologo/', buscar_paciente_ficha_api_monologo,
@@ -67,6 +70,9 @@ urlpatterns = [
     ),
     path(
         "pdfs/stickers/paciente/<int:paciente_id>/", pdf_stickers, name="pdf_stickers_paciente"
+    ),
+    path(
+        "pdfs/stickers/ejemplos/", pdf_stickers_ejemplos, name="pdf_stickers_ejemplos"
     ),
 
     path("pdfs/ficha/<int:ficha_id>/", pdf_index, name="pdf_ficha"),

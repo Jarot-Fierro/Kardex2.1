@@ -382,7 +382,6 @@ class PacienteAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
     list_filter = (
         'sexo',
         'estado_civil',
-        'comuna',
         'prevision',
         'fallecido',
     )
@@ -393,7 +392,7 @@ class PacienteAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
         'usuario_anterior',
     )
 
-    ordering = ('-updated_at',)
+    ordering = ('-id',)
 
     readonly_fields = (
         'created_at',
@@ -465,4 +464,3 @@ class PacienteAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
             )
         }),
     )
-

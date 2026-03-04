@@ -4,6 +4,7 @@ from io import BytesIO
 from types import SimpleNamespace
 
 import barcode
+from barcode.writer import ImageWriter
 from django.http import Http404
 from django.shortcuts import render, get_object_or_404
 
@@ -164,6 +165,53 @@ def pdf_stickers(request, ficha_id=None, paciente_id=None):
     return render(request, 'pdfs/formato_stickers.html', context)
 
 
+def pdf_stickers_ejemplos(request):
+    # Obtener los últimos 3 registros de fichas para el establecimiento del usuario logueado
+    # Si el usuario no tiene establecimiento, se obtienen las últimas 3 de forma global (o manejar como en pdf_stickers)
+    establecimiento = getattr(request.user, 'establecimiento', None)
+
+    if establecimiento:
+        fichas = Ficha.objects.filter(establecimiento=establecimiento).order_by('id')[:27]
+    else:
+        fichas = Ficha.objects.all().order_by('id')[:27]
+
+    stickers_data = []
+
+    for ficha in fichas:
+        paciente = ficha.paciente
+
+        # Compatibilidad con plantillas antiguas: proporcionar atributos esperados
+        if not hasattr(ficha, 'numero_ficha'):
+            ficha.numero_ficha = ficha.numero_ficha_sistema
+        if not hasattr(ficha, 'ingreso_paciente'):
+            ficha.ingreso_paciente = SimpleNamespace(
+                establecimiento=ficha.establecimiento,
+                paciente=ficha.paciente,
+            )
+
+        # Generar código de barras basado en el número de RUT del paciente
+        rut_paciente = getattr(paciente, 'rut', '') or ''
+        numero_rut = obtener_numero_rut(rut_paciente)
+        # Fallbacks por si no hay RUT válido
+        if not numero_rut:
+            numero_rut = (
+                    getattr(paciente, 'codigo', '') or str(getattr(ficha, 'numero_ficha_sistema', '') or '')).strip()
+        codigo_barras_base64 = generar_barcode_sticker_base64_128(numero_rut)
+
+        # Añadimos la data de cada ficha/sticker
+        stickers_data.append({
+            'paciente': paciente,
+            'ficha': ficha,
+            'codigo_barras_base64': codigo_barras_base64
+        })
+
+    context = {
+        'stickers_data': stickers_data,
+    }
+
+    return render(request, 'pdfs/formato_stickers_ejemplos.html', context)
+
+
 def obtener_numero_rut(rut_str: str) -> str:
     if not rut_str:
         return ''
@@ -223,6 +271,31 @@ def generar_barcode_sticker_base64(codigo_paciente: str) -> str:
 
     base64_data = base64.b64encode(buffer.getvalue()).decode('utf-8')
     return f"data:{mime_type};base64,{base64_data}"
+
+
+def generar_barcode_sticker_base64_128(valor):
+    """
+    Genera un código de barras Code128 en base64
+    """
+    if not valor:
+        valor = "000000"
+
+    buffer = BytesIO()
+
+    # Forzar Code128
+    code128 = barcode.get('code128', str(valor), writer=ImageWriter())
+
+    code128.write(buffer, {
+        'module_width': 0.2,  # Grosor barras
+        'module_height': 10,  # Altura
+        'quiet_zone': 2,
+        'font_size': 8,
+        'text_distance': 1,
+        'write_text': True,
+    })
+
+    barcode_base64 = base64.b64encode(buffer.getvalue()).decode()
+    return f"data:image/png;base64,{barcode_base64}"
 
 
 def pdf_movimientos_fichas(request):
