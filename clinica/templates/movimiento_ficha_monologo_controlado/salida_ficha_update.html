@@ -362,6 +362,8 @@
 
                                     if (nombre && ficha && servicio && profesional) {
                                         if (!isSubmitting) {
+                                            isSubmitting = true;
+                                            $btnRegistrar.prop('disabled', true);
                                             $formSalida.submit();
                                         }
                                     } else {
@@ -404,11 +406,13 @@
             $formSalida.on('submit', function (e) {
                 e.preventDefault();
 
-                if (isSubmitting) return;
+                if (isSubmitting && e.originalEvent) return;
 
                 // Validar que tengamos los datos necesarios
                 if (!$('#id_ficha_hidden').val()) {
                     Swal.fire('Error', 'Debe buscar un paciente válido primero.', 'error');
+                    isSubmitting = false;
+                    $btnRegistrar.prop('disabled', false);
                     return;
                 }
 
@@ -419,6 +423,8 @@
 
                 if (!(nombre && ficha && servicio && profesional)) {
                     Swal.fire('Campos requeridos', 'Los campos de nombre, N° ficha, servicio clínico y profesional deben estar seleccionados.', 'warning');
+                    isSubmitting = false;
+                    $btnRegistrar.prop('disabled', false);
                     return;
                 }
 
@@ -439,15 +445,26 @@
                                 timer: 1000,
                                 showConfirmButton: false
                             });
-                            {% if is_update %}
-                                setTimeout(function () {
+                            // Reiniciar flag de envío y limpiar solo los campos del paciente
+                            setTimeout(function () {
+                                isSubmitting = false;
+                                {% if is_update %}
                                     window.location.href = "{% url 'movimiento_monologo_salida' %}";
-                                }, 1000);
-                            {% else %}
-                                setTimeout(function () {
-                                    window.location.reload();
-                                }, 1000);
-                            {% endif %}
+                                {% else %}
+                                    $('#id_ficha_hidden').val('');
+                                    $('#id_rut').val('');
+                                    $('#nombre_paciente').val('');
+                                    $('#numero_ficha').val('');
+
+                                    // Recargar la tabla si existe
+                                    if ($.fn.DataTable.isDataTable('#Table')) {
+                                        $('#Table').DataTable().ajax.reload();
+                                    }
+
+                                    $btnRegistrar.prop('disabled', true);
+                                    $rut.focus();
+                                {% endif %}
+                            }, 1000);
                         } else {
                             isSubmitting = false;
                             $btnRegistrar.prop('disabled', false);

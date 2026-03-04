@@ -308,6 +308,9 @@
                                         if (nombre && ficha && servicio && profesional) {
                                             if (!isSubmitting) {
                                                 console.log("Auto-submitting form...");
+                                                // Bloqueamos envío antes de llamar al trigger del form para evitar doble disparo simultaneo
+                                                isSubmitting = true;
+                                                $btnRegistrar.prop('disabled', true);
                                                 $formTraspaso.submit();
                                             }
                                         } else {
@@ -351,10 +354,15 @@
             $formTraspaso.on('submit', function (e) {
                 e.preventDefault();
 
-                if (isSubmitting) return;
+                if (isSubmitting && e.originalEvent) {
+                    // Si ya se está enviando y el evento es del usuario (no disparado por código que ya seteó isSubmitting)
+                    return;
+                }
 
                 if (!$('#id_movimiento_hidden').val()) {
                     Swal.fire('Error', 'Debe buscar un paciente con movimiento válido primero.', 'error');
+                    isSubmitting = false;
+                    $btnRegistrar.prop('disabled', false);
                     return;
                 }
 
@@ -365,6 +373,8 @@
 
                 if (!(nombre && ficha && servicio && profesional)) {
                     Swal.fire('Campos requeridos', 'Los campos de nombre, N° ficha, servicio clínico y profesional deben estar seleccionados.', 'warning');
+                    isSubmitting = false;
+                    $btnRegistrar.prop('disabled', false);
                     return;
                 }
 
@@ -385,27 +395,14 @@
                                 timer: 1000,
                                 showConfirmButton: false
                             });
-                            // En lugar de recargar toda la página, limpiamos los campos del paciente
-                            // pero mantenemos la configuración de servicio y profesional si el usuario lo desea.
+                            // Reiniciar flag de envío y limpiar solo los campos del paciente
                             setTimeout(function () {
-                                // Reiniciar flag de envío
                                 isSubmitting = false;
-                                // Limpiar solo los datos del paciente buscado
                                 $('#id_movimiento_hidden').val('');
                                 $('#id_rut').val('');
                                 $('#nombre_paciente').val('');
                                 $('#numero_ficha').val('');
                                 $('#id_ficha_hidden').val('');
-                                // Mantenemos servicio_clinico_destino y profesional si están en localStorage (config)
-                                // Si no se usan config, el usuario puede querer que se mantengan para el siguiente escaneo.
-
-                                // Limpiar observación y fecha salida si NO están en configKeys o si queremos resetearlas
-                                if (!configKeys.includes('id_observacion_traspaso')) {
-                                    $('#id_observacion_traspaso').val('');
-                                }
-                                if (!configKeys.includes('id_fecha_salida')) {
-                                    $('#id_fecha_salida').val('');
-                                }
 
                                 // Recargar la tabla si existe
                                 if ($.fn.DataTable.isDataTable('#Table')) {

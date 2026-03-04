@@ -361,9 +361,15 @@ def pdf_movimientos_fichas(request):
         profs_sorted = sorted(s['profesionales_map'].values(), key=lambda x: x['order'])
         profesionales_list = []
         for p in profs_sorted:
+            # Ordenar los movimientos por numero_ficha de mayor a menor
+            movimientos_sorted = sorted(
+                p['movimientos'],
+                key=lambda x: int(x['numero_ficha']) if str(x['numero_ficha']).isdigit() else 0,
+                reverse=True
+            )
             profesionales_list.append({
                 'nombre': str(p['obj']),
-                'movimientos': p['movimientos']
+                'movimientos': movimientos_sorted
             })
 
         datos_agrupados.append({
@@ -442,7 +448,7 @@ def pdf_movimientos_fichas_monologo_controlado(request):
             establecimiento=establecimiento,
             fecha_salida__isnull=False,
             status=True
-        )
+        ).order_by('ficha__numero_ficha_sistema')
 
     filtros_aplicados = any([hora_inicio, hora_termino, servicio_id, profesional_id])
 
@@ -511,9 +517,15 @@ def pdf_movimientos_fichas_monologo_controlado(request):
             profs_sorted = sorted(s['profesionales_map'].values(), key=lambda x: x['order'])
             profesionales_list = []
             for p in profs_sorted:
+                # Ordenar los movimientos por numero_ficha de mayor a menor
+                movimientos_sorted = sorted(
+                    p['movimientos'],
+                    key=lambda x: int(x['numero_ficha']) if str(x['numero_ficha']).isdigit() else 0,
+                    reverse=True
+                )
                 profesionales_list.append({
                     'nombre': str(p['obj']),
-                    'movimientos': p['movimientos']
+                    'movimientos': movimientos_sorted
                 })
             datos_agrupados.append({
                 'nombre': s['obj'].nombre,
@@ -530,47 +542,82 @@ def pdf_movimientos_fichas_monologo_controlado(request):
 
     # 2. SI NO HAY FILTROS: Aplicar lógica de últimos servicios, profesionales y fichas
     else:
-        # Obtener los últimos 3 servicios clínicos que tienen movimientos
-        servicios_ids = base_queryset.values_list(f'{servicio_field}_id', flat=True).distinct().order_by(
-            f'-{fecha_field}')[:3]
+        # Usaremos una lógica de agrupación más robusta para evitar duplicados
+        # cuando un servicio o profesional tiene múltiples movimientos con fechas distintas.
+        limit_servicios = 30
+        limit_profesionales = 2
+        limit_fichas = 10
+
+        # Obtener los movimientos más recientes del establecimiento
+        queryset = base_queryset.select_related(
+            'rut_paciente',
+            servicio_field,
+            profesional_field
+        ).order_by(f'-{fecha_field}')
 
         datos_agrupados = []
-        for s_id in servicios_ids:
-            # Obtenemos el objeto ServicioClinico
-            from establecimientos.models import ServicioClinico
-            s_obj = ServicioClinico.objects.filter(id=s_id).first()
+        servicios_map = {}
 
-            # Obtener los últimos 2 profesionales de este servicio
-            profesionales_ids = base_queryset.filter(**{f"{servicio_field}_id": s_id}).values_list(
-                f'{profesional_field}_id', flat=True).distinct().order_by(f'-{fecha_field}')[:2]
+        for m in queryset:
+            s_obj = getattr(m, servicio_field)
+            if not s_obj: continue
+            s_id = s_obj.id
 
+            if s_id not in servicios_map:
+                if len(servicios_map) >= limit_servicios:
+                    continue
+                servicios_map[s_id] = {
+                    'obj': s_obj,
+                    'profesionales_map': {},
+                    'order': len(servicios_map)
+                }
+
+            s_data = servicios_map[s_id]
+            p_obj = getattr(m, profesional_field)
+            if not p_obj: continue
+            p_id = p_obj.id
+
+            if p_id not in s_data['profesionales_map']:
+                if len(s_data['profesionales_map']) >= limit_profesionales:
+                    continue
+                s_data['profesionales_map'][p_id] = {
+                    'obj': p_obj,
+                    'movimientos': [],
+                    'order': len(s_data['profesionales_map'])
+                }
+
+            p_data = s_data['profesionales_map'][p_id]
+            if len(p_data['movimientos']) >= limit_fichas:
+                continue
+
+            usuario_responsable = getattr(m, usuario_field_str, 'N/A')
+            p_data['movimientos'].append({
+                'numero_ficha': m.numero_ficha,
+                'rut_paciente': m.rut,
+                'nombre_paciente': m.rut_paciente.nombre_completo if m.rut_paciente else 'N/A',
+                'hora_movimiento': getattr(m, fecha_field),
+                'usuario_responsable': usuario_responsable or 'N/A',
+            })
+
+        # Convertir mapas a listas ordenadas
+        servicios_sorted = sorted(servicios_map.values(), key=lambda x: x['order'])
+        for s in servicios_sorted:
+            profs_sorted = sorted(s['profesionales_map'].values(), key=lambda x: x['order'])
             profesionales_list = []
-            for p_id in profesionales_ids:
-                p_movs = base_queryset.filter(
-                    **{f"{servicio_field}_id": s_id, f"{profesional_field}_id": p_id}
-                ).select_related('rut_paciente', profesional_field).order_by(f'-{fecha_field}')[:10]
-
-                if p_movs.exists():
-                    p_obj = getattr(p_movs[0], profesional_field)
-                    movimientos_list = []
-                    for m in p_movs:
-                        usuario_responsable = getattr(m, usuario_field_str, 'N/A')
-                        movimientos_list.append({
-                            'numero_ficha': m.numero_ficha,
-                            'rut_paciente': m.rut,
-                            'nombre_paciente': m.rut_paciente.nombre_completo if m.rut_paciente else 'N/A',
-                            'hora_movimiento': getattr(m, fecha_field),
-                            'usuario_responsable': usuario_responsable or 'N/A',
-                        })
-                    profesionales_list.append({
-                        'nombre': str(p_obj) if p_obj else 'N/A',
-                        'movimientos': movimientos_list
-                    })
-
+            for p in profs_sorted:
+                # Ordenar los movimientos por numero_ficha de mayor a menor
+                movimientos_sorted = sorted(
+                    p['movimientos'],
+                    key=lambda x: int(x['numero_ficha']) if str(x['numero_ficha']).isdigit() else 0,
+                    reverse=True
+                )
+                profesionales_list.append({
+                    'nombre': str(p['obj']),
+                    'movimientos': movimientos_sorted
+                })
             if profesionales_list:
-                s_name = getattr(s_obj, 'nombre', 'N/A')
                 datos_agrupados.append({
-                    'nombre': s_name,
+                    'nombre': s['obj'].nombre,
                     'profesionales': profesionales_list
                 })
 
