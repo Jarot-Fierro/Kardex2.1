@@ -46,7 +46,7 @@ def get_movimientos_paciente_establecimiento(request, rut):
     if ficha.usuario_anterior:
         ingresado_por = ficha.usuario_anterior.nombre
     elif ficha.created_by:
-        ingresado_por = ficha.created_by.username
+        ingresado_por = ficha.created_by.nombre_completo
 
     # segundo fecha ingreso al sistema sería lo mismo, se saca de ficha
     # prioridad el campo de fecha_creacion_anterior, si no created_at.
@@ -89,7 +89,9 @@ def get_movimientos_paciente_establecimiento(request, rut):
             "servicio_clinico_destino",
             "profesional",
             "usuario_entrega_id",
-            "usuario_entrada_id"
+            "usuario_entrada_id",
+            "created_by",
+            "updated_by"
         )
         .order_by("-fecha_salida", "-created_at")
     )
@@ -136,11 +138,14 @@ def get_movimientos_paciente_establecimiento(request, rut):
             ),
             "usuario_envio": (
                 m.usuario_entrega_id.nombre
-                if m.usuario_entrega_id else (m.usuario_entrega or None)
+                if m.usuario_entrega_id else (
+                        m.usuario_entrega or (m.created_by.nombre_completo if m.created_by else '---'))
             ),
             "usuario_recepcion": (
                 m.usuario_entrada_id.nombre
-                if m.usuario_entrada_id else (m.usuario_entrada or None)
+                if m.usuario_entrada_id else (
+                        m.usuario_entrada or (
+                    m.updated_by.nombre_completo if m.updated_by and m.estado == 'R' else '---'))
             ),
             "observacion_envio": m.observacion_salida,
             "observacion_recepcion": m.observacion_entrada,

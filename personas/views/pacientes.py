@@ -71,90 +71,136 @@ def parse_fecha(fecha_str):
         return None
 
 
+def resolver_paciente(paciente_id=None, rut=None):
+    """
+    Busca un paciente por ID y por RUT, validando consistencia.
+    Casos posibles:
+    A) PK y RUT existen y corresponden al mismo paciente -> actualización
+    B) PK existe pero el RUT corresponde a otro paciente distinto -> actualización (prevalece el del RUT)
+    C) No viene PK pero sí existe un paciente con ese RUT -> actualización
+    D) No existe ni PK ni RUT -> creación
+    """
+    paciente_por_id = None
+    paciente_por_rut = None
+
+    if paciente_id:
+        paciente_por_id = Paciente.objects.filter(pk=paciente_id, status=True).first()
+
+    if rut:
+        paciente_por_rut = Paciente.objects.filter(rut=rut, status=True).first()
+
+    # Evaluación de resultados
+    if paciente_por_id and paciente_por_rut:
+        if paciente_por_id == paciente_por_rut:
+            # Caso A: Ambos identifican al mismo paciente
+            return paciente_por_id, 'ACTUALIZAR', None
+        else:
+            # Caso B: Conflicto. Se indica que el RUT manda según requerimiento:
+            # "En el caso B es el RUT el que vale por ende se modifica el registro que tiene el rut asignado"
+            return paciente_por_rut, 'ACTUALIZAR', None
+
+    if paciente_por_rut:
+        # Caso C: Solo RUT existe (o PK no venía)
+        return paciente_por_rut, 'ACTUALIZAR', None
+
+    if paciente_por_id:
+        # Existe el ID pero el RUT no está en la BD (o no vino RUT)
+        return paciente_por_id, 'ACTUALIZAR', None
+
+    # Caso D: Nada encontrado
+    return None, 'CREAR', None
+
+
+def resolver_ficha(ficha_id=None, numero_ficha_sistema=None, establecimiento=None, paciente=None):
+    """
+    Busca una ficha por ID y por (numero_ficha_sistema + establecimiento).
+    """
+    ficha_por_id = None
+    ficha_por_numero = None
+
+    if ficha_id:
+        ficha_por_id = Ficha.objects.filter(pk=ficha_id, status=True).first()
+
+    if numero_ficha_sistema and establecimiento:
+        ficha_por_numero = Ficha.objects.filter(
+            numero_ficha_sistema=numero_ficha_sistema,
+            establecimiento=establecimiento,
+            status=True
+        ).first()
+
+    # Si no se encuentra por número, buscar si el paciente ya tiene una ficha en este establecimiento
+    if not ficha_por_numero and paciente and establecimiento:
+        ficha_por_numero = Ficha.objects.filter(
+            paciente=paciente,
+            establecimiento=establecimiento,
+            status=True
+        ).first()
+
+    if ficha_por_id and ficha_por_numero:
+        if ficha_por_id == ficha_por_numero:
+            return ficha_por_id, 'ACTUALIZAR', None
+        else:
+            # Caso B para Ficha: Prevalece la ficha encontrada por lógica de negocio
+            # (número de ficha o paciente en el establecimiento)
+            return ficha_por_numero, 'ACTUALIZAR', None
+
+    if ficha_por_numero:
+        return ficha_por_numero, 'ACTUALIZAR', None
+
+    if ficha_por_id:
+        return ficha_por_id, 'ACTUALIZAR', None
+
+    return None, 'CREAR', None
+
+
 def paciente_view(request, paciente_id=None):
     paciente_instance = None
     ficha_instance = None
     modo = "consulta"
 
     if request.method == 'POST':
-        # if request.method == 'POST':
-        #     print("========== POST RAW ==========")
-        #     for k, v in request.POST.items():
-        #         print(f"{k} = {v}")
-        #     print("================================")
-
-        accion = request.POST.get('accion')
+        # capturamos datos del post
+        datos_post = capturar_datos_paciente(request)
+        accion_post = request.POST.get('accion')
+        rut_post = datos_post.get('rut')
         paciente_id_post = request.POST.get('paciente_id') or paciente_id
 
-        if paciente_id_post:
-            paciente_instance = Paciente.objects.filter(pk=paciente_id_post).first()
+        ficha_id_post = request.POST.get('ficha_id')  # Asegurarse que venga del form
+        numero_ficha_post = request.POST.get('numero_ficha_sistema')
 
-            if paciente_instance:
-                ficha_instance = Ficha.objects.filter(
-                    paciente=paciente_instance,
-                    establecimiento=request.user.establecimiento, status=True
-                ).first()
+        # 1. RESOLVER PACIENTE
+        paciente_instance, modo_paciente, error_pac_consistencia = resolver_paciente(
+            paciente_id=paciente_id_post,
+            rut=rut_post
+        )
 
-        es_edicion = (accion == 'ACTUALIZAR') or (paciente_instance is not None)
+        # 2. RESOLVER FICHA
+        ficha_instance, modo_ficha, error_ficha_consistencia = resolver_ficha(
+            ficha_id=ficha_id_post,
+            numero_ficha_sistema=numero_ficha_post,
+            establecimiento=request.user.establecimiento,
+            paciente=paciente_instance
+        )
+
+        es_edicion = (modo_paciente == 'ACTUALIZAR') or (paciente_instance is not None)
+        accion = accion_post or modo_paciente  # Prioridad a lo que venga del POST explicitamente si aplica
 
         paciente_form = PacienteForm(request.POST, instance=paciente_instance)
         ficha_form = FichaForm(request.POST, instance=ficha_instance, user=request.user)
 
         if paciente_form.is_valid() and ficha_form.is_valid():
-
-            # Verificación de consistencia Accion vs Instancia
-            rut_post = paciente_form.cleaned_data.get('rut')
-            if accion == 'CREAR' and rut_post:
-                if Paciente.objects.filter(rut=rut_post, status=True).exists():
-                    paciente_form.add_error('rut',
-                                            'Ya existe un paciente con este RUT. Por favor, consúltelo antes de intentar crear uno nuevo.')
-                    return render(request, 'paciente/form.html', {
-                        'paciente_form': paciente_form,
-                        'ficha_form': ficha_form,
-                        'modo': 'error_crear',
-                        'accion': accion,
-                        'paciente_id': paciente_id_post,
-                        'title': f'Consulta de pacientes {request.user.establecimiento}'
-                    })
-            elif accion == 'ACTUALIZAR':
-                if not paciente_instance:
-                    messages.error(request,
-                                   'Error de consistencia: Se intentó actualizar un paciente que no existe o no fue cargado correctamente.')
-                    return redirect('paciente_view')
-
-                # Validar que el RUT no pertenezca a otro paciente
-                if rut_post:
-                    existe_otro = Paciente.objects.filter(rut=rut_post, status=True).exclude(
-                        pk=paciente_instance.pk).exists()
-                    if existe_otro:
-                        paciente_form.add_error('rut', 'El RUT indicado ya pertenece a otro paciente.')
-                        return render(request, 'paciente/form.html', {
-                            'paciente_form': paciente_form,
-                            'ficha_form': ficha_form,
-                            'modo': 'error_actualizar',
-                            'accion': accion,
-                            'paciente_id': paciente_id_post,
-                            'title': f'Consulta de pacientes {request.user.establecimiento}'
-                        })
-
             try:
-
                 with transaction.atomic():
-
-                    # 1. GUARDAR PACIENTE (CREAR O ACTUALIZAR)
-                    # Si existía paciente_instance, el form lo actualiza. Si no, crea uno nuevo.
+                    # GUARDAR PACIENTE
                     paciente = paciente_form.save(commit=False)
-                    es_creacion = (paciente_instance is None)
+                    es_creacion_paciente = (paciente.pk is None)
 
-                    # Auditoría (usuario logueado)
-                    if es_creacion:
+                    if es_creacion_paciente:
                         paciente.created_by = request.user
                     paciente.updated_by = request.user
-
                     paciente.save()
 
-                    # CREAR / ACTUALIZAR FICHA
-                    # Si ya existía una ficha_instance cargada, el form la actualiza.
+                    # GUARDAR FICHA
                     ficha = ficha_form.save(commit=False)
                     es_creacion_ficha = (ficha.pk is None)
 
@@ -165,9 +211,7 @@ def paciente_view(request, paciente_id=None):
                     ficha.paciente = paciente
                     ficha.establecimiento = request.user.establecimiento
                     ficha.usuario = request.user
-
                     ficha.save()
-
 
             except IntegrityError as e:
                 error_str = str(e).lower()
@@ -197,7 +241,7 @@ def paciente_view(request, paciente_id=None):
                 })
 
             # ÉXITO
-            if es_creacion:
+            if es_creacion_paciente:
                 messages.success(request, 'Paciente y ficha creados correctamente.')
                 modo = "creado"
             else:
@@ -223,13 +267,13 @@ def paciente_view(request, paciente_id=None):
     if request.method == 'GET':
         # GET
         if paciente_id:
-            paciente_instance = Paciente.objects.filter(pk=paciente_id, status=True).first()
+            paciente_instance, _, _ = resolver_paciente(paciente_id=paciente_id)
 
             if paciente_instance:
-                ficha_instance = Ficha.objects.filter(
+                ficha_instance, _, _ = resolver_ficha(
                     paciente=paciente_instance,
-                    establecimiento=request.user.establecimiento, status=True
-                ).first()
+                    establecimiento=request.user.establecimiento
+                )
 
         paciente_form = PacienteForm(instance=paciente_instance)
         ficha_form = FichaForm(instance=ficha_instance, user=request.user)

@@ -38,6 +38,14 @@ class User(AbstractUser):
         verbose_name_plural = 'Usuarios'
         ordering = ['first_name']
 
+    @property
+    def nombre_completo(self):
+        if self.first_name and self.last_name:
+            return f"{self.first_name} {self.last_name}".strip()
+        elif self.first_name:
+            return self.first_name
+        return self.username
+
     def __str__(self):
         return self.username
 

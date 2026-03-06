@@ -3,6 +3,14 @@ from simple_history.models import HistoricalRecords
 
 from core.choices import ESTADO_CIVIL, SEXO_CHOICES
 from core.models import StandardModel
+from personas.models.genero import Genero
+
+
+def get_genero_no_informado():
+    try:
+        return Genero.objects.get(nombre='NO INFORMADO').id
+    except Genero.DoesNotExist:
+        return None
 
 
 class Paciente(StandardModel):
@@ -62,7 +70,7 @@ class Paciente(StandardModel):
 
     genero = models.ForeignKey('personas.Genero', on_delete=models.SET_NULL, null=True, blank=True,
                                verbose_name='Género',
-                               related_name='pacientes_genero', default=1)
+                               related_name='pacientes_genero', default=get_genero_no_informado)
 
     usuario = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True, blank=True,
                                 verbose_name='Usuario', related_name='pacientes_usuario')

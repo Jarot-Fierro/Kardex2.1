@@ -113,7 +113,7 @@ def get_paciente_ficha(request, rut):
                     )
                 )
             ),
-            "usuario": ficha.usuario.username if ficha.usuario else None,
+            "usuario": ficha.usuario.nombre_completo if ficha.usuario else None,
             "establecimiento": ficha.establecimiento.nombre if ficha.establecimiento else None,
             "sector_id": ficha.sector_id,
             "sector": ficha.sector.color.nombre if ficha.sector and ficha.sector.color else "",
@@ -122,14 +122,14 @@ def get_paciente_ficha(request, rut):
                     ficha.usuario_anterior.nombre
                     if ficha.usuario_anterior
                     else (
-                        f"{ficha.created_by.first_name or ''} {ficha.created_by.last_name or ''}"
+                        ficha.created_by.nombre_completo
                         if ficha.created_by
                         else ""
                     )
                 )
             ).strip(),
             "ingresado_por": ficha.usuario_anterior.nombre if ficha.usuario_anterior else (
-                ficha.created_by.username if ficha.created_by else None),
+                ficha.created_by.nombre_completo if ficha.created_by else None),
             "fecha_ingreso": (ficha.fecha_creacion_anterior.isoformat() if ficha.fecha_creacion_anterior else (
                 ficha.created_at.isoformat() if ficha.created_at else None)),
             "movimientos": [
