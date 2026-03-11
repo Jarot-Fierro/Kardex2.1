@@ -886,6 +886,13 @@
 
     {#  Funciones que Sirve, Reutilizables #}
     <script>
+        function limpiarNumeroFicha() {
+            const $el = $('#id_ficha');
+            if ($el.length) {
+                $el.val('').trigger('change');
+            }
+        }
+
         function setValue(id, value) {
             const $el = $('#' + id);
             if (!$el.length) return;
@@ -1066,11 +1073,19 @@
         }
 
         function cargarFicha(data) {
-            if (!data.ficha) return;
+            if (!data.ficha) {
+                limpiarNumeroFicha();
+                return;
+            }
 
             const f = data.ficha;
 
-            setValue('id_ficha', f.numero_ficha_sistema);
+            if (f.numero_ficha_sistema) {
+                setValue('id_ficha', f.numero_ficha_sistema);
+            } else {
+                limpiarNumeroFicha();
+            }
+
             setValue('id_observacion', f.observacion);
             setSelect2ById('id_sector', f.sector_id);
             setText('id_usuario_anterior', f.usuario_creador || '—');
@@ -1286,6 +1301,9 @@
                 $('#paciente-form')
                     .find('input[type="text"], input[type="date"], textarea')
                     .val('');
+
+                // Limpiar específicamente número de ficha (que es un number input)
+                limpiarNumeroFicha();
 
                 // checkboxes
                 $('#paciente-form')
