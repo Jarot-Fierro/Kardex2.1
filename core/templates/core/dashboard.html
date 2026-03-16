@@ -41,7 +41,7 @@
         <div class="col-12 col-sm-6 col-md-3">
             <div class="small-box bg-info">
                 <div class="inner">
-                    <h3>{{ total_pacientes|default:"0" }}</h3>
+                    <h3 id="total_pacientes">...</h3>
                     <p>Total de Pacientes</p>
                 </div>
                 <div class="icon">
@@ -52,7 +52,7 @@
         <div class="col-12 col-sm-6 col-md-3">
             <div class="small-box bg-success">
                 <div class="inner">
-                    <h3>{{ total_ingresos_est|default:"0" }}</h3>
+                    <h3 id="total_ingresos_est">...</h3>
                     <p>Ingresos en este establecimiento</p>
                 </div>
                 <div class="icon">
@@ -63,7 +63,7 @@
         <div class="col-12 col-sm-6 col-md-3">
             <div class="small-box bg-warning">
                 <div class="inner">
-                    <h3>{{ total_fichas_est|default:"0" }}</h3>
+                    <h3 id="total_fichas_est">...</h3>
                     <p>Fichas en este establecimiento</p>
                 </div>
                 <div class="icon">
@@ -183,4 +183,49 @@
             <div>{{ permission }}</div>
         {% endif %}
     {% endfor %}
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // IDs de los elementos a actualizar y el texto de carga inicial
+            const metrics = {
+                'total_pacientes': document.getElementById('total_pacientes'),
+                'total_ingresos_est': document.getElementById('total_ingresos_est'),
+                'total_fichas_est': document.getElementById('total_fichas_est')
+            };
+
+            // Mostrar "Cargando..."
+            Object.values(metrics).forEach(el => {
+                if (el) el.innerText = 'Cargando...';
+            });
+
+            // Hacer fetch al endpoint de métricas
+            console.log("Iniciando fetch de métricas...");
+            fetch("{% url 'dashboard_metrics' %}")
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error al cargar métricas: ' + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("Métricas recibidas:", data);
+                    // Actualizar los valores en el DOM
+                    if (metrics.total_pacientes)
+                        metrics.total_pacientes.innerText = data.total_pacientes !== undefined ? data.total_pacientes : 'N/A';
+                    if (metrics.total_ingresos_est)
+                        metrics.total_ingresos_est.innerText = data.total_ingresos_est !== undefined ? data.total_ingresos_est : 'N/A';
+                    if (metrics.total_fichas_est)
+                        metrics.total_fichas_est.innerText = data.total_fichas_est !== undefined ? data.total_fichas_est : 'N/A';
+                })
+                .catch(error => {
+                    console.error('Error fetching dashboard metrics:', error);
+                    // Mostrar N/A en caso de error
+                    Object.values(metrics).forEach(el => {
+                        if (el) el.innerText = 'N/A';
+                    });
+                });
+        });
+    </script>
 {% endblock %}

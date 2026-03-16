@@ -373,6 +373,10 @@ class FichaHistoryListView(GenericHistoryListView):
 
     url_last_page = 'ficha_list'
 
+    def get_base_queryset(self):
+        return self.model.objects.filter(establecimiento_id=self.request.user.establecimiento).select_related(
+            'history_user').order_by('-history_date')
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['url_last_page'] = self.url_last_page

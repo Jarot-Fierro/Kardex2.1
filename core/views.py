@@ -3,7 +3,9 @@ from datetime import timedelta
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.cache import cache
 from django.db.models import Q
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.utils import timezone
 from django.views.generic.base import TemplateView
@@ -72,21 +74,6 @@ def dashboard_view(request):
                 permissions[module] = current
 
     # ==========================
-    # 📊 MÉTRICAS
-    # ==========================
-    total_pacientes = Paciente.objects.count()
-
-    fichas_qs = Ficha.objects.select_related('paciente', 'establecimiento')
-    if establecimiento:
-        fichas_qs = fichas_qs.filter(
-            establecimiento=establecimiento,
-            paciente__status=True
-        )
-
-    total_ingresos_est = fichas_qs.values('paciente').distinct().count()
-    total_fichas_est = fichas_qs.count()
-
-    # ==========================
     # 🕒 CAMBIOS RECIENTES
     # ==========================
     last_7 = timezone.now() - timedelta(days=7)
@@ -125,7 +112,7 @@ def dashboard_view(request):
     # ==========================
     # 🧾 PACIENTES RECIENTES
     # ==========================
-    fichas_recientes = fichas_qs.order_by('-created_at')[:10]
+    fichas_recientes = Ficha.objects.all().order_by('-created_at')[:10]
     pacientes_recientes = []
 
     for ficha in fichas_recientes:
@@ -149,15 +136,59 @@ def dashboard_view(request):
         'user_nombre': user.get_username(),
         'establecimiento': establecimiento,
         'rol': rol,
-        'total_pacientes': total_pacientes,
-        'total_ingresos_est': total_ingresos_est,
-        'total_fichas_est': total_fichas_est,
         'cambios_recientes_count': cambios_recientes_count,
         'pacientes_recientes': pacientes_recientes,
         'cambios': cambios,
     }
 
     return render(request, 'core/dashboard.html', context)
+
+
+@login_required
+def dashboard_metrics_view(request):
+    """
+    Vista asíncrona para cargar las métricas pesadas del dashboard.
+    Retorna un JsonResponse con las métricas calculadas.
+    Incluye caché de 5 minutos por establecimiento.
+    """
+    user = request.user
+    establecimiento = getattr(user, 'establecimiento', None)
+    est_id = establecimiento.id if establecimiento else 'global'
+
+    cache_key = f'dashboard_metrics_{est_id}'
+    data = cache.get(cache_key)
+
+    if not data:
+        # 1. Total Pacientes: Global y Activos (status=True)
+        total_pacientes = Paciente.objects.filter(status=True).count()
+
+        # 2. Métricas por Establecimiento
+        total_ingresos_est = 0
+        total_fichas_est = 0
+
+        if establecimiento:
+            # Query base filtrando por establecimiento y pacientes activos
+            fichas_qs = Ficha.objects.filter(
+                establecimiento=establecimiento,
+                paciente__status=True
+            )
+
+            # Cantidad de pacientes distintos con ficha en ese establecimiento
+            total_ingresos_est = fichas_qs.values('paciente_id').distinct().count()
+
+            # Total de fichas del establecimiento
+            total_fichas_est = fichas_qs.count()
+
+        data = {
+            'total_pacientes': total_pacientes,
+            'total_ingresos_est': total_ingresos_est,
+            'total_fichas_est': total_fichas_est,
+        }
+
+        # Cache por 5 minutos (300 segundos)
+        cache.set(cache_key, data, 300)
+
+    return JsonResponse(data)
 
 
 @login_required
