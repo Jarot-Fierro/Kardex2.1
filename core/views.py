@@ -173,15 +173,11 @@ def dashboard_metrics_view(request):
                 paciente__status=True
             )
 
-            # Cantidad de pacientes distintos con ficha en ese establecimiento
-            total_ingresos_est = fichas_qs.values('paciente_id').distinct().count()
-
             # Total de fichas del establecimiento
             total_fichas_est = fichas_qs.count()
 
         data = {
             'total_pacientes': total_pacientes,
-            'total_ingresos_est': total_ingresos_est,
             'total_fichas_est': total_fichas_est,
         }
 

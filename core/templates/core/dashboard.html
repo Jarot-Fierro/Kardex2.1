@@ -38,7 +38,7 @@
 
     <!-- Summary cards -->
     <div class="row">
-        <div class="col-12 col-sm-6 col-md-3">
+        <div class="col-12 col-sm-6 col-md-4">
             <div class="small-box bg-info">
                 <div class="inner">
                     <h3 id="total_pacientes">...</h3>
@@ -49,18 +49,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-12 col-sm-6 col-md-3">
-            <div class="small-box bg-success">
-                <div class="inner">
-                    <h3 id="total_ingresos_est">...</h3>
-                    <p>Ingresos en este establecimiento</p>
-                </div>
-                <div class="icon">
-                    <i class="fas fa-hospital-user"></i>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-sm-6 col-md-3">
+        <div class="col-12 col-sm-6 col-md-4">
             <div class="small-box bg-warning">
                 <div class="inner">
                     <h3 id="total_fichas_est">...</h3>
@@ -71,8 +60,8 @@
                 </div>
             </div>
         </div>
-        <div class="col-12 col-sm-6 col-md-3">
-            <div class="small-box bg-danger">
+        <div class="col-12 col-sm-6 col-md-4">
+            <div class="small-box bg-success">
                 <div class="inner">
                     <h3>{{ cambios_recientes_count|default:"0" }}</h3>
                     <p>Cambios recientes de pacientes (7 días)</p>
@@ -191,7 +180,6 @@
             // IDs de los elementos a actualizar y el texto de carga inicial
             const metrics = {
                 'total_pacientes': document.getElementById('total_pacientes'),
-                'total_ingresos_est': document.getElementById('total_ingresos_est'),
                 'total_fichas_est': document.getElementById('total_fichas_est')
             };
 
