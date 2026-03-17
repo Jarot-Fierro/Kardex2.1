@@ -150,7 +150,18 @@
                     <!-- IDENTIFICACIÓN -->
                     <div class="card mb-2">
                         <div class="card-header">
-                            <h6 class="m-0"><i class="fas fa-id-card me-2"></i> Identificación</h6>
+                            <div class="row">
+                                <div class="col-3">
+                                    <h6 class="m-0"><i class="fas fa-id-card me-2"></i> Identificación</h6>
+                                </div>
+                                <div class="col-9">
+                                    <select id="smart-search-paciente" class="form-control" style="width: 100%;">
+                                        <option value="">Búsqueda inteligente (Nombre, Apellidos)...</option>
+                                    </select>
+                                </div>
+                            </div>
+
+
                         </div>
                         <div class="card-body">
                             <div class="row">
@@ -2208,6 +2219,52 @@
             $('#modalBuscarFicha').on('hidden.bs.modal', function () {
                 $select.val(null).trigger('change');
                 $detalle.addClass('d-none');
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('#smart-search-paciente').select2({
+                placeholder: "Búsqueda inteligente (Nombre, Apellidos)...",
+                allowClear: true,
+                minimumInputLength: 3,
+                ajax: {
+                    url: "{% url 'paciente_search_api' %}",
+                    dataType: 'json',
+                    delay: 300,
+                    data: function (params) {
+                        return {
+                            q: params.term,
+                            page: params.page || 1
+                        };
+                    },
+                    processResults: function (data, params) {
+                        params.page = params.page || 1;
+                        return {
+                            results: data.results,
+                            pagination: {
+                                more: data.pagination.more
+                            }
+                        };
+                    },
+                    cache: true
+                },
+                language: {
+                    inputTooShort: function () {
+                        return "Por favor ingrese 3 o más caracteres";
+                    },
+                    noResults: function () {
+                        return "No se encontraron pacientes";
+                    },
+                    searching: function () {
+                        return "Buscando...";
+                    }
+                }
+            }).on('select2:select', function (e) {
+                const data = e.params.data;
+                if (data.url) {
+                    window.location.href = data.url;
+                }
             });
         });
     </script>
