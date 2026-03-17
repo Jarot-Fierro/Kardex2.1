@@ -2,48 +2,67 @@ import re
 
 from django.db.models import Q
 
-from core.validations import format_rut
 
+def get_rut_q_filter(search_value, field_name='rut'):
+    """
+    Filtra por RUT ignorando puntos y guión.
+    """
+    if not search_value:
+        return Q()
 
-def get_rut_q_filter(search_value, rut_field='rut'):
-    """
-    Genera un filtro Q para búsqueda por RUT, intentando normalizar la entrada.
-    """
-    # Limpiar la búsqueda de puntos y guiones
+    # Limpiar el valor de búsqueda (quitar puntos y guiones)
     clean_value = re.sub(r'[^0-9kK]', '', search_value).upper()
 
-    q = Q(**{f'{rut_field}__icontains': search_value})
-
+    # Búsqueda flexible en el campo RUT
+    q = Q(**{f"{field_name}__icontains": search_value})
     if clean_value:
-        # Si tiene al menos un dígito, intentamos buscar por la versión limpia
-        q |= Q(**{f'{rut_field}__icontains': clean_value})
-
-        # Si parece un RUT completo (al menos 7 caracteres), intentamos formatearlo
-        if len(clean_value) >= 7:
-            try:
-                formatted = format_rut(clean_value)
-                if formatted != search_value:
-                    q |= Q(**{f'{rut_field}__icontains': formatted})
-            except Exception:
-                pass
+        q |= Q(**{f"{field_name}__icontains": clean_value})
 
     return q
 
 
-def get_name_q_filter(search_value, prefix='rut_paciente__'):
+def get_name_q_filter(search_value, prefix=''):
     """
-    Genera un filtro Q para búsqueda por nombre, apellido paterno o materno.
+    Implementa la lógica de búsqueda inteligente (fuzzy tokens).
+    - Divide por palabras (tokens).
+    - Cada palabra debe estar presente en nombre, apellido_paterno o apellido_materno (OR).
+    - Todas las palabras deben coincidir (AND).
     """
-    parts = search_value.split()
-    q = Q()
-    for part in parts:
-        q_part = (
-                Q(**{f'{prefix}nombre__icontains': part}) |
-                Q(**{f'{prefix}apellido_paterno__icontains': part}) |
-                Q(**{f'{prefix}apellido_materno__icontains': part})
-        )
-        if q:
-            q &= q_part
+    if not search_value:
+        return Q()
+
+    # Limpiar y tokenizar
+    tokens = search_value.strip().split()
+    if not tokens:
+        return Q()
+
+    # Prefijo para los campos (ej: 'paciente__')
+    f_nombre = f"{prefix}nombre__icontains"
+    f_paterno = f"{prefix}apellido_paterno__icontains"
+    f_materno = f"{prefix}apellido_materno__icontains"
+
+    # Construir el filtro AND de tokens
+    final_q = Q()
+    for token in tokens:
+        # Cada token puede estar en cualquiera de los 3 campos (OR)
+        token_q = Q(**{f_nombre: token}) | Q(**{f_paterno: token}) | Q(**{f_materno: token})
+        if final_q:
+            final_q &= token_q
         else:
-            q = q_part
-    return q
+            final_q = token_q
+
+    return final_q
+
+
+def build_paciente_search_q(search_value, prefix=''):
+    """
+    Combina búsqueda por RUT y por Nombre.
+    """
+    if not search_value:
+        return Q()
+
+    q_name = get_name_q_filter(search_value, prefix=prefix)
+    q_rut = get_rut_q_filter(search_value, field_name=f'{prefix}rut')
+
+    # Combinamos con OR: o coincide el nombre (con todos sus tokens) o coincide el RUT
+    return q_name | q_rut

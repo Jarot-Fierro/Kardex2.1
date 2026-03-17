@@ -6,15 +6,25 @@
 {% block content %}
     <div class="card">
         <div class="card-header">
-            <div class="row align-items-center w-100">
-                <div class="col">
+            <div class="row align-items-center w-100 g-2">
+                <!-- Título -->
+                <div class="col-auto">
                     <h5 class="mb-0">Listado de Pacientes</h5>
                 </div>
-                <div class="col-auto text-end">
-                    <a href="{% url 'paciente_history' %}" class="btn btn-warning me-2">
+
+                <!-- Select2 -->
+                <div class="col">
+                    <select id="smart-search-paciente" class="form-control" style="width: 100%;">
+                        <option value="">Búsqueda inteligente (Nombre, Apellidos)...</option>
+                    </select>
+                </div>
+
+                <!-- Botones -->
+                <div class="col-auto d-flex align-items-center gap-2">
+                    <a href="{% url 'paciente_history' %}" class="btn btn-warning">
                         <i class="bi bi-file-earmark-excel"></i> Historial
                     </a>
-                    <a href="{% url 'export_paciente_csv' %}" class="btn btn-success me-2">
+                    <a href="{% url 'export_paciente_csv' %}" class="btn btn-success">
                         <i class="bi bi-file-earmark-excel"></i> Reporte
                     </a>
                     <a href="{% url 'paciente_view' %}" class="btn btn-primary">
@@ -41,4 +51,53 @@
             </table>
         </div>
     </div>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        $(document).ready(function () {
+            $('#smart-search-paciente').select2({
+                placeholder: "Búsqueda inteligente (Nombre, Apellidos)...",
+                allowClear: true,
+                minimumInputLength: 3,
+                ajax: {
+                    url: "{% url 'paciente_search_api' %}",
+                    dataType: 'json',
+                    delay: 300,
+                    data: function (params) {
+                        return {
+                            q: params.term,
+                            page: params.page || 1
+                        };
+                    },
+                    processResults: function (data, params) {
+                        params.page = params.page || 1;
+                        return {
+                            results: data.results,
+                            pagination: {
+                                more: data.pagination.more
+                            }
+                        };
+                    },
+                    cache: true
+                },
+                language: {
+                    inputTooShort: function () {
+                        return "Por favor ingrese 3 o más caracteres";
+                    },
+                    noResults: function () {
+                        return "No se encontraron pacientes";
+                    },
+                    searching: function () {
+                        return "Buscando...";
+                    }
+                }
+            }).on('select2:select', function (e) {
+                const data = e.params.data;
+                if (data.url) {
+                    window.location.href = data.url;
+                }
+            });
+        });
+    </script>
 {% endblock %}

@@ -95,42 +95,15 @@
                             <th>Acciones</th>
                         </tr>
                         </thead>
-                        <tbody>
-                        {% if pacientes_recientes %}
-                            {% for item in pacientes_recientes %}
-                                {% with p=item.paciente i=item.ingreso f=item.ficha %}
-                                    <tr>
-                                        <td>{{ p.nombre }} {{ p.apellido_paterno }} {{ p.apellido_materno }}</td>
-                                        <td>{{ p.rut|default:'-' }}</td>
-                                        <td>{{ i.created_at|date:'d-m-Y H:i' }}</td>
-                                        <td>
-                                            {% if item.numero_ficha %}
-                                                <span class="badge badge-primary">{{ item.numero_ficha }}</span>
-                                            {% else %}
-                                                <span class="badge badge-secondary">Sin ficha</span>
-                                            {% endif %}
-                                        </td>
-                                        <td>
-                                            {% if p %}
-                                                <a href="{% url 'paciente_view_param' p.id %}"
-                                                   class="btn btn-sm btn-outline-primary">
-                                                    Ver ficha
-                                                </a>
-                                            {% else %}
-                                                <button class="btn btn-sm btn-outline-secondary" disabled>Ver ficha
-                                                </button>
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                {% endwith %}
-                            {% endfor %}
-                        {% else %}
-                            <tr>
-                                <td colspan="5" class="text-center text-muted">No hay ingresos recientes para este
-                                    establecimiento.
-                                </td>
-                            </tr>
-                        {% endif %}
+                        <tbody id="pacientes_recientes_body">
+                        <tr>
+                            <td colspan="5" class="text-center">
+                                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                    <span class="sr-only">Cargando...</span>
+                                </div>
+                                Cargando pacientes recientes...
+                            </td>
+                        </tr>
                         </tbody>
                     </table>
                 </div>
@@ -214,6 +187,54 @@
                         if (el) el.innerText = 'N/A';
                     });
                 });
+
+            // Cargar pacientes recientes asíncronamente
+            const pacientesBody = document.getElementById('pacientes_recientes_body');
+            if (pacientesBody) {
+                fetch("{% url 'dashboard_pacientes_recientes' %}")
+                    .then(response => response.json())
+                    .then(data => {
+                        pacientesBody.innerHTML = '';
+                        if (data.pacientes && data.pacientes.length > 0) {
+                            data.pacientes.forEach(item => {
+                                const row = document.createElement('tr');
+
+                                const numeroFichaBadge = item.numero_ficha
+                                    ? `<span class="badge badge-primary">${item.numero_ficha}</span>`
+                                    : `<span class="badge badge-secondary">Sin ficha</span>`;
+
+                                row.innerHTML = `
+                                    <td>${item.nombre_completo}</td>
+                                    <td>${item.rut}</td>
+                                    <td>${item.fecha_ingreso}</td>
+                                    <td>${numeroFichaBadge}</td>
+                                    <td>
+                                        <a href="${item.url_paciente}" class="btn btn-sm btn-outline-primary">
+                                            Ver ficha
+                                        </a>
+                                    </td>
+                                `;
+                                pacientesBody.appendChild(row);
+                            });
+                        } else {
+                            pacientesBody.innerHTML = `
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted">
+                                        No hay ingresos recientes para este establecimiento.
+                                    </td>
+                                </tr>`;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error al cargar pacientes recientes:', error);
+                        pacientesBody.innerHTML = `
+                            <tr>
+                                <td colspan="5" class="text-center text-danger">
+                                    Error al cargar los datos.
+                                </td>
+                            </tr>`;
+                    });
+            }
         });
     </script>
 {% endblock %}

@@ -3,7 +3,48 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import JsonResponse
 
+from core.utils.search_utils import build_paciente_search_q
 from personas.models.pacientes import Paciente
+
+
+@login_required
+def paciente_search_api(request):
+    """
+    API de búsqueda inteligente de pacientes para autocompletado Select2.
+    Usa lógica de tokens (AND entre palabras, OR entre campos).
+    """
+    search_value = request.GET.get('q', '').strip()
+    page_number = request.GET.get('page', 1)
+    page_size = 20
+
+    if not search_value:
+        return JsonResponse({'results': []}, safe=False)
+
+    # Construir el filtro usando la utilidad
+    q_filter = build_paciente_search_q(search_value)
+
+    # Ejecutar búsqueda con paginación para Select2
+    pacientes_qs = Paciente.objects.filter(q_filter, status=True).distinct().order_by('apellido_paterno', 'nombre')
+
+    paginator = Paginator(pacientes_qs, page_size)
+    page_obj = paginator.get_page(page_number)
+
+    results = []
+    for p in page_obj:
+        nombre_completo = p.nombre_completo
+        display = f"{p.rut or 'SIN RUT'} - {nombre_completo}"
+        results.append({
+            "id": p.id,
+            "text": display,
+            "url": f"/personas/paciente/{p.id}/"
+        })
+
+    return JsonResponse({
+        'results': results,
+        'pagination': {
+            'more': page_obj.has_next()
+        }
+    }, safe=False)
 
 
 @login_required

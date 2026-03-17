@@ -63,15 +63,42 @@ def get_permissions_for_role(role):
     return permissions
 
 
+from django.core.cache import cache
+from django.db import transaction
+
+
 def sync_user_permissions(user):
     """
-    Limpia y vuelve a asignar permisos según los roles del usuario
+    Limpia y vuelve a asignar permisos según los roles del usuario.
+    Se utiliza caché para evitar deadlocks y repeticiones innecesarias.
     """
-    user.user_permissions.clear()
+    if not user.is_authenticated:
+        return
 
-    user_roles = user.userrole_set.select_related('role_id')
+    cache_key = f"user_perms_synced_{user.pk}"
+    if cache.get(cache_key):
+        return
 
-    for ur in user_roles:
-        role = ur.role_id
-        perms = get_permissions_for_role(role)
-        user.user_permissions.add(*perms)
+    try:
+        with transaction.atomic():
+            # Obtener permisos ANTES de limpiar, por si falla algo
+            user_roles = user.userrole_set.select_related('role_id').all()
+            all_perms = []
+            for ur in user_roles:
+                all_perms.extend(get_permissions_for_role(ur.role_id))
+
+            # Solo limpiar y añadir si los permisos han cambiado o no están sincronizados
+            # Pero para simplificar y asegurar, usamos el clear/add dentro de la transacción
+            # La clave es minimizar el tiempo de bloqueo.
+            user.user_permissions.clear()
+            if all_perms:
+                # Usar set para evitar duplicados si varios roles tienen el mismo permiso
+                user.user_permissions.add(*set(all_perms))
+    except Exception:
+        # Si hay un error (como un deadlock), simplemente no marcamos la caché
+        # y dejamos que la siguiente petición intente de nuevo.
+        # No bloqueamos la petición del usuario por esto.
+        return
+
+    # Marcar como sincronizado por 5 minutos
+    cache.set(cache_key, True, 300)

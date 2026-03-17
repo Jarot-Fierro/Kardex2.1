@@ -19,6 +19,11 @@ class User(AbstractUser):
     USERNAME_FIELD = 'username'
 
     def save(self, *args, **kwargs):
+        from django.core.cache import cache
+        if self.pk:
+            cache_key = f"user_perms_synced_{self.pk}"
+            cache.delete(cache_key)
+
         if self.username:
             self.username = self.username.upper()
 
@@ -87,8 +92,15 @@ class Role(models.Model):
         verbose_name = 'Rol'
         verbose_name_plural = 'Roles'
 
-    def __str__(self):
-        return self.role_name
+    def save(self, *args, **kwargs):
+        from django.core.cache import cache
+        if self.rol_id:
+            # Invalidar para todos los usuarios que tengan este rol
+            user_ids = UserRole.objects.filter(role_id=self).values_list('user_id', flat=True)
+            for uid in user_ids:
+                cache.delete(f"user_perms_synced_{uid}")
+
+        super().save(*args, **kwargs)
 
 
 class UserRole(models.Model):
@@ -104,5 +116,14 @@ class UserRole(models.Model):
         verbose_name_plural = 'Roles del Usuario'
         unique_together = ('user_id', 'role_id')
 
-    def __str__(self):
-        return self.user_id.username
+    def save(self, *args, **kwargs):
+        from django.core.cache import cache
+        if self.user_id_id:
+            cache.delete(f"user_perms_synced_{self.user_id_id}")
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        from django.core.cache import cache
+        if self.user_id_id:
+            cache.delete(f"user_perms_synced_{self.user_id_id}")
+        super().delete(*args, **kwargs)

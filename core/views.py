@@ -110,24 +110,6 @@ def dashboard_view(request):
         })
 
     # ==========================
-    # 🧾 PACIENTES RECIENTES
-    # ==========================
-    fichas_recientes = Ficha.objects.all().order_by('-created_at')[:10]
-    pacientes_recientes = []
-
-    for ficha in fichas_recientes:
-        pacientes_recientes.append({
-            'paciente': ficha.paciente,
-            'ingreso': ficha,
-            'ficha': ficha,
-            'numero_ficha': (
-                str(ficha.numero_ficha_sistema).zfill(4)
-                if ficha.numero_ficha_sistema is not None
-                else None
-            )
-        })
-
-    # ==========================
     # 📦 CONTEXTO FINAL (SEPARADO)
     # ==========================
     context = {
@@ -137,7 +119,6 @@ def dashboard_view(request):
         'establecimiento': establecimiento,
         'rol': rol,
         'cambios_recientes_count': cambios_recientes_count,
-        'pacientes_recientes': pacientes_recientes,
         'cambios': cambios,
     }
 
@@ -185,6 +166,45 @@ def dashboard_metrics_view(request):
         cache.set(cache_key, data, 300)
 
     return JsonResponse(data)
+
+
+@login_required
+def dashboard_pacientes_recientes_view(request):
+    """
+    Vista asíncrona para cargar la tabla de pacientes recientes.
+    """
+    from django.urls import reverse
+    user = request.user
+    establecimiento = getattr(user, 'establecimiento', None)
+
+    fichas_qs = Ficha.objects.select_related('paciente', 'establecimiento')
+
+    if establecimiento:
+        fichas_qs = fichas_qs.filter(
+            establecimiento=establecimiento,
+            paciente__status=True
+        )
+    else:
+        fichas_qs = fichas_qs.none()
+
+    fichas_recientes = fichas_qs.order_by('-created_at')[:10]
+    data = []
+
+    for ficha in fichas_recientes:
+        paciente = ficha.paciente
+        # URL para ver la ficha del paciente
+        url_paciente = reverse('paciente_view_param', args=[paciente.id]) if paciente else "#"
+
+        data.append({
+            'nombre_completo': f"{paciente.nombre} {paciente.apellido_paterno} {paciente.apellido_materno}" if paciente else "Desconocido",
+            'rut': paciente.rut if paciente and paciente.rut else "-",
+            'fecha_ingreso': ficha.created_at.strftime('%d-%m-%Y %H:%M'),
+            'numero_ficha': str(ficha.numero_ficha_sistema).zfill(
+                4) if ficha.numero_ficha_sistema is not None else None,
+            'url_paciente': url_paciente
+        })
+
+    return JsonResponse({'pacientes': data})
 
 
 @login_required
