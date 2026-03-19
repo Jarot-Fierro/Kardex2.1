@@ -21,7 +21,7 @@ class Profesional(StandardModel):
     history = HistoricalRecords()
 
     def __str__(self):
-        return f"{self.nombres} - {self.rut}"
+        return f"{self.nombres}"
 
     def save(self, *args, **kwargs):
         if self.rut:

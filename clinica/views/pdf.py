@@ -519,7 +519,7 @@ def pdf_movimientos_fichas_monologo_controlado(request):
         etiqueta_usuario = "Entregado por"
         base_queryset = MovimientoMonologoControlado.objects.filter(
             establecimiento=establecimiento,
-            fecha_salida__isnull=False,
+            estado='E',
             status=True
         ).order_by('ficha__numero_ficha_sistema')
 

@@ -2009,6 +2009,7 @@
     <script>
         $(document).ready(function () {
             const $checkRecienNacido = $('#id_recien_nacido');
+            const $checkExtranjero = $('#id_extranjero');
             const $inputRut = $('#id_rut');
             const $inputPacienteId = $('#id_paciente_id');
 
@@ -2031,9 +2032,19 @@
             }
 
             // Función para generar RUT ficticio (comienza con 90 millones)
-            function generarRutFicticio() {
-                // Generar número aleatorio entre 90,000,000 y 99,999,999
-                const numeroBase = Math.floor(90000000 + Math.random() * (99999999 - 90000000 + 1));
+            function generarRutFicticio(tipo) {
+                let min, max;
+                if (tipo === 'extranjero') {
+                    // Generar número aleatorio entre 96,000,000 y 99,999,999
+                    min = 96000000;
+                    max = 99999999;
+                } else {
+                    // Generar número aleatorio entre 90,000,000 y 95,999,999 (Recién Nacido)
+                    min = 90000000;
+                    max = 95999999;
+                }
+
+                const numeroBase = Math.floor(min + Math.random() * (max - min + 1));
                 const dv = calcularDigitoVerificador(numeroBase.toString());
                 return formatearRutString(numeroBase.toString() + dv);
             }
@@ -2054,11 +2065,25 @@
                 return cuerpo.replace(/\B(?=(\d{3})+(?!\d))/g, '.') + '-' + dv;
             }
 
-            // Evento cuando cambia el checkbox
+            // Evento cuando cambia el checkbox Recién Nacido
             $checkRecienNacido.on('change', function () {
                 // Solo si el checkbox está marcado y el campo RUT está vacío
                 if ($checkRecienNacido.is(':checked') && !$inputRut.val().trim()) {
-                    const rutFicticio = generarRutFicticio();
+                    const rutFicticio = generarRutFicticio('recien_nacido');
+                    $inputRut.val(rutFicticio);
+
+                    // Actualizar reglas del formulario si existe la función
+                    if (typeof window.actualizarReglasPaciente === 'function') {
+                        window.actualizarReglasPaciente();
+                    }
+                }
+            });
+
+            // Evento cuando cambia el checkbox Extranjero
+            $checkExtranjero.on('change', function () {
+                // Solo si el checkbox está marcado y el campo RUT está vacío
+                if ($checkExtranjero.is(':checked') && !$inputRut.val().trim()) {
+                    const rutFicticio = generarRutFicticio('extranjero');
                     $inputRut.val(rutFicticio);
 
                     // Actualizar reglas del formulario si existe la función
@@ -2070,11 +2095,16 @@
 
             // También ejecutar al cargar la página si ya está marcado el checkbox y el RUT está vacío
             $(window).on('load', function () {
-                if ($checkRecienNacido.is(':checked') && !$inputRut.val().trim()) {
-                    const rutFicticio = generarRutFicticio();
-                    $inputRut.val(rutFicticio);
+                if (!$inputRut.val().trim()) {
+                    if ($checkRecienNacido.is(':checked')) {
+                        const rutFicticio = generarRutFicticio('recien_nacido');
+                        $inputRut.val(rutFicticio);
+                    } else if ($checkExtranjero.is(':checked')) {
+                        const rutFicticio = generarRutFicticio('extranjero');
+                        $inputRut.val(rutFicticio);
+                    }
 
-                    if (typeof window.actualizarReglasPaciente === 'function') {
+                    if (typeof window.actualizarReglasPaciente === 'function' && ($checkRecienNacido.is(':checked') || $checkExtranjero.is(':checked'))) {
                         window.actualizarReglasPaciente();
                     }
                 }

@@ -117,8 +117,9 @@
                 <th style="width: 12%;">Ficha</th>
                 <th style="width: 18%;">RUT</th>
                 <th style="width: 30%;">Paciente</th>
-                <th style="width: 15%;">Fecha y Hora</th>
-                <th style="width: 25%;">{{ etiqueta_usuario }}</th>
+                {#                <th style="width: 15%;">Fecha y Hora</th>#}
+                {#                <th style="width: 25%;">{{ etiqueta_usuario }}</th>#}
+                <th style="width: 25%;">Check</th>
             </tr>
 
             {% for mov in profesional.movimientos %}
@@ -126,8 +127,9 @@
                     <td>{{ mov.numero_ficha }}</td>
                     <td>{{ mov.rut_paciente }}</td>
                     <td>{{ mov.nombre_paciente }}</td>
-                    <td>{{ mov.hora_movimiento|date:"d/m/Y H:i" }}</td>
-                    <td>{{ mov.usuario_responsable }}</td>
+                    {#                    <td>{{ mov.hora_movimiento|date:"d/m/Y H:i" }}</td>#}
+                    {#                    <td>{{ mov.usuario_responsable }}</td>#}
+                    <td></td>
                 </tr>
             {% empty %}
                 <tr>
