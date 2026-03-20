@@ -1,4 +1,5 @@
 import datetime
+
 from django import forms
 from django.utils import timezone
 
@@ -11,7 +12,7 @@ class FichaForm(forms.ModelForm):
     numero_ficha_sistema = forms.IntegerField(
         required=False,
         widget=forms.NumberInput(attrs={
-            'class': 'form-control form-control-sm',
+            'class': 'form-control form-control-sm bg-danger text-white border-dange',
             'id': 'id_ficha',
             'placeholder': 'Número de ficha sistema'
         })
@@ -28,7 +29,7 @@ class FichaForm(forms.ModelForm):
     observacion = forms.CharField(
         required=False,
         widget=forms.Textarea(attrs={
-            'class': 'form-control form-control-sm',
+            'class': 'form-control form-control-sm bg-danger text-white border-dange',
             'rows': 3,
             'placeholder': 'Observaciones de la ficha'
         })
@@ -227,4 +228,3 @@ class FormFichaTarjeta(forms.ModelForm):
             )
 
         return numero
-
