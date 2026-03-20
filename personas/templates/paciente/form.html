@@ -36,7 +36,7 @@
                             </div>
                             <div class="col-6">
 
-                                <span>N° FICHA:</span><br>
+                                <span class="text-danger">N° FICHA:</span><br>
                                 {{ ficha_form.numero_ficha_sistema }}
 
                             </div>
@@ -663,7 +663,7 @@
                                     {% endif %}
                                 </div>
                                 <div class="col-md-12">
-                                    <label class="form-label" for="id_observacion">Observación</label>
+                                    <label class="form-label text-danger" for="id_observacion">Observación</label>
                                     {{ ficha_form.observacion }}
                                     {% if paciente_form.observacion.errors %}
                                         <div class="invalid-feedback d-block">
