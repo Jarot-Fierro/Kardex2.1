@@ -102,6 +102,9 @@ class Role(models.Model):
 
         super().save(*args, **kwargs)
 
+    def __str__(self):
+        return self.role_name
+
 
 class UserRole(models.Model):
     user_role_id = models.AutoField(primary_key=True)
@@ -127,3 +130,6 @@ class UserRole(models.Model):
         if self.user_id_id:
             cache.delete(f"user_perms_synced_{self.user_id_id}")
         super().delete(*args, **kwargs)
+        
+    def __str__(self):
+        return f"{self.user_id} - {self.role_id}"
