@@ -12,7 +12,7 @@ class FichaForm(forms.ModelForm):
     numero_ficha_sistema = forms.IntegerField(
         required=False,
         widget=forms.NumberInput(attrs={
-            'class': 'form-control form-control-sm bg-danger text-white border-dange',
+            'class': 'form-control form-control-sm text-danger text-bold',
             'id': 'id_ficha',
             'placeholder': 'Número de ficha sistema'
         })
@@ -29,7 +29,7 @@ class FichaForm(forms.ModelForm):
     observacion = forms.CharField(
         required=False,
         widget=forms.Textarea(attrs={
-            'class': 'form-control form-control-sm bg-danger text-white border-dange',
+            'class': 'form-control form-control-sm text-danger text-bold',
             'rows': 3,
             'placeholder': 'Observaciones de la ficha'
         })
