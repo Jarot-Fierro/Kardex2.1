@@ -14,7 +14,8 @@ class FichaForm(forms.ModelForm):
         widget=forms.NumberInput(attrs={
             'class': 'form-control form-control-sm text-danger text-bold',
             'id': 'id_ficha',
-            'placeholder': 'Número de ficha sistema'
+            'placeholder': 'Número de ficha sistema',
+            'readonly': True,
         })
     )
 

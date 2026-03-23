@@ -82,3 +82,10 @@ class Ficha(StandardModel):
     class Meta:
         verbose_name = 'Ficha'
         verbose_name_plural = 'Fichas'
+
+        constraints = [
+            models.UniqueConstraint(
+                fields=['establecimiento', 'numero_ficha_sistema'],
+                name='unique_ficha_numero_por_establecimiento'
+            )
+        ]

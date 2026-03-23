@@ -43,7 +43,6 @@ class SalidaTablaFichaView(LoginRequiredMixin, DataTableMixinMov, TemplateView):
         'servicio_clinico_recepcion__nombre__icontains',
         'usuario_envio__username__icontains',
         'observacion_envio__icontains',
-        'fecha_envio__icontains',
     ]
 
     def get(self, request, *args, **kwargs):

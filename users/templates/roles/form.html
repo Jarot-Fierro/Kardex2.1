@@ -160,6 +160,13 @@
                             <div class="invalid-feedback d-block">{{ error }}</div>
                         {% endfor %}
                     </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="id_movimiento_ficha">Movimiento Ficha Entre Servicios</label>
+                        {{ form.movimiento_ficha_controlado }}
+                        {% for error in form.movimiento_ficha_controlado.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
                 </div>
                 <li class="dropdown-divider"></li>
                 <!-- Botones -->

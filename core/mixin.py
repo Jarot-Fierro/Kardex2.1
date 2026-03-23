@@ -226,18 +226,27 @@ class DataTableMixinMov:
                     rut_field = field.replace('__icontains', '')
                     q |= get_rut_q_filter(search_value, rut_field)
                 elif any(
-                        name_part in field.lower() for name_part in ['nombre', 'apellido_paterno', 'apellido_materno']):
+                        name_part in field.lower() for name_part in
+                        ['nombre', 'apellido_paterno', 'apellido_materno']):
                     # Evitar duplicados si ya procesamos el nombre completo
                     prefix = field.split('nombre')[0] if 'nombre' in field else (
                         field.split('apellido_paterno')[0] if 'apellido_paterno' in field else
                         field.split('apellido_materno')[0]
                     )
+
                     # Solo procesamos una vez por prefijo (ej: ficha__paciente__)
                     if not hasattr(self, '_processed_prefixes'):
                         self._processed_prefixes = set()
+
                     if prefix not in self._processed_prefixes:
-                        q |= get_name_q_filter(search_value, prefix)
-                        self._processed_prefixes.add(prefix)
+                        # Solo usar get_name_q_filter si el prefijo parece ser de un paciente
+                        # o si no hay prefijo y estamos buscando en el modelo base que tiene estos campos.
+                        # De lo contrario, tratar como un campo normal de texto.
+                        if 'paciente' in prefix.lower() or not prefix:
+                            q |= get_name_q_filter(search_value, prefix)
+                            self._processed_prefixes.add(prefix)
+                        else:
+                            q |= Q(**{field: search_value})
                 else:
                     q |= Q(**{field: search_value})
 
