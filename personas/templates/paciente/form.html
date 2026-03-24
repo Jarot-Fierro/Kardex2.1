@@ -694,7 +694,8 @@
 
         </form>
     </div>
-    <div class="modal fade" id="modalPacienteNoEncontrado" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal fade" id="modalPacienteNoEncontrado" tabindex="-1" role="dialog" aria-hidden="true"
+         data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
 
@@ -702,9 +703,6 @@
                     <h5 class="modal-title">
                         Paciente no encontrado
                     </h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
                 </div>
 
                 <div class="modal-body">
@@ -878,10 +876,13 @@
     <script>
         {#    Botones #}
         $('#btn-confirmar-limpiar-formulario').on('click', function () {
-
+            const rutActual = $('#id_rut').val();
             if (window.limpiarFormularioPacienteGlobal) {
                 window.limpiarFormularioPacienteGlobal();
             }
+
+            // Restaurar el RUT después de limpiar el formulario
+            $('#id_rut').val(rutActual);
 
             // cerrar modal
             $('#modalPacienteNoEncontrado').modal('hide');
