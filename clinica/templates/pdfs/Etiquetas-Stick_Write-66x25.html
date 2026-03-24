@@ -1,0 +1,421 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Etiquetas 66x25</title>
+    <style>
+        @page {
+            size: letter;
+            margin: 0;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+
+        /* BOTÓN */
+        .no-print {
+            padding: 10px 0;
+            background-color: #f0f0f0;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .btn {
+            display: inline-block;
+            font-weight: 400;
+            color: #fff;
+            text-align: center;
+            vertical-align: middle;
+            cursor: pointer;
+            background-color: #007bff;
+            border: 1px solid #007bff;
+            padding: .25rem .5rem;
+            font-size: .875rem;
+            line-height: 1.5;
+            border-radius: .2rem;
+            text-decoration: none;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .page {
+            width: 215.9mm;
+            height: 279.4mm;
+            margin: 0 auto;
+            background-color: white;
+            box-sizing: border-box;
+            padding: 14mm 5mm 0 5mm; /* 1.5cm arriba */
+            display: grid;
+            grid-template-columns: repeat(3, 66mm);
+            grid-template-rows: repeat(10, 25mm);
+            gap: 1mm 2mm;
+            justify-content: center;
+        }
+
+        .sticker {
+            width: 66mm;
+            height: 25mm;
+            border: 0.1mm dashed #ccc;
+            box-sizing: border-box;
+            padding: 1.5mm;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .nombre {
+            font-size: 8pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            line-height: 1.1;
+            margin-bottom: 0.2mm;
+            width: 100%;
+        }
+
+        .info {
+            font-size: 6.5pt;
+            line-height: 1;
+            margin-bottom: 0.2mm;
+            width: 100%;
+        }
+
+        .ficha {
+            font-size: 10pt;
+            font-weight: 900;
+            line-height: 1;
+            margin-bottom: 0.2mm;
+            width: 100%;
+        }
+
+        .rut {
+            font-size: 8pt;
+            line-height: 1;
+            margin-bottom: 0.5mm;
+            width: 100%;
+        }
+
+        .barcode-container {
+            height: 5mm;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .barcode {
+            max-height: 100%;
+            max-width: 100%;
+        }
+
+        @media print {
+            body {
+                background-color: white;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .page {
+                margin: 0;
+                border: none;
+                padding: 14mm 5mm 0 5mm; /* 15mm superior para calce */
+            }
+
+            .sticker {
+                border: 0.1mm solid transparent;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- BOTÓN -->
+<div class="text-center no-print">
+    <button onclick="window.print()" class="btn">
+        Guardar como PDF / Imprimir
+    </button>
+</div>
+
+<div class="page">
+    <div class="sticker">
+        <div class="nombre">PAMELA ALEPICHEO CAYUPE</div>
+        <div class="info">Nac: 27/01/1988 - CAÑETE</div>
+        <div class="ficha">FICHA 148884</div>
+        <div class="rut">16.979.751-K</div>
+        <div class="barcode-container"><img class="barcode"
+                                            src="./imagen_barra.png">
+        </div>
+    </div>
+    <div class="sticker">
+        <div class="nombre">NOMBRE COMPLETO PACIENTE 2</div>
+        <div class="info">Nac: DD/MM/AAAA - COMUNA</div>
+        <div class="ficha">FICHA XXXXXX</div>
+        <div class="rut">XX.XXX.XXX-X</div>
+        <div class="barcode-container"><img class="barcode"
+                                            src="./imagen_barra.png">
+        </div>
+    </div>
+    <div class="sticker">
+        <div class="nombre">NOMBRE COMPLETO PACIENTE 3</div>
+        <div class="info">Nac: DD/MM/AAAA - COMUNA</div>
+        <div class="ficha">FICHA XXXXXX</div>
+        <div class="rut">XX.XXX.XXX-X</div>
+        <div class="barcode-container"><img class="barcode"
+                                            src="./imagen_barra.png">
+        </div>
+    </div>
+    <div class="sticker">
+        <div class="nombre">NOMBRE COMPLETO PACIENTE 4</div>
+        <div class="info">Nac: DD/MM/AAAA - COMUNA</div>
+        <div class="ficha">FICHA XXXXXX</div>
+        <div class="rut">XX.XXX.XXX-X</div>
+        <div class="barcode-container"><img class="barcode"
+                                            src="./imagen_barra.png">
+        </div>
+    </div>
+    <div class="sticker">
+        <div class="nombre">NOMBRE COMPLETO PACIENTE 5</div>
+        <div class="info">Nac: DD/MM/AAAA - COMUNA</div>
+        <div class="ficha">FICHA XXXXXX</div>
+        <div class="rut">XX.XXX.XXX-X</div>
+        <div class="barcode-container"><img class="barcode"
+                                            src="./imagen_barra.png">
+        </div>
+    </div>
+    <div class="sticker">
+        <div class="nombre">NOMBRE COMPLETO PACIENTE 6</div>
+        <div class="info">Nac: DD/MM/AAAA - COMUNA</div>
+        <div class="ficha">FICHA XXXXXX</div>
+        <div class="rut">XX.XXX.XXX-X</div>
+        <div class="barcode-container"><img class="barcode"
+                                            src="./imagen_barra.png">
+        </div>
+    </div>
+    <div class="sticker">
+        <div class="nombre">NOMBRE COMPLETO PACIENTE 7</div>
+        <div class="info">Nac: DD/MM/AAAA - COMUNA</div>
+        <div class="ficha">FICHA XXXXXX</div>
+        <div class="rut">XX.XXX.XXX-X</div>
+        <div class="barcode-container"><img class="barcode"
+                                            src="./imagen_barra.png">
+        </div>
+    </div>
+    <div class="sticker">
+        <div class="nombre">NOMBRE COMPLETO PACIENTE 8</div>
+        <div class="info">Nac: DD/MM/AAAA - COMUNA</div>
+        <div class="ficha">FICHA XXXXXX</div>
+        <div class="rut">XX.XXX.XXX-X</div>
+        <div class="barcode-container"><img class="barcode"
+                                            src="./imagen_barra.png">
+        </div>
+    </div>
+    <div class="sticker">
+        <div class="nombre">NOMBRE COMPLETO PACIENTE 9</div>
+        <div class="info">Nac: DD/MM/AAAA - COMUNA</div>
+        <div class="ficha">FICHA XXXXXX</div>
+        <div class="rut">XX.XXX.XXX-X</div>
+        <div class="barcode-container"><img class="barcode"
+                                            src="./imagen_barra.png">
+        </div>
+    </div>
+    <div class="sticker">
+        <div class="nombre">NOMBRE COMPLETO PACIENTE 10</div>
+        <div class="info">Nac: DD/MM/AAAA - COMUNA</div>
+        <div class="ficha">FICHA XXXXXX</div>
+        <div class="rut">XX.XXX.XXX-X</div>
+        <div class="barcode-container"><img class="barcode"
+                                            src="./imagen_barra.png">
+        </div>
+    </div>
+    <div class="sticker">
+        <div class="nombre">NOMBRE COMPLETO PACIENTE 11</div>
+        <div class="info">Nac: DD/MM/AAAA - COMUNA</div>
+        <div class="ficha">FICHA XXXXXX</div>
+        <div class="rut">XX.XXX.XXX-X</div>
+        <div class="barcode-container"><img class="barcode"
+                                            src="./imagen_barra.png">
+        </div>
+    </div>
+    <div class="sticker">
+        <div class="nombre">NOMBRE COMPLETO PACIENTE 12</div>
+        <div class="info">Nac: DD/MM/AAAA - COMUNA</div>
+        <div class="ficha">FICHA XXXXXX</div>
+        <div class="rut">XX.XXX.XXX-X</div>
+        <div class="barcode-container"><img class="barcode"
+                                            src="./imagen_barra.png">
+        </div>
+    </div>
+    <div class="sticker">
+        <div class="nombre">NOMBRE COMPLETO PACIENTE 13</div>
+        <div class="info">Nac: DD/MM/AAAA - COMUNA</div>
+        <div class="ficha">FICHA XXXXXX</div>
+        <div class="rut">XX.XXX.XXX-X</div>
+        <div class="barcode-container"><img class="barcode"
+                                            src="./imagen_barra.png">
+        </div>
+    </div>
+    <div class="sticker">
+        <div class="nombre">NOMBRE COMPLETO PACIENTE 14</div>
+        <div class="info">Nac: DD/MM/AAAA - COMUNA</div>
+        <div class="ficha">FICHA XXXXXX</div>
+        <div class="rut">XX.XXX.XXX-X</div>
+        <div class="barcode-container"><img class="barcode"
+                                            src="./imagen_barra.png">
+        </div>
+    </div>
+    <div class="sticker">
+        <div class="nombre">NOMBRE COMPLETO PACIENTE 15</div>
+        <div class="info">Nac: DD/MM/AAAA - COMUNA</div>
+        <div class="ficha">FICHA XXXXXX</div>
+        <div class="rut">XX.XXX.XXX-X</div>
+        <div class="barcode-container"><img class="barcode"
+                                            src="./imagen_barra.png">
+        </div>
+    </div>
+    <div class="sticker">
+        <div class="nombre">NOMBRE COMPLETO PACIENTE 16</div>
+        <div class="info">Nac: DD/MM/AAAA - COMUNA</div>
+        <div class="ficha">FICHA XXXXXX</div>
+        <div class="rut">XX.XXX.XXX-X</div>
+        <div class="barcode-container"><img class="barcode"
+                                            src="./imagen_barra.png">
+        </div>
+    </div>
+    <div class="sticker">
+        <div class="nombre">NOMBRE COMPLETO PACIENTE 17</div>
+        <div class="info">Nac: DD/MM/AAAA - COMUNA</div>
+        <div class="ficha">FICHA XXXXXX</div>
+        <div class="rut">XX.XXX.XXX-X</div>
+        <div class="barcode-container"><img class="barcode"
+                                            src="./imagen_barra.png">
+        </div>
+    </div>
+    <div class="sticker">
+        <div class="nombre">NOMBRE COMPLETO PACIENTE 18</div>
+        <div class="info">Nac: DD/MM/AAAA - COMUNA</div>
+        <div class="ficha">FICHA XXXXXX</div>
+        <div class="rut">XX.XXX.XXX-X</div>
+        <div class="barcode-container"><img class="barcode"
+                                            src="./imagen_barra.png">
+        </div>
+    </div>
+    <div class="sticker">
+        <div class="nombre">NOMBRE COMPLETO PACIENTE 19</div>
+        <div class="info">Nac: DD/MM/AAAA - COMUNA</div>
+        <div class="ficha">FICHA XXXXXX</div>
+        <div class="rut">XX.XXX.XXX-X</div>
+        <div class="barcode-container"><img class="barcode"
+                                            src="./imagen_barra.png">
+        </div>
+    </div>
+    <div class="sticker">
+        <div class="nombre">NOMBRE COMPLETO PACIENTE 20</div>
+        <div class="info">Nac: DD/MM/AAAA - COMUNA</div>
+        <div class="ficha">FICHA XXXXXX</div>
+        <div class="rut">XX.XXX.XXX-X</div>
+        <div class="barcode-container"><img class="barcode"
+                                            src="./imagen_barra.png">
+        </div>
+    </div>
+    <div class="sticker">
+        <div class="nombre">NOMBRE COMPLETO PACIENTE 21</div>
+        <div class="info">Nac: DD/MM/AAAA - COMUNA</div>
+        <div class="ficha">FICHA XXXXXX</div>
+        <div class="rut">XX.XXX.XXX-X</div>
+        <div class="barcode-container"><img class="barcode"
+                                            src="./imagen_barra.png">
+        </div>
+    </div>
+    <div class="sticker">
+        <div class="nombre">NOMBRE COMPLETO PACIENTE 22</div>
+        <div class="info">Nac: DD/MM/AAAA - COMUNA</div>
+        <div class="ficha">FICHA XXXXXX</div>
+        <div class="rut">XX.XXX.XXX-X</div>
+        <div class="barcode-container"><img class="barcode"
+                                            src="./imagen_barra.png">
+        </div>
+    </div>
+    <div class="sticker">
+        <div class="nombre">NOMBRE COMPLETO PACIENTE 23</div>
+        <div class="info">Nac: DD/MM/AAAA - COMUNA</div>
+        <div class="ficha">FICHA XXXXXX</div>
+        <div class="rut">XX.XXX.XXX-X</div>
+        <div class="barcode-container"><img class="barcode"
+                                            src="./imagen_barra.png">
+        </div>
+    </div>
+    <div class="sticker">
+        <div class="nombre">NOMBRE COMPLETO PACIENTE 24</div>
+        <div class="info">Nac: DD/MM/AAAA - COMUNA</div>
+        <div class="ficha">FICHA XXXXXX</div>
+        <div class="rut">XX.XXX.XXX-X</div>
+        <div class="barcode-container"><img class="barcode"
+                                            src="./imagen_barra.png">
+        </div>
+    </div>
+    <div class="sticker">
+        <div class="nombre">NOMBRE COMPLETO PACIENTE 25</div>
+        <div class="info">Nac: DD/MM/AAAA - COMUNA</div>
+        <div class="ficha">FICHA XXXXXX</div>
+        <div class="rut">XX.XXX.XXX-X</div>
+        <div class="barcode-container"><img class="barcode"
+                                            src="./imagen_barra.png">
+        </div>
+    </div>
+    <div class="sticker">
+        <div class="nombre">NOMBRE COMPLETO PACIENTE 26</div>
+        <div class="info">Nac: DD/MM/AAAA - COMUNA</div>
+        <div class="ficha">FICHA XXXXXX</div>
+        <div class="rut">XX.XXX.XXX-X</div>
+        <div class="barcode-container"><img class="barcode"
+                                            src="./imagen_barra.png">
+        </div>
+    </div>
+    <div class="sticker">
+        <div class="nombre">NOMBRE COMPLETO PACIENTE 27</div>
+        <div class="info">Nac: DD/MM/AAAA - COMUNA</div>
+        <div class="ficha">FICHA XXXXXX</div>
+        <div class="rut">XX.XXX.XXX-X</div>
+        <div class="barcode-container"><img class="barcode"
+                                            src="./imagen_barra.png">
+        </div>
+    </div>
+    <div class="sticker">
+        <div class="nombre">NOMBRE COMPLETO PACIENTE 28</div>
+        <div class="info">Nac: DD/MM/AAAA - COMUNA</div>
+        <div class="ficha">FICHA XXXXXX</div>
+        <div class="rut">XX.XXX.XXX-X</div>
+        <div class="barcode-container"><img class="barcode"
+                                            src="./imagen_barra.png">
+        </div>
+    </div>
+    <div class="sticker">
+        <div class="nombre">NOMBRE COMPLETO PACIENTE 29</div>
+        <div class="info">Nac: DD/MM/AAAA - COMUNA</div>
+        <div class="ficha">FICHA XXXXXX</div>
+        <div class="rut">XX.XXX.XXX-X</div>
+        <div class="barcode-container"><img class="barcode"
+                                            src="./imagen_barra.png">
+        </div>
+    </div>
+    <div class="sticker">
+        <div class="nombre">NOMBRE COMPLETO PACIENTE 30</div>
+        <div class="info">Nac: DD/MM/AAAA - COMUNA</div>
+        <div class="ficha">FICHA XXXXXX</div>
+        <div class="rut">XX.XXX.XXX-X</div>
+        <div class="barcode-container"><img class="barcode"
+                                            src="./imagen_barra.png">
+        </div>
+    </div>
+</div>
+</body>
+</html>
