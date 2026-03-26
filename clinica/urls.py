@@ -13,8 +13,11 @@ from clinica.views.movimiento_ficha import *
 from clinica.views.movimiento_ficha_monologo_controlado import (
     SalidaFichaView, SalidaFichaUpdateView, RecepcionFichaView, FichasEnTransitoView, TraspasoFichaView
 )
-from clinica.views.pdf import pdf_stickers, pdf_index, pdf_movimientos_fichas, \
-    pdf_movimientos_fichas_monologo_controlado, pdf_index_rn, pdf_stickers_ejemplos
+from clinica.views.pdf import (
+    pdf_index, pdf_movimientos_fichas,
+    pdf_movimientos_fichas_monologo_controlado, pdf_index_rn, pdf_stickers_ejemplos,
+    pdf_stickers_66_25
+)
 
 urlpatterns = [
     path('fichas/', FichaListView.as_view(), name='ficha_list'),
@@ -66,14 +69,21 @@ urlpatterns = [
     path('api/paciente/buscar-general/', buscar_paciente_general_api, name='api-paciente-buscar-general'),
 
     path(
-        "pdfs/stickers/ficha/<int:ficha_id>/", pdf_stickers, name="pdf_stickers_ficha"
+        "pdfs/stickers/ficha/<int:ficha_id>/", pdf_stickers_66_25, name="pdf_stickers_ficha"
     ),
     path(
-        "pdfs/stickers/paciente/<int:paciente_id>/", pdf_stickers, name="pdf_stickers_paciente"
+        "pdfs/stickers/paciente/<int:paciente_id>/", pdf_stickers_66_25, name="pdf_stickers_paciente"
     ),
     path(
         "pdfs/stickers/ejemplos/", pdf_stickers_ejemplos, name="pdf_stickers_ejemplos"
     ),
+
+    # path(
+    #     "pdfs/stickers-66-25/ficha/<int:ficha_id>/", pdf_stickers_66_25, name="pdf_stickers_66_25_ficha"
+    # ),
+    # path(
+    #     "pdfs/stickers-66-25/paciente/<int:paciente_id>/", pdf_stickers_66_25, name="pdf_stickers_66_25_paciente"
+    # ),
 
     path("pdfs/ficha/<int:ficha_id>/", pdf_index, name="pdf_ficha"),
     path("pdfs/ficha/paciente/<int:paciente_id>/", pdf_index, name="pdf_ficha_paciente"),

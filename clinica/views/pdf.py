@@ -165,6 +165,49 @@ def pdf_stickers(request, ficha_id=None, paciente_id=None):
     return render(request, 'pdfs/formato_stickers.html', context)
 
 
+def pdf_stickers_66_25(request, ficha_id=None, paciente_id=None):
+    # Obtener el establecimiento del usuario
+    establecimiento = getattr(request.user, 'establecimiento', None)
+
+    # Lógica para obtener el paciente y la ficha
+    if paciente_id:
+        paciente = get_object_or_404(Paciente, id=paciente_id)
+        ficha = Ficha.objects.filter(
+            paciente=paciente,
+            establecimiento=establecimiento
+        ).first()
+    elif ficha_id:
+        ficha = get_object_or_404(Ficha, id=ficha_id)
+        paciente = ficha.paciente
+    else:
+        raise Http404("Se requiere ficha o paciente")
+
+    # Compatibilidad con plantillas: proporcionar atributos esperados
+    if ficha:
+        if not hasattr(ficha, 'numero_ficha'):
+            ficha.numero_ficha = ficha.numero_ficha_sistema
+    else:
+        # Si no hay ficha para este establecimiento, crear un objeto dummy para el template
+        ficha = SimpleNamespace(numero_ficha="S/F")
+
+    # Generar código de barras basado en el RUT o código
+    rut_paciente = getattr(paciente, 'rut', '') or ''
+    numero_rut = obtener_numero_rut(rut_paciente)
+    if not numero_rut:
+        numero_rut = (getattr(paciente, 'codigo', '') or str(getattr(ficha, 'numero_ficha_sistema', '') or '')).strip()
+
+    codigo_barras_base64 = generar_barcode_sticker_base64(numero_rut)
+
+    context = {
+        'paciente': paciente,
+        'ficha': ficha,
+        'codigo_barras_base64': codigo_barras_base64,
+        'sticker_range': range(30)  # 3 columnas x 10 filas = 30 stickers
+    }
+
+    return render(request, 'pdfs/Etiquetas-Stick_Write-66x25.html', context)
+
+
 def pdf_stickers_ejemplos(request):
     # Obtener los últimos 3 registros de fichas para el establecimiento del usuario logueado
     # Si el usuario no tiene establecimiento, se obtienen las últimas 3 de forma global (o manejar como en pdf_stickers)
@@ -262,11 +305,12 @@ def generar_barcode_sticker_base64(codigo_paciente: str) -> str:
 
     codigo = barcode.get('code128', codigo_paciente, writer=writer)
     codigo.write(buffer, options={
-        "module_width": 0.12,  # 🔹 barras más delgadas
-        "module_height": 1.5,  # 🔹 más bajo para ocupar menos espacio
+        "module_width": 0.2,  # 🔹 barras un poco más anchas (largo)
+        "module_height": 10.0,  # 🔹 mantenemos altura para que ocupe all el espacio
         "font_size": 0,  # 🔹 sin texto
         "quiet_zone": 0.1,  # 🔹 margen mínimo lateral del código
         "write_text": False,
+        "margin": 0,  # 🔹 quitamos márgenes internos por defecto
     })
 
     base64_data = base64.b64encode(buffer.getvalue()).decode('utf-8')

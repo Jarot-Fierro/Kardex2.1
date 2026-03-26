@@ -9,17 +9,24 @@
     <style>
         body {
             font-family: Calibri, sans-serif;
-            padding: 20px;
-            font-size: 18px; /* base más grande para impresión */
+            padding: 50px 50px 0 50px;
+            margin-top: 0;
+            font-size: 16px; /* base más grande para impresión */
+        }
+
+        @page {
+            margin: 50px;
         }
 
         .numero-ficha {
-            font-size: 64px;
+            font-size: 54px;
             font-weight: bold;
+            line-height: 0.8;
+            margin-top: 0;
         }
 
         .barcode img {
-            max-height: 100px;
+            max-height: 90px;
         }
 
         .fecha-tabla {
@@ -44,7 +51,6 @@
             border-bottom: none;
         }
 
-        /* Tabla grande con bordes negros y esquinas redondeadas */
         .custom-table {
             width: 100%;
             border: 1px solid #000;
@@ -52,29 +58,30 @@
             border-spacing: 0;
             border-radius: 8px;
             overflow: hidden;
-            font-size: 18px;
+            font-size: 15px;
+
         }
 
         .custom-table td {
             border: 1px solid #000;
-            padding: 4px;
+            padding: 2px 4px;
             vertical-align: top;
         }
 
         .custom-table strong {
             display: block;
-            margin-bottom: 6px;
-            font-size: 18px;
+            margin-bottom: 2px;
+            font-size: 15px;
         }
 
         .custom-table p {
             margin: 0;
-            font-size: 20px;
+            font-size: 16px;
             font-weight: 500;
         }
 
         .custom-table h1, .custom-table h2, .custom-table h3 {
-            margin: 0.2em 0;
+            margin: 0.1em 0;
         }
 
         /* Bordes redondeados solo en las esquinas externas */
@@ -126,15 +133,15 @@
     </button>
 </div>
 
-<div class="container">
+<div class="container-fluid">
     <!-- Encabezado ficha -->
-    <div class="row align-items-center print-row-fix">
+    <div class="row align-items-center print-row-fix mb-2">
         <div class="col-md-4">
             <div class="numero-ficha">{{ ficha.numero_ficha|stringformat:"04d" }}</div>
         </div>
 
         <div class="col-md-4 text-center barcode">
-            <img src="{{ codigo_barras_base64 }}" alt="Código de barras" style="height: 90px">
+            <img src="{{ codigo_barras_base64 }}" alt="Código de barras">
         </div>
 
         <div class="col-md-4 text-right">
