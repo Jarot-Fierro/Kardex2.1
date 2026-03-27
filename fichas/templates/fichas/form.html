@@ -1,0 +1,355 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+    <!-- BUSCADORES -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card card-outline card-info">
+                <div class="card-body">
+                    <form method="get" class="form-inline">
+                        <div class="input-group input-group-sm mb-0">
+                            <label class="label mr-3" for="rut">Busqueda por RUT: </label>
+                            <input type="text" name="rut" id="rut" value="{{ request.GET.rut }}"
+                                   class="form-control id_rut"
+                                   placeholder="RUT sin puntos y con guión">
+                            <span class="input-group-append">
+                                <button type="submit" class="btn btn-info btn-flat">Buscar</button>
+                            </span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card card-outline card-info">
+                <div class="card-body">
+                    <form method="get" class="form-inline">
+                        <div class="input-group input-group-sm mb-0">
+                            <label class="label mr-3" for="numero_ficha">Busqueda por Número de Ficha:</label>
+                            <input type="text" name="numero_ficha" id="numero_ficha"
+                                   value="{{ request.GET.numero_ficha }}" class="form-control"
+                                   placeholder="Número de ficha">
+                            <span class="input-group-append">
+                                <button type="submit" class="btn btn-info btn-flat">Buscar</button>
+                            </span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FORMULARIO PRINCIPAL -->
+    <form method="post">
+        {% csrf_token %}
+
+        <!-- Hidden IDs para mantener la instancia en POST -->
+        {% if paciente_form.instance.pk %}
+            <input type="hidden" name="paciente_id" value="{{ paciente_form.instance.pk }}">
+        {% endif %}
+
+        {% if ficha_form.instance.pk %}
+            <input type="hidden" name="ficha_id" value="{{ ficha_form.instance.pk }}">
+        {% endif %}
+
+        <div class="row">
+            <!-- PACIENTE -->
+            <div class="col-md-9">
+                <div class="card card-primary card-outline">
+                    <div class="card-header py-2 px-3">
+                        <div class="row align-items-center">
+
+                            <!-- IZQUIERDA: TÍTULO -->
+                            <div class="col-md-3 col-12 mb-2 mb-md-0">
+                                <h3 class="card-title text-sm font-weight-bold mb-0 text-dark">
+                                    <i class="fas fa-user-injured text-primary mr-1"></i>
+                                    Datos del Paciente
+                                </h3>
+                            </div>
+
+                            <!-- CENTRO: ESTADO / BADGE -->
+                            <div class="col-md-6 col-12 text-center mb-2 mb-md-0">
+                                {% if ficha_exists %}
+                                    <span class="badge badge-primary px-3 py-2 shadow-sm" style="font-size: 0.95rem;">
+                    <i class="fas fa-edit mr-1"></i>
+                    Edición completa | Paciente + ficha existentes
+                </span>
+                                {% elif paciente_exists %}
+                                    <span class="badge badge-warning px-3 py-2 shadow-sm" style="font-size: 0.95rem;">
+                    <i class="fas fa-user-check mr-1"></i>
+                    Paciente existente / Ficha nueva
+                </span>
+                                {% else %}
+                                    <span class="badge badge-success px-3 py-2 shadow-sm" style="font-size: 0.95rem;">
+                    <i class="fas fa-plus-circle mr-1"></i>
+                    Nuevo paciente + nueva ficha
+                </span>
+                                {% endif %}
+                            </div>
+
+                            <!-- DERECHA: BOTÓN -->
+                            <div class="col-md-3 col-12 text-md-right text-left">
+                                <a class="btn btn-outline-danger btn-sm px-3 shadow-sm text-decoration-none"
+                                   href="{% url 'ficha_paciente_manage' %}">
+                                    <i class="fas fa-broom mr-1"></i>
+                                    Limpiar formulario
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="row">
+                            <div class="col-md-2 form-group mb-2 pt-4">
+                                <div class="form-check">
+                                    {{ paciente_form.recien_nacido }}
+                                    <label class="form-check-label text-xs"
+                                           for="{{ paciente_form.recien_nacido.id_for_label }}">{{ paciente_form.recien_nacido.label }}</label>
+                                </div>
+                            </div>
+
+                            <div class="col-md-2 form-group mb-2 pt-4">
+                                <div class="form-check">
+                                    {{ paciente_form.extranjero }}
+                                    <label class="form-check-label text-xs"
+                                           for="{{ paciente_form.extranjero.id_for_label }}">{{ paciente_form.extranjero.label }}</label>
+                                </div>
+                            </div>
+                            <div class="col-md-2 form-group mb-2 pt-4">
+                                <div class="form-check">
+                                    {{ paciente_form.pueblo_indigena }}
+                                    <label class="form-check-label text-xs"
+                                           for="{{ paciente_form.pueblo_indigena.id_for_label }}">{{ paciente_form.pueblo_indigena.label }}</label>
+                                </div>
+                            </div>
+                            <div class="col-md-2 form-group mb-2 pt-4">
+                                <div class="form-check">
+                                    {{ paciente_form.fallecido }}
+                                    <label class="form-check-label text-xs"
+                                           for="{{ paciente_form.fallecido.id_for_label }}">{{ paciente_form.fallecido.label }}</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4 form-group mb-2">
+                                <label class="mb-0 text-xs">{{ paciente_form.fecha_fallecimiento.label }}</label>
+                                {{ paciente_form.fecha_fallecimiento }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3 form-group mb-2">
+                                <label class="mb-0 text-xs">{{ paciente_form.rut.label }}</label>
+                                {{ paciente_form.rut }}
+                                {{ paciente_form.rut.errors }}
+                            </div>
+                            <div class="col-md-3 form-group mb-2">
+                                <label class="mb-0 text-xs">{{ paciente_form.nombre.label }}</label>
+                                {{ paciente_form.nombre }}
+                                {{ paciente_form.nombre.errors }}
+                            </div>
+                            <div class="col-md-3 form-group mb-2">
+                                <label class="mb-0 text-xs">{{ paciente_form.apellido_paterno.label }}</label>
+                                {{ paciente_form.apellido_paterno }}
+                                {{ paciente_form.apellido_paterno.errors }}
+                            </div>
+                            <div class="col-md-3 form-group mb-2">
+                                <label class="mb-0 text-xs">{{ paciente_form.apellido_materno.label }}</label>
+                                {{ paciente_form.apellido_materno }}
+                                {{ paciente_form.apellido_materno.errors }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-3 form-group mb-2">
+                                <label class="mb-0 text-xs">{{ paciente_form.nombre_social.label }}</label>
+                                {{ paciente_form.nombre_social }}
+                            </div>
+                            <div class="col-md-3 form-group mb-2">
+                                <label class="mb-0 text-xs">{{ paciente_form.pasaporte.label }}</label>
+                                {{ paciente_form.pasaporte }}
+                            </div>
+                            <div class="col-md-3 form-group mb-2">
+                                <label class="mb-0 text-xs">{{ paciente_form.nip.label }}</label>
+                                {{ paciente_form.nip }}
+                            </div>
+                            <div class="col-md-3 form-group mb-2">
+                                <label class="mb-0 text-xs">{{ paciente_form.sexo.label }}</label>
+                                {{ paciente_form.sexo }}
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-3 form-group mb-2">
+                                <label class="mb-0 text-xs">{{ paciente_form.estado_civil.label }}</label>
+                                {{ paciente_form.estado_civil }}
+                            </div>
+                            <div class="col-md-3 form-group mb-2">
+                                <label class="mb-0 text-xs">{{ paciente_form.genero.label }}</label>
+                                {{ paciente_form.genero }}
+                            </div>
+                            <div class="col-md-3 form-group mb-2">
+                                <label class="mb-0 text-xs">{{ paciente_form.fecha_nacimiento.label }}</label>
+                                {{ paciente_form.fecha_nacimiento }}
+                            </div>
+                        </div>
+
+                        <hr class="my-2">
+
+                        <div class="row">
+                            <div class="col-md-3 form-group mb-2">
+                                <label class="mb-0 text-xs">{{ paciente_form.rut_madre.label }}</label>
+                                {{ paciente_form.rut_madre }}
+                            </div>
+                            <div class="col-md-3 form-group mb-2">
+                                <label class="mb-0 text-xs">{{ paciente_form.nombres_madre.label }}</label>
+                                {{ paciente_form.nombres_madre }}
+                            </div>
+                            <div class="col-md-3 form-group mb-2">
+                                <label class="mb-0 text-xs">{{ paciente_form.nombres_padre.label }}</label>
+                                {{ paciente_form.nombres_padre }}
+                            </div>
+                            <div class="col-md-3 form-group mb-2">
+                                <label class="mb-0 text-xs">{{ paciente_form.nombre_pareja.label }}</label>
+                                {{ paciente_form.nombre_pareja }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-3 form-group mb-2">
+                                <label class="mb-0 text-xs">{{ paciente_form.representante_legal.label }}</label>
+                                {{ paciente_form.representante_legal }}
+                            </div>
+                            <div class="col-md-3 form-group mb-2">
+                                <label class="mb-0 text-xs">{{ paciente_form.rut_responsable_temporal.label }}</label>
+                                {{ paciente_form.rut_responsable_temporal }}
+                            </div>
+                            <div class="col-md-4 form-group mb-2 pt-4">
+                                <div class="form-check">
+                                    {{ paciente_form.usar_rut_madre_como_responsable }}
+                                    <label class="form-check-label text-xs"
+                                           for="{{ paciente_form.usar_rut_madre_como_responsable.id_for_label }}">{{ paciente_form.usar_rut_madre_como_responsable.label }}</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-2">
+
+                        <div class="row">
+                            <div class="col-md-6 form-group mb-2">
+                                <label class="mb-0 text-xs">{{ paciente_form.direccion.label }}</label>
+                                {{ paciente_form.direccion }}
+                            </div>
+                            <div class="col-md-3 form-group mb-2">
+                                <label class="mb-0 text-xs">{{ paciente_form.comuna.label }}</label>
+                                {{ paciente_form.comuna }}
+                            </div>
+                            <div class="col-md-3 form-group mb-2">
+                                <label class="mb-0 text-xs">{{ paciente_form.prevision.label }}</label>
+                                {{ paciente_form.prevision }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-3 form-group mb-2">
+                                <label class="mb-0 text-xs">{{ paciente_form.ocupacion.label }}</label>
+                                {{ paciente_form.ocupacion }}
+                            </div>
+                            <div class="col-md-3 form-group mb-2">
+                                <label class="mb-0 text-xs">{{ paciente_form.numero_telefono1.label }}</label>
+                                {{ paciente_form.numero_telefono1 }}
+                            </div>
+                            <div class="col-md-3 form-group mb-2">
+                                <label class="mb-0 text-xs">{{ paciente_form.numero_telefono2.label }}</label>
+                                {{ paciente_form.numero_telefono2 }}
+                            </div>
+                            <div class="col-md-3 form-group mb-2 pt-4">
+                                <div class="form-check">
+                                    {{ paciente_form.sin_telefono }}
+                                    <label class="form-check-label text-xs"
+                                           for="{{ paciente_form.sin_telefono.id_for_label }}">{{ paciente_form.sin_telefono.label }}</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12 form-group mb-0">
+                                <label class="mb-0 text-xs">{{ paciente_form.alergico_a.label }}</label>
+                                {{ paciente_form.alergico_a }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FICHA -->
+            <div class="col-md-3">
+                <div class="card card-secondary card-outline">
+                    <div class="card-header py-2">
+                        <h3 class="card-title text-sm">Datos de la Ficha</h3>
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="form-group mb-2">
+                            <label class="mb-0 text-xs">{{ ficha_form.numero_ficha_sistema.label }}</label>
+                            {{ ficha_form.numero_ficha_sistema }}
+                            {{ ficha_form.numero_ficha_sistema.errors }}
+                        </div>
+                        <div class="form-group mb-2">
+                            <label class="mb-0 text-xs">{{ ficha_form.sector.label }}</label>
+                            {{ ficha_form.sector }}
+                            {{ ficha_form.sector.errors }}
+                        </div>
+                        <div class="form-group mb-2">
+                            <label class="mb-0 text-xs">{{ ficha_form.fecha_creacion_anterior.label }}</label>
+                            {{ ficha_form.fecha_creacion_anterior }}
+                        </div>
+                        <div class="form-group mb-2">
+                            <div class="form-check">
+                                {{ ficha_form.pasivado }}
+                                <label class="form-check-label text-xs"
+                                       for="{{ ficha_form.pasivado.id_for_label }}">{{ ficha_form.pasivado.label }}</label>
+                            </div>
+                        </div>
+                        <div class="form-group mb-0">
+                            <label class="mb-0 text-xs">{{ ficha_form.observacion.label }}</label>
+                            {{ ficha_form.observacion }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body p-3">
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <i class="fas fa-save"></i> Guardar Todo
+                        </button>
+                        <a href="{{ list_url }}" class="btn btn-default btn-block">
+                            Cancelar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        $(document).ready(function () {
+            // Inicializar Select2 para todos los elementos select del formulario
+            $('select').select2({
+                theme: 'bootstrap4',
+                width: '100%',
+                placeholder: 'Seleccione una opción',
+                allowClear: true,
+                selectionCssClass: 'form-control-sm',
+                containerCssClass: 'select2-sm',
+            });
+
+            // Ajuste para que el focus funcione correctamente con Select2 y Bootstrap 4
+            $(document).on('select2:open', () => {
+                document.querySelector('.select2-search__field').focus();
+            });
+        });
+    </script>
+{% endblock %}

@@ -1,9 +1,7 @@
 from django.contrib import admin
 from django.db.models import Count
-from django.http import JsonResponse
 from django.urls import path, include
 
-from clinica.models import Ficha
 from core.views import *
 
 
@@ -49,4 +47,5 @@ urlpatterns = [
     path('reportes/', include('reports.urls')),
     path('duplicados/', debug_integridad_view, name='debug_integridad'),
     path('mantenimiento/', maintenance_view, name='maintenance'),
+    path('fichas/', include('fichas.urls')),
 ]
