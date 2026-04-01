@@ -1,13 +1,207 @@
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from django.shortcuts import redirect
+from django.db.models import Q, ProtectedError
+from django.http import JsonResponse
+from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import TemplateView
+from django.views import View
+from django.views.generic import FormView, TemplateView
 
 from clinica.models import Ficha
+from clinica.models.movimiento_ficha import MovimientoFicha
 from personas.models.pacientes import Paciente
-from .forms import PacienteForm, FichaForm
+from .forms import FusionarPacientesForm, PacienteForm, FichaForm
+from .services import fusionar_pacientes_clinicos
+
+
+class FusionarPacientesView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
+    template_name = 'fichas/fusionar_pacientes.html'
+    form_class = FusionarPacientesForm
+    permission_required = 'personas.change_paciente'  # O el permiso que definas
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        ficticio_id = self.request.GET.get('ficticio', '').strip()
+        real_id = self.request.GET.get('real', '').strip()
+        if ficticio_id:
+            kwargs['paciente_ficticio'] = get_object_or_404(Paciente, pk=ficticio_id)
+        if real_id:
+            kwargs['paciente_real'] = get_object_or_404(Paciente, pk=real_id)
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        ficticio_id = self.request.GET.get('ficticio', '').strip()
+        real_id = self.request.GET.get('real', '').strip()
+        q_ficticio = self.request.GET.get('q_ficticio', '')
+        q_real = self.request.GET.get('q_real', '')
+        user_est = self.request.user.establecimiento
+
+        context['title'] = f'Fusionar Pacientes | {self.request.user.establecimiento}'
+
+        # Búsqueda de pacientes ficticios filtrada por establecimiento y que estén activos
+        if q_ficticio:
+            # Filtrar por establecimiento a través de la ficha del paciente
+            base_qs = Paciente.objects.filter(fichas_pacientes__establecimiento=user_est, )
+
+            # Restringir la búsqueda a RUT o Número de Ficha
+            context['resultados_ficticio'] = base_qs.filter(
+                Q(rut__icontains=q_ficticio) |
+                Q(fichas_pacientes__numero_ficha_sistema__icontains=q_ficticio)
+            ).distinct()[:10]
+            context['q_ficticio'] = q_ficticio
+
+        # Búsqueda de pacientes reales filtrada por establecimiento y que estén activos
+        if q_real:
+            # Filtrar por establecimiento a través de la ficha del paciente
+            base_qs = Paciente.objects.filter(fichas_pacientes__establecimiento=user_est, )
+
+            # Restringir la búsqueda a RUT o Número de Ficha
+            context['resultados_real'] = base_qs.filter(
+                Q(rut__icontains=q_real) |
+                Q(fichas_pacientes__numero_ficha_sistema__icontains=q_real)
+            ).distinct()[:10]
+            context['q_real'] = q_real
+
+        if ficticio_id:
+            ficticio = get_object_or_404(Paciente, pk=ficticio_id)
+            context['paciente_ficticio'] = ficticio
+            # Ficha filtrada por establecimiento
+            ficha_ficticia_qs = Ficha.objects.filter(paciente=ficticio)
+            if user_est:
+                ficha_ficticia_qs = ficha_ficticia_qs.filter(establecimiento=user_est)
+
+            context['ficha_ficticia'] = ficha_ficticia_qs.first()
+            if context['ficha_ficticia']:
+                context['movimientos_ficticio'] = MovimientoFicha.objects.filter(ficha=context['ficha_ficticia'])
+
+        if real_id:
+            real = get_object_or_404(Paciente, pk=real_id)
+            context['paciente_real'] = real
+            # Ficha filtrada por establecimiento
+            ficha_real_qs = Ficha.objects.filter(paciente=real)
+            if user_est:
+                ficha_real_qs = ficha_real_qs.filter(establecimiento=user_est)
+
+            context['ficha_real'] = ficha_real_qs.first()
+            if context['ficha_real']:
+                context['movimientos_real'] = MovimientoFicha.objects.filter(ficha=context['ficha_real'])
+
+        return context
+
+    def post(self, request, *args, **kwargs):
+        # print("DEBUG: FusionarPacientesView.post iniciado")
+        # print(f"DEBUG: POST data: {request.POST}")
+        return super().post(request, *args, **kwargs)
+
+    def form_invalid(self, form):
+        # print("DEBUG: form_invalid llamado")
+        # print(f"DEBUG: Form errors: {form.errors}")
+        return super().form_invalid(form)
+
+    def form_valid(self, form):
+        # print("DEBUG: form_valid iniciado")
+        paciente_ficticio = form.cleaned_data['paciente_ficticio']
+        paciente_real = form.cleaned_data['paciente_real']
+        ficha_conservar_choice = form.cleaned_data['ficha_a_conservar']
+        borrar_paciente_ficticio = form.cleaned_data['borrar_paciente']
+        motivo = form.cleaned_data['motivo']
+
+        user_est = self.request.user.establecimiento
+        ficha_ficticia = Ficha.objects.filter(paciente=paciente_ficticio, establecimiento=user_est).first()
+        ficha_real = Ficha.objects.filter(paciente=paciente_real, establecimiento=user_est).first()
+
+        if ficha_conservar_choice == 'ficticia':
+            ficha_a_conservar = ficha_ficticia
+            ficha_a_eliminar = ficha_real
+        else:
+            ficha_a_conservar = ficha_real
+            ficha_a_eliminar = ficha_ficticia
+
+        if not ficha_a_conservar:
+            messages.error(self.request, "La ficha a conservar no existe en su establecimiento.")
+            return self.form_invalid(form)
+
+        try:
+            fusionar_pacientes_clinicos(
+                paciente_ficticio=paciente_ficticio,
+                paciente_real=paciente_real,
+                ficha_a_conservar=ficha_a_conservar,
+                ficha_a_eliminar=ficha_a_eliminar,
+                movimientos_ficticio_ids=form.cleaned_data.get('movimientos_ficticio', []),
+                movimientos_real_ids=form.cleaned_data.get('movimientos_real', []),
+                usuario=self.request.user,
+                motivo_fusion=motivo,
+                borrar_paciente_ficticio=borrar_paciente_ficticio
+            )
+            messages.success(self.request, "La fusión de pacientes se realizó correctamente.")
+            return redirect('ficha_paciente_manage')
+        except ProtectedError as e:
+            # Extraer objetos protegidos para listarlos
+            protected_objects = []
+            from clinica.models.movimiento_ficha_monologo_controlado import MovimientoMonologoControlado
+
+            for obj in e.protected_objects:
+                if isinstance(obj, Ficha):
+                    protected_objects.append({
+                        'tipo': 'Ficha',
+                        'detalle': f"Ficha #{obj.numero_ficha_sistema}",
+                        'rut': obj.paciente.rut if obj.paciente else 'S/R',
+                        'nombre': obj.paciente.nombre_completo if obj.paciente else 'S/N',
+                        'establecimiento': obj.establecimiento.nombre if obj.establecimiento else 'N/A'
+                    })
+                elif isinstance(obj, MovimientoMonologoControlado):
+                    protected_objects.append({
+                        'tipo': 'Movimiento Monólogo',
+                        'detalle': f"Movimiento en {obj.establecimiento.nombre if obj.establecimiento else 'N/A'}",
+                        'rut': obj.rut_paciente.rut if obj.rut_paciente else obj.rut,
+                        'nombre': obj.rut_paciente.nombre_completo if obj.rut_paciente else 'S/N',
+                        'establecimiento': obj.establecimiento.nombre if obj.establecimiento else 'N/A'
+                    })
+                else:
+                    protected_objects.append({
+                        'tipo': type(obj).__name__,
+                        'detalle': str(obj),
+                        'rut': 'N/A',
+                        'nombre': 'N/A',
+                        'establecimiento': 'N/A'
+                    })
+
+            context = self.get_context_data(form=form)
+            context['protected_objects'] = protected_objects
+            messages.error(self.request, "No se puede completar la fusión porque existen registros protegidos en otros establecimientos.")
+            return self.render_to_response(context)
+        except Exception as e:
+            # print(f"DEBUG: Error en fusión: {e}")
+            messages.error(self.request, f"Error al procesar la fusión: {str(e)}")
+            return self.form_invalid(form)
+
+
+class PacienteAutocompleteView(View):
+    def get(self, request, *args, **kwargs):
+        term = request.GET.get('term', '')
+        user_est = self.request.user.establecimiento
+        if not term:
+            return JsonResponse({'results': []})
+
+        # Filtrar pacientes por RUT o Ficha y por establecimiento
+        base_qs = Paciente.objects.all()
+        if user_est:
+            base_qs = base_qs.filter(fichas_pacientes__establecimiento=user_est)
+
+        pacientes = base_qs.filter(
+            Q(rut__icontains=term) |
+            Q(fichas_pacientes__numero_ficha_sistema__icontains=term)
+        ).distinct()[:20]  # Limitar resultados para velocidad
+
+        results = [
+            {'id': p.id, 'text': f"{p.rut or 'S/R'} - {p.nombre_completo}"}
+            for p in pacientes
+        ]
+        return JsonResponse({'results': results})
+
 
 MODULE_NAME = 'Paciente / Ficha'
 
@@ -126,7 +320,7 @@ class PacienteFichaManageView(TemplateView):
     def resolve_instances_from_get(self):
         """
         Prioridad:
-        1) Si viene numero_ficha -> buscamos ficha y su paciente (filtrado por establecimiento y status=True)
+        1) Si viene numero_ficha -> buscamos ficha y su paciente (filtrado por establecimiento y )
         2) Si no, si viene rut -> buscamos paciente y su ficha en el establecimiento actual
         """
         numero_ficha = self.request.GET.get('numero_ficha', '').strip()
@@ -138,7 +332,7 @@ class PacienteFichaManageView(TemplateView):
             ficha = Ficha.objects.select_related('paciente').filter(
                 numero_ficha_sistema=numero_ficha,
                 establecimiento=establecimiento,
-                status=True
+                
             ).first()
 
             if ficha:
@@ -154,7 +348,7 @@ class PacienteFichaManageView(TemplateView):
                 ficha = Ficha.objects.filter(
                     paciente=paciente,
                     establecimiento=establecimiento,
-                    status=True
+                    
                 ).first()
                 return paciente, ficha
             else:
@@ -196,7 +390,7 @@ class PacienteFichaManageView(TemplateView):
         ficha_id = self.request.POST.get('ficha_id')
 
         if ficha_id:
-            ficha = Ficha.objects.select_related('paciente').filter(pk=ficha_id, status=True).first()
+            ficha = Ficha.objects.select_related('paciente').filter(pk=ficha_id, ).first()
             if ficha:
                 return ficha
 
@@ -205,7 +399,7 @@ class PacienteFichaManageView(TemplateView):
             return Ficha.objects.select_related('paciente').filter(
                 numero_ficha_sistema=numero_ficha,
                 establecimiento=establecimiento,
-                status=True
+                
             ).first()
 
         return None

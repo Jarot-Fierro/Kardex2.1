@@ -91,8 +91,7 @@
 
                         {% if user_permissions.fichas > 0 %}
                             <li><a href="{% url 'ficha_list' %}" class="dropdown-item">Fichas</a></li>
-                            <li><a href="{% url 'ficha_paciente_manage' %}" class="dropdown-item">Consulta Paciente
-                                0.2</a></li>
+
                         {% endif %}
                     </ul>
                 </li>
@@ -156,55 +155,19 @@
                                     Número
                                 </a>
                             </li>
+                            <li class="dropdown-divider"></li>
+
 
 
                         </ul>
                     </li>
                 {% endif %}
 
-                {% if user_permissions.movimiento_ficha > 0 or user_permissions.movimiento_ficha_controlado > 0 %}
+                {% if user_permissions.movimiento_ficha_controlado > 0 %}
                     <li class="nav-item dropdown">
                     <a id="dropdownSubMenu3" href="#" data-toggle="dropdown" aria-haspopup="true"
                        aria-expanded="false" class="nav-link dropdown-toggle">Movimiento Ficha</a>
                     <ul aria-labelledby="dropdownSubMenu3" class="dropdown-menu border-0 shadow">
-
-                    {% if user_permissions.movimiento_ficha > 0 %}
-
-                        <!-- ===== BLOQUE 1: BIDIRECCIONAL ===== -->
-                        <li class="dropdown-header text-primary font-weight-bold d-flex justify-content-between align-items-center">
-                            <span>🔄 Enviar y Recibir entre Servicios</span>
-
-                            <button type="button"
-                                    class="btn btn-sm btn-outline-primary ml-2"
-                                    data-toggle="modal"
-                                    data-target="#modalServicios"
-                                    style="padding:2px 6px;">
-                                ?
-                            </button>
-                        </li>
-
-
-                        <li>
-                            <a href="{% url 'salida_ficha_masiva' %}" class="dropdown-item">
-                                Envío fichas
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="{% url 'entrada_tabla_ficha' %}" class="dropdown-item">
-                                Recepción fichas
-                            </a>
-                        </li>
-                        <li class="dropdown-divider"></li>
-                        <li>
-                            <a href="{% url 'fichas_en_transito' %}" class="dropdown-item">
-                                Fichas en Tránsito
-                            </a>
-                        </li>
-
-                        <li class="dropdown-divider"></li>
-
-                    {% endif %}
 
                     {% if user_permissions.movimiento_ficha_controlado > 0 %}
 
@@ -233,25 +196,31 @@
                                 Entrada Rápida
                             </a>
                         </li>
-                        <li class="dropdown-divider"></li>
-                        <li>
-                            <a href="{% url 'movimiento_monologo_traspaso' %}" class="dropdown-item">
-                                Traspaso Rápido
-                            </a>
-                        </li>
-                        <li class="dropdown-divider"></li>
-
-                        <li>
-                            <a href="{% url 'fichas_en_transito_monologo' %}" class="dropdown-item">
-                                Fichas en Transito
-                            </a>
-                        </li>
                     {% endif %}
+                </ul>
+                </li>
                 {% endif %}
 
-                </ul>
 
+                <li class="nav-item dropdown">
+                    <a id="dropdownSubMenu5" href="#" data-toggle="dropdown" aria-haspopup="true"
+                       aria-expanded="false" class="nav-link dropdown-toggle text-primary text-bold">Herramientas</a>
+                    <ul aria-labelledby="dropdownSubMenu5" class="dropdown-menu border-0 shadow">
+                        {% if user_permissions.paciente > 0 and user_permissions.fichas > 0 %}
+                            <li>
+                                <a href="{% url 'ficha_paciente_manage' %}" class="dropdown-item text-bold text-success">Consulta Paciente (0.2)</a>
+                            </li>
+                            <li class="dropdown-divider"></li>
+                            <li>
+                                <a href="{% url 'fusionar_pacientes' %}"
+                                   class="dropdown-item text-danger font-weight-bold">
+                                    Fusionar Pacientes (RN)
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
                 </li>
+
             </ul>
         </div>
 
@@ -268,6 +237,21 @@
                     <i class="fas fa-user ml-1"></i>
                 </a>
                 <ul aria-labelledby="dropdownUserMenu" class="dropdown-menu dropdown-menu-right border-0 shadow">
+
+                    <li class="bg-body-tertiary border-bottom px-3 py-3">
+                        <div class="d-flex align-items-center gap-3">
+
+                            <div class="flex-grow-1">
+                                <div class="text-uppercase text-muted fw-semibold small" style="letter-spacing: .5px;">
+                                    Establecimiento actual
+                                </div>
+                                <div class="text-bold text-success small text-wrap">
+                                    {{ request.user.establecimiento|default:"Sin establecimiento asignado" }}
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+
                     {% if request.user.is_superuser %}
                         <li>
                             <a href="{% url 'admin:index' %}" class="dropdown-item">

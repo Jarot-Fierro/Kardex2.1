@@ -64,7 +64,7 @@
 
                             <!-- IZQUIERDA: TÍTULO -->
                             <div class="col-md-3 col-12 mb-2 mb-md-0">
-                                <h3 class="card-title text-sm font-weight-bold mb-0 text-dark">
+                                <h3 class="card-title text-bold font-weight-bold mb-0 text-dark">
                                     <i class="fas fa-user-injured text-primary mr-1"></i>
                                     Datos del Paciente
                                 </h3>
@@ -132,31 +132,52 @@
                                            for="{{ paciente_form.fallecido.id_for_label }}">{{ paciente_form.fallecido.label }}</label>
                                 </div>
                             </div>
-                            <div class="col-md-4 form-group mb-2">
-                                <label class="mb-0 text-xs">{{ paciente_form.fecha_fallecimiento.label }}</label>
+                            <div class="col-md-4 form-group mb-2" id="div_fecha_fallecimiento">
+                                <label class="mb-0 text-bold text-danger">{{ paciente_form.fecha_fallecimiento.label }}</label>
                                 {{ paciente_form.fecha_fallecimiento }}
+                                {% if paciente_form.fecha_fallecimiento.errors %}
+                                    <div class="text-danger text-xs">
+                                        {{ paciente_form.fecha_fallecimiento.errors }}
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-3 form-group mb-2">
-                                <label class="mb-0 text-xs">{{ paciente_form.rut.label }}</label>
+                                <label class="mb-0 text-bold text-primary">{{ paciente_form.rut.label }}</label>
                                 {{ paciente_form.rut }}
-                                {{ paciente_form.rut.errors }}
+                                {% if paciente_form.rut.errors %}
+                                    <div class="text-danger text-xs">
+                                        {{ paciente_form.rut.errors }}
+                                    </div>
+                                {% endif %}
                             </div>
                             <div class="col-md-3 form-group mb-2">
                                 <label class="mb-0 text-xs">{{ paciente_form.nombre.label }}</label>
                                 {{ paciente_form.nombre }}
-                                {{ paciente_form.nombre.errors }}
+                                {% if paciente_form.nombre.errors %}
+                                    <div class="text-danger text-xs">
+                                        {{ paciente_form.nombre.errors }}
+                                    </div>
+                                {% endif %}
                             </div>
                             <div class="col-md-3 form-group mb-2">
                                 <label class="mb-0 text-xs">{{ paciente_form.apellido_paterno.label }}</label>
                                 {{ paciente_form.apellido_paterno }}
-                                {{ paciente_form.apellido_paterno.errors }}
+                                {% if paciente_form.apellido_paterno.errors %}
+                                    <div class="text-danger text-xs">
+                                        {{ paciente_form.apellido_paterno.errors }}
+                                    </div>
+                                {% endif %}
                             </div>
                             <div class="col-md-3 form-group mb-2">
                                 <label class="mb-0 text-xs">{{ paciente_form.apellido_materno.label }}</label>
                                 {{ paciente_form.apellido_materno }}
-                                {{ paciente_form.apellido_materno.errors }}
+                                {% if paciente_form.apellido_materno.errors %}
+                                    <div class="text-danger text-xs">
+                                        {{ paciente_form.apellido_materno.errors }}
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
 
@@ -172,6 +193,11 @@
                             <div class="col-md-3 form-group mb-2">
                                 <label class="mb-0 text-xs">{{ paciente_form.nip.label }}</label>
                                 {{ paciente_form.nip }}
+                                {% if paciente_form.nip.errors %}
+                                    <div class="text-danger text-xs">
+                                        {{ paciente_form.nip.errors }}
+                                    </div>
+                                {% endif %}
                             </div>
                             <div class="col-md-3 form-group mb-2">
                                 <label class="mb-0 text-xs">{{ paciente_form.sexo.label }}</label>
@@ -287,22 +313,77 @@
             <div class="col-md-3">
                 <div class="card card-secondary card-outline">
                     <div class="card-header py-2">
-                        <h3 class="card-title text-sm">Datos de la Ficha</h3>
+                        <div class="row mb-2">
+                            <div class="col-12">
+                                <h3 class="card-title text-bold">Datos de la Ficha</h3>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="btn-group shadow-sm mr-1">
+                                    {% if ficha_form.instance.pk %}
+                                        <a href="{% url 'pdf_ficha' ficha_form.instance.pk %}"
+                                           class="btn btn-outline-secondary btn-imprimir-mini p-1"
+                                           title="Imprimir Carátula">
+                                            Carátula
+                                        </a>
+                                        <a href="{% url 'pdf_ficha_paciente_rn' paciente_form.instance.pk %}"
+                                           class="btn btn-outline-secondary btn-imprimir-mini p-1"
+                                           title="Imprimir Carátula sin RUT">
+                                            C. SIN RUT
+                                        </a>
+                                        <a href="{% url 'pdf_stickers_ficha' ficha_form.instance.pk %}"
+                                           class="btn btn-outline-secondary btn-imprimir-mini p-1"
+                                           title="Imprimir Stickers">
+                                            Stickers
+                                        </a>
+                                    {% else %}
+                                        <button type="button" class="btn btn-outline-secondary disabled p-1"
+                                                style="pointer-events: none; opacity: 0.6;">
+                                            Carátula
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary disabled p-1"
+                                                style="pointer-events: none; opacity: 0.6;">
+                                            C. S/RUT
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary disabled p-1"
+                                                style="pointer-events: none; opacity: 0.6;">
+                                            Stickers
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="card-body p-3">
                         <div class="form-group mb-2">
-                            <label class="mb-0 text-xs">{{ ficha_form.numero_ficha_sistema.label }}</label>
+                            <label class="mb-0 text-danger text-bold">{{ ficha_form.numero_ficha_sistema.label }}</label>
                             {{ ficha_form.numero_ficha_sistema }}
-                            {{ ficha_form.numero_ficha_sistema.errors }}
+                            {% if ficha_form.numero_ficha_sistema.errors %}
+                                <div class="text-danger text-xs">
+                                    {{ ficha_form.numero_ficha_sistema.errors }}
+                                </div>
+                            {% endif %}
                         </div>
+                        
                         <div class="form-group mb-2">
                             <label class="mb-0 text-xs">{{ ficha_form.sector.label }}</label>
                             {{ ficha_form.sector }}
-                            {{ ficha_form.sector.errors }}
+                            {% if ficha_form.sector.errors %}
+                                <div class="text-danger text-xs">
+                                    {{ ficha_form.sector.errors }}
+                                </div>
+                            {% endif %}
                         </div>
                         <div class="form-group mb-2">
                             <label class="mb-0 text-xs">{{ ficha_form.fecha_creacion_anterior.label }}</label>
                             {{ ficha_form.fecha_creacion_anterior }}
+                            {% if ficha_form.fecha_creacion_anterior.errors %}
+                                <div class="text-danger text-xs">
+                                    {{ ficha_form.fecha_creacion_anterior.errors }}
+                                </div>
+                            {% endif %}
                         </div>
                         <div class="form-group mb-2">
                             <div class="form-check">
@@ -320,12 +401,17 @@
 
                 <div class="card">
                     <div class="card-body p-3">
-                        <button type="submit" class="btn btn-primary btn-block">
-                            <i class="fas fa-save"></i> Guardar Todo
-                        </button>
-                        <a href="{{ list_url }}" class="btn btn-default btn-block">
+                        {% if user_permissions.paciente <= 1 and user_permissions.fichas <= 1 %}
+                            <button type="submit" class="btn btn-primary btn-block">
+                                <i class="fas fa-save"></i> Guardar Todo
+                            </button>
+                        {% endif %}
+                    <button type="submit" class="btn btn-primary btn-block">
+                                <i class="fas fa-save"></i> Guardar Todo
+                            </button>
+                        <button type="button" class="btn btn-default btn-block" onclick="window.location.reload();">
                             Cancelar
-                        </a>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -336,20 +422,336 @@
 {% block javascript %}
     <script>
         $(document).ready(function () {
-            // Inicializar Select2 para todos los elementos select del formulario
-            $('select').select2({
-                theme: 'bootstrap4',
-                width: '100%',
-                placeholder: 'Seleccione una opción',
-                allowClear: true,
-                selectionCssClass: 'form-control-sm',
-                containerCssClass: 'select2-sm',
+            // Inicializar Select2 con AJAX para los campos que lo requieran
+            $('.select2').each(function () {
+                var $this = $(this);
+                var ajaxUrl = $this.data('ajax--url');
+
+                var options = {
+                    width: '100%',
+                    theme: 'default',
+                    language: {
+                        inputTooShort: function () {
+                            return "Por favor, introduzca 2 o más caracteres";
+                        },
+                        noResults: function () {
+                            return "No se encontraron resultados";
+                        },
+                        searching: function () {
+                            return "Buscando...";
+                        }
+                    }
+                };
+
+                // Si tiene URL de AJAX, configuramos el transporte
+                if (ajaxUrl) {
+                    options.ajax = {
+                        url: ajaxUrl,
+                        dataType: 'json',
+                        delay: 250,
+                        data: function (params) {
+                            return {
+                                term: params.term, // parámetro que espera tu vista
+                                page: params.page
+                            };
+                        },
+                        processResults: function (data) {
+                            return {
+                                results: data.results
+                            };
+                        },
+                        cache: true
+                    };
+                    options.minimumInputLength = $this.data('minimum-input-length') || 2;
+                }
+
+                $this.select2(options);
             });
 
-            // Ajuste para que el focus funcione correctamente con Select2 y Bootstrap 4
-            $(document).on('select2:open', () => {
-                document.querySelector('.select2-search__field').focus();
+            // Inicializar Select2 estándar para el resto de los select
+            $('select:not(.select2)').select2({
+                width: '100%',
+                theme: 'default'
+            });
+
+            // Script para abrir en ventana pequeña (mini navegador)
+            $('.btn-imprimir-mini').on('click', function (e) {
+                e.preventDefault();
+                var url = $(this).attr('href');
+                var w = 800;
+                var h = 600;
+                var left = (screen.width / 2) - (w / 2);
+                var top = (screen.height / 2) - (h / 2);
+
+                window.open(url, 'Imprimir',
+                    'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=yes, copyhistory=no, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
             });
         });
     </script>
+
+    {#  Reglas del formulario, campos que estarán con DISABLE y campos que serpan REQUIRED    #}
+    <script>
+        (function () {
+
+            const el = {
+                rut: document.getElementById('id_paciente-rut'),
+                nip: document.getElementById('id_paciente-nip'),
+                pasaporte: document.getElementById('id_paciente-pasaporte'),
+                rut_resp: document.getElementById('id_paciente-rut_responsable_temporal'),
+                rut_madre: document.getElementById('id_paciente-rut_madre'),
+                fecha_fallecimiento: document.getElementById('id_paciente-fecha_fallecimiento'),
+                div_fecha_fallecimiento: document.getElementById('div_fecha_fallecimiento'),
+                ocupacion: document.getElementById('id_paciente-ocupacion'),
+                nombre_pareja: document.getElementById('id_paciente-nombre_pareja'),
+                telefono1: document.getElementById('id_paciente-numero_telefono1'),
+                telefono2: document.getElementById('id_paciente-numero_telefono2'),
+
+                recien_nacido: document.getElementById('id_paciente-recien_nacido'),
+                extranjero: document.getElementById('id_paciente-extranjero'),
+                fallecido: document.getElementById('id_paciente-fallecido'),
+                sin_telefono: document.getElementById('id_paciente-sin_telefono'),
+                usar_rut_madre: document.getElementById('id_usar_rut_madre_como_responsable'),
+            };
+
+            function disable(fields) {
+                fields.forEach(f => {
+                    if (!f) return;
+                    f.disabled = true;
+                    f.removeAttribute('required');
+                });
+            }
+
+            function enable(fields) {
+                fields.forEach(f => {
+                    if (!f) return;
+                    f.disabled = false;
+                });
+            }
+
+            function applyRules() {
+
+                const rn = el.recien_nacido.checked;
+                const ext = el.extranjero.checked;
+                const fal = el.fallecido.checked;
+                const sn = el.sin_telefono.checked;
+
+                enable([
+                    el.rut, el.nip, el.pasaporte, el.rut_resp, el.rut_madre,
+                    el.fecha_fallecimiento, el.ocupacion, el.nombre_pareja,
+                    el.telefono1, el.telefono2
+                ]);
+
+                // Mostrar/Ocultar fecha de fallecimiento
+                if (el.div_fecha_fallecimiento) {
+                    if (fal) {
+                        el.div_fecha_fallecimiento.style.display = 'block';
+                    } else {
+                        el.div_fecha_fallecimiento.style.display = 'none';
+                    }
+                }
+
+                // ESTÁNDAR
+                if (!rn && !ext && !fal) {
+                    disable([el.nip, el.pasaporte, el.rut_resp, el.fecha_fallecimiento]);
+                    el.usar_rut_madre.checked = false;
+                    el.rut.required = true;
+                }
+
+                // FALLECIDO
+                if (!rn && !ext && fal) {
+                    disable([el.nip, el.pasaporte, el.rut_resp]);
+                    el.fecha_fallecimiento.required = true;
+                    el.rut.required = true;
+                }
+
+                // RN
+                if (rn && !ext && !fal) {
+                    disable([el.nip, el.pasaporte, el.ocupacion, el.nombre_pareja, el.fecha_fallecimiento]);
+                    el.rut.required = false; // El RUT puede ser autogenerado o nulo al inicio
+                }
+
+                // RN + FALLECIDO
+                if (rn && !ext && fal) {
+                    disable([el.nip, el.pasaporte, el.ocupacion, el.nombre_pareja]);
+                    el.fecha_fallecimiento.required = true;
+                    el.rut.required = false;
+                }
+
+                // EXTRANJERO
+                if (!rn && ext && !fal) {
+                    disable([el.rut_resp, el.fecha_fallecimiento]);
+                    el.rut.required = false;
+                    el.nip.required = true;
+                }
+
+                // EXTRANJERO + FALLECIDO
+                if (!rn && ext && fal) {
+                    disable([el.rut_resp]);
+                    el.fecha_fallecimiento.required = true;
+                    el.rut.required = false;
+                    el.nip.required = true;
+                }
+
+                // RN + EXTRANJERO
+                if (rn && ext && !fal) {
+                    disable([el.ocupacion, el.nombre_pareja, el.fecha_fallecimiento]);
+                    el.rut.required = false;
+                    el.nip.required = true;
+                }
+
+                // RN + EXTRANJERO + FALLECIDO
+                if (rn && ext && fal) {
+                    disable([el.ocupacion, el.nombre_pareja]);
+                    el.fecha_fallecimiento.required = true;
+                    el.rut.required = false;
+                    el.nip.required = true;
+                }
+
+                // TELÉFONOS
+                if (sn) {
+                    disable([el.telefono1, el.telefono2]);
+                } else {
+                    enable([el.telefono1, el.telefono2]);
+                    el.telefono1.required = true;
+                }
+            }
+
+            document.addEventListener('change', e => {
+                if (!e.target) return;
+                const targetId = e.target.id;
+                if ([
+                    'id_paciente-recien_nacido', 
+                    'id_paciente-extranjero', 
+                    'id_paciente-fallecido', 
+                    'id_paciente-sin_telefono'
+                ].includes(targetId)) {
+                    applyRules();
+                }
+            });
+
+            document.addEventListener('DOMContentLoaded', applyRules);
+            window.actualizarReglasPaciente = applyRules;
+
+        })();
+    </script>
+
+    {# Script para generar RUT ficticio automático para recién nacidos en creación #}
+    <script>
+        $(document).ready(function () {
+            const $checkRecienNacido = $('#id_paciente-recien_nacido');
+            const $checkExtranjero = $('#id_paciente-extranjero');
+            const $inputRut = $('#id_paciente-rut');
+            const $inputPacienteId = $('input[name="paciente_id"]');
+
+            // Función para generar dígito verificador
+            function calcularDigitoVerificador(rutSinDV) {
+                let suma = 0;
+                let multiplicador = 2;
+
+                for (let i = rutSinDV.length - 1; i >= 0; i--) {
+                    suma += parseInt(rutSinDV.charAt(i)) * multiplicador;
+                    multiplicador = multiplicador === 7 ? 2 : multiplicador + 1;
+                }
+
+                const resto = suma % 11;
+                const dv = 11 - resto;
+
+                if (dv === 11) return '0';
+                if (dv === 10) return 'K';
+                return dv.toString();
+            }
+
+            // Función para generar RUT ficticio (comienza con 90 millones)
+            function generarRutFicticio(tipo) {
+                let min, max;
+                if (tipo === 'extranjero') {
+                    // Generar número aleatorio entre 96,000,000 y 99,999,999
+                    min = 96000000;
+                    max = 99999999;
+                } else {
+                    // Generar número aleatorio entre 90,000,000 y 95,999,999 (Recién Nacido)
+                    min = 90000000;
+                    max = 95999999;
+                }
+
+                const numeroBase = Math.floor(min + Math.random() * (max - min + 1));
+                const dv = calcularDigitoVerificador(numeroBase.toString());
+                return formatearRutString(numeroBase.toString() + dv);
+            }
+
+            // Función para formatear RUT (usando la función existente o creando una nueva)
+            function formatearRutString(rut) {
+                // Si ya existe la función global, usarla
+                if (typeof window.formatearRutString === 'function') {
+                    return window.formatearRutString(rut);
+                }
+
+                // Si no existe, crear formato básico
+                rut = rut.replace(/\./g, '').replace(/-/g, '').toUpperCase();
+                if (rut.length <= 1) return rut;
+
+                const cuerpo = rut.slice(0, -1);
+                const dv = rut.slice(-1);
+                return cuerpo.replace(/\B(?=(\d{3})+(?!\d))/g, '.') + '-' + dv;
+            }
+
+            // Evento cuando cambia el checkbox Recién Nacido
+            $checkRecienNacido.on('change', function () {
+                // Solo si el checkbox está marcado y el campo RUT está vacío (o tiene RUT ficticio previo)
+                const valorRut = $inputRut.val().trim();
+                const esFicticioAnterior = valorRut.startsWith('90.') || valorRut.startsWith('91.') || valorRut.startsWith('92.') || valorRut.startsWith('93.') || valorRut.startsWith('94.') || valorRut.startsWith('95.');
+
+                if ($checkRecienNacido.is(':checked') && (!valorRut || esFicticioAnterior || $checkExtranjero.is(':checked'))) {
+                    const rutFicticio = generarRutFicticio('recien_nacido');
+                    $inputRut.val(rutFicticio);
+                } else if (!$checkRecienNacido.is(':checked') && !$checkExtranjero.is(':checked') && valorRut.startsWith('9')) {
+                     // Si se desmarcan ambos, y hay un ficticio, mejor limpiarlo para obligar al real
+                     $inputRut.val('');
+                }
+
+                // Actualizar reglas del formulario si existe la función
+                if (typeof window.actualizarReglasPaciente === 'function') {
+                    window.actualizarReglasPaciente();
+                }
+            });
+
+            // Evento cuando cambia el checkbox Extranjero
+            $checkExtranjero.on('change', function () {
+                // Solo si el checkbox está marcado y el campo RUT está vacío
+                const valorRut = $inputRut.val().trim();
+                const esFicticioAnterior = valorRut.startsWith('9');
+
+                if ($checkExtranjero.is(':checked') && (!valorRut || esFicticioAnterior)) {
+                    const rutFicticio = generarRutFicticio('extranjero');
+                    $inputRut.val(rutFicticio);
+                } else if (!$checkRecienNacido.is(':checked') && !$checkExtranjero.is(':checked') && valorRut.startsWith('9')) {
+                     $inputRut.val('');
+                }
+
+                // Actualizar reglas del formulario si existe la función
+                if (typeof window.actualizarReglasPaciente === 'function') {
+                    window.actualizarReglasPaciente();
+                }
+            });
+
+            // También ejecutar al cargar la página si ya está marcado el checkbox y el RUT está vacío
+            $(window).on('load', function () {
+                const valorRut = $inputRut.val().trim();
+                if (!valorRut) {
+                    if ($checkRecienNacido.is(':checked')) {
+                        const rutFicticio = generarRutFicticio('recien_nacido');
+                        $inputRut.val(rutFicticio);
+                    } else if ($checkExtranjero.is(':checked')) {
+                        const rutFicticio = generarRutFicticio('extranjero');
+                        $inputRut.val(rutFicticio);
+                    }
+                }
+                
+                if (typeof window.actualizarReglasPaciente === 'function') {
+                    window.actualizarReglasPaciente();
+                }
+            });
+        });
+    </script>
+
 {% endblock %}
