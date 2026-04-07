@@ -277,14 +277,12 @@
 
             // Función para limpiar campos de registro
             function limpiarRegistro() {
-                $('#id_movimiento_hidden').val('');
-                $('#id_rut').val('');
-                $('#nombre_mov').val('');
-                $('#id_ficha').val('');
-                $('#servicio_clinico_actual').val('');
-                $('#profesional_asignado').val('');
-                $btnRegistrar.prop('disabled', true);
-                $rut.focus();
+                // Limpiar configuración de localStorage
+                configKeys.forEach(id => {
+                    localStorage.removeItem('recepcion_config_' + id);
+                });
+                // Recargar la página para limpiar all
+                location.reload();
             }
 
             $btnLimpiar.on('click', limpiarRegistro);
