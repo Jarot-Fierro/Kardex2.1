@@ -19,6 +19,13 @@ class DataTableMixin:
     permission_update = None
     permission_delete = None
 
+    def get_url_update(self):
+        """
+        Devuelve el nombre de la URL de actualización si el usuario tiene permiso.
+        Puede ser sobreescrito en la clase hija.
+        """
+        return self.url_update
+
     def get_base_queryset(self):
         qs = self.model.objects.all()
         # Auto-filtro por establecimiento si el middleware adjuntó request.establecimiento
@@ -67,14 +74,15 @@ class DataTableMixin:
                    <i class="fas fa-search"></i></a>
             """)
 
-        if self.url_update:
+        url_update = self.get_url_update()
+        if url_update:
             # Check if url_update is 'paciente_view_param' to use 'paciente_id' instead of 'pk'
             update_kwargs = {'pk': obj.pk}
-            if self.url_update == 'paciente_view_param':
+            if url_update == 'paciente_view_param':
                 update_kwargs = {'paciente_id': obj.pk}
 
             actions.append(f"""
-                <a href="{reverse_lazy(f'{self.url_update}', kwargs=update_kwargs)}"
+                <a href="{reverse_lazy(f'{url_update}', kwargs=update_kwargs)}"
                    class="btn p-1 btn-sm btn-info" title="Editar">
                    <i class="fas fa-edit"></i></a>
             """)
@@ -153,6 +161,13 @@ class DataTableMixinMov:
     permission_update = None
     permission_delete = None
 
+    def get_url_update(self):
+        """
+        Devuelve el nombre de la URL de actualización si el usuario tiene permiso.
+        Puede ser sobreescrito en la clase hija.
+        """
+        return self.url_update
+
     def get_base_queryset(self):
         qs = self.model.objects.all()
         # Auto-filtro por establecimiento si el middleware adjuntó request.establecimiento
@@ -201,14 +216,15 @@ class DataTableMixinMov:
                    <i class="fas fa-search"></i></a>
             """)
 
-        if self.url_update:
+        url_update = self.get_url_update()
+        if url_update:
             # Check if url_update is 'paciente_view_param' to use 'paciente_id' instead of 'pk'
             update_kwargs = {'pk': obj.pk}
-            if self.url_update == 'paciente_view_param':
+            if url_update == 'paciente_view_param':
                 update_kwargs = {'paciente_id': obj.pk}
 
             actions.append(f"""
-                <a href="{reverse_lazy(f'{self.url_update}', kwargs=update_kwargs)}"
+                <a href="{reverse_lazy(f'{url_update}', kwargs=update_kwargs)}"
                    class="btn p-1 btn-sm btn-info" title="Editar">
                    <i class="fas fa-edit"></i></a>
             """)

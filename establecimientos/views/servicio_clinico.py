@@ -24,7 +24,12 @@ class ServicioClinicoListView(DataTableMixin, TemplateView):
                                'telefono__icontains', 'establecimiento__nombre__icontains']
 
     url_detail = 'servicio_clinico_detail'
-    url_update = 'servicio_clinico_update'
+
+    def get_url_update(self):
+        user = self.request.user
+        if getattr(user, 'rol', None) and user.rol.servicio_clinico == 2:
+            return 'servicio_clinico_update'
+        return None
 
     def get_base_queryset(self):
         """Filtra por el establecimiento del usuario logueado."""
@@ -75,6 +80,12 @@ class ServicioClinicoInactivoListView(DataTableMixin, TemplateView):
 
     url_detail = 'servicio_clinico_detail'
     url_update = 'servicio_clinico_update'
+
+    def get_url_update(self):
+        user = self.request.user
+        if getattr(user, 'rol', None) and user.rol.servicio_clinico == 2:
+            return self.url_update
+        return None
 
     def get_base_queryset(self):
         """Filtra por el establecimiento del usuario logueado."""

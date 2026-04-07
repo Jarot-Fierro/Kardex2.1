@@ -21,7 +21,12 @@ class ColorListView(DataTableMixin, TemplateView):
     datatable_search_fields = ['nombre__icontains', ]
 
     url_detail = 'color_detail'
-    url_update = 'color_update'
+
+    def get_url_update(self):
+        user = self.request.user
+        if getattr(user, 'rol', None) and user.rol.colores_sector == 2:
+            return 'color_update'
+        return None
 
     def render_row(self, obj):
         return {

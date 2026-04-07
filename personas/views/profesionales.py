@@ -26,7 +26,12 @@ class ProfesionalListView(DataTableMixin, TemplateView):
     ]
 
     url_detail = 'profesional_detail'
-    url_update = 'profesional_update'
+
+    def get_url_update(self):
+        user = self.request.user
+        if getattr(user, 'rol', None) and user.rol.profesionales == 2:
+            return 'profesional_update'
+        return None
 
     def render_row(self, obj):
         return {

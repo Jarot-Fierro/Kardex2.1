@@ -21,7 +21,12 @@ class PrevisionListView(DataTableMixin, TemplateView):
     datatable_search_fields = ['nombre__icontains']
 
     url_detail = 'prevision_detail'
-    url_update = 'prevision_update'
+
+    def get_url_update(self):
+        user = self.request.user
+        if getattr(user, 'rol', None) and user.rol.prevision == 2:
+            return 'prevision_update'
+        return None
 
     def render_row(self, obj):
         return {

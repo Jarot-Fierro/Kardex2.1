@@ -33,8 +33,13 @@ class FichaListView(DataTableMixin, TemplateView):
     ]
 
     url_detail = 'ficha_detail'
-    url_update = 'ficha_update'
     export_report_url_name = 'export_ficha'
+
+    def get_url_update(self):
+        user = self.request.user
+        if getattr(user, 'rol', None) and user.rol.fichas == 2:
+            return 'ficha_update'
+        return None
 
     def render_row(self, obj):
         pac = getattr(obj, 'paciente', None)

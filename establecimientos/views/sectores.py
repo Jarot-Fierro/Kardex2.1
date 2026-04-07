@@ -27,7 +27,12 @@ class SectorListView(DataTableMixin, TemplateView):
     ]
 
     url_detail = 'sector_detail'
-    url_update = 'sector_update'
+
+    def get_url_update(self):
+        user = self.request.user
+        if getattr(user, 'rol', None) and user.rol.sectores == 2:
+            return 'sector_update'
+        return None
 
     def render_row(self, obj):
         return {

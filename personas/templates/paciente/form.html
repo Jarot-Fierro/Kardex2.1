@@ -129,7 +129,10 @@
                                 <button type="button" class="btn btn-secondary btn-sm no-print" id="btn-cancelar">
                                     Cancelar
                                 </button>
+                                {% if request.user.rol.paciente > 1 or request.rol.ficha > 1 %}
                                 <button type="submit" class="btn btn-primary btn-sm no-print">Guardar</button>
+                                {% endif %}
+
 
                                 <button type="button"
                                         id="btn-buscar-ficha-modal"
@@ -681,9 +684,12 @@
                                     <button type="button" class="btn btn-secondary btn-sm no-print" id="btn-cancelar">
                                         Cancelar
                                     </button>
-                                    <button type="submit" class="btn btn-primary btn-sm no-print">
+                                    {% if request.user.rol.paciente > 1 or request.rol.ficha > 1 %}
+                                        <button type="submit" class="btn btn-primary btn-sm no-print">
                                         Guardar
                                     </button>
+                                    {% endif %}
+
                                 </div>
                             </div>
                         </div>

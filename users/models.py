@@ -14,6 +14,10 @@ class User(AbstractUser):
                                         verbose_name='Establecimiento'
                                         )
 
+    rol = models.ForeignKey('users.Role', on_delete=models.PROTECT, null=True,
+                                        blank=True,
+                                        verbose_name='Rol'
+                                        )
     history = HistoricalRecords()
 
     USERNAME_FIELD = 'username'
@@ -75,7 +79,6 @@ class Role(models.Model):
     pais = models.IntegerField(choices=PERMISSION_CHOICES, default=0)
     prevision = models.IntegerField(choices=PERMISSION_CHOICES, default=0)
     colores_sector = models.IntegerField(choices=PERMISSION_CHOICES, default=0)
-    genero = models.IntegerField(choices=PERMISSION_CHOICES, default=0)
     profesion = models.IntegerField(choices=PERMISSION_CHOICES, default=0)
     profesionales = models.IntegerField(choices=PERMISSION_CHOICES, default=0)
     sectores = models.IntegerField(choices=PERMISSION_CHOICES, default=0)
@@ -92,44 +95,5 @@ class Role(models.Model):
         verbose_name = 'Rol'
         verbose_name_plural = 'Roles'
 
-    def save(self, *args, **kwargs):
-        from django.core.cache import cache
-        if self.rol_id:
-            # Invalidar para todos los usuarios que tengan este rol
-            user_ids = UserRole.objects.filter(role_id=self).values_list('user_id', flat=True)
-            for uid in user_ids:
-                cache.delete(f"user_perms_synced_{uid}")
-
-        super().save(*args, **kwargs)
-
     def __str__(self):
         return self.role_name
-
-
-class UserRole(models.Model):
-    user_role_id = models.AutoField(primary_key=True)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
-    role_id = models.ForeignKey(Role, on_delete=models.CASCADE)
-
-    history = HistoricalRecords()
-
-    class Meta:
-        db_table = 'user_roles'
-        verbose_name = 'Rol del Usuario'
-        verbose_name_plural = 'Roles del Usuario'
-        unique_together = ('user_id', 'role_id')
-
-    def save(self, *args, **kwargs):
-        from django.core.cache import cache
-        if self.user_id_id:
-            cache.delete(f"user_perms_synced_{self.user_id_id}")
-        super().save(*args, **kwargs)
-
-    def delete(self, *args, **kwargs):
-        from django.core.cache import cache
-        if self.user_id_id:
-            cache.delete(f"user_perms_synced_{self.user_id_id}")
-        super().delete(*args, **kwargs)
-        
-    def __str__(self):
-        return f"{self.user_id} - {self.role_id}"

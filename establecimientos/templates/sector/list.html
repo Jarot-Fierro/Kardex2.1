@@ -17,9 +17,11 @@
                     <a href="{% url 'export_sector' %}" class="btn btn-success me-2">
                         <i class="bi bi-file-earmark-excel"></i> Reporte
                     </a>
+                    {% if request.user.rol.sectores == 2 %}
                     <a href="{% url 'sector_create' %}" class="btn btn-primary">
                         <i class="fas fa-plus"></i> Nuevo Sector
                     </a>
+                    {% endif %}
                 </div>
             </div>
         </div>

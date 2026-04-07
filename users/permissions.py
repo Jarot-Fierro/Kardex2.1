@@ -82,10 +82,10 @@ def sync_user_permissions(user):
     try:
         with transaction.atomic():
             # Obtener permisos ANTES de limpiar, por si falla algo
-            user_roles = user.userrole_set.select_related('role_id').all()
+            role = user.rol
             all_perms = []
-            for ur in user_roles:
-                all_perms.extend(get_permissions_for_role(ur.role_id))
+            if role:
+                all_perms.extend(get_permissions_for_role(role))
 
             # Solo limpiar y añadir si los permisos han cambiado o no están sincronizados
             # Pero para simplificar y asegurar, usamos el clear/add dentro de la transacción

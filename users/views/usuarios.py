@@ -19,7 +19,7 @@ from django.views.generic import UpdateView
 from core.mixin import DataTableMixin
 from users.forms.usuarios import LoginForm, FormUsuario, FormUsuarioUpdate, UserResetPasswordForm, \
     FormUsuarioProfileUpdate
-from users.models import User, UserRole
+from users.models import User
 
 MODULE_NAME = 'Usuarios'
 
@@ -70,8 +70,13 @@ class UserListView(DataTableMixin, TemplateView):
         'email__icontains', 'establecimiento__nombre__icontains'
     ]
 
-    url_update = 'usuarios_update'
     url_detail = 'usuarios_detail'
+
+    def get_url_update(self):
+        user = self.request.user
+        if getattr(user, 'rol', None) and user.rol.usuarios == 2:
+            return 'usuarios_update'
+        return None
 
     # FILTRA SOLO USUARIOS DEL MISMO ESTABLECIMIENTO QUE EL USUARIO LOGUEADO
     def get_base_queryset(self):
@@ -164,12 +169,6 @@ class UserCreateView(CreateView):
         # Crear usuario
         user = form.save()
 
-        # Crear relación en UserRole
-        UserRole.objects.create(
-            user_id=user,
-            role_id=form.cleaned_data['roles']
-        )
-
         messages.success(self.request, "Usuario registrado correctamente.")
         return super().form_valid(form)
 
@@ -209,14 +208,6 @@ class UserUpdateView(UpdateView):
 
         # Guardamos los cambios del usuario
         user = form.save()
-
-        # Actualizamos la relación UserRole si cambió
-        role_id = form.cleaned_data.get('roles')
-        if role_id:
-            UserRole.objects.update_or_create(
-                user_id=user,
-                defaults={'role_id': role_id}
-            )
 
         messages.success(self.request, "Usuario actualizado correctamente.")
         return super().form_valid(form)
@@ -270,26 +261,18 @@ class UserProfileUpdateView(UpdateView):
         kwargs['request'] = self.request
 
         # Obtener rol actual del usuario
-        try:
-            current_user_role = UserRole.objects.get(user_id=self.request.user).role_id
-        except UserRole.DoesNotExist:
-            current_user_role = None
+        # try:
+        #     current_user_role = UserRole.objects.get(user_id=self.request.user).role_id
+        # except UserRole.DoesNotExist:
+        #     current_user_role = None
 
-        kwargs['initial_role'] = current_user_role
+        # kwargs['initial_role'] = current_user_role
         return kwargs
 
     @transaction.atomic
     def form_valid(self, form):
         form.instance.establecimiento = self.request.user.establecimiento
         user = form.save()
-
-        # Actualizamos UserRole si cambió el rol
-        role = form.cleaned_data.get('roles')
-        if role:
-            UserRole.objects.update_or_create(
-                user_id=user,
-                defaults={'role_id': role}
-            )
 
         messages.info(self.request, "Tus datos se actualizaron correctamente.")
         return super().form_valid(form)

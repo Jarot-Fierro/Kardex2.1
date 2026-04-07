@@ -12,7 +12,6 @@ from django.views.generic.base import TemplateView
 
 from clinica.models import Ficha
 from personas.models.pacientes import Paciente
-from users.models import UserRole
 
 
 @login_required
@@ -46,7 +45,7 @@ def dashboard_view(request):
     rol = first_group.name if first_group else getattr(user, 'tipo_perfil', None)
 
     # ==========================
-    # 🔐 PERMISOS (SIN TOCAR)
+    # 🔐 PERMISOS
     # ==========================
     permissions = {
         'comunas': 0,
@@ -63,15 +62,14 @@ def dashboard_view(request):
         'sectores': 0,
         'servicio_clinico': 0,
         'soporte': 0,
+        'reportes': 0,
+        'usuarios': 0,
     }
 
-    user_roles = UserRole.objects.filter(user_id=user)
-    for user_role in user_roles:
-        role = user_role.role_id
+    role = getattr(user, 'rol', None)
+    if role:
         for module in permissions:
-            current = getattr(role, module, 0)
-            if current > permissions[module]:
-                permissions[module] = current
+            permissions[module] = getattr(role, module, 0)
 
     # ==========================
     # 🕒 CAMBIOS RECIENTES

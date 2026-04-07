@@ -63,13 +63,13 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'core.middleware.maintenance.MaintenanceModeMiddleware',
-    'users.middleware.login_required.LoginRequiredMiddleware',
+    #'core.middleware.maintenance.MaintenanceModeMiddleware',
+    #'users.middleware.login_required.LoginRequiredMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'users.middleware.user_roles.UserRolesMiddleware',
-    'users.middleware.roles_permissions.RolePermissionMiddleware',
-    'core.middleware.establecimiento_required.EstablecimientoRequiredMiddleware',
+    #'users.middleware.roles_permissions.RolePermissionMiddleware',
+    #'core.middleware.establecimiento_required.EstablecimientoRequiredMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
 
 ]

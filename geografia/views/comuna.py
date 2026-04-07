@@ -22,7 +22,12 @@ class ComunaListView(DataTableMixin, TemplateView):
     datatable_only = ['id', 'nombre', ]
 
     url_detail = 'detail_comunas'
-    url_update = 'update_comunas'
+
+    def get_url_update(self):
+        user = self.request.user
+        if getattr(user, 'rol', None) and user.rol.comunas == 2:
+            return 'update_comunas'
+        return None
 
     def render_row(self, obj):
         return {

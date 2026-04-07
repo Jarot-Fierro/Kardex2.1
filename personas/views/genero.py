@@ -21,7 +21,12 @@ class GeneroListView(DataTableMixin, TemplateView):
     datatable_search_fields = ['nombre__icontains', ]
 
     url_detail = 'genero_detail'
-    url_update = 'genero_update'
+
+    def get_url_update(self):
+        user = self.request.user
+        if getattr(user, 'rol', None) and user.rol.genero == 2:
+            return 'genero_update'
+        return None
 
     def render_row(self, obj):
         return {

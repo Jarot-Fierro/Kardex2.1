@@ -317,6 +317,8 @@ class PacienteListView(DataTableMixin, TemplateView):
     url_detail = 'paciente_detail'
     url_update = 'paciente_view_param'
 
+
+
     def get_base_queryset(self):
         # Vista libre: no limitar por establecimiento, mostrar todos los pacientes
         return Paciente.objects.filter(status=True).order_by('nombre')

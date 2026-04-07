@@ -6,7 +6,7 @@ from import_export.widgets import ForeignKeyWidget
 from simple_history.admin import SimpleHistoryAdmin
 
 from establecimientos.models.establecimiento import Establecimiento
-from users.models import User, Role, UserRole
+from users.models import User, Role
 
 
 class UserResource(resources.ModelResource):
@@ -69,13 +69,15 @@ class CustomUserAdmin(
 
     list_display = (
         'username',
-        'email',
+        'rol',
         'first_name',
         'last_name',
         'establecimiento',
+        'email',
         'is_staff',
         'is_active',
         'last_login',
+
     )
 
     list_filter = (
@@ -94,21 +96,27 @@ class CustomUserAdmin(
 
     ordering = ('username',)
 
-    fieldsets = UserAdmin.fieldsets + (
+    fieldsets = (
+        ('Credenciales', {
+            'fields': ('username', 'password'),
+        }),
+        ('Información personal', {
+            'fields': ('first_name', 'last_name', 'email'),
+        }),
         ('Información institucional', {
-            'fields': ('establecimiento',),
+            'fields': ('rol', 'establecimiento'),
+        }),
+        ('Permisos', {
+            'fields': ('is_active', 'is_staff', 'is_superuser'),
+        }),
+        ('Auditoría', {
+            'fields': ('last_login', 'date_joined'),
         }),
     )
 
     def has_delete_permission(self, request, obj=None):
         return False
 
-
-@admin.register(UserRole)
-class UserRoleAdmin(admin.ModelAdmin):
-    list_display = ('user_id', 'role_id')
-    list_filter = ('role_id',)
-    search_fields = ('user_id__username', 'role_id__role_name')
 
 
 @admin.register(Role)

@@ -40,6 +40,8 @@ class FormUsuario(forms.ModelForm):
         self.establecimiento = establecimiento
         self.request = request
         super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            self.fields['roles'].initial = self.instance.rol
 
     username = forms.CharField(
         label='R.U.T',
@@ -126,6 +128,9 @@ class FormUsuario(forms.ModelForm):
     def save(self, commit=True):
         user = super().save(commit=False)
 
+        # Asignar el rol directamente al usuario
+        user.rol = self.cleaned_data.get('roles')
+
         # hasheo aquí
         user.set_password(self.cleaned_data["password1"])
 
@@ -148,6 +153,8 @@ class FormUsuarioUpdate(forms.ModelForm):
         self.establecimiento = establecimiento
         self.request = request
         super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            self.fields['roles'].initial = self.instance.rol
 
     username = forms.CharField(
         label='R.U.T',
@@ -222,6 +229,14 @@ class FormUsuarioUpdate(forms.ModelForm):
                 raise ValidationError("El RUT ingresado no es válido.")
 
         return username
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        # Asignar el rol directamente al usuario
+        user.rol = self.cleaned_data.get('roles')
+        if commit:
+            user.save()
+        return user
 
     class Meta:
         model = User

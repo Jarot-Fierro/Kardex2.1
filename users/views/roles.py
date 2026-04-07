@@ -18,7 +18,12 @@ class RoleListView(DataTableMixin, TemplateView):
     datatable_only = ['rol_id', 'role_name', 'establecimiento']
 
     url_detail = 'roles_detail'
-    url_update = 'roles_update'
+
+    def get_url_update(self):
+        user = self.request.user
+        if getattr(user, 'rol', None) and user.rol.usuarios == 2:
+            return 'roles_update'
+        return None
 
     def render_row(self, obj):
         return {

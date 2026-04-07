@@ -21,7 +21,12 @@ class ProfesionListView(DataTableMixin, TemplateView):
     datatable_search_fields = ['nombre__icontains']
 
     url_detail = 'profesion_detail'
-    url_update = 'profesion_update'
+
+    def get_url_update(self):
+        user = self.request.user
+        if getattr(user, 'rol', None) and user.rol.profesion == 2:
+            return 'profesion_update'
+        return None
 
     def render_row(self, obj):
         return {

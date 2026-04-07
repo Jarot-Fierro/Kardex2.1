@@ -1,7 +1,5 @@
 from django.utils.deprecation import MiddlewareMixin
 
-from users.models import UserRole
-
 
 class UserRolesMiddleware(MiddlewareMixin):
 
@@ -16,8 +14,8 @@ class UserRolesMiddleware(MiddlewareMixin):
             # Establecimiento desde el usuario
             request.establecimiento = user.establecimiento
 
-            # Traer roles asignados al usuario
-            roles = UserRole.objects.filter(user_id=user).select_related('role_id')
+            # Traer rol asignado al usuario
+            role = user.rol
 
             permisos = {
                 "usuarios": 0,
@@ -39,11 +37,10 @@ class UserRolesMiddleware(MiddlewareMixin):
                 "soporte": 0
             }
 
-            # combinar permisos (si tuviera más de un rol, se usa el mayor)
-            for user_role in roles:
-                role = user_role.role_id
+            # Si el usuario tiene un rol, obtener sus permisos
+            if role:
                 for perm in permisos.keys():
-                    permisos[perm] = max(permisos[perm], getattr(role, perm))
+                    permisos[perm] = getattr(role, perm, 0)
 
             request.user_roles = permisos
 

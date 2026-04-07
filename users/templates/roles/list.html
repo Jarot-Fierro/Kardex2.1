@@ -11,9 +11,12 @@
                     <h5 class="mb-0">Listado de Roles</h5>
                 </div>
                 <div class="col-auto text-end">
-                    <a href="{% url 'roles_create' %}" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> Nuevo Rol
-                    </a>
+                    {% if request.user.rol.usuarios == 2 %}
+
+                        <a href="{% url 'roles_create' %}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Nuevo Rol
+                        </a>
+                    {% endif %}
                 </div>
             </div>
         </div>

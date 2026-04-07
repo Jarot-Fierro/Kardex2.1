@@ -22,7 +22,12 @@ class EstablecimientoListView(DataTableMixin, TemplateView):
                                'comuna__nombre__icontains']
 
     url_detail = 'establecimiento_detail'
-    url_update = 'establecimiento_update'
+
+    def get_url_update(self):
+        user = self.request.user
+        if getattr(user, 'rol', None) and user.rol.establecimientos == 2:
+            return 'establecimiento_update'
+        return None
 
     def render_row(self, obj):
         return {
