@@ -60,8 +60,6 @@ Thumbs.db
 # ==========================
 docker-compose.override.yml
 *.pid
-/clinica/migrations/0003_alter_historicalmovimientoficha_estado_envio_and_more.py
-/personas/migrations/0003_alter_historicalpaciente_genero_and_more.py
 /log_importacion_fichas.txt
 /log_importacion_debug.txt
 /log_importacion_fichas_excel.txt
