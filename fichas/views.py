@@ -255,13 +255,22 @@ class PacienteFichaManageView(TemplateView):
     # =========================================================
     def post(self, request, *args, **kwargs):
         """
-        Guarda ambos formularios en una sola operación:
-        - create/create
-        - update/create
-        - update/update
+        Guarda ambos formularios en una sola operación o maneja eliminación.
         """
         self.paciente = self.get_paciente_from_post()
         self.ficha = self.get_ficha_from_post()
+
+        action = request.POST.get('action')
+
+        if action == 'eliminar_ficha':
+            if self.ficha:
+                return redirect('ficha_delete', pk=self.ficha.pk)
+            return redirect('ficha_paciente_manage')
+
+        if action == 'eliminar_paciente_ficha':
+            if self.paciente:
+                return redirect('paciente_delete', pk=self.paciente.pk)
+            return redirect('ficha_paciente_manage')
 
         paciente_form, ficha_form = self.get_forms(
             paciente=self.paciente,

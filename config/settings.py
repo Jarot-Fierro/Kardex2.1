@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'clinica',
     'reports',
     'fichas',
+    'respaldos',
 ]
 
 AUTH_USER_MODEL = 'users.User'

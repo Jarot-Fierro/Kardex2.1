@@ -133,7 +133,10 @@
                                 </div>
                             </div>
                             <div class="col-md-4 form-group mb-2" id="div_fecha_fallecimiento">
-                                <label class="mb-0 text-bold text-danger">{{ paciente_form.fecha_fallecimiento.label }}</label>
+                                <label class="mb-0 text-xs text-bold">
+                                    {{ paciente_form.fecha_fallecimiento.label }}
+                                    <span class="text-primary">(*)</span>
+                                </label>
                                 {{ paciente_form.fecha_fallecimiento }}
                                 {% if paciente_form.fecha_fallecimiento.errors %}
                                     <div class="text-danger text-xs">
@@ -144,7 +147,10 @@
                         </div>
                         <div class="row">
                             <div class="col-md-3 form-group mb-2">
-                                <label class="mb-0 text-bold text-primary">{{ paciente_form.rut.label }}</label>
+                                <label class="mb-0 text-xs text-bold text-primary">
+                                    {{ paciente_form.rut.label }}
+                                    <span class="text-primary">(*)</span>
+                                </label>
                                 {{ paciente_form.rut }}
                                 {% if paciente_form.rut.errors %}
                                     <div class="text-danger text-xs">
@@ -153,7 +159,10 @@
                                 {% endif %}
                             </div>
                             <div class="col-md-3 form-group mb-2">
-                                <label class="mb-0 text-xs">{{ paciente_form.nombre.label }}</label>
+                                <label class="mb-0 text-xs text-bold">
+                                    {{ paciente_form.nombre.label }}
+                                    <span class="text-danger">(*)</span>
+                                </label>
                                 {{ paciente_form.nombre }}
                                 {% if paciente_form.nombre.errors %}
                                     <div class="text-danger text-xs">
@@ -162,7 +171,10 @@
                                 {% endif %}
                             </div>
                             <div class="col-md-3 form-group mb-2">
-                                <label class="mb-0 text-xs">{{ paciente_form.apellido_paterno.label }}</label>
+                                <label class="mb-0 text-xs text-bold">
+                                    {{ paciente_form.apellido_paterno.label }}
+                                    <span class="text-danger">(*)</span>
+                                </label>
                                 {{ paciente_form.apellido_paterno }}
                                 {% if paciente_form.apellido_paterno.errors %}
                                     <div class="text-danger text-xs">
@@ -171,7 +183,10 @@
                                 {% endif %}
                             </div>
                             <div class="col-md-3 form-group mb-2">
-                                <label class="mb-0 text-xs">{{ paciente_form.apellido_materno.label }}</label>
+                                <label class="mb-0 text-xs text-bold">
+                                    {{ paciente_form.apellido_materno.label }}
+                                    <span class="text-danger">(*)</span>
+                                </label>
                                 {{ paciente_form.apellido_materno }}
                                 {% if paciente_form.apellido_materno.errors %}
                                     <div class="text-danger text-xs">
@@ -191,7 +206,10 @@
                                 {{ paciente_form.pasaporte }}
                             </div>
                             <div class="col-md-3 form-group mb-2">
-                                <label class="mb-0 text-xs">{{ paciente_form.nip.label }}</label>
+                                <label class="mb-0 text-xs text-bold">
+                                    {{ paciente_form.nip.label }}
+                                    <span class="text-primary">(*)</span>
+                                </label>
                                 {{ paciente_form.nip }}
                                 {% if paciente_form.nip.errors %}
                                     <div class="text-danger text-xs">
@@ -200,7 +218,10 @@
                                 {% endif %}
                             </div>
                             <div class="col-md-3 form-group mb-2">
-                                <label class="mb-0 text-xs">{{ paciente_form.sexo.label }}</label>
+                                <label class="mb-0 text-xs text-bold">
+                                    {{ paciente_form.sexo.label }}
+                                    <span class="text-danger">(*)</span>
+                                </label>
                                 {{ paciente_form.sexo }}
                             </div>
 
@@ -208,15 +229,24 @@
 
                         <div class="row">
                             <div class="col-md-3 form-group mb-2">
-                                <label class="mb-0 text-xs">{{ paciente_form.estado_civil.label }}</label>
+                                <label class="mb-0 text-xs text-bold">
+                                    {{ paciente_form.estado_civil.label }}
+                                    <span class="text-danger">(*)</span>
+                                </label>
                                 {{ paciente_form.estado_civil }}
                             </div>
                             <div class="col-md-3 form-group mb-2">
-                                <label class="mb-0 text-xs">{{ paciente_form.genero.label }}</label>
+                                <label class="mb-0 text-xs text-bold">
+                                    {{ paciente_form.genero.label }}
+                                    <span class="text-danger">(*)</span>
+                                </label>
                                 {{ paciente_form.genero }}
                             </div>
-                            <div class="col-md-3 form-group mb-2">
-                                <label class="mb-0 text-xs">{{ paciente_form.fecha_nacimiento.label }}</label>
+                            <div class="col-md-3 form-group mb-2 " style="color:#772dff;">
+                                <label class="mb-0 text-xs text-bold">
+                                    {{ paciente_form.fecha_nacimiento.label }}
+                                    <span class="text-danger">(*)</span>
+                                </label>
                                 {{ paciente_form.fecha_nacimiento }}
                             </div>
                         </div>
@@ -264,15 +294,24 @@
 
                         <div class="row">
                             <div class="col-md-6 form-group mb-2">
-                                <label class="mb-0 text-xs">{{ paciente_form.direccion.label }}</label>
+                                <label class="mb-0 text-xs text-bold">
+                                    {{ paciente_form.direccion.label }}
+                                    <span class="text-danger">(*)</span>
+                                </label>
                                 {{ paciente_form.direccion }}
                             </div>
                             <div class="col-md-3 form-group mb-2">
-                                <label class="mb-0 text-xs">{{ paciente_form.comuna.label }}</label>
+                                <label class="mb-0 text-xs text-bold">
+                                    {{ paciente_form.comuna.label }}
+                                    <span class="text-danger">(*)</span>
+                                </label>
                                 {{ paciente_form.comuna }}
                             </div>
                             <div class="col-md-3 form-group mb-2">
-                                <label class="mb-0 text-xs">{{ paciente_form.prevision.label }}</label>
+                                <label class="mb-0 text-xs text-bold">
+                                    {{ paciente_form.prevision.label }}
+                                    <span class="text-danger">(*)</span>
+                                </label>
                                 {{ paciente_form.prevision }}
                             </div>
                         </div>
@@ -283,7 +322,10 @@
                                 {{ paciente_form.ocupacion }}
                             </div>
                             <div class="col-md-3 form-group mb-2">
-                                <label class="mb-0 text-xs">{{ paciente_form.numero_telefono1.label }}</label>
+                                <label class="mb-0 text-xs text-bold">
+                                    {{ paciente_form.numero_telefono1.label }}
+                                    <span class="text-primary">(*)</span>
+                                </label>
                                 {{ paciente_form.numero_telefono1 }}
                             </div>
                             <div class="col-md-3 form-group mb-2">
@@ -300,9 +342,27 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-md-12 form-group mb-0">
+                            <div class="col-md-6 form-group mb-0">
                                 <label class="mb-0 text-xs">{{ paciente_form.alergico_a.label }}</label>
                                 {{ paciente_form.alergico_a }}
+                            </div>
+                            <div class="col-md-3 form-group mb-0 pt-4">
+                                {% if ficha_form.instance.pk and request.user.rol.paciente == 2 and request.user.rol.fichas == 2 %}
+                                    <button type="submit" name="action" value="eliminar_ficha" 
+                                            class="btn btn-outline-danger btn-block btn-sm"
+                                            onclick="return confirm('¿Está seguro de que desea eliminar solo la ficha?');">
+                                        <i class="fas fa-file-excel"></i> Eliminar Ficha
+                                    </button>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-3 form-group mb-0 pt-4">
+                                {% if paciente_form.instance.pk and request.user.rol.paciente == 2 and request.user.rol.fichas == 2 %}
+                                    <button type="submit" name="action" value="eliminar_paciente_ficha" 
+                                            class="btn btn-danger btn-block btn-sm"
+                                            onclick="return confirm('¿Está seguro de que desea eliminar el PACIENTE y su FICHA? Esta acción no se puede deshacer.');">
+                                        <i class="fas fa-user-times"></i> Eliminar Paciente+Ficha
+                                    </button>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -312,7 +372,7 @@
             <!-- FICHA -->
             <div class="col-md-3">
                 <div class="card card-secondary card-outline">
-                    <div class="card-header py-2">
+                    <div class="card-header">
                         <div class="row mb-2">
                             <div class="col-12">
                                 <h3 class="card-title text-bold">Datos de la Ficha</h3>
@@ -320,37 +380,47 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-12">
-                                <div class="btn-group shadow-sm mr-1">
+                            <div class="col-12 m-0 p-0">
+                                <div class="row no-gutters">
                                     {% if ficha_form.instance.pk %}
-                                        <a href="{% url 'pdf_ficha' ficha_form.instance.pk %}"
-                                           class="btn btn-outline-secondary btn-imprimir-mini p-1"
-                                           title="Imprimir Carátula">
-                                            Carátula
-                                        </a>
-                                        <a href="{% url 'pdf_ficha_paciente_rn' paciente_form.instance.pk %}"
-                                           class="btn btn-outline-secondary btn-imprimir-mini p-1"
-                                           title="Imprimir Carátula sin RUT">
-                                            C. SIN RUT
-                                        </a>
-                                        <a href="{% url 'pdf_stickers_ficha' ficha_form.instance.pk %}"
-                                           class="btn btn-outline-secondary btn-imprimir-mini p-1"
-                                           title="Imprimir Stickers">
-                                            Stickers
-                                        </a>
+                                        <div class="col-4">
+                                            <a href="{% url 'pdf_ficha' ficha_form.instance.pk %}"
+                                               class="btn btn-outline-secondary btn-block p-1 btn-imprimir-mini">
+                                                Carátula
+                                            </a>
+                                        </div>
+
+                                        <div class="col-4">
+                                            <a href="{% url 'pdf_ficha_paciente_rn' paciente_form.instance.pk %}"
+                                               class="btn btn-outline-secondary btn-block p-1 btn-imprimir-mini">
+                                                C. SIN RUT
+                                            </a>
+                                        </div>
+
+                                        <div class="col-4">
+                                            <a href="{% url 'pdf_stickers_ficha' ficha_form.instance.pk %}"
+                                               class="btn btn-outline-secondary btn-block p-1 btn-imprimir-mini">
+                                                Stickers
+                                            </a>
+                                        </div>
                                     {% else %}
-                                        <button type="button" class="btn btn-outline-secondary disabled p-1"
-                                                style="pointer-events: none; opacity: 0.6;">
-                                            Carátula
-                                        </button>
-                                        <button type="button" class="btn btn-outline-secondary disabled p-1"
-                                                style="pointer-events: none; opacity: 0.6;">
-                                            C. S/RUT
-                                        </button>
-                                        <button type="button" class="btn btn-outline-secondary disabled p-1"
-                                                style="pointer-events: none; opacity: 0.6;">
-                                            Stickers
-                                        </button>
+                                        <div class="col-4">
+                                            <button class="btn btn-outline-secondary btn-block p-1" disabled>
+                                                Carátula
+                                            </button>
+                                        </div>
+
+                                        <div class="col-4">
+                                            <button class="btn btn-outline-secondary btn-block p-1" disabled>
+                                                C. SIN RUT
+                                            </button>
+                                        </div>
+
+                                        <div class="col-4">
+                                            <button class="btn btn-outline-secondary btn-block p-1" disabled>
+                                                Stickers
+                                            </button>
+                                        </div>
                                     {% endif %}
                                 </div>
                             </div>
@@ -358,7 +428,10 @@
                     </div>
                     <div class="card-body p-3">
                         <div class="form-group mb-2">
-                            <label class="mb-0 text-danger text-bold">{{ ficha_form.numero_ficha_sistema.label }}</label>
+                                <label class="mb-0 text-xs text-bold">
+                                    {{ ficha_form.numero_ficha_sistema.label }}
+                                    <span class="text-danger">(*)</span>
+                                </label>
                             {{ ficha_form.numero_ficha_sistema }}
                             {% if ficha_form.numero_ficha_sistema.errors %}
                                 <div class="text-danger text-xs">
@@ -368,7 +441,10 @@
                         </div>
                         
                         <div class="form-group mb-2">
-                            <label class="mb-0 text-xs">{{ ficha_form.sector.label }}</label>
+                            <label class="mb-0 text-xs text-bold">
+                                {{ ficha_form.sector.label }}
+                                <span class="text-danger">(*)</span>
+                            </label>
                             {{ ficha_form.sector }}
                             {% if ficha_form.sector.errors %}
                                 <div class="text-danger text-xs">
@@ -401,7 +477,7 @@
 
                 <div class="card">
                     <div class="card-body p-3">
-                        {% if request.user.rol.paciente > 1 or request.rol.ficha > 1 %}
+                        {% if request.user.rol.paciente == 2 and request.user.rol.fichas == 2 %}
                             <button type="submit" class="btn btn-primary btn-block">
                                 <i class="fas fa-save"></i> Guardar Todo
                             </button>
@@ -465,18 +541,18 @@
                 $this.select2(options);
             });
 
-            // Inicializar Select2 estándar para el resto de los select
-            $('select:not(.select2)').select2({
+            // Inicializar Select2 estándar para el resto de los select (EXCEPTO los indicados por el usuario)
+            $('select:not(.select2):not(#id_paciente-sexo):not(#id_paciente-estado_civil):not(#id_paciente-genero):not(#id_paciente-prevision):not(#id_ficha-sector)').select2({
                 width: '100%',
                 theme: 'default'
             });
 
             // Script para abrir en ventana pequeña (mini navegador)
-            $('.btn-imprimir-mini').on('click', function (e) {
+            $(document).on('click', '.btn-imprimir-mini', function (e) {
                 e.preventDefault();
                 var url = $(this).attr('href');
-                var w = 800;
-                var h = 600;
+                var w = 900;
+                var h = 700;
                 var left = (screen.width / 2) - (w / 2);
                 var top = (screen.height / 2) - (h / 2);
 

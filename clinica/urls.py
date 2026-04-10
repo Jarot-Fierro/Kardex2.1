@@ -26,6 +26,7 @@ urlpatterns = [
     path('fichas/<int:pk>/detalle/', FichaDetailView.as_view(), name='ficha_detail'),
     path('fichas/<int:pk>/toggle-pasivar/', TogglePasivadoFichaView.as_view(), name='ficha_toggle_pasivar'),
     path('fichas/<int:pk>/tarjeta/', FichaTarjetaView.as_view(), name='ficha_tarjeta'),
+    path('fichas/<int:pk>/eliminar/', FichaDeleteView.as_view(), name='ficha_delete'),
     path('fichas/pasivadas/', PacientePasivadosListView.as_view(), name='ficha_pasivados_list'),
     path('fichas/duplicadas/', FichaDuplicadaListView.as_view(), name='ficha_list_duplicados'),
     path('fichas/historial/', FichaHistoryListView.as_view(), name='ficha_history'),

@@ -26,6 +26,13 @@ class DataTableMixin:
         """
         return self.url_update
 
+    def get_url_delete(self):
+        """
+        Devuelve el nombre de la URL de eliminación si el usuario tiene permiso.
+        Puede ser sobreescrito en la clase hija.
+        """
+        return self.url_delete
+
     def get_base_queryset(self):
         qs = self.model.objects.all()
         # Auto-filtro por establecimiento si el middleware adjuntó request.establecimiento
@@ -87,7 +94,21 @@ class DataTableMixin:
                    <i class="fas fa-edit"></i></a>
             """)
 
+        url_delete = self.get_url_delete()
+        if url_delete:
+            delete_kwargs = {'pk': obj.pk}
+            if url_delete == 'paciente_view_param':
+                delete_kwargs = {'paciente_id': obj.pk}
+
+            actions.append(f"""
+                <a href="{reverse_lazy(f'{url_delete}', kwargs=delete_kwargs)}"
+                   class="btn p-1 btn-sm btn-danger delete-btn" title="Eliminar">
+                   <i class="fas fa-trash"></i></a>
+            """)
+
         return ''.join(actions)
+
+
 
     def filter_queryset(self, qs, search_value):
         """

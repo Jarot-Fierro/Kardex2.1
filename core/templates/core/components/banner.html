@@ -1,26 +1,96 @@
 {% load static %}
-<section class="container-fluid bg-light" style="border-bottom: 1px solid #dee2e6;">
-    <div class="container py-2">
+
+<style>
+.banner-custom {
+    background: linear-gradient(90deg, #003366 0%, #004a99 70%, #d52b1e 100%);
+    color: white;
+    border-bottom: 4px solid #d52b1e;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.banner-title {
+    font-size: 1.6rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.banner-subtitle {
+    font-size: 0.85rem;
+    opacity: 0.85;
+}
+
+.badge-establecimiento {
+    background: white;
+    color: #003366;
+    border-radius: 10px;
+    padding: 10px 18px;
+    border-left: 5px solid #d52b1e;
+    text-align: right;
+    min-width: 240px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+}
+
+.badge-establecimiento h6 {
+    margin: 0;
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+    color: #6c757d;
+}
+
+.badge-establecimiento strong {
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+/* 🔥 CORRECCIÓN DEL LOGO */
+.logo-wrapper {
+    width: 115px;
+    height: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-wrapper img {
+    width: 100%;
+    height: auto;
+}
+</style>
+
+<section class="banner-custom">
+    <div class="container py-3">
         <div class="d-flex justify-content-between align-items-center">
-            <!-- Logo izquierda -->
-            <div class="logo-left">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQBV_3wN_R1zFcIum1WmaEwT2yip42ydPPLqg&s"
-                     alt="Servicio Salud Arauco" class="img-fluid" style="max-height: 100px;">
+
+            <!-- Logo izquierda (corregido) -->
+            <div class="logo-wrapper">
+                <img src="https://saludoccidentecapacita.cl/pluginfile.php/166147/coursecat/description/logo%20SS%20arauco.jpg"
+                     alt="Servicio Salud Arauco">
             </div>
 
-            <!-- Texto central/derecha -->
+            <!-- Título -->
             <div class="text-center">
-                <h2 class="mb-0" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
-                    <span class="text-danger font-weight-bold">SOME</span>
-                    <span class="text-dark">Fichas Clínicas</span>
-                </h2>
+                <div class="banner-title">
+                    <span style="color:#ffb3b3;">SOME</span>
+                    <span> Fichas Clínicas</span>
+                </div>
+                <div class="banner-subtitle">
+                    Sistema de gestión clínica
+                </div>
             </div>
 
-            <!-- Logo derecha -->
-            <div class="logo-right">
-{#                <img src=""#}
-{#                     alt="Logo secundario" class="img-fluid" style="max-height: 100px;">#}
+            <!-- Badge establecimiento -->
+            <div class="badge-establecimiento">
+                <h6>ESTABLECIMIENTO</h6>
+                <strong>{{ request.user.establecimiento }}</strong>
+                <hr>
+                <h6 class="mb-0">
+                    PERFIL:
+                    <span class="badge badge-success ml-1">
+                        {{ request.user.rol|upper }}
+                    </span>
+                </h6>
             </div>
+
         </div>
     </div>
 </section>

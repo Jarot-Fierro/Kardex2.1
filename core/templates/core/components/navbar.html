@@ -91,8 +91,21 @@
                     </ul>
                 </li>
                 {% if user_permissions.paciente > 0 and user_permissions.fichas > 0 %}
-                    <li class="nav-item">
-                        <a href="{% url 'paciente_view' %}" class="nav-link">Consulta Pacientes</a>
+                    <li class="nav-item dropdown">
+                        <a id="dropdownSubMenuPatient" href="#" data-toggle="dropdown" aria-haspopup="true"
+                           aria-expanded="false" class="nav-link dropdown-toggle">Consulta Pacientes</a>
+                        <ul aria-labelledby="dropdownSubMenuPatient" class="dropdown-menu border-0 shadow">
+                            <li>
+                                <a href="{% url 'paciente_view' %}" class="dropdown-item text-bold">Consulta Paciente</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'ficha_paciente_manage' %}" class="dropdown-item text-bold text-primary">Consulta Paciente v2</a>
+                            </li>
+                            <li class="dropdown-divider"></li>
+                            <li>
+                                <a href="{% url 'fusionar_pacientes' %}" class="dropdown-item">Fusionar Pacientes <span class="text-danger">(RN/EXT)</span></a>
+                            </li>
+                        </ul>
                     </li>
                 {% endif %}
                 {% if user_permissions.reportes > 0 %}
@@ -210,24 +223,6 @@
                 {% endif %}
 
 
-                <li class="nav-item dropdown">
-                    <a id="dropdownSubMenu5" href="#" data-toggle="dropdown" aria-haspopup="true"
-                       aria-expanded="false" class="nav-link dropdown-toggle text-primary text-bold">Herramientas</a>
-                    <ul aria-labelledby="dropdownSubMenu5" class="dropdown-menu border-0 shadow">
-                        {% if user_permissions.paciente > 0 and user_permissions.fichas > 0 %}
-                            <li>
-                                <a href="{% url 'ficha_paciente_manage' %}" class="dropdown-item text-bold text-success">Consulta Paciente (0.2)</a>
-                            </li>
-                            <li class="dropdown-divider"></li>
-                            <li>
-                                <a href="{% url 'fusionar_pacientes' %}"
-                                   class="dropdown-item text-danger font-weight-bold">
-                                    Fusionar Pacientes (RN)
-                                </a>
-                            </li>
-                        {% endif %}
-                    </ul>
-                </li>
 
             </ul>
         </div>
@@ -236,33 +231,29 @@
             <li class="nav-item dropdown">
                 <a id="dropdownUserMenu" href="#" data-toggle="dropdown" aria-haspopup="true"
                    aria-expanded="false" class="nav-link dropdown-toggle">
-                    {% if request.user.is_superuser %}
-                        <span class="badge badge-danger">Administrador</span>
-                    {% else %}
-                        <span class="badge badge-success">{{ request.user.first_name|default:request.user.username }}</span>
-                    {% endif %}
+                        <span class="badge badge-primary">{{ request.user.first_name|default:request.user.username }}</span>
 
                     <i class="fas fa-user ml-1"></i>
                 </a>
                 <ul aria-labelledby="dropdownUserMenu" class="dropdown-menu dropdown-menu-right border-0 shadow">
 
-                    <li class="bg-body-tertiary border-bottom px-3 py-3">
-                        <div class="d-flex align-items-center gap-3">
-
-                            <div class="flex-grow-1">
-                                <div class="text-uppercase text-muted fw-semibold small" style="letter-spacing: .5px;">
-                                    Establecimiento actual
-                                </div>
-                                <div class="text-bold text-success small text-wrap">
-                                    {{ request.user.establecimiento|default:"Sin establecimiento asignado" }}
-                                </div>
-                            </div>
-                        </div>
-                    </li>
+{#                    <li class="bg-body-tertiary border-bottom px-3 py-3">#}
+{#                        <div class="d-flex align-items-center gap-3">#}
+{##}
+{#                            <div class="flex-grow-1">#}
+{#                                <div class="text-uppercase text-muted fw-semibold small" style="letter-spacing: .5px;">#}
+{#                                    Establecimiento actual#}
+{#                                </div>#}
+{#                                <div class="text-bold text-success small text-wrap">#}
+{#                                    {{ request.user.establecimiento|default:"Sin establecimiento asignado" }}#}
+{#                                </div>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </li>#}
 
                     {% if request.user.is_superuser %}
                         <li>
-                            <a href="{% url 'admin:index' %}" class="dropdown-item">
+                            <a href="{% url 'admin:index' %}" class="dropdown-item text-primary">
                                 <i class="fas fa-cog"></i>
                                 Panel de Administrador
                             </a>

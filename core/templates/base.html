@@ -51,10 +51,10 @@
             <div class="container">
                 {% include 'core/components/messages/messages.html' %}
                 <div class="row mb-2">
-                    <div class="col-sm-8">
+                    <div class="col-sm-11">
                         <h1 class="m-0">{{ title }}</h1>
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-1">
                         <ol class="breadcrumb float-sm-right">
                             home
                         </ol>
@@ -253,6 +253,58 @@
 </script>
 
 <script>
+    // Delegated handler for delete view buttons (requires SweetAlert2)
+    $(document).on('click', '.delete-btn', function (e) {
+        e.preventDefault();
+        const url = $(this).attr('href');
+
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "Esta acción no se puede deshacer. Por favor ingrese el motivo de la eliminación:",
+            icon: 'warning',
+            input: 'text',
+            inputAttributes: {
+                autocapitalize: 'off',
+                required: 'required'
+            },
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar',
+            preConfirm: (motivo) => {
+                if (!motivo) {
+                    Swal.showValidationMessage('El motivo es obligatorio');
+                }
+                return motivo;
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Crear un formulario temporal para enviar el POST
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = url;
+
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = 'csrfmiddlewaretoken';
+                csrfInput.value = '{{ csrf_token }}';
+                form.appendChild(csrfInput);
+
+                const motivoInput = document.createElement('input');
+                motivoInput.type = 'hidden';
+                motivoInput.name = 'motivo_eliminacion';
+                motivoInput.value = result.value;
+                form.appendChild(motivoInput);
+
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
+    });
+</script>
+
+<script>
     $(document).ready(function () {
         $('input[required], select[required], textarea[required]').each(function () {
 
@@ -280,6 +332,14 @@
     });
 </script>
 
+<script>
+    window.addEventListener('load', function () {
+        window.scrollTo({
+            top: 75,
+            behavior: 'smooth' // puedes quitarlo si no quieres animación
+        });
+    });
+</script>
 
 {% block javascript %}
 {% endblock %}

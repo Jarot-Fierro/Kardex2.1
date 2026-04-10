@@ -4,17 +4,22 @@ from django.contrib import messages
 from django.db import transaction, IntegrityError
 from django.db.models import Count, Subquery
 from django.http import HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.utils.dateparse import parse_date
+from django.views import View
 from django.views.generic import TemplateView, DetailView, FormView
 
 from clinica.forms.ficha import FichaForm
 from clinica.models import Ficha
+from clinica.models.movimiento_ficha_monologo_controlado import MovimientoMonologoControlado
 from core.history import GenericHistoryListView
 from core.mixin import DataTableMixin
 from personas.forms.pacientes import PacienteForm, PacienteFechaRangoForm
 from personas.models.pacientes import Paciente
+from respaldos.models.respaldo_ficha import RespaldoFicha as RespaldoFicha
+from respaldos.models.respaldo_movimiento import RespaldoMovimientoMonologoControlado
+from respaldos.models.respaldo_paciente import RespaldoPaciente
 
 
 def capturar_datos_paciente(request):
@@ -317,7 +322,11 @@ class PacienteListView(DataTableMixin, TemplateView):
     url_detail = 'paciente_detail'
     url_update = 'paciente_view_param'
 
-
+    def get_url_delete(self):
+        user = self.request.user
+        if getattr(user, 'rol', None) and getattr(user.rol, 'paciente', None) == 2:
+            return 'paciente_delete'
+        return None
 
     def get_base_queryset(self):
         # Vista libre: no limitar por establecimiento, mostrar todos los pacientes
@@ -650,6 +659,16 @@ class PacienteFallecidoListView(PacienteListView):
 
 class PacientePuebloIndigenaListView(PacienteListView):
     datatable_columns = ['ID', 'N° Ficha', 'RUT', 'Nombre', 'Sexo', 'Estado Civil', 'Comuna', 'Observación']
+    datatable_order_fields = [
+        'id',
+        None,
+        'rut',
+        None,
+        'sexo',
+        'estado_civil',
+        'comuna__nombre',
+        None,
+    ]
 
     def render_row(self, obj):
         ficha = Ficha.objects.filter(paciente=obj, establecimiento=self.request.user.establecimiento,
@@ -770,3 +789,124 @@ class PacienteDuplicadoListView(PacienteListView):
             'list_url': reverse_lazy('paciente_list_duplicados'),
         })
         return context
+
+
+class PacienteDeleteView(View):
+    def post(self, request, pk, *args, **kwargs):
+        paciente = get_object_or_404(Paciente, pk=pk)
+        user = request.user
+
+        # Verificar permisos (permisos totales == 2)
+        if not (getattr(user, 'rol', None) and getattr(user.rol, 'paciente', None) == 2):
+            messages.error(request, 'No tiene permisos para eliminar pacientes.')
+            return redirect('paciente_list')
+
+        motivo = request.POST.get('motivo_eliminacion', 'Sin motivo especificado')
+
+        try:
+            with transaction.atomic():
+                # 1. Buscar todas las fichas del paciente
+                fichas = Ficha.objects.filter(paciente=paciente)
+
+                for ficha in fichas:
+                    # 1.1 Respaldar Movimientos de cada ficha
+                    movimientos = MovimientoMonologoControlado.objects.filter(ficha=ficha)
+                    for mov in movimientos:
+                        RespaldoMovimientoMonologoControlado.objects.create(
+                            rut=mov.rut,
+                            numero_ficha=mov.numero_ficha,
+                            fecha_salida=mov.fecha_salida,
+                            usuario_entrega=mov.usuario_entrega,
+                            usuario_entrega_id=mov.usuario_entrega_id,
+                            fecha_entrada=mov.fecha_entrada,
+                            usuario_entrada=mov.usuario_entrada,
+                            usuario_entrada_id=mov.usuario_entrada_id,
+                            fecha_traspaso=mov.fecha_traspaso,
+                            usuario_traspaso=mov.usuario_traspaso,
+                            observacion_salida=mov.observacion_salida,
+                            observacion_entrada=mov.observacion_entrada,
+                            observacion_traspaso=mov.observacion_traspaso,
+                            profesional=mov.profesional,
+                            profesional_anterior=mov.profesional_anterior,
+                            rut_paciente=None,
+                            establecimiento=mov.establecimiento,
+                            ficha=None,
+                            servicio_clinico_destino=mov.servicio_clinico_destino,
+                            estado=mov.estado,
+                            usuario_eliminacion=user,
+                            motivo_eliminacion=motivo
+                        )
+                        mov.delete()
+
+                    # 1.2 Respaldar Ficha
+                    RespaldoFicha.objects.create(
+                        numero_ficha_sistema=ficha.numero_ficha_sistema,
+                        numero_ficha_tarjeta=ficha.numero_ficha_tarjeta,
+                        numero_ficha_respaldo=ficha.numero_ficha_respaldo,
+                        rut=paciente.rut,
+                        pasivado=ficha.pasivado,
+                        observacion=ficha.observacion,
+                        usuario=ficha.usuario,
+                        usuario_anterior=ficha.usuario_anterior,
+                        rut_anterior=ficha.rut_anterior,
+                        fecha_creacion_anterior=ficha.fecha_creacion_anterior,
+                        paciente=None,
+                        fecha_mov=ficha.fecha_mov,
+                        establecimiento=ficha.establecimiento,
+                        sector=ficha.sector,
+                        usuario_eliminacion=user,
+                        motivo_eliminacion=motivo
+                    )
+                    ficha.delete()
+
+                # 2. Respaldar Paciente
+                last_ficha = fichas.last()
+                RespaldoPaciente.objects.create(
+                    ficha=str(last_ficha.numero_ficha_sistema) if last_ficha else 'SIN FICHA',
+                    codigo=paciente.codigo,
+                    id_anterior=paciente.id_anterior,
+                    rut=paciente.rut,
+                    nip=paciente.nip,
+                    nombre=paciente.nombre,
+                    rut_madre=paciente.rut_madre,
+                    apellido_paterno=paciente.apellido_paterno,
+                    apellido_materno=paciente.apellido_materno,
+                    pueblo_indigena=paciente.pueblo_indigena,
+                    rut_responsable_temporal=paciente.rut_responsable_temporal,
+                    usar_rut_madre_como_responsable=paciente.usar_rut_madre_como_responsable,
+                    pasaporte=paciente.pasaporte,
+                    nombre_social=paciente.nombre_social,
+                    fecha_nacimiento=paciente.fecha_nacimiento,
+                    sexo=paciente.sexo,
+                    estado_civil=paciente.estado_civil,
+                    nombres_padre=paciente.nombres_padre,
+                    nombres_madre=paciente.nombres_madre,
+                    nombre_pareja=paciente.nombre_pareja,
+                    representante_legal=paciente.representante_legal,
+                    direccion=paciente.direccion,
+                    sin_telefono=paciente.sin_telefono,
+                    numero_telefono1=paciente.numero_telefono1,
+                    numero_telefono2=paciente.numero_telefono2,
+                    ocupacion=paciente.ocupacion,
+                    recien_nacido=paciente.recien_nacido,
+                    extranjero=paciente.extranjero,
+                    fallecido=paciente.fallecido,
+                    fecha_fallecimiento=paciente.fecha_fallecimiento,
+                    alergico_a=paciente.alergico_a,
+                    comuna=paciente.comuna,
+                    prevision=paciente.prevision,
+                    genero=paciente.genero,
+                    usuario=paciente.usuario,
+                    usuario_anterior=paciente.usuario_anterior,
+                    usuario_eliminacion=user,
+                    motivo_eliminacion=motivo
+                )
+
+                # 3. Eliminar Paciente
+                paciente.delete()
+
+            messages.success(request, 'Paciente, sus fichas y movimientos respaldados y eliminados correctamente.')
+        except Exception as e:
+            messages.error(request, f'Error al eliminar el paciente: {str(e)}')
+
+        return redirect('paciente_list')

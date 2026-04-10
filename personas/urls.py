@@ -48,6 +48,7 @@ urlpatterns = [
     path('pacientes/fallecidos/', PacienteFallecidoListView.as_view(), name='paciente_fallecido_list'),
     path('pacientes-pueblo_indigena/', PacientePuebloIndigenaListView.as_view(), name='paciente_pueblo_indigena_list'),
     path('pacientes/<int:pk>/detalle/', PacienteDetailView.as_view(), name='paciente_detail'),
+    path('pacientes/<int:pk>/eliminar/', PacienteDeleteView.as_view(), name='paciente_delete'),
     path('pacientes/historial', PacientesHistoryListView.as_view(), name='paciente_history'),
     path('pacientes/por-fecha/', PacientePorFechaListView.as_view(), name='paciente_por_fecha_list'),
     path('pacientes/por-fecha/form/', PacienteFechaFormView.as_view(), name='paciente_fecha_form'),

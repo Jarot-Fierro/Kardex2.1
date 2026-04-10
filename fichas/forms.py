@@ -17,9 +17,9 @@ class PacienteForm(forms.ModelForm):
             'alergico_a', 'fecha_nacimiento',
         ]
         widgets = {
-            'fecha_fallecimiento': forms.DateInput(attrs={'type': 'date', 'class': 'text-danger text-bold'},
+            'fecha_fallecimiento': forms.DateInput(attrs={'type': 'date', 'class': 'text-danger text-bold', 'style': 'background-color:#FFF9F2; color:#4b0082; border:1px solid #FFB95C;'},
                                                    format='%Y-%m-%d'),
-            'fecha_nacimiento': forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'),
+            'fecha_nacimiento': forms.DateInput(attrs={'type': 'date', 'class':'text-bold', 'style': 'background-color:#F8F2FF; color:#4b0082; border:1px solid #6f42c1;'}, format='%Y-%m-%d'),
             'rut': forms.TextInput(attrs={'class': 'id_rut text-bold text-primary'}),
             'rut_madre': forms.TextInput(attrs={'class': 'id_rut'}),
             'rut_responsable_temporal': forms.TextInput(attrs={'class': 'id_rut'}),
@@ -92,8 +92,8 @@ class FichaForm(forms.ModelForm):
             'sector',
         ]
         widgets = {
-            'fecha_creacion_anterior': forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'),
-            'numero_ficha_sistema': forms.NumberInput(attrs={'class': 'text-bold text-danger'}),
+            'fecha_creacion_anterior': forms.DateInput(attrs={'type': 'date', 'class':'text-bold', 'style': 'background-color:#E3FFED; color:#00571C; border:1px solid #1FC24C;'}, format='%Y-%m-%d'),
+            'numero_ficha_sistema': forms.NumberInput(attrs={'class': 'text-bold text-danger', 'style': 'background-color:#FFF9F2; border:1px solid #FFB95C;'}),
             'observacion': forms.Textarea(attrs={'rows': 3}),
         }
 

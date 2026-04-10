@@ -1,8 +1,9 @@
 from django.contrib import messages
+from django.db import transaction
 from django.db.models import Count
 from django.http import HttpResponse
 from django.http.response import JsonResponse
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import TemplateView
@@ -10,8 +11,11 @@ from django.views.generic import UpdateView, DetailView
 
 from clinica.forms.ficha import FichaForm, FormFichaTarjeta
 from clinica.models import Ficha
+from clinica.models.movimiento_ficha_monologo_controlado import MovimientoMonologoControlado
 from core.history import GenericHistoryListView
 from core.mixin import DataTableMixin
+from respaldos.models.respaldo_ficha import RespaldoFicha
+from respaldos.models.respaldo_movimiento import RespaldoMovimientoMonologoControlado
 
 MODULE_NAME = 'Fichas'
 
@@ -39,6 +43,12 @@ class FichaListView(DataTableMixin, TemplateView):
         user = self.request.user
         if getattr(user, 'rol', None) and user.rol.fichas == 2:
             return 'ficha_update'
+        return None
+
+    def get_url_delete(self):
+        user = self.request.user
+        if getattr(user, 'rol', None) and user.rol.fichas == 2:
+            return 'ficha_delete'
         return None
 
     def render_row(self, obj):
@@ -386,3 +396,80 @@ class FichaHistoryListView(GenericHistoryListView):
         context = super().get_context_data(**kwargs)
         context['url_last_page'] = self.url_last_page
         return context
+
+
+class FichaDeleteView(View):
+    def post(self, request, pk, *args, **kwargs):
+        ficha = get_object_or_404(Ficha, pk=pk)
+        user = request.user
+
+        # Verificar permisos (permisos totales == 2)
+        if not (getattr(user, 'rol', None) and user.rol.fichas == 2):
+            messages.error(request, 'No tiene permisos para eliminar fichas.')
+            return redirect('ficha_list')
+
+        motivo = request.POST.get('motivo_eliminacion', 'Sin motivo especificado')
+
+        try:
+            with transaction.atomic():
+                # 1. Respaldar Movimientos asociados
+                movimientos = MovimientoMonologoControlado.objects.filter(ficha=ficha)
+                for mov in movimientos:
+                    RespaldoMovimientoMonologoControlado.objects.create(
+                        rut=mov.rut,
+                        numero_ficha=mov.numero_ficha,
+                        fecha_salida=mov.fecha_salida,
+                        usuario_entrega=mov.usuario_entrega,
+                        usuario_entrega_id=mov.usuario_entrega_id,
+                        fecha_entrada=mov.fecha_entrada,
+                        usuario_entrada=mov.usuario_entrada,
+                        usuario_entrada_id=mov.usuario_entrada_id,
+                        fecha_traspaso=mov.fecha_traspaso,
+                        usuario_traspaso=mov.usuario_traspaso,
+                        observacion_salida=mov.observacion_salida,
+                        observacion_entrada=mov.observacion_entrada,
+                        observacion_traspaso=mov.observacion_traspaso,
+                        profesional=mov.profesional,
+                        profesional_anterior=mov.profesional_anterior,
+                        rut_paciente=mov.rut_paciente,
+                        establecimiento=mov.establecimiento,
+                        ficha=None,  # Se pierde la relación física
+                        servicio_clinico_destino=mov.servicio_clinico_destino,
+                        estado=mov.estado,
+                        usuario_eliminacion=user,
+                        motivo_eliminacion=motivo
+                    )
+                    # El borrado físico de movimientos se dará por el CASCADE si está definido,
+                    # o lo hacemos explícito si es PROTECT.
+                    # Según el modelo original, ficha es PROTECT en Movimiento.
+                    # Pero el usuario dice que se deben borrar de la tabla principal.
+                    mov.delete()
+
+                # 2. Respaldar Ficha
+                RespaldoFicha.objects.create(
+                    numero_ficha_sistema=ficha.numero_ficha_sistema,
+                    numero_ficha_tarjeta=ficha.numero_ficha_tarjeta,
+                    numero_ficha_respaldo=ficha.numero_ficha_respaldo,
+                    rut=ficha.paciente.rut if ficha.paciente else 'SIN RUT',
+                    pasivado=ficha.pasivado,
+                    observacion=ficha.observacion,
+                    usuario=ficha.usuario,
+                    usuario_anterior=ficha.usuario_anterior,
+                    rut_anterior=ficha.rut_anterior,
+                    fecha_creacion_anterior=ficha.fecha_creacion_anterior,
+                    paciente=ficha.paciente,
+                    fecha_mov=ficha.fecha_mov,
+                    establecimiento=ficha.establecimiento,
+                    sector=ficha.sector,
+                    usuario_eliminacion=user,
+                    motivo_eliminacion=motivo
+                )
+
+                # 3. Eliminar Ficha
+                ficha.delete()
+
+            messages.success(request, 'Ficha y sus movimientos respaldados y eliminados correctamente.')
+        except Exception as e:
+            messages.error(request, f'Error al eliminar la ficha: {str(e)}')
+
+        return redirect('ficha_list')
