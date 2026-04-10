@@ -11,7 +11,7 @@ from .models.respaldo_paciente import RespaldoPaciente
 class RespaldoPacienteAdmin(admin.ModelAdmin):
     list_display = ('rut', 'nombre', 'apellido_paterno', 'apellido_materno', 'fecha_nacimiento', 'sexo', 'comuna', 'prevision', 'fallecido')
     search_fields = ('rut', 'nombre', 'apellido_paterno', 'apellido_materno', 'ficha', 'codigo')
-    list_filter = ('sexo', 'estado_civil', 'fallecido', 'comuna', 'prevision', 'pueblo_indigena', 'extranjero')
+    list_filter = ('sexo', 'estado_civil', 'fallecido', 'prevision', 'pueblo_indigena', 'extranjero')
     autocomplete_fields = ('comuna', 'prevision', 'genero', 'usuario', 'usuario_anterior', 'usuario_eliminacion')
     ordering = ('apellido_paterno', 'apellido_materno', 'nombre')
     readonly_fields = ('created_at', 'updated_at')
@@ -29,7 +29,7 @@ class RespaldoFichaAdmin(admin.ModelAdmin):
 class RespaldoMovimientoAdmin(admin.ModelAdmin):
     list_display = ('establecimiento', 'rut', 'numero_ficha', 'estado', 'fecha_salida', 'fecha_entrada', 'profesional')
     search_fields = ('rut', 'numero_ficha', 'usuario_entrega', 'usuario_entrada', 'profesional_anterior')
-    list_filter = ('estado', 'establecimiento', 'profesional', 'fecha_salida', 'fecha_entrada')
+    list_filter = ('estado', 'establecimiento', 'fecha_salida', 'fecha_entrada')
     autocomplete_fields = ('usuario_entrega_id', 'usuario_entrada_id', 'profesional', 'rut_paciente', 'establecimiento', 'ficha', 'servicio_clinico_destino', 'usuario_eliminacion')
     ordering = ('-id',)
     readonly_fields = ('created_at', 'updated_at')

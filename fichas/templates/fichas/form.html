@@ -348,18 +348,20 @@
                             </div>
                             <div class="col-md-3 form-group mb-0 pt-4">
                                 {% if ficha_form.instance.pk and request.user.rol.paciente == 2 and request.user.rol.fichas == 2 %}
-                                    <button type="submit" name="action" value="eliminar_ficha" 
-                                            class="btn btn-outline-danger btn-block btn-sm"
-                                            onclick="return confirm('¿Está seguro de que desea eliminar solo la ficha?');">
+                                    <button type="button" name="action" value="eliminar_ficha" 
+                                            class="btn btn-outline-danger btn-block btn-sm delete-btn"
+                                            data-confirm-text="¿Está seguro de que desea eliminar solo la ficha?"
+                                            data-url="{% if ficha_form.instance.pk %}{% url 'ficha_delete' ficha_form.instance.pk %}{% endif %}">
                                         <i class="fas fa-file-excel"></i> Eliminar Ficha
                                     </button>
                                 {% endif %}
                             </div>
                             <div class="col-md-3 form-group mb-0 pt-4">
                                 {% if paciente_form.instance.pk and request.user.rol.paciente == 2 and request.user.rol.fichas == 2 %}
-                                    <button type="submit" name="action" value="eliminar_paciente_ficha" 
-                                            class="btn btn-danger btn-block btn-sm"
-                                            onclick="return confirm('¿Está seguro de que desea eliminar el PACIENTE y su FICHA? Esta acción no se puede deshacer.');">
+                                    <button type="button" name="action" value="eliminar_paciente_ficha" 
+                                            class="btn btn-danger btn-block btn-sm delete-btn"
+                                            data-confirm-text="¿Está seguro de que desea eliminar el PACIENTE y su FICHA? Esta acción no se puede deshacer."
+                                            data-url="{% if paciente_form.instance.pk %}{% url 'paciente_delete' paciente_form.instance.pk %}{% endif %}">
                                         <i class="fas fa-user-times"></i> Eliminar Paciente+Ficha
                                     </button>
                                 {% endif %}

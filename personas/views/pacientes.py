@@ -799,7 +799,7 @@ class PacienteDeleteView(View):
         # Verificar permisos (permisos totales == 2)
         if not (getattr(user, 'rol', None) and getattr(user.rol, 'paciente', None) == 2):
             messages.error(request, 'No tiene permisos para eliminar pacientes.')
-            return redirect('paciente_list')
+            return redirect('ficha_paciente_manage')
 
         motivo = request.POST.get('motivo_eliminacion', 'Sin motivo especificado')
 
@@ -909,4 +909,4 @@ class PacienteDeleteView(View):
         except Exception as e:
             messages.error(request, f'Error al eliminar el paciente: {str(e)}')
 
-        return redirect('paciente_list')
+        return redirect('ficha_paciente_manage')

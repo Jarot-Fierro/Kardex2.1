@@ -256,11 +256,20 @@
     // Delegated handler for delete view buttons (requires SweetAlert2)
     $(document).on('click', '.delete-btn', function (e) {
         e.preventDefault();
-        const url = $(this).attr('href');
+        const $this = $(this);
+        const url = $this.data('url') || $this.attr('href') || $this.closest('form').attr('action');
+        const confirmText = $this.data('confirm-text') || "Esta acción no se puede deshacer.";
+        const actionName = $this.attr('name');
+        const actionValue = $this.attr('value');
+
+        if (!url || url === 'undefined') {
+            Swal.fire('Error', 'No se pudo determinar la URL de eliminación', 'error');
+            return;
+        }
 
         Swal.fire({
             title: '¿Estás seguro?',
-            text: "Esta acción no se puede deshacer. Por favor ingrese el motivo de la eliminación:",
+            text: confirmText + " Por favor ingrese el motivo de la eliminación:",
             icon: 'warning',
             input: 'text',
             inputAttributes: {
@@ -296,6 +305,15 @@
                 motivoInput.name = 'motivo_eliminacion';
                 motivoInput.value = result.value;
                 form.appendChild(motivoInput);
+
+                // Si viene de un botón con name/value (como en el form), agregarlos
+                if (actionName && actionValue) {
+                    const actionInput = document.createElement('input');
+                    actionInput.type = 'hidden';
+                    actionInput.name = actionName;
+                    actionInput.value = actionValue;
+                    form.appendChild(actionInput);
+                }
 
                 document.body.appendChild(form);
                 form.submit();

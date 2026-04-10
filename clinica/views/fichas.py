@@ -406,7 +406,7 @@ class FichaDeleteView(View):
         # Verificar permisos (permisos totales == 2)
         if not (getattr(user, 'rol', None) and user.rol.fichas == 2):
             messages.error(request, 'No tiene permisos para eliminar fichas.')
-            return redirect('ficha_list')
+            return redirect('ficha_paciente_manage')
 
         motivo = request.POST.get('motivo_eliminacion', 'Sin motivo especificado')
 
@@ -431,7 +431,7 @@ class FichaDeleteView(View):
                         observacion_traspaso=mov.observacion_traspaso,
                         profesional=mov.profesional,
                         profesional_anterior=mov.profesional_anterior,
-                        rut_paciente=mov.rut_paciente,
+                        rut_paciente=None,
                         establecimiento=mov.establecimiento,
                         ficha=None,  # Se pierde la relación física
                         servicio_clinico_destino=mov.servicio_clinico_destino,
@@ -457,7 +457,7 @@ class FichaDeleteView(View):
                     usuario_anterior=ficha.usuario_anterior,
                     rut_anterior=ficha.rut_anterior,
                     fecha_creacion_anterior=ficha.fecha_creacion_anterior,
-                    paciente=ficha.paciente,
+                    paciente=None,
                     fecha_mov=ficha.fecha_mov,
                     establecimiento=ficha.establecimiento,
                     sector=ficha.sector,
@@ -472,4 +472,4 @@ class FichaDeleteView(View):
         except Exception as e:
             messages.error(request, f'Error al eliminar la ficha: {str(e)}')
 
-        return redirect('ficha_list')
+        return redirect('ficha_paciente_manage')
