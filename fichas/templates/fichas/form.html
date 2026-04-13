@@ -5,12 +5,12 @@
 
     <!-- BUSCADORES -->
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-5">
             <div class="card card-outline card-info">
                 <div class="card-body">
                     <form method="get" class="form-inline">
                         <div class="input-group input-group-sm mb-0">
-                            <label class="label mr-3" for="rut">Busqueda por RUT: </label>
+                            <label class="label mr-3" for="rut">RUT: </label>
                             <input type="text" name="rut" id="rut" value="{{ request.GET.rut }}"
                                    class="form-control id_rut"
                                    placeholder="RUT sin puntos y con guión">
@@ -23,12 +23,12 @@
             </div>
         </div>
 
-        <div class="col-md-6">
+        <div class="col-md-5">
             <div class="card card-outline card-info">
                 <div class="card-body">
                     <form method="get" class="form-inline">
                         <div class="input-group input-group-sm mb-0">
-                            <label class="label mr-3" for="numero_ficha">Busqueda por Número de Ficha:</label>
+                            <label class="label mr-3" for="numero_ficha">Correlativo:</label>
                             <input type="text" name="numero_ficha" id="numero_ficha"
                                    value="{{ request.GET.numero_ficha }}" class="form-control"
                                    placeholder="Número de ficha">
@@ -40,6 +40,18 @@
                 </div>
             </div>
         </div>
+        <div class="col-md-2">
+            <div class="card card-outline card-info">
+                <div class="card-body">
+                        <div class="input-group input-group-sm mb-0">
+                            <span class="input-group-append">
+                                <a href="{% url 'paciente_list_v2' %}" class="btn btn-info btn-flat">Buscar x Nombres</a>
+                            </span>
+                        </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <!-- FORMULARIO PRINCIPAL -->
@@ -466,7 +478,7 @@
                         <div class="form-group mb-2">
                             <div class="form-check">
                                 {{ ficha_form.pasivado }}
-                                <label class="form-check-label text-xs"
+                                <label class="form-check-label text-md text-bold text-danger"
                                        for="{{ ficha_form.pasivado.id_for_label }}">{{ ficha_form.pasivado.label }}</label>
                             </div>
                         </div>

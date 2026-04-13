@@ -1,16 +1,20 @@
+import csv
+
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.exceptions import ValidationError
+from django.core.paginator import Paginator
 from django.db import transaction
 from django.db.models import Q, ProtectedError
-from django.http import JsonResponse
-from django.shortcuts import redirect, get_object_or_404
+from django.http import JsonResponse, HttpResponse
+from django.shortcuts import redirect, get_object_or_404, render
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import FormView, TemplateView
 
 from clinica.models import Ficha
 from clinica.models.movimiento_ficha import MovimientoFicha
+from geografia.models.comuna import Comuna
 from personas.models.pacientes import Paciente
 from .forms import FusionarPacientesForm, PacienteForm, FichaForm
 from .services import fusionar_pacientes_clinicos
@@ -530,3 +534,71 @@ class PacienteFichaManageView(TemplateView):
             context['action'] = 'add'
 
         return context
+
+
+
+
+def paciente_list_v2(request):
+    user_est = request.user.establecimiento
+    pacientes_list = Paciente.objects.all().order_by('apellido_paterno', 'apellido_materno', 'nombre')
+
+    rut = request.GET.get('rut', '').strip()
+    nombres = request.GET.get('nombres', '').strip()
+    apellido_paterno = request.GET.get('apellido_paterno', '').strip()
+    apellido_materno = request.GET.get('apellido_materno', '').strip()
+    comuna_id = request.GET.get('comuna')
+    sexo = request.GET.get('sexo')
+    correlativo = request.GET.get('correlativo', '').strip()
+
+    if rut:
+        pacientes_list = pacientes_list.filter(rut__icontains=rut)
+    if nombres:
+        pacientes_list = pacientes_list.filter(nombre__icontains=nombres)
+    if apellido_paterno:
+        pacientes_list = pacientes_list.filter(apellido_paterno__icontains=apellido_paterno)
+    if apellido_materno:
+        pacientes_list = pacientes_list.filter(apellido_materno__icontains=apellido_materno)
+    if comuna_id:
+        pacientes_list = pacientes_list.filter(comuna_id=comuna_id)
+    if sexo:
+        pacientes_list = pacientes_list.filter(sexo=sexo)
+    if correlativo:
+        pacientes_list = pacientes_list.filter(
+            fichas_pacientes__numero_ficha_sistema__icontains=correlativo,
+            fichas_pacientes__establecimiento=user_est
+        ).distinct()
+
+    if request.GET.get('export') == 'csv':
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="pacientes.csv"'
+        response.write('\ufeff'.encode('utf-8'))
+        writer = csv.writer(response)
+        writer.writerow(['RUT', 'Nombres', 'Apellidos', 'Comuna', 'Sexo', 'Ficha (Establecimiento)'])
+        for p in pacientes_list:
+            ficha = p.fichas_pacientes.filter(establecimiento=user_est).first()
+            num_ficha = ficha.numero_ficha_sistema if ficha else "S/F"
+            writer.writerow([
+                p.rut,
+                p.nombre,
+                f"{p.apellido_paterno} {p.apellido_materno}",
+                p.comuna.nombre if p.comuna else "",
+                p.get_sexo_display(),
+                num_ficha
+            ])
+        return response
+
+    paginator = Paginator(pacientes_list, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    comunas = Comuna.objects.all()
+    from core.choices import SEXO_CHOICES
+
+    context = {
+        'page_obj': page_obj,
+        'comunas': comunas,
+        'sexo_choices': SEXO_CHOICES,
+        'title': 'Búsqueda de Pacientes'
+    }
+
+    return render(request, 'fichas/list_paciente_v2.html', context)

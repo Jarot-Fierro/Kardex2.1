@@ -1,6 +1,6 @@
 from django.db.models import Q
 from django.http import JsonResponse
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 
 from core.utils.search_utils import get_rut_q_filter, get_name_q_filter
 
@@ -105,6 +105,20 @@ class DataTableMixin:
                    class="btn p-1 btn-sm btn-danger delete-btn" title="Eliminar">
                    <i class="fas fa-trash"></i></a>
             """)
+
+        # Si el modelo es Paciente, agregar el botón "Actualizar v2"
+        if self.model.__name__ == 'Paciente':
+            rut_param = getattr(obj, 'rut', '') or ''
+            try:
+                base_url = reverse('ficha_paciente_manage')
+                url_v2 = f"{base_url}?rut={rut_param}"
+                actions.append(f"""
+                    <a href="{url_v2}"
+                       class="btn p-1 btn-sm btn-success" title="Actualizar v2">
+                       <i class="fas fa-edit"></i></a>
+                """)
+            except:
+                pass
 
         return ''.join(actions)
 
