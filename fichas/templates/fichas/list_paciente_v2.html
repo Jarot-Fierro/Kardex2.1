@@ -17,7 +17,7 @@
             <form method="get" action="{% url 'paciente_list_v2' %}" class="row g-3">
                 <div class="col-md-3">
                     <label for="rut" class="form-label">RUT</label>
-                    <input type="text" name="rut" id="rut" class="form-control"
+                    <input type="text" name="rut" id="rut" class="form-control id_rut"
                            value="{{ request.GET.rut }}" placeholder="Buscar por RUT...">
                 </div>
                 <div class="col-md-3">

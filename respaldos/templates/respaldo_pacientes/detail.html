@@ -1,0 +1,56 @@
+{% load static %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h5 class="mb-3">Detalle de Respaldo de Paciente</h5>
+            <dl class="row mb-0">
+                <dt class="col-sm-4">ID</dt>
+                <dd class="col-sm-8">{{ object.id }}</dd>
+
+                <dt class="col-sm-4">RUT / NIP / Pasaporte</dt>
+                <dd class="col-sm-8">{{ object.rut|default:object.nip|default:object.pasaporte|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Nombre Completo</dt>
+                <dd class="col-sm-8">{{ object.nombre_completo }}</dd>
+
+                <dt class="col-sm-4">Nombre Social</dt>
+                <dd class="col-sm-8">{{ object.nombre_social|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Fecha Nacimiento</dt>
+                <dd class="col-sm-8">{{ object.fecha_nacimiento|date:"d/m/Y"|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Sexo / Género</dt>
+                <dd class="col-sm-8">{{ object.sexo }} / {{ object.genero|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Estado Civil</dt>
+                <dd class="col-sm-8">{{ object.estado_civil }}</dd>
+
+                <dt class="col-sm-4">Dirección / Comuna</dt>
+                <dd class="col-sm-8">{{ object.direccion|default:"-" }}, {{ object.comuna }}</dd>
+
+                <dt class="col-sm-4">Teléfonos</dt>
+                <dd class="col-sm-8">{{ object.numero_telefono1|default:"-" }} / {{ object.numero_telefono2|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Previsión</dt>
+                <dd class="col-sm-8">{{ object.prevision|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Fallecido</dt>
+                <dd class="col-sm-8">
+                    {{ object.fallecido|yesno:"Sí,No" }}
+                    {% if object.fecha_fallecimiento %}({{ object.fecha_fallecimiento|date:"d/m/Y" }}){% endif %}
+                </dd>
+
+                <hr class="col-12">
+
+                <dt class="col-sm-4">Usuario Eliminación</dt>
+                <dd class="col-sm-8">{{ object.usuario_eliminacion|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Motivo Eliminación</dt>
+                <dd class="col-sm-8">{{ object.motivo_eliminacion|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Fecha Eliminación</dt>
+                <dd class="col-sm-8">{{ object.created_at|date:"d/m/Y H:i" }}</dd>
+            </dl>
+        </div>
+    </div>
+</div>

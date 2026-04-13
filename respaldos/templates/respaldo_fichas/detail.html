@@ -1,0 +1,50 @@
+{% load static %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h5 class="mb-3">Detalle de Respaldo de Ficha</h5>
+            <dl class="row mb-0">
+                <dt class="col-sm-4">ID</dt>
+                <dd class="col-sm-8">{{ object.id }}</dd>
+
+                <dt class="col-sm-4">N° Ficha Sistema</dt>
+                <dd class="col-sm-8">{{ object.numero_ficha_sistema|default:"-" }}</dd>
+
+                <dt class="col-sm-4">N° Ficha Tarjeta</dt>
+                <dd class="col-sm-8">{{ object.numero_ficha_tarjeta|default:"-" }}</dd>
+
+                <dt class="col-sm-4">N° Ficha Respaldo</dt>
+                <dd class="col-sm-8">{{ object.numero_ficha_respaldo|default:"-" }}</dd>
+
+                <dt class="col-sm-4">RUT</dt>
+                <dd class="col-sm-8">{{ object.rut|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Pasivado</dt>
+                <dd class="col-sm-8">{{ object.pasivado|yesno:"Sí,No" }}</dd>
+
+                <dt class="col-sm-4">Observación</dt>
+                <dd class="col-sm-8">{{ object.observacion|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Paciente</dt>
+                <dd class="col-sm-8">{{ object.paciente|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Establecimiento</dt>
+                <dd class="col-sm-8">{{ object.establecimiento|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Sector</dt>
+                <dd class="col-sm-8">{{ object.sector|default:"-" }}</dd>
+
+                <hr class="col-12">
+
+                <dt class="col-sm-4">Usuario Eliminación</dt>
+                <dd class="col-sm-8">{{ object.usuario_eliminacion|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Motivo Eliminación</dt>
+                <dd class="col-sm-8">{{ object.motivo_eliminacion|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Fecha Eliminación</dt>
+                <dd class="col-sm-8">{{ object.created_at|date:"d/m/Y H:i" }}</dd>
+            </dl>
+        </div>
+    </div>
+</div>

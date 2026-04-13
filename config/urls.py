@@ -48,4 +48,5 @@ urlpatterns = [
     path('duplicados/', debug_integridad_view, name='debug_integridad'),
     path('mantenimiento/', maintenance_view, name='maintenance'),
     path('fichas/', include('fichas.urls')),
+    path('respaldos/', include('respaldos.urls')),
 ]

@@ -1,0 +1,65 @@
+{% load static %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h5 class="mb-3">Detalle de Respaldo de Movimiento</h5>
+            <dl class="row mb-0">
+                <dt class="col-sm-4">ID</dt>
+                <dd class="col-sm-8">{{ object.id }}</dd>
+
+                <dt class="col-sm-4">Establecimiento</dt>
+                <dd class="col-sm-8">{{ object.establecimiento|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Paciente (RUT)</dt>
+                <dd class="col-sm-8">{{ object.rut_paciente|default:object.rut }}</dd>
+
+                <dt class="col-sm-4">N° Ficha</dt>
+                <dd class="col-sm-8">{{ object.numero_ficha|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Estado</dt>
+                <dd class="col-sm-8">{{ object.get_estado_display }}</dd>
+
+                <dt class="col-sm-4">Fecha Salida</dt>
+                <dd class="col-sm-8">{{ object.fecha_salida|date:"d/m/Y H:i"|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Usuario Entrega</dt>
+                <dd class="col-sm-8">{{ object.usuario_entrega|default:object.usuario_entrega_id|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Fecha Entrada</dt>
+                <dd class="col-sm-8">{{ object.fecha_entrada|date:"d/m/Y H:i"|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Usuario Entrada</dt>
+                <dd class="col-sm-8">{{ object.usuario_entrada|default:object.usuario_entrada_id|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Fecha Traspaso</dt>
+                <dd class="col-sm-8">{{ object.fecha_traspaso|date:"d/m/Y H:i"|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Profesional</dt>
+                <dd class="col-sm-8">{{ object.profesional|default:object.profesional_anterior|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Servicio Clínico Destino</dt>
+                <dd class="col-sm-8">{{ object.servicio_clinico_destino|default:"-" }}</dd>
+
+                <hr class="col-12">
+
+                <dt class="col-sm-4">Observaciones</dt>
+                <dd class="col-sm-8">
+                    Salida: {{ object.observacion_salida|default:"-" }}<br>
+                    Entrada: {{ object.observacion_entrada|default:"-" }}<br>
+                    Traspaso: {{ object.observacion_traspaso|default:"-" }}
+                </dd>
+
+                <hr class="col-12">
+
+                <dt class="col-sm-4">Usuario Eliminación</dt>
+                <dd class="col-sm-8">{{ object.usuario_eliminacion|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Motivo Eliminación</dt>
+                <dd class="col-sm-8">{{ object.motivo_eliminacion|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Fecha Eliminación</dt>
+                <dd class="col-sm-8">{{ object.created_at|date:"d/m/Y H:i" }}</dd>
+            </dl>
+        </div>
+    </div>
+</div>

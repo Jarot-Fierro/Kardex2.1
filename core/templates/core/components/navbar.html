@@ -105,6 +105,33 @@
                             <li>
                                 <a href="{% url 'fusionar_pacientes' %}" class="dropdown-item">Fusionar Pacientes <span class="text-danger">(RN/EXT)</span></a>
                             </li>
+                            <li class="dropdown-divider"></li>
+
+                            <li class="dropdown-submenu dropdown-hover">
+                                <a class="dropdown-item dropdown-toggle" href="#" data-toggle="dropdown">
+                                    <i class="fas fa-database mr-1"></i> Respaldos
+                                </a>
+
+                                <ul class="dropdown-menu border-0 shadow">
+                                    <li>
+                                        <a href="{% url 'respaldo_fichas_list' %}" class="dropdown-item">
+                                            Fichas
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a href="{% url 'respaldo_pacientes_list' %}" class="dropdown-item">
+                                            Pacientes
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a href="{% url 'respaldo_movimientos_list' %}" class="dropdown-item">
+                                            Movimientos
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
                         </ul>
                     </li>
                 {% endif %}
