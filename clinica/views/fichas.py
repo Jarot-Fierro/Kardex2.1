@@ -437,7 +437,9 @@ class FichaDeleteView(View):
                         servicio_clinico_destino=mov.servicio_clinico_destino,
                         estado=mov.estado,
                         usuario_eliminacion=user,
-                        motivo_eliminacion=motivo
+                        motivo_eliminacion=motivo,
+                        created_by=user,
+                        updated_by=request.user,
                     )
                     # El borrado físico de movimientos se dará por el CASCADE si está definido,
                     # o lo hacemos explícito si es PROTECT.
@@ -462,7 +464,9 @@ class FichaDeleteView(View):
                     establecimiento=ficha.establecimiento,
                     sector=ficha.sector,
                     usuario_eliminacion=user,
-                    motivo_eliminacion=motivo
+                    motivo_eliminacion=motivo,
+                    created_by=user,
+                    updated_by=request.user,
                 )
 
                 # 3. Eliminar Ficha

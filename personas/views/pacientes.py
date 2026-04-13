@@ -834,7 +834,9 @@ class PacienteDeleteView(View):
                             servicio_clinico_destino=mov.servicio_clinico_destino,
                             estado=mov.estado,
                             usuario_eliminacion=user,
-                            motivo_eliminacion=motivo
+                            motivo_eliminacion=motivo,
+                            created_by=user,
+                            updated_by=request.user,
                         )
                         mov.delete()
 
@@ -855,7 +857,9 @@ class PacienteDeleteView(View):
                         establecimiento=ficha.establecimiento,
                         sector=ficha.sector,
                         usuario_eliminacion=user,
-                        motivo_eliminacion=motivo
+                        motivo_eliminacion=motivo,
+                        created_by=user,
+                        updated_by=request.user,
                     )
                     ficha.delete()
 
@@ -899,7 +903,9 @@ class PacienteDeleteView(View):
                     usuario=paciente.usuario,
                     usuario_anterior=paciente.usuario_anterior,
                     usuario_eliminacion=user,
-                    motivo_eliminacion=motivo
+                    motivo_eliminacion=motivo,
+                    created_by=user,
+                    updated_by=request.user,
                 )
 
                 # 3. Eliminar Paciente

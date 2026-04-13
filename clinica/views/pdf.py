@@ -198,10 +198,21 @@ def pdf_stickers_66_25(request, ficha_id=None, paciente_id=None):
 
     codigo_barras_base64 = generar_barcode_sticker_base64(numero_rut)
 
+    # Obtener solo el primer nombre
+    nombre = (getattr(paciente, 'nombre', '') or '').strip()
+    partes = nombre.split()
+    primer_nombre = partes[0] if partes else ''
+
+    apellido_paterno = getattr(paciente, 'apellido_paterno', '') or ''
+    apellido_materno = getattr(paciente, 'apellido_materno', '') or ''
+
+    nombre_corto = f"{primer_nombre} {apellido_paterno} {apellido_materno}".strip()
+
     context = {
         'paciente': paciente,
         'ficha': ficha,
         'codigo_barras_base64': codigo_barras_base64,
+        'nombre_corto': nombre_corto,
         'sticker_range': range(30)  # 3 columnas x 10 filas = 30 stickers
     }
 
