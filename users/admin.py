@@ -114,9 +114,6 @@ class CustomUserAdmin(
         }),
     )
 
-    def has_delete_permission(self, request, obj=None):
-        return False
-
 
 
 @admin.register(Role)
