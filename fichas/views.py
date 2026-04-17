@@ -128,14 +128,18 @@ class FusionarPacientesView(LoginRequiredMixin, PermissionRequiredMixin, FormVie
             messages.error(self.request, "La ficha a conservar no existe en su establecimiento.")
             return self.form_invalid(form)
 
+        # Obtener todos los movimientos del paciente ficticio y real (todas sus fichas)
+        movimientos_ficticio_ids = list(MovimientoFicha.objects.filter(ficha__paciente=paciente_ficticio).values_list('id', flat=True))
+        movimientos_real_ids = list(MovimientoFicha.objects.filter(ficha__paciente=paciente_real).values_list('id', flat=True))
+
         try:
             fusionar_pacientes_clinicos(
                 paciente_ficticio=paciente_ficticio,
                 paciente_real=paciente_real,
                 ficha_a_conservar=ficha_a_conservar,
                 ficha_a_eliminar=ficha_a_eliminar,
-                movimientos_ficticio_ids=form.cleaned_data.get('movimientos_ficticio', []),
-                movimientos_real_ids=form.cleaned_data.get('movimientos_real', []),
+                movimientos_ficticio_ids=movimientos_ficticio_ids,
+                movimientos_real_ids=movimientos_real_ids,
                 usuario=self.request.user,
                 motivo_fusion=motivo,
                 borrar_paciente_ficticio=borrar_paciente_ficticio
@@ -178,7 +182,7 @@ class FusionarPacientesView(LoginRequiredMixin, PermissionRequiredMixin, FormVie
             messages.error(self.request, "No se puede completar la fusión porque existen registros protegidos en otros establecimientos.")
             return self.render_to_response(context)
         except Exception as e:
-            # print(f"DEBUG: Error en fusión: {e}")
+            print(f"DEBUG: Error en fusión: {e}")
             messages.error(self.request, f"Error al procesar la fusión: {str(e)}")
             return self.form_invalid(form)
 
@@ -395,25 +399,15 @@ class PacienteFichaManageView(TemplateView):
     def get_ficha_from_post(self):
         """
         Al guardar NO dependemos del GET.
-        Intentamos por:
-        1) ficha_id hidden
-        2) numero_ficha del formulario
+        Solo usamos ficha_id (hidden) para determinar si se está editando una ficha existente.
+        NUNCA buscamos por numero_ficha_sistema aquí para evitar reasignaciones accidentales.
         """
-        establecimiento = getattr(self.request.user, 'establecimiento', None)
         ficha_id = self.request.POST.get('ficha_id')
 
         if ficha_id:
-            ficha = Ficha.objects.select_related('paciente').filter(pk=ficha_id, ).first()
+            ficha = Ficha.objects.select_related('paciente').filter(pk=ficha_id).first()
             if ficha:
                 return ficha
-
-        numero_ficha = self.request.POST.get('ficha-numero_ficha_sistema', '').strip()
-        if numero_ficha:
-            return Ficha.objects.select_related('paciente').filter(
-                numero_ficha_sistema=numero_ficha,
-                establecimiento=establecimiento,
-                
-            ).first()
 
         return None
 
@@ -481,9 +475,13 @@ class PacienteFichaManageView(TemplateView):
         ficha = ficha_form.save(commit=False)
         creada = ficha.pk is None
 
-        # Si la ficha ya existe y pertenece a otro paciente, no permitimos cruzar datos
-        if ficha.pk and ficha.paciente_id and ficha.paciente_id != paciente.id:
-            raise ValidationError('La ficha encontrada pertenece a otro paciente y no puede reasignarse.')
+        # Doble verificación de seguridad:
+        # Si la ficha ya existe, verificamos que pertenezca al mismo paciente que estamos procesando.
+        if not creada and ficha.paciente_id and ficha.paciente_id != paciente.id:
+            raise ValidationError(
+                f"Seguridad: Esta ficha (ID {ficha.pk}) pertenece al paciente con ID {ficha.paciente_id} "
+                f"y no puede ser reasignada al paciente con ID {paciente.id}."
+            )
 
         # Asignar paciente
         ficha.paciente = paciente

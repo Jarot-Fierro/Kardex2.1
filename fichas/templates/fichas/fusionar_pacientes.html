@@ -26,8 +26,8 @@
                                         <input type="hidden" name="q_real" value="{{ q_real }}">
                                     {% endif %}
                                     <div class="input-group w-100">
-                                        <input type="text" name="q_ficticio" class="form-control"
-                                               placeholder="RUT o Ficha..." value="{{ q_ficticio|default:'' }}">
+                                        <input type="text" name="q_ficticio" class="form-control id_rut"
+                                               placeholder="RUT" value="{{ q_ficticio|default:'' }}">
                                         <div class="input-group-append">
                                             <button class="btn btn-warning" type="submit">
                                                 <i class="fas fa-search"></i> Buscar
@@ -40,14 +40,6 @@
                                     <div class="list-group mt-3">
                                         {% for p in resultados_ficticio %}
                                             <a href="?ficticio=
-
-
-
-
-
-
-
-
                                                     {{ p.id }}{% if paciente_real %}&real={{ paciente_real.id }}{% endif %}{% if q_ficticio %}&q_ficticio={{ q_ficticio }}{% endif %}{% if q_real %}&q_real={{ q_real }}{% endif %}"
                                                class="list-group-item list-group-item-action py-2">
                                                 <small class="text-muted d-block">{{ p.rut|default:"SIN RUT" }}</small>
@@ -93,7 +85,7 @@
                                         <input type="hidden" name="q_ficticio" value="{{ q_ficticio }}">
                                     {% endif %}
                                     <div class="input-group w-100">
-                                        <input type="text" name="q_real" class="form-control"
+                                        <input type="text" name="q_real" class="form-control id_rut"
                                                placeholder="RUT o Ficha..." value="{{ q_real|default:'' }}">
                                         <div class="input-group-append">
                                             <button class="btn btn-success" type="submit">
@@ -244,84 +236,6 @@
                             </div>
                         </div>
 
-                        <!-- Sección 3: Movimientos clínicos -->
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <div class="card h-100 shadow-sm">
-                                    <div class="card-header bg-warning-light">
-                                        <strong>Movimientos del Ficticio (Ficha {% if ficha_ficticia %}#
-                                            {{ ficha_ficticia.numero_ficha_sistema }}{% else %}N/A{% endif %})</strong>
-                                    </div>
-                                    <div class="card-body p-0">
-                                        <div class="table-responsive" style="max-height: 300px;">
-                                            <table class="table table-sm table-hover table-striped mb-0">
-                                                <thead class="thead-light">
-                                                <tr>
-                                                    <th><input type="checkbox" id="select-all-ficticio"></th>
-                                                    <th>Fecha</th>
-                                                    <th>Tipo</th>
-                                                    <th>Obs</th>
-                                                </tr>
-                                                </thead>
-                                                <tbody>
-                                                {% for mov in movimientos_ficticio %}
-                                                    <tr>
-                                                        <td><input type="checkbox" name="movimientos_ficticio"
-                                                                   value="{{ mov.id }}" class="chk-ficticio"></td>
-                                                        <td>{{ mov.fecha_envio|date:"d/m/Y H:i" }}</td>
-                                                        <td>{{ mov.get_estado_envio_display }}</td>
-                                                        <td title="{{ mov.observacion_envio }}">{{ mov.observacion_envio|truncatechars:20 }}</td>
-                                                    </tr>
-                                                {% empty %}
-                                                    <tr>
-                                                        <td colspan="4" class="text-center">No hay movimientos</td>
-                                                    </tr>
-                                                {% endfor %}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="card h-100 shadow-sm">
-                                    <div class="card-header bg-success-light">
-                                        <strong>Movimientos del Real (Ficha {% if ficha_real %}#
-                                            {{ ficha_real.numero_ficha_sistema }}{% else %}N/A{% endif %})</strong>
-                                    </div>
-                                    <div class="card-body p-0">
-                                        <div class="table-responsive" style="max-height: 300px;">
-                                            <table class="table table-sm table-hover table-striped mb-0">
-                                                <thead class="thead-light">
-                                                <tr>
-                                                    <th><input type="checkbox" id="select-all-real"></th>
-                                                    <th>Fecha</th>
-                                                    <th>Tipo</th>
-                                                    <th>Obs</th>
-                                                </tr>
-                                                </thead>
-                                                <tbody>
-                                                {% for mov in movimientos_real %}
-                                                    <tr>
-                                                        <td><input type="checkbox" name="movimientos_real"
-                                                                   value="{{ mov.id }}" class="chk-real"></td>
-                                                        <td>{{ mov.fecha_envio|date:"d/m/Y H:i" }}</td>
-                                                        <td>{{ mov.get_estado_envio_display }}</td>
-                                                        <td title="{{ mov.observacion_envio }}">{{ mov.observacion_envio|truncatechars:20 }}</td>
-                                                    </tr>
-                                                {% empty %}
-                                                    <tr>
-                                                        <td colspan="4" class="text-center">No hay movimientos</td>
-                                                    </tr>
-                                                {% endfor %}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
                         <!-- Sección 4: Resumen final -->
                         <div class="card border-danger mb-4 shadow">
                             <div class="card-header bg-danger text-white">
@@ -339,13 +253,14 @@
                                         <p>Ficha que será eliminada: <span id="summary-ficha-del"
                                                                            class="badge bg-danger">N/A</span></p>
                                         <p>Movimientos a traspasar: <span id="summary-mov-total"
-                                                                          class="badge bg-info">0</span></p>
+                                                                          class="badge bg-info">Total Automático</span></p>
                                     </div>
                                 </div>
                                 <div class="alert alert-warning mb-0 mt-3">
                                     <i class="fas fa-exclamation-triangle"></i>
                                     <strong>Advertencia:</strong> Esta acción modificará permanentemente los registros
                                     clínicos. La ficha seleccionada para eliminar será borrada físicamente, y el paciente ficticio será desactivado (si no se marca la casilla de borrar).
+                                    Se traspasarán todos los movimientos clínicos asociados automáticamente.
                                 </div>
                             </div>
                         </div>
@@ -443,9 +358,7 @@
 
                 $('#id_paciente_id_eliminar').val(idPacienteFicticio);
 
-                let countFicticio = $('.chk-ficticio:checked').length;
-                let countReal = $('.chk-real:checked').length;
-                $('#summary-mov-total').text(countFicticio + countReal);
+                $('#summary-mov-total').text('Total Automático');
             }
 
             $('.ficha-selector').on('change', function () {
@@ -455,18 +368,7 @@
                 updateSummary();
             });
 
-            $('.chk-ficticio, .chk-real').on('change', updateSummary);
             updateSummary();
-
-            // Select all checkboxes
-            $('#select-all-ficticio').on('change', function () {
-                $('.chk-ficticio').prop('checked', this.checked);
-                updateSummary();
-            });
-            $('#select-all-real').on('change', function () {
-                $('.chk-real').prop('checked', this.checked);
-                updateSummary();
-            });
 
             // Validación y Modal
             $('#btn-submit').on('click', function () {

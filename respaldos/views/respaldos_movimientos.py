@@ -1,5 +1,6 @@
 from django.http import HttpResponse
 from django.urls import reverse_lazy
+from django.utils.timezone import localtime
 from django.views.generic import DetailView
 from django.views.generic import TemplateView
 
@@ -22,13 +23,14 @@ class RespaldoMovimientosListView(DataTableMixin, TemplateView):
         return None
 
     def render_row(self, obj):
+        fecha_local = localtime(obj.created_at)
         return {
             'ID': obj.id,
             'Establecimiento': obj.establecimiento.nombre if obj.establecimiento else 'N/A',
             'N° Ficha': obj.numero_ficha,
             'Estado': obj.get_estado_display(),
             'Eliminado por': obj.usuario_eliminacion.username if obj.usuario_eliminacion else 'N/A',
-            'Fecha': obj.created_at.strftime('%d/%m/%Y %H:%M:%S')
+            'Fecha': fecha_local.strftime('%d/%m/%Y %H:%M:%S')
         }
 
     def get(self, request, *args, **kwargs):

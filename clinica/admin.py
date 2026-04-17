@@ -162,6 +162,8 @@ class MovimientoFichaAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
         "fecha_envio",
         "fecha_recepcion",
         "fecha_traspaso",
+        "created_by",
+        "updated_by",
     )
 
     fieldsets = (
@@ -209,6 +211,8 @@ class MovimientoFichaAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
             "fields": (
                 "created_at",
                 "updated_at",
+                "created_by",
+                "updated_by",
             )
         }),
     )
@@ -219,7 +223,7 @@ from .models import MovimientoMonologoControlado
 
 
 @admin.register(MovimientoMonologoControlado)
-class MovimientoMonologoControladoAdmin(admin.ModelAdmin):
+class MovimientoMonologoControladoAdmin(SimpleHistoryAdmin):
     list_display = (
         'id',
         'status_icon',
@@ -247,7 +251,7 @@ class MovimientoMonologoControladoAdmin(admin.ModelAdmin):
         'ficha__numero_ficha_tarjeta',
     )
 
-    raw_id_fields = (
+    autocomplete_fields = (
         'rut_paciente',
         'ficha',
         'profesional',
@@ -264,6 +268,65 @@ class MovimientoMonologoControladoAdmin(admin.ModelAdmin):
     )
 
     ordering = ('-id',)
+
+    readonly_fields = (
+        'created_at',
+        'updated_at',
+        'created_by',
+        'updated_by',
+    )
+
+    fieldsets = (
+        ("Información General", {
+            "fields": (
+                "establecimiento",
+                "rut",
+                "rut_paciente",
+                "numero_ficha",
+                "ficha",
+                "estado",
+                "status",
+            )
+        }),
+
+        ("Salida", {
+            "fields": (
+                "fecha_salida",
+                "usuario_entrega",
+                "usuario_entrega_id",
+                "profesional",
+                "profesional_anterior",
+                "observacion_salida",
+                "servicio_clinico_destino",
+            )
+        }),
+
+        ("Entrada", {
+            "fields": (
+                "fecha_entrada",
+                "usuario_entrada",
+                "usuario_entrada_id",
+                "observacion_entrada",
+            )
+        }),
+
+        ("Traspaso", {
+            "fields": (
+                "fecha_traspaso",
+                "usuario_traspaso",
+                "observacion_traspaso",
+            )
+        }),
+
+        ("Sistema", {
+            "fields": (
+                "created_at",
+                "updated_at",
+                "created_by",
+                "updated_by",
+            )
+        }),
+    )
 
     def status_icon(self, obj):
         return obj.status

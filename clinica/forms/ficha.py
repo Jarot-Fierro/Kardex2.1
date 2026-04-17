@@ -126,9 +126,14 @@ class FichaForm(forms.ModelForm):
         if not numero:
             return numero
 
-        # Obtener establecimiento desde el usuario
-        est = getattr(self.user, 'establecimiento', None)
+        # Priorizar establecimiento de la instancia, luego del usuario
+        est = getattr(self.instance, 'establecimiento', None)
+        if not est and self.user:
+            est = getattr(self.user, 'establecimiento', None)
+
         if not est:
+            # Si no hay establecimiento, no podemos validar la unicidad por establecimiento.
+            # Podríamos lanzar un error o simplemente dejar que pase si no es requerido.
             return numero
 
         qs = Ficha.objects.filter(
@@ -142,7 +147,8 @@ class FichaForm(forms.ModelForm):
 
         if qs.exists():
             raise forms.ValidationError(
-                "La ficha se está intentando duplicar. Bórrela para generar una automática o coloque una válida (que no esté ocupada)."
+                "Este número de ficha ya está ocupado en este establecimiento. "
+                "Por favor, use otro número o bórrelo para generar uno automático."
             )
 
         return numero
@@ -209,8 +215,11 @@ class FormFichaTarjeta(forms.ModelForm):
         if not numero:
             return numero
 
-        # Obtener establecimiento desde la instancia
+        # Priorizar establecimiento de la instancia, luego del usuario si estuviera disponible
         est = getattr(self.instance, 'establecimiento', None)
+        if not est and hasattr(self, 'user'):
+            est = getattr(self.user, 'establecimiento', None)
+
         if not est:
             return numero
 
@@ -225,7 +234,8 @@ class FormFichaTarjeta(forms.ModelForm):
 
         if qs.exists():
             raise forms.ValidationError(
-                "La ficha se está intentando duplicar. Bórrela para generar una automática o coloque una válida (que no esté ocupada)."
+                "Este número de ficha ya está ocupado en este establecimiento. "
+                "Por favor, use otro número o bórrelo para generar uno automático."
             )
 
         return numero

@@ -14,10 +14,10 @@ class RespaldoFicha(StandardModel):
     pasivado = models.BooleanField(default=False, verbose_name='Pasivado')
     observacion = models.TextField(null=True, blank=True, verbose_name='Observación')
 
-    usuario = models.ForeignKey('users.User', on_delete=models.PROTECT, null=True, blank=True,
+    usuario = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True, blank=True,
                                 verbose_name='Usuario', related_name='respaldo_fichas_usuarios')
 
-    usuario_anterior = models.ForeignKey('personas.UsuarioAnterior', on_delete=models.PROTECT, null=True, blank=True,
+    usuario_anterior = models.ForeignKey('personas.UsuarioAnterior', on_delete=models.SET_NULL, null=True, blank=True,
                                          verbose_name='Usuario Anterior', related_name='respaldo_fichas_usuarios_anteriores')
 
     rut_anterior = models.CharField(max_length=50, null=True, blank=True,
@@ -25,16 +25,16 @@ class RespaldoFicha(StandardModel):
 
     fecha_creacion_anterior = models.DateTimeField(null=True, blank=True)
 
-    paciente = models.ForeignKey('personas.Paciente', on_delete=models.PROTECT, null=True, blank=True,
+    paciente = models.ForeignKey('personas.Paciente', on_delete=models.SET_NULL, null=True, blank=True,
                                  verbose_name='Paciente', related_name='respaldo_fichas_pacientes')
 
     fecha_mov = models.DateTimeField(null=True, blank=True, verbose_name='Fecha de Movimiento')
 
-    establecimiento = models.ForeignKey('establecimientos.Establecimiento', on_delete=models.PROTECT, null=True,
+    establecimiento = models.ForeignKey('establecimientos.Establecimiento', on_delete=models.SET_NULL, null=True,
                                         blank=True,
                                         verbose_name='Establecimiento', related_name='respaldo_fichas_establecimientos')
 
-    sector = models.ForeignKey('establecimientos.Sector', on_delete=models.PROTECT, null=True, blank=True,
+    sector = models.ForeignKey('establecimientos.Sector', on_delete=models.SET_NULL, null=True, blank=True,
                                verbose_name='Sector', related_name='respaldo_fichas_sectores')
 
     # Auditoria de eliminación

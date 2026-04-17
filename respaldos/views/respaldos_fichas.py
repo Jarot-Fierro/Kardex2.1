@@ -1,5 +1,6 @@
 from django.http import HttpResponse
 from django.urls import reverse_lazy
+from django.utils.timezone import localtime
 from django.views.generic import DetailView
 from django.views.generic import TemplateView
 
@@ -22,12 +23,13 @@ class RespaldoFichasListView(DataTableMixin, TemplateView):
         return None
 
     def render_row(self, obj):
+        fecha_local = localtime(obj.created_at)
         return {
             'ID': obj.id,
             'N° Ficha Sistema': obj.numero_ficha_sistema,
             'RUT': obj.rut,
             'Eliminado por': obj.usuario_eliminacion.username if obj.usuario_eliminacion else 'N/A',
-            'Fecha': obj.created_at.strftime('%d/%m/%Y %H:%M:%S')
+            'Fecha': fecha_local.strftime('%d/%m/%Y %H:%M:%S')
         }
 
     def get(self, request, *args, **kwargs):

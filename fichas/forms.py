@@ -215,12 +215,12 @@ class FusionarPacientesForm(forms.Form):
 
     movimientos_ficticio = forms.ModelMultipleChoiceField(
         queryset=MovimientoFicha.objects.none(),
-        widget=forms.CheckboxSelectMultiple,
+        widget=forms.MultipleHiddenInput(),
         required=False
     )
     movimientos_real = forms.ModelMultipleChoiceField(
         queryset=MovimientoFicha.objects.none(),
-        widget=forms.CheckboxSelectMultiple,
+        widget=forms.MultipleHiddenInput(),
         required=False
     )
 

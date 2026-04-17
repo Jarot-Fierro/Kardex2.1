@@ -55,7 +55,7 @@ class RespaldoPaciente(StandardModel):
     fecha_fallecimiento = models.DateField(null=True, blank=True, verbose_name='Fecha de Fallecimiento')
     alergico_a = models.CharField(null=True, blank=True, max_length=200, verbose_name='Alergico a')
 
-    comuna = models.ForeignKey('geografia.Comuna', on_delete=models.PROTECT, null=False,
+    comuna = models.ForeignKey('geografia.Comuna', on_delete=models.SET_NULL, null=True, blank=True,
                                verbose_name='Comuna', related_name='respaldo_pacientes_comuna', default=1)
     prevision = models.ForeignKey('personas.Prevision', on_delete=models.SET_NULL, null=True, blank=True,
                                   verbose_name='Previsión', related_name='respaldo_pacientes_prevision', default=1)
@@ -67,7 +67,7 @@ class RespaldoPaciente(StandardModel):
     usuario = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True, blank=True,
                                 verbose_name='Usuario', related_name='respaldo_pacientes_usuario')
 
-    usuario_anterior = models.ForeignKey('personas.UsuarioAnterior', on_delete=models.PROTECT, null=True, blank=True,
+    usuario_anterior = models.ForeignKey('personas.UsuarioAnterior', on_delete=models.SET_NULL, null=True, blank=True,
                                          verbose_name='UsuarioAnterior', related_name='respaldo_usuarios_anteriores')
 
     # Auditoria de eliminación
