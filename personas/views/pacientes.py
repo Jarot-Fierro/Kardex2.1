@@ -866,7 +866,7 @@ class PacienteDeleteView(View):
                 # 2. Respaldar Paciente
                 last_ficha = fichas.last()
                 RespaldoPaciente.objects.create(
-                    ficha=str(last_ficha.numero_ficha_sistema) if last_ficha else 'SIN FICHA',
+                    ficha=ficha.numero_ficha_sistema if ficha.numero_ficha_sistema else 'SIN FICHA',
                     codigo=paciente.codigo,
                     id_anterior=paciente.id_anterior,
                     rut=paciente.rut,
