@@ -79,7 +79,7 @@ class FormUsuario(forms.ModelForm):
     roles = forms.ModelChoiceField(
         label='Rol',
         empty_label='Seleccione un Rol',
-        queryset=Role.objects.all(),
+        queryset=Role.objects.filter(status=True),
         widget=forms.Select(attrs={'class': 'form-control'}),
     )
     password1 = forms.CharField(

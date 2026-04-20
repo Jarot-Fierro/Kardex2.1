@@ -25,6 +25,11 @@ class RoleListView(DataTableMixin, TemplateView):
             return 'roles_update'
         return None
 
+
+    def get_base_queryset(self):
+        qs = Role.objects.filter(status=True)
+        return qs
+
     def render_row(self, obj):
         return {
             'ID': obj.rol_id,
@@ -49,6 +54,8 @@ class RoleListView(DataTableMixin, TemplateView):
             'columns': self.datatable_columns,
         })
         return context
+
+
 
 
 class RoleCreateView(CreateView):

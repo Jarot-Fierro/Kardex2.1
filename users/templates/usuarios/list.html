@@ -11,7 +11,7 @@
                     <h5 class="mb-0">Listado de Usuarios</h5>
                 </div>
                 <div class="col-auto text-end">
-                    {% if request.user.rol.usuario %}
+                    {% if request.user.rol.usuarios == 2 %}
                         <a href="{% url 'usuarios_create' %}" class="btn btn-primary">
                             <i class="fas fa-plus"></i> Nuevo Usuario
                         </a>

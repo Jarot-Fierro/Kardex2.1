@@ -1,4 +1,3 @@
-from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from import_export import resources, fields
 from import_export.admin import ImportExportModelAdmin
@@ -6,7 +5,7 @@ from import_export.widgets import ForeignKeyWidget
 from simple_history.admin import SimpleHistoryAdmin
 
 from establecimientos.models.establecimiento import Establecimiento
-from users.models import User, Role
+from users.models import User
 
 
 class UserResource(resources.ModelResource):
@@ -59,6 +58,67 @@ class UserResource(resources.ModelResource):
 # =========================
 # ADMIN
 # =========================
+
+from users.models import Role
+
+from django.contrib import admin
+
+@admin.action(description="Asignar rol Clinico")
+def asignar_clinico(modeladmin, request, queryset):
+    rol = Role.objects.filter(role_name="clinico").first()
+
+    if not rol:
+        modeladmin.message_user(
+            request,
+            "El rol 'clinico' no existe",
+            level="error"
+        )
+        return
+
+    for user in queryset:
+        user.rol = rol
+        user.save()
+
+
+@admin.action(description="Asignar rol Visualizador")
+def asignar_visualizador(modeladmin, request, queryset):
+    rol = Role.objects.filter(role_name="visualizador").first()
+
+    if not rol:
+        modeladmin.message_user(request, "El rol 'visualizador' no existe", level="error")
+        return
+
+    for user in queryset:
+        user.rol = rol
+        user.save()
+
+
+@admin.action(description="Asignar rol Solo Movimientos Clinicos")
+def asignar_movimientos(modeladmin, request, queryset):
+    rol = Role.objects.filter(role_name="solo movimientos clinicos").first()
+
+    if not rol:
+        modeladmin.message_user(request, "El rol no existe", level="error")
+        return
+
+    for user in queryset:
+        user.rol = rol
+        user.save()
+
+
+@admin.action(description="Asignar rol Administrador")
+def asignar_administrador(modeladmin, request, queryset):
+    rol = Role.objects.filter(role_name="administrador").first()
+
+    if not rol:
+        modeladmin.message_user(request, "El rol 'administrador' no existe", level="error")
+        return
+
+    for user in queryset:
+        user.rol = rol
+        user.save()
+
+
 @admin.register(User)
 class CustomUserAdmin(
     ImportExportModelAdmin,
@@ -66,6 +126,8 @@ class CustomUserAdmin(
     UserAdmin
 ):
     resource_class = UserResource
+
+    actions = [asignar_clinico, asignar_movimientos, asignar_visualizador, asignar_administrador]
 
     list_display = (
         'username',
@@ -115,18 +177,46 @@ class CustomUserAdmin(
     )
 
 
+@admin.action(description="Activar roles seleccionados")
+def activar_roles(modeladmin, request, queryset):
+    for role in queryset:
+        role.status = True
+        role.save()
+
+    modeladmin.message_user(request, "Roles activados correctamente")
+
+
+@admin.action(description="Desactivar roles seleccionados")
+def desactivar_roles(modeladmin, request, queryset):
+    for role in queryset:
+        role.status = False
+        role.save()
+
+    modeladmin.message_user(request, "Roles desactivados correctamente")
+
 
 @admin.register(Role)
 class RoleAdmin(admin.ModelAdmin):
+
+    def estado_icono(self, obj):
+        return obj.status
+
+    estado_icono.boolean = True
+    estado_icono.short_description = "Estado"
+
     list_display = (
-        'role_name', 'usuarios', 'comunas', 'establecimientos', 'fichas', 'genero', 'movimiento_ficha',
-        'pais', 'prevision', 'profesion', 'profesionales', 'sectores', 'servicio_clinico', 'soporte'
+        'role_name', 'usuarios', 'comunas', 'establecimientos', 'fichas', 'genero', 'movimiento_ficha', 'prevision',
+        'profesion', 'profesionales', 'sectores', 'servicio_clinico', 'estado_icono',
     )
     search_fields = ('role_name',)
 
+    actions = [activar_roles, desactivar_roles]
+
+
+
     fieldsets = (
         ("Información del Rol", {
-            "fields": ("role_name", "establecimiento",)
+            "fields": ("role_name", "establecimiento", "status",)
         }),
 
         ("Mantenedores", {

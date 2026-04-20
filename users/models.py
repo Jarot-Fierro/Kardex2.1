@@ -67,6 +67,11 @@ class Role(models.Model):
         (2, 'Lectura y escritura'),
     ]
 
+    STATUS_CHOICES = [
+        (True, 'Activo'),
+        (False, 'Inactivo'),
+    ]
+
     role_name = models.CharField(max_length=50, unique=True)
     usuarios = models.IntegerField(choices=PERMISSION_CHOICES, default=0)
     comunas = models.IntegerField(choices=PERMISSION_CHOICES, default=0)
@@ -85,6 +90,8 @@ class Role(models.Model):
     servicio_clinico = models.IntegerField(choices=PERMISSION_CHOICES, default=0)
     reportes = models.IntegerField(choices=PERMISSION_CHOICES, default=0)
     soporte = models.IntegerField(choices=PERMISSION_CHOICES, default=0)
+
+    status = models.BooleanField(choices=STATUS_CHOICES, default=True, verbose_name='Estado')
 
     establecimiento = models.ForeignKey(Establecimiento, on_delete=models.PROTECT, null=True, blank=True)
 
