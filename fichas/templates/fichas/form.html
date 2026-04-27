@@ -438,6 +438,38 @@
                                     {% endif %}
                                 </div>
                             </div>
+
+
+                        <div class="col-12 m-0 p-0">
+                                <div class="row no-gutters">
+                                    {% if ficha_form.instance.pk %}
+                                        <div class="col-4">
+                                            <a href="{% url 'pdf_ficha_reportlab' ficha_form.instance.pk %}"
+                                               class="btn btn-outline-secondary btn-block p-1 btn-imprimir-mini">
+                                                Carátula
+                                            </a>
+                                        </div>
+
+                                        <div class="col-4">
+                                            <a href="{% url 'pdf_stickers_66_25_ficha' ficha_form.instance.pk %}"
+                                               class="btn btn-outline-secondary btn-block p-1 btn-imprimir-mini">
+                                                Stickers
+                                            </a>
+                                        </div>
+                                    {% else %}
+                                        <div class="col-4">
+                                            <button class="btn btn-outline-secondary btn-block p-1" disabled>
+                                                Carátula
+                                            </button>
+                                        </div>
+                                        <div class="col-4">
+                                            <button class="btn btn-outline-secondary btn-block p-1" disabled>
+                                                Stickers
+                                            </button>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="card-body p-3">

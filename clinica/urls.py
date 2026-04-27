@@ -14,9 +14,10 @@ from clinica.views.movimiento_ficha_monologo_controlado import (
     SalidaFichaView, SalidaFichaUpdateView, RecepcionFichaView, FichasEnTransitoView, TraspasoFichaView
 )
 from clinica.views.pdf import (
+    pdf_caratula_reportlab,
     pdf_index, pdf_movimientos_fichas,
     pdf_movimientos_fichas_monologo_controlado, pdf_index_rn, pdf_stickers_ejemplos,
-    pdf_stickers_66_25
+    pdf_stickers_66_25, pdf_stickers_66_25_reportlab
 )
 
 urlpatterns = [
@@ -79,15 +80,18 @@ urlpatterns = [
         "pdfs/stickers/ejemplos/", pdf_stickers_ejemplos, name="pdf_stickers_ejemplos"
     ),
 
-    # path(
-    #     "pdfs/stickers-66-25/ficha/<int:ficha_id>/", pdf_stickers_66_25, name="pdf_stickers_66_25_ficha"
-    # ),
-    # path(
-    #     "pdfs/stickers-66-25/paciente/<int:paciente_id>/", pdf_stickers_66_25, name="pdf_stickers_66_25_paciente"
-    # ),
+    path(
+        "pdfs/stickers-66-25/ficha/<int:ficha_id>/", pdf_stickers_66_25_reportlab, name="pdf_stickers_66_25_ficha"
+    ),
+    path(
+        "pdfs/stickers-66-25/paciente/<int:paciente_id>/", pdf_stickers_66_25_reportlab, name="pdf_stickers_66_25_paciente"
+    ),
 
     path("pdfs/ficha/<int:ficha_id>/", pdf_index, name="pdf_ficha"),
     path("pdfs/ficha/paciente/<int:paciente_id>/", pdf_index, name="pdf_ficha_paciente"),
+
+    path("pdfs/reportlab/ficha/<int:ficha_id>/", pdf_caratula_reportlab, name="pdf_ficha_reportlab"),
+    path("pdfs/reportlab/paciente/<int:paciente_id>/", pdf_caratula_reportlab, name="pdf_ficha_paciente_reportlab"),
     path("pdfs/ficha/paciente-rn/<int:paciente_id>/", pdf_index_rn, name="pdf_ficha_paciente_rn"),
 
     path("pdfs/movimientos/", pdf_movimientos_fichas, name="pdf_movimientos_fichas"),

@@ -5,8 +5,15 @@ from types import SimpleNamespace
 
 import barcode
 from barcode.writer import ImageWriter
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import render, get_object_or_404
+from reportlab.graphics.barcode import code128
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import cm
+from reportlab.pdfgen import canvas
+from reportlab.platypus import Table, TableStyle, Paragraph
 
 from clinica.models import Ficha
 from clinica.models import MovimientoFicha
@@ -114,6 +121,237 @@ def pdf_index_rn(request, ficha_id=None, paciente_id=None):
     return render(request, 'pdfs/formato_caratula_rn.html', context)
 
 
+
+def pdf_caratula_reportlab(request, ficha_id=None, paciente_id=None):
+    ficha = None
+
+    if ficha_id is not None:
+        ficha = get_object_or_404(Ficha, id=ficha_id)
+        paciente = ficha.paciente
+    elif paciente_id is not None:
+        paciente = get_object_or_404(Paciente, id=paciente_id)
+        establecimiento = getattr(request.user, 'establecimiento', None)
+        if establecimiento is None:
+            raise Http404("El usuario no tiene un establecimiento asociado")
+        ficha = Ficha.objects.filter(
+            paciente=paciente,
+            establecimiento=establecimiento
+        ).first()
+        if ficha is None:
+            raise Http404("El paciente no tiene una ficha asociada para el establecimiento del usuario")
+    else:
+        raise Http404("Se requiere ficha")
+
+    # Preparar respuesta PDF
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'inline; filename="caratula_{paciente.rut or paciente.id}.pdf"'
+
+    buffer = BytesIO()
+    p = canvas.Canvas(buffer, pagesize=letter)
+    width, height = letter
+
+    # Margen de 1.5 cm aprox (50px era en HTML)
+    margin = 0.5 * cm
+    top_margin = height - margin
+
+    # 1. Encabezado (Número Ficha, Barcode, Fecha)
+    # Número Ficha
+    p.setFont("Helvetica-Bold", 40)
+    numero = ficha.numero_ficha_sistema or 0
+    num_ficha_str = f"{numero:,}".replace(",", ".")
+    # El HTML tiene un line-height de 0.8 y margin-top 0
+    p.drawString(margin, top_margin - 1.4 * cm, num_ficha_str)
+
+    # Código de Barras
+    rut_paciente = getattr(paciente, 'rut', '') or ''
+    numero_rut = obtener_numero_rut(rut_paciente)
+    if not numero_rut:
+        numero_rut = (getattr(paciente, 'codigo', '') or str(getattr(ficha, 'numero_ficha_sistema', '') or '')).strip()
+
+    # En HTML max-height: 90px (~2.4cm)
+    barcode_obj = code128.Code128(numero_rut, barHeight=1.5 * cm, barWidth=1.2)
+    barcode_width = barcode_obj.width
+    barcode_x = (width - barcode_width) / 2
+    barcode_obj.drawOn(p, barcode_x, top_margin - 1.8 * cm)
+
+    # Tabla Fecha Creación (Esquina superior derecha)
+    styles = getSampleStyleSheet()
+    fecha_creacion = ficha.fecha_creacion_anterior or ficha.created_at
+    fecha_str = fecha_creacion.strftime("%d/%m/%Y") if fecha_creacion else "-"
+    
+    style_fecha_label = ParagraphStyle(
+        'FechaLabel',
+        parent=styles['Normal'],
+        fontSize=11,
+        alignment=1, # Center
+        fontName='Helvetica-Bold'
+    )
+    style_fecha_value = ParagraphStyle(
+        'FechaValue',
+        parent=styles['Normal'],
+        fontSize=12,
+        alignment=1, # Center
+    )
+
+    data_fecha = [
+        [Paragraph("Fecha Creación", style_fecha_label)],
+        [Paragraph(fecha_str, style_fecha_value)]
+    ]
+    table_fecha = Table(data_fecha, colWidths=[3.8 * cm], rowHeights=[0.6 * cm, 0.7 * cm])
+    table_fecha.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('BOX', (0, 0), (-1, -1), 1, colors.black),
+        ('LINEBELOW', (0, 0), (0, 0), 1, colors.black),
+        ('ROUNDEDCORNERS', [8, 8, 8, 8]), 
+    ]))
+    tw, th = table_fecha.wrap(0, 0)
+    table_fecha.drawOn(p, width - margin - tw, top_margin - th)
+
+    # 2. Tabla Principal de Datos
+    styles = getSampleStyleSheet()
+    style_label = ParagraphStyle(
+        'CustomLabel',
+        parent=styles['Normal'],
+        fontSize=11,
+        leading=12,
+        fontName='Helvetica-Bold'
+    )
+    
+    style_value = ParagraphStyle(
+        'CustomValue',
+        parent=styles['Normal'],
+        fontSize=12,
+        leading=14,
+        fontName='Helvetica'
+    )
+
+    style_value_bold = ParagraphStyle(
+        'CustomValueBold',
+        parent=style_value,
+        fontName='Helvetica-Bold'
+    )
+    
+    style_value_red = ParagraphStyle(
+        'CustomValueRed',
+        parent=style_value_bold,
+        textColor=colors.red
+    )
+
+    style_header_h1 = ParagraphStyle(
+        'HeaderH1',
+        parent=styles['Normal'],
+        fontSize=20,
+        leading=22,
+        fontName='Helvetica-Bold'
+    )
+
+    style_header_h2 = ParagraphStyle(
+        'HeaderH2',
+        parent=styles['Normal'],
+        fontSize=18,
+        leading=20,
+        fontName='Helvetica-Bold'
+    )
+
+    def make_cell(label, value, value_style=style_value):
+        return [Paragraph(label, style_label), Paragraph(str(value or "-"), value_style)]
+
+    data = [
+        # Fila 1: Establecimiento / RUT | Ficha / Pasaporte
+        [
+            [Paragraph(getattr(ficha.establecimiento, 'nombre', '-'), style_header_h2),
+             Paragraph(f"R.U.T: {paciente.rut or '-'}", style_header_h1)],
+            '',
+            [Paragraph(f"Ficha: {num_ficha_str}", style_header_h2),
+             Paragraph(f"<b>Pasaporte: {paciente.pasaporte or '-'}</b>", style_value_bold)],
+            ''
+        ],
+        # Fila 2: Nombre Completo | Sexo | Estado Civil
+        [
+            make_cell("Apellido Paterno, Apellido Materno, Nombres", 
+                      f"{paciente.apellido_paterno or ''} {paciente.apellido_materno or ''} {paciente.nombre or ''}",
+                      style_value_bold),
+            '',
+            make_cell("Sexo", paciente.get_sexo_display() if hasattr(paciente, 'get_sexo_display') else paciente.sexo),
+            make_cell("Estado Civil", paciente.get_estado_civil_display() if hasattr(paciente, 'get_estado_civil_display') else paciente.estado_civil)
+        ],
+        # Fila 3: Fecha Nacimiento | Fecha Fallecimiento
+        [
+            make_cell("Fecha de Nacimiento", paciente.fecha_nacimiento.strftime("%d/%m/%Y") if paciente.fecha_nacimiento else "-"),
+            '',
+            make_cell("Fecha de Fallecimiento", 
+                      paciente.fecha_fallecimiento.strftime("%d/%m/%Y") if paciente.fecha_fallecimiento else "-",
+                      style_value_red if paciente.fecha_fallecimiento else style_value),
+            ''
+        ],
+        # Fila 4: Dirección | Teléfono 1 | Teléfono 2
+        [
+            make_cell("Dirección", f"{paciente.direccion or ''}, {paciente.comuna.nombre if paciente.comuna else ''}"),
+            '',
+            make_cell("N° Teléfono 1", paciente.numero_telefono1),
+            make_cell("N° Teléfono 2", paciente.numero_telefono2)
+        ],
+        # Fila 5: Nombre Social | Nombre Madre | Nombre Padre
+        [
+            make_cell("Nombre Social", paciente.nombre_social),
+            '',
+            make_cell("Nombre Madre", paciente.nombres_madre),
+            make_cell("Nombre Padre", paciente.nombres_padre)
+        ],
+        # Fila 6: Nombre del Cónyuge | Previsión
+        [
+            make_cell("Nombre del Cónyuge", paciente.nombre_pareja),
+            '',
+            make_cell("Previsión", paciente.prevision.nombre if paciente.prevision else "-"),
+            ''
+        ],
+        # Fila 7: Representante Legal | Ocupación
+        [
+            make_cell("Representante Legal", paciente.representante_legal),
+            '',
+            make_cell("Ocupación", paciente.ocupacion),
+            ''
+        ]
+    ]
+
+    col_widths = [(width - 2 * margin) * 0.4, (width - 2 * margin) * 0.1, (width - 2 * margin) * 0.25, (width - 2 * margin) * 0.25]
+    
+    main_table = Table(data, colWidths=col_widths)
+    main_table.setStyle(TableStyle([
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('SPAN', (0, 0), (1, 0)), # Establecimiento/RUT
+        ('SPAN', (2, 0), (3, 0)), # Ficha/Pasaporte
+        ('SPAN', (0, 1), (1, 1)), # Nombre
+        ('SPAN', (0, 2), (1, 2)), # Nacimiento
+        ('SPAN', (2, 2), (3, 2)), # Fallecimiento
+        ('SPAN', (0, 3), (1, 3)), # Dirección
+        ('SPAN', (0, 4), (1, 4)), # Nombre Social
+        ('SPAN', (0, 5), (1, 5)), # Cónyuge
+        ('SPAN', (2, 5), (3, 5)), # Previsión
+        ('SPAN', (0, 6), (1, 6)), # Representante
+        ('SPAN', (2, 6), (3, 6)), # Ocupación
+        ('LEFTPADDING', (0, 0), (-1, -1), 6),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+        ('ROUNDEDCORNERS', [8, 8, 8, 8]),
+    ]))
+
+    tw, th = main_table.wrap(0, 0)
+    # 50px de margen superior aprox 1.76cm. El header ocupa espacio.
+    main_table.drawOn(p, margin, top_margin - 2 * cm - th)
+
+    p.showPage()
+    p.save()
+
+    pdf = buffer.getvalue()
+    buffer.close()
+    response.write(pdf)
+    return response
+
+
 def pdf_stickers(request, ficha_id=None, paciente_id=None):
     ficha = None
 
@@ -217,6 +455,153 @@ def pdf_stickers_66_25(request, ficha_id=None, paciente_id=None):
     }
 
     return render(request, 'pdfs/Etiquetas-Stick_Write-66x25.html', context)
+
+
+def pdf_stickers_66_25_reportlab(request, ficha_id=None, paciente_id=None):
+    from reportlab.lib.units import mm
+    from reportlab.lib.pagesizes import letter
+
+    # Obtener el establecimiento del usuario
+    establecimiento = getattr(request.user, 'establecimiento', None)
+
+    # Lógica para obtener el paciente y la ficha
+    if paciente_id:
+        paciente = get_object_or_404(Paciente, id=paciente_id)
+        ficha = Ficha.objects.filter(
+            paciente=paciente,
+            establecimiento=establecimiento
+        ).first()
+    elif ficha_id:
+        ficha = get_object_or_404(Ficha, id=ficha_id)
+        paciente = ficha.paciente
+    else:
+        raise Http404("Se requiere ficha o paciente")
+
+    # Preparar datos
+    nombre = (getattr(paciente, 'nombre', '') or '').strip()
+    partes = nombre.split()
+    primer_nombre = partes[0] if partes else ''
+    apellido_paterno = getattr(paciente, 'apellido_paterno', '') or ''
+    apellido_materno = getattr(paciente, 'apellido_materno', '') or ''
+    nombre_corto = f"{primer_nombre} {apellido_paterno} {apellido_materno}".strip().upper()
+
+    fecha_nac = paciente.fecha_nacimiento.strftime("%d/%m/%Y") if paciente.fecha_nacimiento else ""
+    comuna = paciente.comuna.nombre if hasattr(paciente, 'comuna') and paciente.comuna else ""
+    info_nac = f"Nac: {fecha_nac}"
+    if comuna:
+        info_nac += f" - {comuna}"
+
+    num_ficha = ""
+    if ficha:
+        n = getattr(ficha, 'numero_ficha', getattr(ficha, 'numero_ficha_sistema', 0))
+        try:
+            num_ficha = f"FICHA {int(n):04d}"
+        except (ValueError, TypeError):
+            num_ficha = f"FICHA {n}"
+
+    rut_str = paciente.rut or "SIN RUT"
+
+    # Generar código de barras basado en el RUT o código
+    rut_paciente = getattr(paciente, 'rut', '') or ''
+    numero_rut = obtener_numero_rut(rut_paciente)
+    if not numero_rut:
+        numero_rut = (getattr(paciente, 'codigo', '') or str(getattr(ficha, 'numero_ficha_sistema', '') or '')).strip()
+
+    # Respuesta HTTP
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'inline; filename="stickers_66x25_{paciente.id}.pdf"'
+
+    buffer = BytesIO()
+    c = canvas.Canvas(buffer, pagesize=letter)
+    width_page, height_page = letter  # 215.9mm x 279.4mm
+
+    # Medidas según HTML:
+    # padding: 14mm 5mm 0 5mm;
+    # grid-template-columns: repeat(3, 66mm);
+    # grid-template-rows: repeat(10, 25mm);
+    # gap: 0mm 2mm;
+
+    col_width = 66.7 * mm
+    row_height = 26 * mm
+    gap_x = 2 * mm  # El usuario no menciona gap ahora, pero el ancho total 66.7*3 = 200.1mm cabe en 215.9mm
+    margin_top = 10 * mm  # 1 centimetro
+    margin_left = 5 * mm  # 0.5 centimetros
+    
+    # --- Variables de ajuste para el usuario ---
+    # Si necesita mover all el bloque hacia arriba o abajo, puede ajustar margin_top.
+    # El usuario pidió indicarle variables para ajustar milímetros/centímetros.
+    # margin_top = 1.0 * cm  # Ejemplo en cm
+
+    # En ReportLab el origen (0,0) es abajo a la izquierda.
+    # Necesitamos calcular las posiciones Y desde arriba.
+    
+    for row in range(10):
+        for col in range(3):
+            # Coordenadas de la celda
+            x = margin_left + col * col_width
+            y = height_page - margin_top - (row + 1) * row_height
+            
+            # --- Dibujar bordes del sticker (Solicitado por el usuario para ver separaciones) ---
+            c.setDash(1, 2)  # Línea discontinua opcional, o c.setDash() para sólida
+            c.setLineWidth(0.1)
+            c.rect(x, y, col_width, row_height, stroke=1, fill=0)
+            c.setDash()  # Restaurar a sólida para el resto del contenido
+            
+            # --- Dibujar contenido del sticker ---
+            # El sticker mide 25.4mm de alto.
+            # El último elemento (código de barras) debe tener un padding de 4mm para quedar justo al límite.
+            # Si el código de barras tiene que quedar "al final bajo, justo en los 25mm",
+            # y el alto es 25.4mm, calculamos desde el fondo de la celda.
+            
+            inner_x_center = x + col_width / 2.0
+            
+            # Calculamos las posiciones Y desde abajo hacia arriba
+            # El usuario dice: "el último elemento el codigo de barra debe tener un padding de 4mm"
+            # "el codigo de barra tiene que quedar al final bajo, justo en los 25mm" (asumo que se refiere a la base del sticker)
+            
+            bottom_padding = 0 * mm
+            bc_height = 4 * mm
+            bc_draw_y = y + bottom_padding
+            
+            # Espaciado entre elementos (ajustable para que quepan)
+            inter_spacing = 1.0 * mm
+            
+            rut_y = bc_draw_y + bc_height + 0.5 * mm
+            ficha_y = rut_y + 8 + inter_spacing
+            info_y = ficha_y + 8 + inter_spacing
+            nombre_y = info_y + 6.5 + inter_spacing
+
+            # 5. Código de barras (Abajo con padding de 4mm)
+            try:
+                bc = code128.Code128(numero_rut, barHeight=bc_height, barWidth=1)
+                bc_draw_x = inner_x_center - (bc.width / 2.0)
+                bc.drawOn(c, bc_draw_x, bc_draw_y)
+            except Exception:
+                pass
+
+            # 4. RUT (8pt)
+            c.setFont("Helvetica", 8)
+            c.drawCentredString(inner_x_center, rut_y, rut_str)
+
+            # 3. Ficha (8pt Bold)
+            c.setFont("Helvetica-Bold", 8)
+            c.drawCentredString(inner_x_center, ficha_y, num_ficha)
+
+            # 2. Info Nacimiento (6.5pt)
+            c.setFont("Helvetica", 6.5)
+            c.drawCentredString(inner_x_center, info_y, info_nac)
+
+            # 1. Nombre (8pt Bold)
+            c.setFont("Helvetica-Bold", 8)
+            c.drawCentredString(inner_x_center, nombre_y, nombre_corto)
+
+    c.showPage()
+    c.save()
+
+    pdf = buffer.getvalue()
+    buffer.close()
+    response.write(pdf)
+    return response
 
 
 def pdf_stickers_ejemplos(request):
