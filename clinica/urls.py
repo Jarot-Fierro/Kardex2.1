@@ -17,7 +17,7 @@ from clinica.views.pdf import (
     pdf_caratula_reportlab,
     pdf_index, pdf_movimientos_fichas,
     pdf_movimientos_fichas_monologo_controlado, pdf_index_rn, pdf_stickers_ejemplos,
-    pdf_stickers_66_25, pdf_stickers_66_25_reportlab
+    pdf_stickers_66_25, pdf_stickers_66_25_reportlab, pdf_caratula__rn_reportlab
 )
 
 urlpatterns = [
@@ -92,6 +92,9 @@ urlpatterns = [
 
     path("pdfs/reportlab/ficha/<int:ficha_id>/", pdf_caratula_reportlab, name="pdf_ficha_reportlab"),
     path("pdfs/reportlab/paciente/<int:paciente_id>/", pdf_caratula_reportlab, name="pdf_ficha_paciente_reportlab"),
+    path("pdfs/reportlab/ficha-rn/<int:ficha_id>/", pdf_caratula__rn_reportlab, name="pdf_ficha_rn_reportlab"),
+    path("pdfs/reportlab/paciente-rn/<int:paciente_id>/", pdf_caratula__rn_reportlab, name="pdf_ficha_paciente_rn_reportlab"),
+
     path("pdfs/ficha/paciente-rn/<int:paciente_id>/", pdf_index_rn, name="pdf_ficha_paciente_rn"),
 
     path("pdfs/movimientos/", pdf_movimientos_fichas, name="pdf_movimientos_fichas"),

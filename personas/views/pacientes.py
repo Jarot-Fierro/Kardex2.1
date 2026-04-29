@@ -420,7 +420,12 @@ class PacienteRecienNacidoListView(PacienteListView):
     ]
 
     def get_base_queryset(self):
-        return Paciente.objects.filter(recien_nacido=True, status=True).order_by('apellido_paterno')
+        return Paciente.objects.filter(
+            recien_nacido=True,
+            status=True,
+            fichas_pacientes__establecimiento=self.request.user.establecimiento,
+            fichas_pacientes__status=True
+        ).distinct().order_by('apellido_paterno')
 
     def render_row(self, obj):
         apellidos = f"{obj.apellido_paterno or ''} {obj.apellido_materno or ''}".strip()
@@ -522,7 +527,13 @@ class PacienteExtranjeroListView(PacienteListView):
         }
 
     def get_base_queryset(self):
-        return Paciente.objects.filter(extranjero=True, status=True).order_by('nombre')
+
+        return Paciente.objects.filter(
+            extranjero=True,
+            status=True,
+            fichas_pacientes__establecimiento=self.request.user.establecimiento,
+            fichas_pacientes__status=True
+        ).distinct().order_by('nombre')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -627,7 +638,14 @@ class PacienteFallecidoListView(PacienteListView):
     ]
 
     def get_base_queryset(self):
-        return Paciente.objects.filter(fallecido=True, status=True)
+
+        return Paciente.objects.filter(
+            fallecido=True,
+            status=True,
+            fichas_pacientes__establecimiento=self.request.user.establecimiento,
+            fichas_pacientes__status=True
+        ).distinct().order_by('apellido_paterno')
+
 
     def render_row(self, obj):
         apellidos = f"{obj.apellido_paterno or ''} {obj.apellido_materno or ''}".strip()

@@ -7,6 +7,12 @@
                 <dt class="col-sm-4">ID</dt>
                 <dd class="col-sm-8">{{ object.id }}</dd>
 
+                <dt class="col-sm-4">Número de Ficha</dt>
+                <dd class="col-sm-8">{{ object.ficha|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Código / ID Anterior</dt>
+                <dd class="col-sm-8">{{ object.codigo|default:"-" }} / {{ object.id_anterior|default:"-" }}</dd>
+
                 <dt class="col-sm-4">RUT / NIP / Pasaporte</dt>
                 <dd class="col-sm-8">{{ object.rut|default:object.nip|default:object.pasaporte|default:"-" }}</dd>
 
@@ -15,6 +21,23 @@
 
                 <dt class="col-sm-4">Nombre Social</dt>
                 <dd class="col-sm-8">{{ object.nombre_social|default:"-" }}</dd>
+
+                <dt class="col-sm-4">R.U.T. Madre</dt>
+                <dd class="col-sm-8">{{ object.rut_madre|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Pueblo Indígena</dt>
+                <dd class="col-sm-8">{{ object.pueblo_indigena|yesno:"Sí,No" }}</dd>
+
+                <dt class="col-sm-4">Responsable Temporal</dt>
+                <dd class="col-sm-8">
+                    {{ object.rut_responsable_temporal|default:"-" }}
+                    {% if object.usar_rut_madre_como_responsable %}
+                        <small class="text-muted">(Usar RUT madre como responsable)</small>
+                    {% endif %}
+                </dd>
+
+                <hr class="col-12">
+                <h6 class="col-12 text-primary">Datos de Nacimiento y Estado</h6>
 
                 <dt class="col-sm-4">Fecha Nacimiento</dt>
                 <dd class="col-sm-8">{{ object.fecha_nacimiento|date:"d/m/Y"|default:"-" }}</dd>
@@ -25,14 +48,14 @@
                 <dt class="col-sm-4">Estado Civil</dt>
                 <dd class="col-sm-8">{{ object.estado_civil }}</dd>
 
-                <dt class="col-sm-4">Dirección / Comuna</dt>
-                <dd class="col-sm-8">{{ object.direccion|default:"-" }}, {{ object.comuna }}</dd>
+                <dt class="col-sm-4">Ocupación</dt>
+                <dd class="col-sm-8">{{ object.ocupacion|default:"-" }}</dd>
 
-                <dt class="col-sm-4">Teléfonos</dt>
-                <dd class="col-sm-8">{{ object.numero_telefono1|default:"-" }} / {{ object.numero_telefono2|default:"-" }}</dd>
-
-                <dt class="col-sm-4">Previsión</dt>
-                <dd class="col-sm-8">{{ object.prevision|default:"-" }}</dd>
+                <dt class="col-sm-4">Atributos</dt>
+                <dd class="col-sm-8">
+                    <span class="badge {% if object.recien_nacido %}badge-info{% else %}badge-secondary{% endif %}">Recién Nacido: {{ object.recien_nacido|yesno:"Sí,No" }}</span>
+                    <span class="badge {% if object.extranjero %}badge-info{% else %}badge-secondary{% endif %}">Extranjero: {{ object.extranjero|yesno:"Sí,No" }}</span>
+                </dd>
 
                 <dt class="col-sm-4">Fallecido</dt>
                 <dd class="col-sm-8">
@@ -40,7 +63,44 @@
                     {% if object.fecha_fallecimiento %}({{ object.fecha_fallecimiento|date:"d/m/Y" }}){% endif %}
                 </dd>
 
+                <dt class="col-sm-4">Alérgico a</dt>
+                <dd class="col-sm-8 text-danger"><strong>{{ object.alergico_a|default:"Ninguna" }}</strong></dd>
+
                 <hr class="col-12">
+                <h6 class="col-12 text-primary">Datos Familiares</h6>
+
+                <dt class="col-sm-4">Padre / Madre</dt>
+                <dd class="col-sm-8">{{ object.nombres_padre|default:"-" }} / {{ object.nombres_madre|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Pareja</dt>
+                <dd class="col-sm-8">{{ object.nombre_pareja|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Representante Legal</dt>
+                <dd class="col-sm-8">{{ object.representante_legal|default:"-" }}</dd>
+
+                <hr class="col-12">
+                <h6 class="col-12 text-primary">Contacto y Dirección</h6>
+
+                <dt class="col-sm-4">Dirección / Comuna</dt>
+                <dd class="col-sm-8">{{ object.direccion|default:"-" }}, {{ object.comuna }}</dd>
+
+                <dt class="col-sm-4">Teléfonos</dt>
+                <dd class="col-sm-8">
+                    {{ object.numero_telefono1|default:"-" }} / {{ object.numero_telefono2|default:"-" }}
+                    {% if object.sin_telefono %}<span class="badge badge-warning ml-2">Sin teléfono informado</span>{% endif %}
+                </dd>
+
+                <dt class="col-sm-4">Previsión</dt>
+                <dd class="col-sm-8">{{ object.prevision|default:"-" }}</dd>
+
+                <hr class="col-12">
+                <h6 class="col-12 text-primary">Información de Auditoría</h6>
+
+                <dt class="col-sm-4">Usuario Sistema</dt>
+                <dd class="col-sm-8">{{ object.usuario|default:"-" }}</dd>
+
+                <dt class="col-sm-4">Usuario Anterior</dt>
+                <dd class="col-sm-8">{{ object.usuario_anterior|default:"-" }}</dd>
 
                 <dt class="col-sm-4">Usuario Eliminación</dt>
                 <dd class="col-sm-8">{{ object.usuario_eliminacion|default:"-" }}</dd>

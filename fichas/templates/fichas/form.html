@@ -13,9 +13,12 @@
                             <label class="label mr-3" for="rut">RUT: </label>
                             <input type="text" name="rut" id="rut" value="{{ request.GET.rut }}"
                                    class="form-control id_rut"
-                                   placeholder="RUT sin puntos y con guión">
+                                   placeholder="RUT sin puntos y sin guión" autofocus>
                             <span class="input-group-append">
                                 <button type="submit" class="btn btn-info btn-flat">Buscar</button>
+                                <a href="{% url 'ficha_paciente_manage' %}" class="btn btn-secondary btn-flat" title="Limpiar formulario">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
                             </span>
                         </div>
                     </form>
@@ -34,6 +37,9 @@
                                    placeholder="Número de ficha">
                             <span class="input-group-append">
                                 <button type="submit" class="btn btn-info btn-flat">Buscar</button>
+                                <a href="{% url 'ficha_paciente_manage' %}" class="btn btn-secondary btn-flat" title="Limpiar formulario">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
                             </span>
                         </div>
                     </form>
@@ -395,6 +401,7 @@
 
                         <div class="row">
                             <div class="col-12 m-0 p-0">
+                                <small class="text-bold text-primary">Versión 1</small>
                                 <div class="row no-gutters">
                                     {% if ficha_form.instance.pk %}
                                         <div class="col-4">
@@ -440,13 +447,20 @@
                             </div>
 
 
-                        <div class="col-12 m-0 p-0">
+                            <div class="col-12 m-0 p-0">
+                                <small class="text-bold text-primary">Versión 2</small>
                                 <div class="row no-gutters">
                                     {% if ficha_form.instance.pk %}
                                         <div class="col-4">
                                             <a href="{% url 'pdf_ficha_reportlab' ficha_form.instance.pk %}"
                                                class="btn btn-outline-secondary btn-block p-1 btn-imprimir-mini">
                                                 Carátula
+                                            </a>
+                                        </div>
+                                        <div class="col-4">
+                                            <a href="{% url 'pdf_ficha_rn_reportlab' ficha_form.instance.pk %}"
+                                               class="btn btn-outline-secondary btn-block p-1 btn-imprimir-mini">
+                                                C.SIN RUT
                                             </a>
                                         </div>
 
@@ -460,6 +474,11 @@
                                         <div class="col-4">
                                             <button class="btn btn-outline-secondary btn-block p-1" disabled>
                                                 Carátula
+                                            </button>
+                                        </div>
+                                        <div class="col-4">
+                                            <button class="btn btn-outline-secondary btn-block p-1" disabled>
+                                                C.SIN RUT
                                             </button>
                                         </div>
                                         <div class="col-4">

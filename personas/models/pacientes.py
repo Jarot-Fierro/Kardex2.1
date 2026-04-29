@@ -3,6 +3,7 @@ from simple_history.models import HistoricalRecords
 
 from core.choices import ESTADO_CIVIL, SEXO_CHOICES
 from core.models import StandardModel
+from core.validations import validate_rut, format_rut
 from personas.models.genero import Genero
 
 
@@ -96,18 +97,27 @@ class Paciente(StandardModel):
         # El usuario indica que el RUT debe guardarse con puntos y guion (ej: 20.930.055-9)
         if self.rut:
             self.rut = self.rut.strip().upper()
+            if validate_rut(self.rut):
+                self.rut = format_rut(self.rut)
+
+        if self.rut_madre:
+            self.rut_madre = self.rut_madre.strip().upper()
+            if validate_rut(self.rut_madre):
+                self.rut_madre = format_rut(self.rut_madre)
+
+        if self.rut_responsable_temporal:
+            self.rut_responsable_temporal = self.rut_responsable_temporal.strip().upper()
+            if validate_rut(self.rut_responsable_temporal):
+                self.rut_responsable_temporal = format_rut(self.rut_responsable_temporal)
+
         if self.nip:
             self.nip = self.nip.strip().upper()
         if self.nombre:
             self.nombre = self.nombre.strip().upper()
-        if self.rut_madre:
-            self.rut_madre = self.rut_madre.strip().upper()
         if self.apellido_paterno:
             self.apellido_paterno = self.apellido_paterno.strip().upper()
         if self.apellido_materno:
             self.apellido_materno = self.apellido_materno.strip().upper()
-        if self.rut_responsable_temporal:
-            self.rut_responsable_temporal = self.rut_responsable_temporal.strip().upper()
         if self.pasaporte:
             self.pasaporte = self.pasaporte.strip().upper()
         if self.nombre_social:

@@ -1,6 +1,7 @@
 from django import forms
 
 from clinica.models import Ficha, MovimientoFicha
+from core.validations import validate_rut, format_rut
 from personas.models.pacientes import Paciente
 
 
@@ -23,6 +24,8 @@ class PacienteForm(forms.ModelForm):
             'rut': forms.TextInput(attrs={'class': 'id_rut text-bold text-primary'}),
             'rut_madre': forms.TextInput(attrs={'class': 'id_rut'}),
             'rut_responsable_temporal': forms.TextInput(attrs={'class': 'id_rut'}),
+            'numero_telefono1': forms.TextInput(attrs={'class': 'telefono_personal'}),
+            'numero_telefono2': forms.TextInput(attrs={'class': 'telefono_personal'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -44,6 +47,9 @@ class PacienteForm(forms.ModelForm):
 
         # Normalizamos el RUT igual que en el modelo para comparar
         rut = rut.strip().upper()
+
+        if validate_rut(rut):
+            rut = format_rut(rut)
 
         # Buscamos si ya existe un paciente con este RUT
         qs = Paciente.objects.filter(rut=rut)

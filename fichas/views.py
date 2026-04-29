@@ -14,6 +14,7 @@ from django.views.generic import FormView, TemplateView
 
 from clinica.models import Ficha
 from clinica.models.movimiento_ficha import MovimientoFicha
+from core.validations import format_rut, validate_rut
 from geografia.models.comuna import Comuna
 from personas.models.pacientes import Paciente
 from .forms import FusionarPacientesForm, PacienteForm, FichaForm
@@ -47,6 +48,9 @@ class FusionarPacientesView(LoginRequiredMixin, PermissionRequiredMixin, FormVie
 
         # Búsqueda de pacientes ficticios filtrada por establecimiento y que estén activos
         if q_ficticio:
+            if validate_rut(q_ficticio):
+                q_ficticio = format_rut(q_ficticio)
+
             # Filtrar por establecimiento a través de la ficha del paciente
             base_qs = Paciente.objects.filter(fichas_pacientes__establecimiento=user_est, )
 
@@ -59,6 +63,9 @@ class FusionarPacientesView(LoginRequiredMixin, PermissionRequiredMixin, FormVie
 
         # Búsqueda de pacientes reales filtrada por establecimiento y que estén activos
         if q_real:
+            if validate_rut(q_real):
+                q_real = format_rut(q_real)
+
             # Filtrar por establecimiento a través de la ficha del paciente
             base_qs = Paciente.objects.filter(fichas_pacientes__establecimiento=user_est, )
 
@@ -189,10 +196,13 @@ class FusionarPacientesView(LoginRequiredMixin, PermissionRequiredMixin, FormVie
 
 class PacienteAutocompleteView(View):
     def get(self, request, *args, **kwargs):
-        term = request.GET.get('term', '')
+        term = request.GET.get('term', '').strip()
         user_est = self.request.user.establecimiento
         if not term:
             return JsonResponse({'results': []})
+
+        if validate_rut(term):
+            term = format_rut(term)
 
         # Filtrar pacientes por RUT o Ficha y por establecimiento
         base_qs = Paciente.objects.all()
@@ -359,6 +369,9 @@ class PacienteFichaManageView(TemplateView):
                 return None, None
 
         if rut:
+            if validate_rut(rut):
+                rut = format_rut(rut)
+
             paciente = Paciente.objects.filter(rut=rut).first()
             if paciente:
                 # Si encontramos al paciente, buscamos si tiene ficha en este establecimiento
@@ -392,6 +405,8 @@ class PacienteFichaManageView(TemplateView):
 
         rut = self.request.POST.get('paciente-rut', '').strip()
         if rut:
+            if validate_rut(rut):
+                rut = format_rut(rut)
             return Paciente.objects.filter(rut=rut).first()
 
         return None
