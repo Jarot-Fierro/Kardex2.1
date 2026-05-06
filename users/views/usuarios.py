@@ -58,15 +58,15 @@ class UserListView(DataTableMixin, TemplateView):
     template_name = 'usuarios/list.html'
     model = User
 
-    datatable_columns = ['ID', 'Usuario', 'Nombre', 'Correo', 'Establecimiento', 'Ultimo inicio']
+    datatable_columns = ['ID', 'RUT','Rol', 'Nombre', 'Correo', 'Establecimiento', 'Ultimo inicio']
 
     datatable_order_fields = [
-        'user_id', None, 'username', 'first_name', 'email',
+        'user_id', None, 'username','rol', 'first_name', 'email',
         'establecimiento__nombre', 'last_login'
     ]
 
     datatable_search_fields = [
-        'username__icontains', 'first_name__icontains', 'last_name__icontains',
+        'username__icontains','rol__role_name', 'first_name__icontains', 'last_name__icontains',
         'email__icontains', 'establecimiento__nombre__icontains'
     ]
 
@@ -85,14 +85,13 @@ class UserListView(DataTableMixin, TemplateView):
         qs = User.objects.select_related('establecimiento')
 
         # Si NO es superuser, filtramos por establecimiento
-        if not user.is_superuser:
-            if user.establecimiento:
-                qs = qs.filter(establecimiento=user.establecimiento)
-            else:
-                return User.objects.none()
+        if user.establecimiento:
+            qs = qs.filter(establecimiento=user.establecimiento)
+        else:
+            return User.objects.none()
 
         # Opcional: si quieres excluir superusuarios del listado
-        qs = qs.exclude(is_superuser=True)
+        qs = qs.exclude(is_creator_system=True)
 
         return qs.order_by('first_name')
 
@@ -106,7 +105,8 @@ class UserListView(DataTableMixin, TemplateView):
 
         return {
             'ID': obj.user_id,  # << tu PK real
-            'Usuario': obj.username,
+            'RUT': obj.username,
+            'Rol': obj.rol.role_name if obj.rol else "",
             'Nombre': nombre if nombre else '—',
             'Correo': obj.email or '—',
             'Establecimiento': obj.establecimiento.nombre if obj.establecimiento else '—',

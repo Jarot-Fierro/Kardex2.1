@@ -9,6 +9,7 @@ class User(AbstractUser):
     user_id = models.AutoField(primary_key=True)
     username = models.CharField(max_length=200, unique=True)
     password = models.CharField(max_length=128)
+    is_creator_system = models.BooleanField(default=False)
     establecimiento = models.ForeignKey('establecimientos.Establecimiento', on_delete=models.PROTECT, null=True,
                                         blank=True,
                                         verbose_name='Establecimiento'

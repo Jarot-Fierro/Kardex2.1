@@ -1,4 +1,5 @@
 from django.contrib.auth.admin import UserAdmin
+from django.db.models import Q
 from import_export import resources, fields
 from import_export.admin import ImportExportModelAdmin
 from import_export.widgets import ForeignKeyWidget
@@ -128,6 +129,26 @@ class CustomUserAdmin(
     resource_class = UserResource
 
     actions = [asignar_clinico, asignar_movimientos, asignar_visualizador, asignar_administrador]
+
+
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request).select_related('establecimiento')
+        user = request.user
+
+        # Tu filtro por establecimiento (lo mantengo)
+        if not user.is_superuser:
+            if user.establecimiento:
+                qs = qs.filter(establecimiento=user.establecimiento)
+            else:
+                return qs.none()
+
+        # 🔥 CONTROL VISUAL
+        qs = qs.filter(
+            Q(is_creator_system=False) | Q(pk=user.pk)
+        )
+
+        return qs
 
     list_display = (
         'username',
