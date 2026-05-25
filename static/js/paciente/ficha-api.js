@@ -52,7 +52,7 @@ $(document).ready(function () {
         ultimoRutConsultado = rut;
 
         $.ajax({
-            url: `/personas/ficha-paciente/${rut}`,
+            url: `${window.BASE_URL || '/'}personas/ficha-paciente/${rut}`,
             type: 'GET',
             dataType: 'json',
 

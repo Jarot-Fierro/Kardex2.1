@@ -62,6 +62,7 @@ INSTALLED_APPS = [
 
 AUTH_USER_MODEL = 'users.User'
 FORCE_SCRIPT_NAME = os.getenv('FORCE_SCRIPT_NAME') or None
+FORCE_SCRIPT_NAME_TO_HTML = os.getenv('FORCE_SCRIPT_NAME_TO_HTML', '')
 LOGIN_URL = os.getenv('LOGIN_URL', '/kardex/login/')
 LOGIN_REDIRECT_URL = os.getenv('LOGIN_REDIRECT_URL', '/kardex/dashboard/')
 LOGOUT_REDIRECT_URL = os.getenv('LOGOUT_REDIRECT_URL', '/kardex/login/')
@@ -162,7 +163,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = os.getenv('STATIC_URL', '/kardex/static/')
+STATIC_URL = os.getenv('STATIC_URL', '/static/')
 
 STATICFILES_DIRS = [
     BASE_DIR / 'static'

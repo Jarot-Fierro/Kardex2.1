@@ -1397,7 +1397,7 @@
                 ultimoRutConsultado = rut;
 
                 $.ajax({
-                    url: `/personas/ficha-paciente/${rut}`,
+                    url: `{{ BASE_URL }}personas/ficha-paciente/${rut}`,
                     type: 'GET',
                     dataType: 'json',
 
@@ -1481,7 +1481,7 @@
             if (!hayErrores) return;
 
             $.ajax({
-                url: `/personas/ficha-paciente/${rut}`,
+                url: `{{ BASE_URL }}personas/ficha-paciente/${rut}`,
                 type: 'GET',
                 dataType: 'json',
 
@@ -1765,7 +1765,7 @@
                     const btn = $(this);
                     btn.prop('disabled', true).text('Procesando...');
 
-                    ejecutarAccionClinica('/personas/api/paciente/actualizar-rut/', {
+                    ejecutarAccionClinica('{{ BASE_URL }}personas/api/paciente/actualizar-rut/', {
                         paciente_id: pacienteActual.id,
                         nuevo_rut: nuevoRut
                     }, function (response) {
@@ -1912,7 +1912,7 @@
                 $('#modalMovimientosFicha').modal('show');
 
                 $.ajax({
-                    url: `/clinica/api/movimientos/paciente/${rut}/`,
+                    url: `{{ BASE_URL }}clinica/api/movimientos/paciente/${rut}/`,
                     type: 'GET',
                     success: function (response) {
                         // ACTUALIZAR INFORMACIÓN DE INGRESO Y UBICACIÓN

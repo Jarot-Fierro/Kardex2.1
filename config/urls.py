@@ -1,3 +1,7 @@
+import os
+
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.db.models import Count
 from django.urls import path, include
@@ -50,3 +54,7 @@ urlpatterns = [
     path('fichas/', include('fichas.urls')),
     path('respaldos/', include('respaldos.urls')),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=os.path.join(settings.BASE_DIR, 'static'))

@@ -70,7 +70,7 @@
     <script>
         $('#id_paciente_select').select2({
             ajax: {
-                url: '/personas/api/pacientes/',
+                url: `${window.BASE_URL || '/'}personas/api/pacientes/`,
                 dataType: 'json',
                 delay: 250,
                 data: function (params) {

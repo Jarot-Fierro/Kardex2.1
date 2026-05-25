@@ -41,6 +41,10 @@
     <!-- AdminLTE -->
     <link rel="stylesheet" href="{% static 'adminlte3/css/adminlte.min.css' %}"/>
 
+    <script>
+        window.BASE_URL = "{{ BASE_URL }}";
+    </script>
+
 <body class="hold-transition layout-top-nav">
 <div class="wrapper">
     {% include 'core/components/banner.html' %}

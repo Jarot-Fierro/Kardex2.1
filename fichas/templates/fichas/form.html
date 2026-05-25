@@ -583,6 +583,11 @@
 
                 // Si tiene URL de AJAX, configuramos el transporte
                 if (ajaxUrl) {
+                    // Asegurar que la URL use BASE_URL si es relativa
+                    if (ajaxUrl.startsWith('/') && window.BASE_URL) {
+                        ajaxUrl = window.BASE_URL.replace(/\/$/, '') + ajaxUrl;
+                    }
+
                     options.ajax = {
                         url: ajaxUrl,
                         dataType: 'json',
