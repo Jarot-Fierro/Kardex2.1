@@ -1686,10 +1686,14 @@
                     // Configurar botón Pasivar/Activar
                     actualizarEstadoBotonPasivado(fichaActual ? fichaActual.pasivado : false);
 
-                    // Configurar Links dinámicos
-                    btnCaratula.attr('href', `/clinica/pdfs/ficha/paciente/${pacienteActual.id}/`);
-                    btnCaratulaRn.attr('href', `/clinica/pdfs/ficha/paciente-rn/${pacienteActual.id}/`);
-                    btnStickers.attr('href', `/clinica/pdfs/stickers/paciente/${pacienteActual.id}/`);
+                    // Configurar Links dinámicos usando Django reverse URL con placeholders
+                    const urlCaratula = "{% url 'pdf_ficha_paciente' 0 %}".replace('0', pacienteActual.id);
+                    const urlCaratulaRn = "{% url 'pdf_ficha_paciente_rn' 0 %}".replace('0', pacienteActual.id);
+                    const urlStickers = "{% url 'pdf_stickers_paciente' 0 %}".replace('0', pacienteActual.id);
+
+                    btnCaratula.attr('href', urlCaratula);
+                    btnCaratulaRn.attr('href', urlCaratulaRn);
+                    btnStickers.attr('href', urlStickers);
                     btnCaratula.attr('target', '_blank');
                     btnCaratulaRn.attr('target', '_blank');
                     btnStickers.attr('target', '_blank');
@@ -1783,7 +1787,7 @@
                 const btn = $(this);
                 btn.prop('disabled', true).text('Procesando...');
 
-                ejecutarAccionClinica('/personas/api/ficha/toggle-pasivado/', {
+                ejecutarAccionClinica('{{ BASE_URL }}personas/api/ficha/toggle-pasivado/', {
                     paciente_id: pacienteActual.id
                 }, function (response) {
                     $('#modalPasivarActivar').modal('hide');
@@ -1813,7 +1817,7 @@
                     const btn = $(this);
                     btn.prop('disabled', true).text('Procesando...');
 
-                    ejecutarAccionClinica('/personas/api/ficha/asignar-numero/', {
+                    ejecutarAccionClinica('{{ BASE_URL }}personas/api/ficha/asignar-numero/', {
                         paciente_id: pacienteActual.id,
                         nuevo_numero: nuevoNumero,
                         es_tarjeta: (tipo === 'tarjeta')
@@ -2299,8 +2303,10 @@
                 }
             }).on('select2:select', function (e) {
                 const data = e.params.data;
-                if (data.url) {
-                    window.location.href = data.url;
+                const pacienteId = data.paciente_id || data.id;
+                if (pacienteId) {
+                    const baseUrl = "{% url 'paciente_view_param' 0 %}".replace('0', pacienteId);
+                    window.location.href = baseUrl;
                 }
             });
         });

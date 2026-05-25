@@ -36,7 +36,7 @@ def paciente_search_api(request):
         results.append({
             "id": p.id,
             "text": display,
-            "url": f"/personas/paciente/{p.id}/"
+            "paciente_id": p.id  # Enviamos el ID en lugar de la URL hardcodeada
         })
 
     return JsonResponse({
