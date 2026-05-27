@@ -59,7 +59,8 @@
                     <div class="ficha-header align-items-center">
                         <div class="row">
                             <!-- ACCIONES -->
-                            <div class="col-md-8">
+                            {% if request.user.rol.paciente > 1 or request.rol.ficha > 1 %}
+                                <div class="col-md-8">
                                 <span class="fw-semibold d-block mb-1">Acciones</span>
                                 <div class="d-flex w-100">
                                     <!-- Botones en tu template -->
@@ -94,7 +95,7 @@
 
                                 </div>
                             </div>
-
+                            {% endif %}
                             <!-- IMPRIMIR -->
                             <div class="col-md-4 p-0">
                                 <span class="fw-semibold d-block mb-1">Imprimir</span>
