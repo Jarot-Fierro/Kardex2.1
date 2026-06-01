@@ -300,12 +300,19 @@
 
             // Función para limpiar campos de registro
             function limpiarRegistro() {
-                // Limpiar configuración de localStorage
+                // Solo limpiar campos del paciente y habilitar búsqueda
+                $('#id_ficha_hidden').val('');
+                $rut.val('').focus();
+                $('#nombre_paciente').val('');
+                $('#numero_ficha').val('');
+                // Opcional: si quieres limpiar campos de configuración, descomenta abajo
+                /*
                 configKeys.forEach(id => {
                     localStorage.removeItem('salida_config_' + id);
+                    $('#' + id).val('').trigger('change');
                 });
-                // Recargar la página para limpiar all
-                location.reload();
+                */
+                $btnRegistrar.prop('disabled', true);
             }
 
             $btnLimpiar.on('click', limpiarRegistro);
@@ -343,11 +350,17 @@
                         if (response.results && response.results.length > 0) {
                             const p = response.results[0];
                             if (p.en_transito) {
-                                Swal.fire('Advertencia', 'La ficha ya está en tránsito.', 'warning');
-                                limpiarRegistro();
+                                Swal.fire({
+                                    title: 'Advertencia',
+                                    text: 'La ficha ya está en tránsito (pendiente de recepción).',
+                                    icon: 'warning',
+                                    confirmButtonText: 'Entendido'
+                                }).then(() => {
+                                    limpiarRegistro();
+                                });
                             } else {
                                 $('#id_ficha_hidden').val(p.ficha_id);
-                                $rut.val(p.rut); // El RUT formateado/limpio que devuelve la API
+                                $rut.val(p.rut);
                                 $('#nombre_paciente').val(p.nombre_completo);
                                 $('#numero_ficha').val(p.numero_ficha_sistema);
                                 $btnRegistrar.prop('disabled', false);
@@ -357,8 +370,8 @@
                                     // Validar y Enviar Automáticamente tras cargar datos de la API
                                     const servicio = $('#id_servicio_clinico_destino').val();
                                     const profesional = $('#id_profesional').val();
-                                    const nombre = $('#nombre_paciente').val();
-                                    const ficha = $('#numero_ficha').val();
+                                    const nombre = p.nombre_completo;
+                                    const ficha = p.numero_ficha_sistema;
 
                                     if (nombre && ficha && servicio && profesional) {
                                         if (!isSubmitting) {
@@ -369,7 +382,7 @@
                                     } else {
                                         Swal.fire({
                                             title: 'Información Faltante',
-                                            text: 'Los campos de nombre, n ficha, servicio clínico y profesional deben estar seleccionados para el envío automático.',
+                                            text: 'Los campos de servicio clínico y profesional deben estar seleccionados para el envío automático.',
                                             icon: 'warning',
                                             confirmButtonText: 'Entendido'
                                         });
@@ -416,13 +429,12 @@
                     return;
                 }
 
-                const nombre = $('#nombre_paciente').val();
-                const ficha = $('#numero_ficha').val();
+                const nombre = $('#id_ficha_hidden').val(); // Usamos el ID de la ficha como proxy de validación
                 const servicio = $('#id_servicio_clinico_destino').val();
                 const profesional = $('#id_profesional').val();
 
-                if (!(nombre && ficha && servicio && profesional)) {
-                    Swal.fire('Campos requeridos', 'Los campos de nombre, N° ficha, servicio clínico y profesional deben estar seleccionados.', 'warning');
+                if (!(nombre && servicio && profesional)) {
+                    Swal.fire('Campos requeridos', 'Debe buscar un paciente y seleccionar servicio clínico y profesional.', 'warning');
                     isSubmitting = false;
                     $btnRegistrar.prop('disabled', false);
                     return;

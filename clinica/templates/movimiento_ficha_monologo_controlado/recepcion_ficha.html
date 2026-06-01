@@ -277,12 +277,15 @@
 
             // Función para limpiar campos de registro
             function limpiarRegistro() {
-                // Limpiar configuración de localStorage
-                configKeys.forEach(id => {
-                    localStorage.removeItem('recepcion_config_' + id);
-                });
-                // Recargar la página para limpiar all
-                location.reload();
+                // Solo limpiar campos del movimiento y paciente
+                $('#id_movimiento_hidden').val('');
+                $rut.val('').focus();
+                $('#nombre_mov').val('');
+                $('#id_ficha').val('');
+                $('#servicio_clinico_actual').val('');
+                $('#profesional_asignado').val('');
+                
+                $btnRegistrar.prop('disabled', true);
             }
 
             $btnLimpiar.on('click', limpiarRegistro);
@@ -320,8 +323,14 @@
                         if (response.results && response.results.length > 0) {
                             const p = response.results[0];
                             if (!p.en_espera) {
-                                Swal.fire('Advertencia', 'No se encontró un movimiento pendiente de recepción para esta ficha.', 'warning');
-                                limpiarRegistro();
+                                Swal.fire({
+                                    title: 'Advertencia',
+                                    text: 'No se encontró un movimiento pendiente de recepción para esta ficha.',
+                                    icon: 'warning',
+                                    confirmButtonText: 'Entendido'
+                                }).then(() => {
+                                    limpiarRegistro();
+                                });
                             } else {
                                 $('#id_movimiento_hidden').val(p.movimiento_id);
                                 $rut.val(p.rut);

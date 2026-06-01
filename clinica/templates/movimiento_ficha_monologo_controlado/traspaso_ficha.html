@@ -221,12 +221,15 @@
 
             // Función para limpiar campos de registro
             function limpiarRegistro() {
-                // Limpiar configuración de localStorage
-                configKeys.forEach(id => {
-                    localStorage.removeItem('traspaso_config_' + id);
-                });
-                // Recargar la página para limpiar all
-                location.reload();
+                // Solo limpiar campos del movimiento y paciente
+                $('#id_movimiento_hidden').val('');
+                $('#id_ficha_hidden').val('');
+                $rut.val('').focus();
+                $('#nombre_paciente').val('');
+                $('#numero_ficha').val('');
+                $('#id_observacion_traspaso').val('');
+                
+                $btnRegistrar.prop('disabled', true);
             }
 
             $btnLimpiar.on('click', limpiarRegistro);
@@ -263,13 +266,19 @@
                         if (response.results && response.results.length > 0) {
                             const p = response.results[0];
                             if (!p.movimiento_id) {
-                                Swal.fire('Información', 'No se encontró un movimiento previo para este paciente.', 'info');
-                                // Rellenamos lo básico por si acaso
-                                $('#id_rut').val(p.rut);
-                                $('#nombre_paciente').val(p.nombre_completo);
-                                $('#numero_ficha').val(p.numero_ficha_sistema);
-                                $('#id_ficha_hidden').val(p.ficha_id);
-                                $btnRegistrar.prop('disabled', true);
+                                Swal.fire({
+                                    title: 'Información',
+                                    text: 'No se encontró un movimiento previo para este paciente.',
+                                    icon: 'info',
+                                    confirmButtonText: 'Entendido'
+                                }).then(() => {
+                                    // Rellenamos lo básico por si acaso
+                                    $('#id_rut').val(p.rut);
+                                    $('#nombre_paciente').val(p.nombre_completo);
+                                    $('#numero_ficha').val(p.numero_ficha_sistema);
+                                    $('#id_ficha_hidden').val(p.ficha_id);
+                                    $btnRegistrar.prop('disabled', true);
+                                });
                             } else {
                                 $('#id_movimiento_hidden').val(p.movimiento_id);
                                 $rut.val(p.rut);
