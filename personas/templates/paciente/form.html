@@ -1560,6 +1560,42 @@
                     el.telefono1, el.telefono2
                 ]);
 
+                // Limpiar errores previos de RUT si existen
+                if (el.rut) {
+                    el.rut.classList.remove('is-invalid');
+                    const errorDiv = el.rut.parentElement.querySelector('.invalid-feedback.rut-custom-error');
+                    if (errorDiv) errorDiv.remove();
+                }
+
+                // Validación de RUT en tiempo real si no es RN ni Extranjero
+                if (!rn && !ext && el.rut && el.rut.value.trim() !== '') {
+                    const rutVal = el.rut.value.trim().replace(/\./g, '').replace(/-/g, '').toUpperCase();
+                    if (rutVal.length >= 7) {
+                        const body = rutVal.slice(0, -1);
+                        const dv = rutVal.slice(-1);
+
+                        // Función de validación interna
+                        let suma = 0;
+                        let mult = 2;
+                        for (let i = body.length - 1; i >= 0; i--) {
+                            suma += parseInt(body.charAt(i)) * mult;
+                            mult = mult === 7 ? 2 : mult + 1;
+                        }
+                        const expected = 11 - (suma % 11);
+                        let dvExpected = expected === 11 ? '0' : (expected === 10 ? 'K' : expected.toString());
+
+                        if (dv !== dvExpected) {
+                            el.rut.classList.add('is-invalid');
+                            if (!el.rut.parentElement.querySelector('.rut-custom-error')) {
+                                const div = document.createElement('div');
+                                div.className = 'invalid-feedback rut-custom-error d-block';
+                                div.innerText = 'El RUT no corresponde a un RUT válido en Chile.';
+                                el.rut.parentElement.appendChild(div);
+                            }
+                        }
+                    }
+                }
+
                 // ESTÁNDAR
                 if (!rn && !ext && !fal) {
                     disable([el.nip, el.pasaporte, el.rut_resp, el.fecha_fallecimiento]);
@@ -1618,10 +1654,15 @@
 
             document.addEventListener('change', e => {
                 if (!e.target) return;
-                if (['id_recien_nacido', 'id_extranjero', 'id_fallecido', 'id_sin_telefono'].includes(e.target.id)) {
+                if (['id_recien_nacido', 'id_extranjero', 'id_fallecido', 'id_sin_telefono', 'id_rut'].includes(e.target.id)) {
                     applyRules();
                 }
             });
+
+            if (el.rut) {
+                el.rut.addEventListener('keyup', applyRules);
+                el.rut.addEventListener('blur', applyRules);
+            }
 
             document.addEventListener('DOMContentLoaded', applyRules);
             window.actualizarReglasPaciente = applyRules;

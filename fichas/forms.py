@@ -42,12 +42,20 @@ class PacienteForm(forms.ModelForm):
 
     def clean_rut(self):
         rut = self.cleaned_data.get('rut')
+        recien_nacido = self.data.get(self.add_prefix('recien_nacido')) == 'on' or self.data.get(self.add_prefix('recien_nacido')) is True
+        extranjero = self.data.get(self.add_prefix('extranjero')) == 'on' or self.data.get(self.add_prefix('extranjero')) is True
+
         if not rut:
             return rut
 
         # Normalizamos el RUT igual que en el modelo para comparar
         rut = rut.strip().upper()
 
+        # Validación de RUT Chileno si no es recién nacido ni extranjero
+        if not recien_nacido and not extranjero:
+            if not validate_rut(rut):
+                self.add_error('rut', "El RUT no corresponde a un RUT válido en Chile.")
+        
         if validate_rut(rut):
             rut = format_rut(rut)
 

@@ -471,16 +471,22 @@ class PacienteForm(forms.ModelForm):
 
     def clean_rut(self):
         rut = self.cleaned_data.get('rut')
+        recien_nacido = self.data.get('recien_nacido') == 'on' or self.data.get('recien_nacido') is True
+        extranjero = self.data.get('extranjero') == 'on' or self.data.get('extranjero') is True
 
         if not rut:
             return rut
 
-        rut_limpio = rut
+        rut_limpio = rut.strip().upper()
 
-        if not validate_rut(rut_limpio):
-            raise ValidationError(f"El RUT ingresado no es válido en CHILE.")
+        if not recien_nacido and not extranjero:
+            if not validate_rut(rut_limpio):
+                raise ValidationError(f"El RUT ingresado no es válido en CHILE.")
 
-        return format_rut(rut_limpio)
+        if validate_rut(rut_limpio):
+            return format_rut(rut_limpio)
+
+        return rut_limpio
 
     def clean(self):
         cleaned = super().clean()
