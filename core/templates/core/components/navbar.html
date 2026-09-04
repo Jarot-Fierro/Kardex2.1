@@ -96,14 +96,17 @@
                            aria-expanded="false" class="nav-link dropdown-toggle">Consulta Pacientes</a>
                         <ul aria-labelledby="dropdownSubMenuPatient" class="dropdown-menu border-0 shadow">
                             <li>
-                                <a href="{% url 'paciente_view' %}" class="dropdown-item text-bold">Consulta Paciente</a>
+                                <a href="{% url 'paciente_view' %}" class="dropdown-item text-bold">Consulta
+                                    Paciente</a>
                             </li>
                             <li>
-                                <a href="{% url 'ficha_paciente_manage' %}" class="dropdown-item text-bold text-primary">Consulta Paciente v2</a>
+                                <a href="{% url 'ficha_paciente_manage' %}"
+                                   class="dropdown-item text-bold text-primary">Consulta Paciente v2</a>
                             </li>
                             <li class="dropdown-divider"></li>
                             <li>
-                                <a href="{% url 'fusionar_pacientes' %}" class="dropdown-item">Fusionar Pacientes <span class="text-danger">(RN/EXT)</span></a>
+                                <a href="{% url 'fusionar_pacientes' %}" class="dropdown-item">Fusionar Pacientes <span
+                                        class="text-danger">(RN/EXT)</span></a>
                             </li>
                             <li class="dropdown-divider"></li>
 
@@ -193,62 +196,92 @@
                             <li class="dropdown-divider"></li>
 
 
-
                         </ul>
                     </li>
                 {% endif %}
 
                 {% if user_permissions.movimiento_ficha_controlado > 0 %}
                     <li class="nav-item dropdown">
-                    <a id="dropdownSubMenu3" href="#" data-toggle="dropdown" aria-haspopup="true"
-                       aria-expanded="false" class="nav-link dropdown-toggle">Movimiento Ficha</a>
-                    <ul aria-labelledby="dropdownSubMenu3" class="dropdown-menu border-0 shadow">
+                        <a id="dropdownSubMenu3" href="#" data-toggle="dropdown" aria-haspopup="true"
+                           aria-expanded="false" class="nav-link dropdown-toggle">Movimiento Ficha</a>
+                        <ul aria-labelledby="dropdownSubMenu3" class="dropdown-menu border-0 shadow">
 
-                    {% if user_permissions.movimiento_ficha_controlado > 0 %}
+                            {% if user_permissions.movimiento_ficha_controlado > 0 %}
 
-                        <!-- ===== BLOQUE 2: MONÓLOGO ===== -->
-                        <li class="dropdown-header text-success font-weight-bold d-flex justify-content-between align-items-center">
-                            <span>📁 Enviar y Recibir Normal</span>
+                                <!-- ===== BLOQUE 2: MONÓLOGO ===== -->
+                                <li class="dropdown-header text-success font-weight-bold d-flex justify-content-between align-items-center">
+                                    <span>📁 Enviar y Recibir Normal</span>
 
-                            <button type="button"
-                                    class="btn btn-sm btn-outline-success ml-2"
-                                    data-toggle="modal"
-                                    data-target="#modalSome"
-                                    style="padding:2px 6px;">
-                                ?
-                            </button>
-                        </li>
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-success ml-2"
+                                            data-toggle="modal"
+                                            data-target="#modalSome"
+                                            style="padding:2px 6px;">
+                                        ?
+                                    </button>
+                                </li>
 
 
-                        <li>
-                            <a href="{% url 'movimiento_monologo_salida' %}" class="dropdown-item">
-                                Salida Rápida
-                            </a>
-                        </li>
+                                <li>
+                                    <a href="{% url 'movimiento_monologo_salida' %}" class="dropdown-item">
+                                        Salida Rápida
+                                    </a>
+                                </li>
 
-                        <li>
-                            <a href="{% url 'movimiento_monologo_recepcion' %}" class="dropdown-item">
-                                Entrada Rápida
-                            </a>
-                        </li>
-                        <li class="dropdown-divider"></li>
-                        <li>
-                            <a href="{% url 'movimiento_monologo_traspaso' %}" class="dropdown-item">
-                                Traspaso Rápido
-                            </a>
-                        </li>
-                        <li class="dropdown-divider"></li>
+                                <li>
+                                    <a href="{% url 'movimiento_monologo_recepcion' %}" class="dropdown-item">
+                                        Entrada Rápida
+                                    </a>
+                                </li>
+                                <li class="dropdown-divider"></li>
+                                <li>
+                                    <a href="{% url 'movimiento_monologo_traspaso' %}" class="dropdown-item">
+                                        Traspaso Rápido
+                                    </a>
+                                </li>
+                                <li class="dropdown-divider"></li>
 
-                        <li>
-                            <a href="{% url 'fichas_en_transito_monologo' %}" class="dropdown-item">
-                                Fichas en Transito
-                            </a>
-                        </li>
-                    {% endif %}
-                </ul>
-                </li>
+                                <li>
+                                    <a href="{% url 'fichas_en_transito_monologo' %}" class="dropdown-item">
+                                        Fichas en Transito
+                                    </a>
+                                </li>
+                                <li class="dropdown-divider"></li>
+
+                                <li>
+                                    <a href="{% url 'movimientos_fichas_monologo_controlado_trazabilidad' %}"
+                                       class="dropdown-item">
+                                        Todos de Movimientos
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </li>
                 {% endif %}
 
+
+                <li class="nav-item dropdown">
+                    <a id="dropdownSubMenu4" href="#" data-toggle="dropdown" aria-haspopup="true"
+                       aria-expanded="false" class="nav-link dropdown-toggle">Ficha Clínica</a>
+                    <ul aria-labelledby="dropdownSubMenu3" class="dropdown-menu border-0 shadow">
+
+                        <li>
+                            <a href="{% url 'categoria_list' %}" class="dropdown-item">
+                                Categorías
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'plantilla_list' %}" class="dropdown-item">
+                                Plantillas
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'documento_list' %}" class="dropdown-item">
+                                Documentos
+                            </a>
+                        </li>
+                    </ul>
+                </li>
 
 
             </ul>
@@ -258,25 +291,25 @@
             <li class="nav-item dropdown">
                 <a id="dropdownUserMenu" href="#" data-toggle="dropdown" aria-haspopup="true"
                    aria-expanded="false" class="nav-link dropdown-toggle">
-                        <span class="badge badge-primary">{{ request.user.first_name|default:request.user.username }}</span>
+                    <span class="badge badge-primary">{{ request.user.first_name|default:request.user.username }}</span>
 
                     <i class="fas fa-user ml-1"></i>
                 </a>
                 <ul aria-labelledby="dropdownUserMenu" class="dropdown-menu dropdown-menu-right border-0 shadow">
 
-{#                    <li class="bg-body-tertiary border-bottom px-3 py-3">#}
-{#                        <div class="d-flex align-items-center gap-3">#}
-{##}
-{#                            <div class="flex-grow-1">#}
-{#                                <div class="text-uppercase text-muted fw-semibold small" style="letter-spacing: .5px;">#}
-{#                                    Establecimiento actual#}
-{#                                </div>#}
-{#                                <div class="text-bold text-success small text-wrap">#}
-{#                                    {{ request.user.establecimiento|default:"Sin establecimiento asignado" }}#}
-{#                                </div>#}
-{#                            </div>#}
-{#                        </div>#}
-{#                    </li>#}
+                    {#                    <li class="bg-body-tertiary border-bottom px-3 py-3">#}
+                    {#                        <div class="d-flex align-items-center gap-3">#}
+                    {##}
+                    {#                            <div class="flex-grow-1">#}
+                    {#                                <div class="text-uppercase text-muted fw-semibold small" style="letter-spacing: .5px;">#}
+                    {#                                    Establecimiento actual#}
+                    {#                                </div>#}
+                    {#                                <div class="text-bold text-success small text-wrap">#}
+                    {#                                    {{ request.user.establecimiento|default:"Sin establecimiento asignado" }}#}
+                    {#                                </div>#}
+                    {#                            </div>#}
+                    {#                        </div>#}
+                    {#                    </li>#}
 
                     {% if request.user.is_superuser %}
                         <li>

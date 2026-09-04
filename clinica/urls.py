@@ -11,7 +11,8 @@ from clinica.apis.movimientos_ficha_paciente import get_movimientos_paciente_est
 from clinica.views.fichas import *
 from clinica.views.movimiento_ficha import *
 from clinica.views.movimiento_ficha_monologo_controlado import (
-    SalidaFichaView, SalidaFichaUpdateView, RecepcionFichaView, FichasEnTransitoView, TraspasoFichaView
+    SalidaFichaView, SalidaFichaUpdateView, RecepcionFichaView, FichasEnTransitoView, TraspasoFichaView,
+    MovimientoMonologoControladoListView
 )
 from clinica.views.pdf import (
     pdf_caratula_reportlab,
@@ -84,7 +85,8 @@ urlpatterns = [
         "pdfs/stickers-66-25/ficha/<int:ficha_id>/", pdf_stickers_66_25_reportlab, name="pdf_stickers_66_25_ficha"
     ),
     path(
-        "pdfs/stickers-66-25/paciente/<int:paciente_id>/", pdf_stickers_66_25_reportlab, name="pdf_stickers_66_25_paciente"
+        "pdfs/stickers-66-25/paciente/<int:paciente_id>/", pdf_stickers_66_25_reportlab,
+        name="pdf_stickers_66_25_paciente"
     ),
 
     path("pdfs/ficha/<int:ficha_id>/", pdf_index, name="pdf_ficha"),
@@ -93,11 +95,15 @@ urlpatterns = [
     path("pdfs/reportlab/ficha/<int:ficha_id>/", pdf_caratula_reportlab, name="pdf_ficha_reportlab"),
     path("pdfs/reportlab/paciente/<int:paciente_id>/", pdf_caratula_reportlab, name="pdf_ficha_paciente_reportlab"),
     path("pdfs/reportlab/ficha-rn/<int:ficha_id>/", pdf_caratula__rn_reportlab, name="pdf_ficha_rn_reportlab"),
-    path("pdfs/reportlab/paciente-rn/<int:paciente_id>/", pdf_caratula__rn_reportlab, name="pdf_ficha_paciente_rn_reportlab"),
+    path("pdfs/reportlab/paciente-rn/<int:paciente_id>/", pdf_caratula__rn_reportlab,
+         name="pdf_ficha_paciente_rn_reportlab"),
 
     path("pdfs/ficha/paciente-rn/<int:paciente_id>/", pdf_index_rn, name="pdf_ficha_paciente_rn"),
 
     path("pdfs/movimientos/", pdf_movimientos_fichas, name="pdf_movimientos_fichas"),
     path("pdfs/movimientos-monologo/", pdf_movimientos_fichas_monologo_controlado,
          name="pdf_movimientos_fichas_monologo_controlado"),
+
+    path("movimientos-monologo/trazabilidad/", MovimientoMonologoControladoListView.as_view(),
+         name="movimientos_fichas_monologo_controlado_trazabilidad"),
 ]

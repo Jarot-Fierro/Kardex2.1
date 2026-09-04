@@ -1,9 +1,9 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Case, When, IntegerField, Value
 from django.db.models import Q
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.views.generic import TemplateView
 
@@ -14,6 +14,7 @@ from clinica.forms.movimiento_ficha_monologo_controlado import (
 )
 from clinica.models import Ficha
 from clinica.models.movimiento_ficha_monologo_controlado import MovimientoMonologoControlado
+from core.mixin import DataTableMixin
 from core.utils.search_utils import get_rut_q_filter, get_name_q_filter
 from personas.models.pacientes import Paciente
 
@@ -583,3 +584,259 @@ class FichasEnTransitoView(LoginRequiredMixin, TemplateView):
             'recordsFiltered': records_filtered,
             'data': data
         })
+
+
+class MovimientoMonologoControladoListView(DataTableMixin, TemplateView):
+    template_name = 'movimiento_ficha_monologo_controlado/list.html'
+    model = MovimientoMonologoControlado
+    datatable_columns = [
+        'ID',
+        'RUT',
+        'N° Ficha',
+        'Paciente',
+        'Establecimiento',
+        'Servicio Destino',
+        'Profesional',
+        'Estado',
+        'Fecha Salida',
+        'Fecha Entrada',
+        'Fecha Traspaso',
+    ]
+    datatable_order_fields = [
+        'id',
+        None,
+        'rut',
+        'numero_ficha',
+        'rut_paciente__nombre',
+        'establecimiento__nombre',
+        'servicio_clinico_destino__nombre',
+        'profesional__nombres',
+        'estado',
+        'fecha_salida',
+        'fecha_entrada',
+        'fecha_traspaso',
+    ]
+    datatable_search_fields = [
+        'rut__icontains',
+        'rut_paciente__rut__icontains',
+        'ficha__paciente__rut__icontains',
+        'numero_ficha__icontains',
+        'ficha__numero_ficha_sistema__icontains',
+        'rut_paciente__nombre__icontains',
+        'rut_paciente__apellido_paterno__icontains',
+        'rut_paciente__apellido_materno__icontains',
+        'ficha__paciente__nombre__icontains',
+        'ficha__paciente__apellido_paterno__icontains',
+        'ficha__paciente__apellido_materno__icontains',
+        'profesional__nombres__icontains',
+        'profesional_anterior__icontains',
+        'servicio_clinico_destino__nombre__icontains',
+        'establecimiento__nombre__icontains',
+    ]
+
+    url_detail = 'ficha_detail'
+
+    def get_url_update(self):
+        return None
+
+    def get_url_delete(self):
+        return None
+
+    def get_actions(self, obj):
+        ficha_id = obj.ficha_id if getattr(obj, 'ficha_id', None) else None
+        if not ficha_id and getattr(obj, 'ficha', None):
+            ficha_id = obj.ficha.id
+        if ficha_id:
+            return f"""
+                <a href="{reverse_lazy('ficha_detail', kwargs={'pk': ficha_id})}"
+                   class="btn p-1 btn-sm btn-secondary view-btn" title="Ver detalle">
+                   <i class="fas fa-search"></i></a>
+            """
+        return ''
+
+    def filter_queryset(self, qs, search_value):
+        if not search_value:
+            return qs
+
+        q = get_rut_q_filter(search_value, 'rut')
+        q |= get_rut_q_filter(search_value, 'rut_paciente__rut')
+        q |= get_rut_q_filter(search_value, 'ficha__paciente__rut')
+        q |= get_name_q_filter(search_value, 'rut_paciente__')
+        q |= get_name_q_filter(search_value, 'ficha__paciente__')
+
+        clean_val = search_value.strip()
+        if clean_val.isdigit():
+            q |= Q(numero_ficha=int(clean_val))
+        q |= Q(numero_ficha__icontains=clean_val)
+        q |= Q(ficha__numero_ficha_sistema__icontains=clean_val)
+        q |= Q(profesional__nombres__icontains=clean_val)
+        q |= Q(profesional_anterior__icontains=clean_val)
+        q |= Q(servicio_clinico_destino__nombre__icontains=clean_val)
+        q |= Q(establecimiento__nombre__icontains=clean_val)
+
+        return qs.filter(q).distinct()
+
+    def render_row(self, obj):
+        pac = obj.rut_paciente or (obj.ficha.paciente if obj.ficha else None)
+        nombre_completo = pac.nombre_completo if pac else ''
+        rut_val = obj.rut or (pac.rut if pac else '')
+
+        if obj.estado == 'E':
+            estado_badge = f'<span class="badge badge-primary">{obj.get_estado_display()}</span>'
+        elif obj.estado == 'R':
+            estado_badge = f'<span class="badge badge-success">{obj.get_estado_display()}</span>'
+        elif obj.estado == 'S':
+            estado_badge = f'<span class="badge badge-warning">{obj.get_estado_display()}</span>'
+        else:
+            estado_badge = f'<span class="badge badge-secondary">{obj.get_estado_display()}</span>' if obj.estado else '-'
+
+        fecha_salida = timezone.localtime(obj.fecha_salida).strftime('%d/%m/%Y %H:%M') if obj.fecha_salida else '-'
+        fecha_entrada = timezone.localtime(obj.fecha_entrada).strftime('%d/%m/%Y %H:%M') if obj.fecha_entrada else '-'
+        fecha_traspaso = timezone.localtime(obj.fecha_traspaso).strftime(
+            '%d/%m/%Y %H:%M') if obj.fecha_traspaso else '-'
+
+        profesional_str = str(obj.profesional) if obj.profesional else (obj.profesional_anterior or '-')
+        servicio_destino = obj.servicio_clinico_destino.nombre if obj.servicio_clinico_destino else '-'
+        establecimiento_nombre = obj.establecimiento.nombre if obj.establecimiento else '-'
+
+        return {
+            'ID': obj.id,
+            'RUT': rut_val,
+            'N° Ficha': obj.numero_ficha,
+            'Paciente': nombre_completo,
+            'Establecimiento': establecimiento_nombre,
+            'Servicio Destino': servicio_destino,
+            'Profesional': profesional_str,
+            'Estado': estado_badge,
+            'Fecha Salida': fecha_salida,
+            'Fecha Entrada': fecha_entrada,
+            'Fecha Traspaso': fecha_traspaso,
+        }
+
+    def export_to_excel(self, qs):
+        import openpyxl
+        from openpyxl.styles import Font, PatternFill, Alignment
+        from openpyxl.utils import get_column_letter
+
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Movimientos"
+
+        headers = [
+            'ID',
+            'RUT',
+            'N° Ficha',
+            'Paciente',
+            'Establecimiento',
+            'Servicio Destino',
+            'Profesional',
+            'Estado',
+            'Fecha Salida',
+            'Fecha Entrada',
+            'Fecha Traspaso',
+        ]
+
+        header_font = Font(name='Calibri', size=11, bold=True, color='FFFFFF')
+        header_fill = PatternFill(start_color='1F497D', end_color='1F497D', fill_type='solid')
+        header_alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
+
+        ws.append(headers)
+
+        for cell in ws[1]:
+            cell.font = header_font
+            cell.fill = header_fill
+            cell.alignment = header_alignment
+
+        for obj in qs:
+            pac = obj.rut_paciente or (obj.ficha.paciente if obj.ficha else None)
+            nombre_completo = pac.nombre_completo if pac else ''
+            rut_val = obj.rut or (pac.rut if pac else '')
+            estado_val = obj.get_estado_display() if obj.estado else '-'
+
+            fecha_salida = timezone.localtime(obj.fecha_salida).strftime('%d/%m/%Y %H:%M') if obj.fecha_salida else '-'
+            fecha_entrada = timezone.localtime(obj.fecha_entrada).strftime(
+                '%d/%m/%Y %H:%M') if obj.fecha_entrada else '-'
+            fecha_traspaso = timezone.localtime(obj.fecha_traspaso).strftime(
+                '%d/%m/%Y %H:%M') if obj.fecha_traspaso else '-'
+
+            profesional_str = str(obj.profesional) if obj.profesional else (obj.profesional_anterior or '-')
+            servicio_destino = obj.servicio_clinico_destino.nombre if obj.servicio_clinico_destino else '-'
+            establecimiento_nombre = obj.establecimiento.nombre if obj.establecimiento else '-'
+
+            row = [
+                obj.id,
+                rut_val,
+                obj.numero_ficha or '',
+                nombre_completo,
+                establecimiento_nombre,
+                servicio_destino,
+                profesional_str,
+                estado_val,
+                fecha_salida,
+                fecha_entrada,
+                fecha_traspaso,
+            ]
+            ws.append(row)
+
+        for col in ws.columns:
+            max_length = 0
+            col_letter = get_column_letter(col[0].column)
+            for cell in col:
+                try:
+                    if cell.value:
+                        max_length = max(max_length, len(str(cell.value)))
+                except Exception:
+                    pass
+            ws.column_dimensions[col_letter].width = max(max_length + 3, 12)
+
+        response = HttpResponse(
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = 'attachment; filename="movimientos_monologo_controlado.xlsx"'
+        wb.save(response)
+        return response
+
+    def get(self, request, *args, **kwargs):
+        if request.GET.get('export') == 'excel':
+            search_value = (
+                    request.GET.get('search') or
+                    request.GET.get('search[value]') or
+                    request.GET.get('q') or
+                    ''
+            ).strip()
+            qs = self.get_base_queryset()
+            qs = self.filter_queryset(qs, search_value)
+            return self.export_to_excel(qs.order_by('-id'))
+
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest' and request.GET.get('datatable'):
+            return self.get_datatable_response(request)
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'title': 'Listado de Movimientos Monólogo Controlado',
+            'datatable_enabled': True,
+            'datatable_order': [[0, 'desc']],
+            'datatable_page_length': 100,
+            'columns': self.datatable_columns,
+        })
+        return context
+
+    def get_base_queryset(self):
+        qs = MovimientoMonologoControlado.objects.select_related(
+            'rut_paciente',
+            'establecimiento',
+            'ficha',
+            'ficha__paciente',
+            'servicio_clinico_destino',
+            'profesional',
+            'usuario_entrega_id',
+            'usuario_entrada_id'
+        ).filter(status=True)
+
+        user = getattr(self.request, 'user', None)
+        establecimiento = getattr(user, 'establecimiento', None) if user else None
+        if establecimiento:
+            qs = qs.filter(establecimiento=establecimiento)
+        return qs
