@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Movimientos Monólogo Controlado - Listado{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-header">
+            <div class="row align-items-center w-100">
+                <div class="col">
+                    <h5 class="mb-0">Listado de Movimientos Monólogo Controlado</h5>
+                </div>
+                <div class="col-auto text-end">
+                    <button type="button" id="btn-export-excel" class="btn btn-success btn-sm">
+                        <i class="fas fa-file-excel mr-1"></i> Exportar a Excel
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <table id="Table" class="table table-bordered table-striped table-sm">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Acciones</th>
+                    {% for col in columns %}
+                        {% if col != 'ID' %}
+                            <th>{{ col }}</th>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        $(document).ready(function () {
+            $('#btn-export-excel').on('click', function (e) {
+                e.preventDefault();
+                let searchValue = '';
+                if ($.fn.DataTable.isDataTable('#Table')) {
+                    searchValue = $('#Table').DataTable().search();
+                }
+                const url = new URL(window.location.href);
+                url.searchParams.set('export', 'excel');
+                if (searchValue) {
+                    url.searchParams.set('search', searchValue);
+                } else {
+                    url.searchParams.delete('search');
+                }
+                url.searchParams.delete('datatable');
+                window.location.href = url.toString();
+            });
+        });
+    </script>
+{% endblock %}
